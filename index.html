@@ -8,6 +8,15 @@
   <meta name="theme-color" content="#87CEEB">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
   
+  <!-- Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HM7G4LZM70"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HM7G4LZM70');
+  </script>
+  
   <script src="https://cdn.tailwindcss.com"></script>
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -566,6 +575,7 @@
           // Simular activación (en producción verificarías el pago)
           setTimeout(() => {
             if (confirm('¿Completaste el pago de $3.99 USD?')) {
+              gtag('event', 'subscription_paid');
               activatePremium();
             }
             setProcessingPayment(false);
@@ -627,7 +637,10 @@
           if (currentQuestion < doshaQuestions.length - 1) {
             setCurrentQuestion(currentQuestion + 1);
           } else {
-            setResults(calculateDosha());
+            const doshaResult = calculateDosha();
+            setResults(doshaResult);
+            gtag('event', 'test_completed');
+            gtag('event', 'dosha_result_viewed', { dosha: doshaResult.primaryDosha });
             setStep(3);
           }
         }, 150);
@@ -827,7 +840,7 @@ www.vedabite.com
                 <p className="mt-1">⭐ <strong>Premium ($3.99 USD/mes):</strong> Tu perfil queda guardado. Cancelá cuando quieras.</p>
               </div>
               
-              <button onClick={() => { setAnimateIn(false); setTimeout(() => setStep(2), 200); }} disabled={!isFormComplete}
+              <button onClick={() => { gtag('event', 'test_started'); setAnimateIn(false); setTimeout(() => setStep(2), 200); }} disabled={!isFormComplete}
                 className="mt-4 w-full py-4 rounded-2xl font-semibold shadow-lg disabled:opacity-50" style={{ backgroundColor: '#F4C430', color: '#5D4E37' }}>
                 Comenzar Test (60 preguntas) →
               </button>
@@ -1303,7 +1316,7 @@ www.vedabite.com
             {/* Footer */}
             <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 space-y-2">
               {!isPremium && (
-                <button onClick={() => setShowPaywall(true)} className="w-full py-3 rounded-xl font-semibold bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
+                <button onClick={() => { gtag('event', 'subscription_clicked'); setShowPaywall(true); }} className="w-full py-3 rounded-xl font-semibold bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
                   ⭐ Guardar Mi Perfil - $3.99 USD
                 </button>
               )}
