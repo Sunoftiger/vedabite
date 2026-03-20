@@ -824,7 +824,7 @@ www.vedabite.com
               
               <div className="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800">
                 <p>📋 <strong>Versión Gratuita:</strong> Podés hacer el test y ver tus resultados. Si cerrás la app, tendrás que repetirlo.</p>
-                <p className="mt-1">⭐ <strong>Premium ($3.99 USD):</strong> Tu perfil queda guardado para siempre.</p>
+                <p className="mt-1">⭐ <strong>Premium ($3.99 USD/mes):</strong> Tu perfil queda guardado. Cancelá cuando quieras.</p>
               </div>
               
               <button onClick={() => { setAnimateIn(false); setTimeout(() => setStep(2), 200); }} disabled={!isFormComplete}
@@ -1327,15 +1327,15 @@ www.vedabite.com
                     <p className="text-stone-600 mb-4">Guardá tu perfil para siempre y accedé sin rehacer el test</p>
                     
                     <div className="bg-purple-50 rounded-xl p-4 mb-4">
-                      <div className="text-3xl font-bold text-purple-600">$3.99 USD</div>
-                      <p className="text-purple-500 text-sm">Pago único - Acceso de por vida</p>
+                      <div className="text-3xl font-bold text-purple-600">$3.99 USD/mes</div>
+                      <p className="text-purple-500 text-sm">Suscripción mensual</p>
                     </div>
                     
                     <ul className="text-left text-sm text-stone-600 space-y-2 mb-6">
                       <li>✅ Guardá tu perfil Dosha</li>
                       <li>✅ Accedé sin rehacer el test</li>
                       <li>✅ Actualizaciones automáticas</li>
-                      <li>✅ Soporte prioritario</li>
+                      <li>✅ Cancelá cuando quieras</li>
                     </ul>
                     
                     <button onClick={initPayment} disabled={processingPayment}
