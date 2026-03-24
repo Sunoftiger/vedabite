@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Vedabite - GPS del Bienestar</title>
+  <meta name="description" content="Reprogramá tu ser con pequeños ajustes, guiado por algoritmos y tradición milenaria ayurvédica">
+  <meta name="theme-color" content="#87CEEB">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
+  
+  <!-- Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HM7G4LZM70"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HM7G4LZM70');
+  </script>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
+  
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'DM Sans', system-ui, sans-serif; margin: 0; padding: 0; }
+    @keyframes twinkle { 0%, 100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 0.9; transform: scale(1.2); } }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    
+    // Mercado Pago Config
+    const MP_PUBLIC_KEY = 'APP_USR-cfbe2c27-b52d-4db4-89a1-d67ed5579bc7';
+    const PRECIO_PREMIUM = 10; // USD
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // 60 PREGUNTAS - 20 POR DOSHA
+    // ═══════════════════════════════════════════════════════════════════════════════
+
+    const doshaQuestions = [
+      // VATA - 20 preguntas
+      { id: 1, question: "Mi constitución corporal es delgada, liviana y me cuesta ganar peso", dosha: "vata", categoria: "Constitución" },
+      { id: 2, question: "Mis articulaciones son prominentes y crujen con frecuencia", dosha: "vata", categoria: "Constitución" },
+      { id: 3, question: "Mi piel tiende a ser seca, áspera o agrietada, especialmente en clima frío", dosha: "vata", categoria: "Piel" },
+      { id: 4, question: "Mi cabello es seco, fino, con tendencia a puntas florecidas", dosha: "vata", categoria: "Piel" },
+      { id: 5, question: "Mis manos y pies suelen estar fríos, soy muy sensible al frío", dosha: "vata", categoria: "Temperatura" },
+      { id: 6, question: "Prefiero climas cálidos y me incomoda mucho el viento frío", dosha: "vata", categoria: "Temperatura" },
+      { id: 7, question: "Mi digestión es irregular - a veces buena, a veces con gases o hinchazón", dosha: "vata", categoria: "Digestión" },
+      { id: 8, question: "Tiendo al estreñimiento o mis evacuaciones son irregulares", dosha: "vata", categoria: "Digestión" },
+      { id: 9, question: "Mi apetito es variable - a veces mucha hambre, a veces nada", dosha: "vata", categoria: "Digestión" },
+      { id: 10, question: "Mi sueño es ligero, me despierto fácilmente durante la noche", dosha: "vata", categoria: "Sueño" },
+      { id: 11, question: "Me cuesta conciliar el sueño porque mi mente no para", dosha: "vata", categoria: "Sueño" },
+      { id: 12, question: "Mis pensamientos cambian rápidamente, mi mente es muy activa", dosha: "vata", categoria: "Mente" },
+      { id: 13, question: "Me cuesta concentrarme por mucho tiempo en una sola cosa", dosha: "vata", categoria: "Mente" },
+      { id: 14, question: "Aprendo rápido pero también olvido con facilidad", dosha: "vata", categoria: "Mente" },
+      { id: 15, question: "Tiendo a sentir ansiedad, preocupación o nerviosismo con facilidad", dosha: "vata", categoria: "Emociones" },
+      { id: 16, question: "Cuando estoy estresado me vuelvo miedoso o inseguro", dosha: "vata", categoria: "Emociones" },
+      { id: 17, question: "Mi nivel de energía fluctúa mucho durante el día", dosha: "vata", categoria: "Energía" },
+      { id: 18, question: "Tiendo a agotarme rápido si no descanso lo suficiente", dosha: "vata", categoria: "Energía" },
+      { id: 19, question: "Hablo rápido y a veces cambio de tema abruptamente", dosha: "vata", categoria: "Comportamiento" },
+      { id: 20, question: "Soy muy creativo pero me cuesta mantener rutinas", dosha: "vata", categoria: "Comportamiento" },
+      
+      // PITTA - 20 preguntas
+      { id: 21, question: "Tengo una constitución mediana, atlética y bien proporcionada", dosha: "pitta", categoria: "Constitución" },
+      { id: 22, question: "Tiendo a tener buen tono muscular y puedo desarrollar músculo fácilmente", dosha: "pitta", categoria: "Constitución" },
+      { id: 23, question: "Mi piel es sensible, con tendencia a rojeces, acné o inflamación", dosha: "pitta", categoria: "Piel" },
+      { id: 24, question: "Tengo pecas, lunares o me quemo fácilmente con el sol", dosha: "pitta", categoria: "Piel" },
+      { id: 25, question: "Tiendo a sentir calor, sudo con facilidad incluso sin ejercicio intenso", dosha: "pitta", categoria: "Temperatura" },
+      { id: 26, question: "Prefiero climas frescos y me molesta mucho el calor", dosha: "pitta", categoria: "Temperatura" },
+      { id: 27, question: "Tengo muy buen apetito y me resulta difícil saltarme comidas", dosha: "pitta", categoria: "Digestión" },
+      { id: 28, question: "Tengo buena digestión pero ocasionalmente sufro de acidez o reflujo", dosha: "pitta", categoria: "Digestión" },
+      { id: 29, question: "Si no como a tiempo me pongo irritable o con dolor de cabeza", dosha: "pitta", categoria: "Digestión" },
+      { id: 30, question: "Duermo profundamente pero me bastan 6-7 horas para sentirme bien", dosha: "pitta", categoria: "Sueño" },
+      { id: 31, question: "A veces me despierto en la madrugada (2-4am) y me cuesta volver a dormir", dosha: "pitta", categoria: "Sueño" },
+      { id: 32, question: "Tengo buena memoria, soy analítico/a y me gusta resolver problemas", dosha: "pitta", categoria: "Mente" },
+      { id: 33, question: "Soy organizado/a, me gustan los planes y las listas", dosha: "pitta", categoria: "Mente" },
+      { id: 34, question: "Tiendo a ser perfeccionista y crítico (conmigo y con otros)", dosha: "pitta", categoria: "Mente" },
+      { id: 35, question: "Puedo ser impaciente, irritable o enojarme bajo presión", dosha: "pitta", categoria: "Emociones" },
+      { id: 36, question: "Cuando estoy estresado me vuelvo controlador o agresivo", dosha: "pitta", categoria: "Emociones" },
+      { id: 37, question: "Tengo mucha energía y empuje durante el día", dosha: "pitta", categoria: "Energía" },
+      { id: 38, question: "Me gusta hacer ejercicio intenso y competir", dosha: "pitta", categoria: "Energía" },
+      { id: 39, question: "Soy competitivo/a, orientado/a a metas y me gusta liderar", dosha: "pitta", categoria: "Comportamiento" },
+      { id: 40, question: "Hablo de forma directa, clara y a veces cortante", dosha: "pitta", categoria: "Comportamiento" },
+      
+      // KAPHA - 20 preguntas
+      { id: 41, question: "Tengo contextura sólida, robusta o grande y tiendo a ganar peso fácilmente", dosha: "kapha", categoria: "Constitución" },
+      { id: 42, question: "Mis articulaciones son grandes, bien lubricadas, no crujen", dosha: "kapha", categoria: "Constitución" },
+      { id: 43, question: "Mi piel es suave, gruesa, hidratada y de apariencia luminosa", dosha: "kapha", categoria: "Piel" },
+      { id: 44, question: "Mi cabello es grueso, abundante, brillante y ondulado", dosha: "kapha", categoria: "Piel" },
+      { id: 45, question: "No me afecta mucho el frío, tengo buena tolerancia a temperaturas bajas", dosha: "kapha", categoria: "Temperatura" },
+      { id: 46, question: "Prefiero climas secos y cálidos, la humedad me hace sentir pesado", dosha: "kapha", categoria: "Temperatura" },
+      { id: 47, question: "Mi digestión es lenta pero estable, puedo saltarme comidas sin problema", dosha: "kapha", categoria: "Digestión" },
+      { id: 48, question: "Siento pesadez después de comer, especialmente comidas grandes", dosha: "kapha", categoria: "Digestión" },
+      { id: 49, question: "Mi metabolismo es lento y engordo con facilidad", dosha: "kapha", categoria: "Digestión" },
+      { id: 50, question: "Tengo sueño profundo y prolongado, puedo dormir 8+ horas fácilmente", dosha: "kapha", categoria: "Sueño" },
+      { id: 51, question: "Me cuesta mucho levantarme temprano, soy más activo en la tarde", dosha: "kapha", categoria: "Sueño" },
+      { id: 52, question: "Aprendo de manera gradual pero tengo excelente memoria a largo plazo", dosha: "kapha", categoria: "Mente" },
+      { id: 53, question: "Soy reflexivo/a y me tomo mi tiempo para tomar decisiones", dosha: "kapha", categoria: "Mente" },
+      { id: 54, question: "Tiendo a la nostalgia y me cuesta soltar el pasado", dosha: "kapha", categoria: "Mente" },
+      { id: 55, question: "Soy calmado/a, paciente y no me altero fácilmente", dosha: "kapha", categoria: "Emociones" },
+      { id: 56, question: "Cuando estoy estresado me vuelvo apático, triste o me aíslo", dosha: "kapha", categoria: "Emociones" },
+      { id: 57, question: "Mi energía es estable pero baja, prefiero actividades tranquilas", dosha: "kapha", categoria: "Energía" },
+      { id: 58, question: "Tiendo a la pereza o procrastinación, me cuesta empezar cosas", dosha: "kapha", categoria: "Energía" },
+      { id: 59, question: "Prefiero la rutina, los cambios me cuestan y valoro la estabilidad", dosha: "kapha", categoria: "Comportamiento" },
+      { id: 60, question: "Hablo despacio, con voz suave y melodiosa", dosha: "kapha", categoria: "Comportamiento" },
+    ];
+
+    const doshaInfo = {
+      vata: {
+        name: "Vata", sanskrit: "वात", element: "Aire + Éter", emoji: "🌬️",
+        color: "from-violet-500 to-indigo-600",
+        qualities: "Ligero, Seco, Frío, Móvil, Sutil",
+        enEquilibrio: ["Creatividad fluida y pensamiento innovador", "Entusiasmo y vitalidad", "Flexibilidad mental y adaptabilidad", "Comunicación expresiva", "Movimiento ágil y coordinado"],
+        signosDesequilibrio: ["Ansiedad y preocupación constante", "Insomnio o sueño fragmentado", "Piel seca, cabello quebradizo", "Estreñimiento y gases", "Dolor articular, crujidos", "Mente dispersa, dificultad para concentrarse", "Pérdida de peso involuntaria", "Sensación de frío constante"],
+        proyeccionSalud: {
+          años5: { titulo: "5 años (sin cambios)", sintomas: ["Ansiedad crónica", "Insomnio severo", "Artritis temprana", "Colon irritable"], riesgo: "medio" },
+          años10: { titulo: "10 años (sin cambios)", sintomas: ["Osteoporosis", "Fibromialgia", "Trastornos de ansiedad generalizada", "Síndrome de fatiga crónica"], riesgo: "alto" },
+          años20: { titulo: "20 años (sin cambios)", sintomas: ["Enfermedades neurodegenerativas", "Artritis reumatoide", "Trastornos autoinmunes", "Deterioro cognitivo"], riesgo: "muy alto" }
+        },
+        proyeccionPositiva: { meses3: "Mejor calidad de sueño, reducción de ansiedad", meses6: "Digestión regulada, piel hidratada, mente clara", año1: "Sistema nervioso fortalecido, articulaciones flexibles", años5: "Envejecimiento saludable, vitalidad sostenida, inmunidad fuerte" },
+        alimentosSI: {
+          cereales: ["Arroz basmati", "Avena cocida", "Trigo", "Quinoa"],
+          verduras: ["Zapallo", "Batata", "Zanahoria cocida", "Remolacha", "Espárragos"],
+          frutas: ["Banana madura", "Mango", "Papaya", "Durazno", "Uvas", "Palta"],
+          proteinas: ["Pollo", "Pescado", "Huevos", "Tofu", "Lentejas rojas"],
+          lacteos: ["Ghee", "Leche tibia", "Quesos suaves", "Yogur (moderado)"],
+          especias: ["Jengibre", "Canela", "Cardamomo", "Comino", "Hinojo", "Cúrcuma"],
+          bebidas: ["Agua tibia", "Té de jengibre", "Leche dorada", "Caldos"],
+          grasas: ["Ghee", "Aceite de sésamo", "Aceite de oliva"]
+        },
+        alimentosNO: {
+          cereales: ["Maíz", "Cebada", "Centeno", "Mijo", "Trigo sarraceno"],
+          verduras: ["Verduras crudas", "Brócoli crudo", "Repollo", "Coliflor", "Hojas verdes crudas"],
+          frutas: ["Frutas secas", "Manzana cruda", "Sandía", "Melón", "Frutas verdes"],
+          proteinas: ["Carnes rojas", "Cerdo", "Legumbres pesadas (garbanzos)"],
+          lacteos: ["Helado", "Quesos duros", "Leche fría"],
+          otros: ["Cafeína excesiva", "Alcohol", "Alimentos fríos", "Comida rápida", "Azúcar refinada"],
+          bebidas: ["Bebidas frías", "Bebidas gaseosas", "Café en exceso"]
+        },
+        horarios: {
+          despertar: { hora: "6:00 - 6:30", nota: "Antes del amanecer, hora Vata" },
+          meditacion: { hora: "6:30 - 7:00", nota: "Pranayama calmante, Nadi Shodhana" },
+          desayuno: { hora: "7:30 - 8:00", nota: "Caliente y nutritivo, avena con ghee" },
+          trabajoCreativo: { hora: "10:00 - 12:00", nota: "Hora Kapha, mejor concentración" },
+          almuerzo: { hora: "12:00 - 13:00", nota: "Comida principal, caliente y sustanciosa" },
+          trabajoRutinario: { hora: "14:00 - 17:00", nota: "Tareas estructuradas, evitar multitasking" },
+          ejercicio: { hora: "17:00 - 18:00", nota: "Yoga suave, caminata, nada intenso" },
+          cena: { hora: "18:30 - 19:00", nota: "Ligera y temprana, sopas, guisos" },
+          relajacion: { hora: "19:30 - 21:00", nota: "Masaje con aceite, lectura, música suave" },
+          dormir: { hora: "21:30 - 22:00", nota: "Imprescindible, rutina consistente" }
+        },
+        ejercicio: { recomendados: ["Yoga restaurativo", "Tai Chi", "Caminatas suaves", "Natación en agua tibia", "Pilates suave"], evitar: ["CrossFit", "Running intenso", "HIIT", "Ejercicio en frío", "Deportes de alto impacto"], frecuencia: "30-45 min, 4-5 veces/semana", intensidad: "Baja a moderada, nunca hasta el agotamiento", mejorHora: "Tarde temprana (16:00-18:00)" },
+        hierbas: [
+          { nombre: "Ashwagandha", beneficio: "Reduce ansiedad, fortalece sistema nervioso", dosis: "500mg/día" },
+          { nombre: "Brahmi", beneficio: "Calma la mente, mejora memoria", dosis: "300mg/día" },
+          { nombre: "Triphala", beneficio: "Regula digestión, limpieza suave", dosis: "1 cucharadita antes de dormir" },
+          { nombre: "Shatavari", beneficio: "Nutre tejidos, equilibra hormonas", dosis: "500mg/día" }
+        ],
+        enfermedadesRiesgo: [
+          { nombre: "Trastornos de ansiedad", probabilidad: "Alta" },
+          { nombre: "Insomnio crónico", probabilidad: "Alta" },
+          { nombre: "Síndrome de colon irritable", probabilidad: "Alta" },
+          { nombre: "Artritis / Osteoporosis", probabilidad: "Media-Alta" },
+          { nombre: "Fibromialgia", probabilidad: "Media" },
+          { nombre: "Enfermedades neurodegenerativas", probabilidad: "Media (largo plazo)" }
+        ]
+      },
+      pitta: {
+        name: "Pitta", sanskrit: "पित्त", element: "Fuego + Agua", emoji: "🔥",
+        color: "from-orange-500 to-red-500",
+        qualities: "Caliente, Agudo, Líquido, Ácido, Penetrante",
+        enEquilibrio: ["Inteligencia aguda y capacidad analítica", "Liderazgo natural y determinación", "Metabolismo eficiente y buena digestión", "Piel radiante y ojos brillantes", "Coraje y capacidad de decisión"],
+        signosDesequilibrio: ["Irritabilidad, ira, frustración fácil", "Acidez, reflujo, úlceras", "Inflamación en cualquier parte del cuerpo", "Piel con acné, rosácea, erupciones", "Sudoración excesiva, sensación de calor", "Perfeccionismo extremo, crítica constante", "Diarrea o heces sueltas", "Ojos rojos, sensibles a la luz"],
+        proyeccionSalud: {
+          años5: { titulo: "5 años (sin cambios)", sintomas: ["Gastritis crónica", "Hipertensión temprana", "Problemas de piel crónicos", "Burnout laboral"], riesgo: "medio" },
+          años10: { titulo: "10 años (sin cambios)", sintomas: ["Úlceras gástricas", "Enfermedades cardíacas", "Diabetes tipo 2", "Enfermedades inflamatorias"], riesgo: "alto" },
+          años20: { titulo: "20 años (sin cambios)", sintomas: ["Enfermedades autoinmunes inflamatorias", "Problemas hepáticos", "Cáncer (mayor riesgo)", "Enfermedades cardiovasculares severas"], riesgo: "muy alto" }
+        },
+        proyeccionPositiva: { meses3: "Digestión equilibrada, reducción de acidez, mejor temperamento", meses6: "Piel clara, inflamación reducida, mejor sueño", año1: "Presión arterial normal, energía sostenida sin picos", años5: "Longevidad cardíaca, metabolismo óptimo, bienestar emocional" },
+        alimentosSI: {
+          cereales: ["Arroz basmati", "Trigo", "Avena", "Cebada", "Quinoa"],
+          verduras: ["Pepino", "Zapallito", "Espárragos", "Brócoli", "Hojas verdes", "Apio"],
+          frutas: ["Sandía", "Melón", "Uvas dulces", "Pera", "Manzana dulce", "Coco", "Granada"],
+          proteinas: ["Pollo", "Pescado blanco", "Tofu", "Lentejas", "Porotos mung"],
+          lacteos: ["Ghee", "Leche fría", "Manteca sin sal", "Queso cottage"],
+          especias: ["Cilantro", "Hinojo", "Menta", "Cúrcuma (moderada)", "Cardamomo"],
+          bebidas: ["Agua de coco", "Jugo de aloe", "Té de menta", "Agua a temperatura ambiente"],
+          grasas: ["Ghee", "Aceite de coco", "Aceite de girasol"]
+        },
+        alimentosNO: {
+          cereales: ["Maíz", "Mijo", "Centeno", "Arroz integral en exceso"],
+          verduras: ["Tomate", "Ají", "Cebolla cruda", "Ajo crudo", "Remolacha", "Espinaca en exceso"],
+          frutas: ["Cítricos ácidos", "Frutas verdes", "Papaya", "Ananá"],
+          proteinas: ["Carnes rojas", "Mariscos", "Huevos en exceso", "Cerdo"],
+          lacteos: ["Quesos fermentados", "Yogur ácido", "Crema ácida"],
+          otros: ["Picantes", "Fermentados", "Vinagre", "Alcohol", "Cafeína", "Frituras", "Sal en exceso"],
+          bebidas: ["Alcohol", "Café", "Bebidas energéticas", "Gaseosas"]
+        },
+        horarios: {
+          despertar: { hora: "5:30 - 6:00", nota: "Temprano, evitar dormir hasta tarde" },
+          meditacion: { hora: "6:00 - 6:30", nota: "Meditación de compasión, Shitali pranayama" },
+          desayuno: { hora: "7:00 - 7:30", nota: "Fresco y dulce, frutas, avena" },
+          trabajoCreativo: { hora: "8:00 - 12:00", nota: "Máxima productividad, mañanas frescas" },
+          almuerzo: { hora: "12:00 - 12:30", nota: "Comida principal, no saltear NUNCA" },
+          descanso: { hora: "13:00 - 14:00", nota: "Caminata suave, NO siesta" },
+          trabajoRutinario: { hora: "14:00 - 17:00", nota: "Evitar reuniones conflictivas" },
+          ejercicio: { hora: "6:00 - 7:00 o 18:00 - 19:00", nota: "Nunca al mediodía, evitar calor" },
+          cena: { hora: "18:30 - 19:00", nota: "Ligera, evitar picantes y ácidos" },
+          relajacion: { hora: "20:00 - 21:30", nota: "Paseo bajo la luna, cerca del agua" },
+          dormir: { hora: "22:00 - 22:30", nota: "Habitación fresca, no trabajar en cama" }
+        },
+        ejercicio: { recomendados: ["Natación", "Yoga sin competir", "Ciclismo suave", "Caminatas al amanecer/atardecer", "Deportes acuáticos"], evitar: ["Ejercicio al mediodía", "Hot yoga", "Deportes muy competitivos", "Correr bajo el sol"], frecuencia: "45-60 min, 5-6 veces/semana", intensidad: "Moderada, evitar sobrecalentamiento", mejorHora: "Temprano mañana (6-8am) o tarde (después de 18:00)" },
+        hierbas: [
+          { nombre: "Amalaki (Amla)", beneficio: "Enfría, antioxidante, protege hígado", dosis: "500mg-1g/día" },
+          { nombre: "Brahmi", beneficio: "Enfría la mente, reduce irritabilidad", dosis: "300mg/día" },
+          { nombre: "Shatavari", beneficio: "Enfría y nutre, equilibra hormonas", dosis: "500mg/día" },
+          { nombre: "Neem", beneficio: "Purifica sangre, limpia piel", dosis: "300mg/día" }
+        ],
+        enfermedadesRiesgo: [
+          { nombre: "Gastritis / Úlceras", probabilidad: "Alta" },
+          { nombre: "Hipertensión", probabilidad: "Alta" },
+          { nombre: "Enfermedades inflamatorias", probabilidad: "Alta" },
+          { nombre: "Problemas de piel (acné, rosácea)", probabilidad: "Alta" },
+          { nombre: "Diabetes tipo 2", probabilidad: "Media-Alta" },
+          { nombre: "Enfermedades cardíacas", probabilidad: "Media-Alta" },
+          { nombre: "Enfermedades hepáticas", probabilidad: "Media" }
+        ]
+      },
+      kapha: {
+        name: "Kapha", sanskrit: "कफ", element: "Tierra + Agua", emoji: "🌍",
+        color: "from-emerald-500 to-teal-600",
+        qualities: "Pesado, Lento, Frío, Oleoso, Suave, Estable",
+        enEquilibrio: ["Estabilidad emocional y física", "Fuerza y resistencia excepcionales", "Piel suave y luminosa", "Memoria a largo plazo excelente", "Compasión y paciencia natural", "Sistema inmune fuerte"],
+        signosDesequilibrio: ["Aumento de peso, retención de líquidos", "Letargo, pereza, falta de motivación", "Congestión, mucosidad excesiva", "Apego excesivo, resistencia al cambio", "Digestión lenta, pesadez después de comer", "Sueño excesivo, dificultad para despertar", "Depresión, melancolía", "Piel grasa, quistes"],
+        proyeccionSalud: {
+          años5: { titulo: "5 años (sin cambios)", sintomas: ["Obesidad", "Prediabetes", "Sinusitis crónica", "Depresión leve"], riesgo: "medio" },
+          años10: { titulo: "10 años (sin cambios)", sintomas: ["Diabetes tipo 2", "Apnea del sueño", "Colesterol alto", "Hipotiroidismo"], riesgo: "alto" },
+          años20: { titulo: "20 años (sin cambios)", sintomas: ["Enfermedades cardíacas", "Tumores benignos/quistes", "Artritis degenerativa", "Insuficiencia renal"], riesgo: "muy alto" }
+        },
+        proyeccionPositiva: { meses3: "Pérdida de peso inicial, más energía, mejor respiración", meses6: "Metabolismo activo, claridad mental, menos congestión", año1: "Peso óptimo, energía sostenida, sistema inmune fortalecido", años5: "Longevidad cardiovascular, movilidad preservada, bienestar emocional" },
+        alimentosSI: {
+          cereales: ["Cebada", "Mijo", "Trigo sarraceno", "Centeno", "Maíz"],
+          verduras: ["Verduras de hoja verde", "Brócoli", "Coliflor", "Espárragos", "Chauchas", "Pimientos"],
+          frutas: ["Manzana", "Pera", "Granada", "Arándanos", "Frutas secas (moderado)"],
+          proteinas: ["Pollo sin piel", "Pescado", "Legumbres", "Huevos (clara)", "Tofu"],
+          lacteos: ["Leche descremada tibia con especias", "Ghee (muy poco)"],
+          especias: ["Jengibre", "Pimienta negra", "Cúrcuma", "Canela", "Clavo", "Mostaza", "Ajo"],
+          bebidas: ["Agua caliente con limón", "Té de jengibre", "Té verde", "Infusiones especiadas"],
+          grasas: ["Aceite de mostaza", "Aceite de linaza (poco)"]
+        },
+        alimentosNO: {
+          cereales: ["Trigo en exceso", "Arroz blanco", "Avena pesada"],
+          verduras: ["Batata", "Zapallo", "Tomate", "Pepino", "Calabaza"],
+          frutas: ["Banana", "Coco", "Melón", "Sandía", "Uvas", "Frutas muy dulces"],
+          proteinas: ["Carnes rojas", "Cerdo", "Mariscos", "Tofu frito"],
+          lacteos: ["Leche entera", "Quesos", "Helado", "Manteca", "Yogur", "Crema"],
+          otros: ["Azúcar", "Sal en exceso", "Frituras", "Alimentos procesados", "Dulces", "Pan blanco"],
+          bebidas: ["Bebidas frías", "Jugos dulces", "Alcohol", "Batidos espesos"]
+        },
+        horarios: {
+          despertar: { hora: "5:00 - 5:30", nota: "ANTES del amanecer, esencial" },
+          ejercicio: { hora: "5:30 - 6:30", nota: "Ejercicio vigoroso en ayunas" },
+          desayuno: { hora: "7:30 - 8:00", nota: "Ligero o ayuno hasta almuerzo" },
+          trabajoActivo: { hora: "8:00 - 12:00", nota: "Máxima productividad, no sedentario" },
+          almuerzo: { hora: "12:00 - 12:30", nota: "Comida principal pero moderada" },
+          caminata: { hora: "13:00 - 13:30", nota: "Caminata activa, NO siesta" },
+          trabajoVariado: { hora: "14:00 - 17:00", nota: "Alternar sentado/parado, reuniones activas" },
+          ejercicioTarde: { hora: "17:30 - 18:30", nota: "Segunda sesión de movimiento" },
+          cena: { hora: "18:30 - 19:00", nota: "Muy ligera, sopa o ensalada, puede omitirse" },
+          actividad: { hora: "19:30 - 21:00", nota: "Actividades estimulantes, socializar" },
+          dormir: { hora: "22:00 - 22:30", nota: "No más de 7 horas, nunca siesta" }
+        },
+        ejercicio: { recomendados: ["Running", "HIIT", "Spinning", "Aeróbicos", "Deportes competitivos", "Boxeo", "CrossFit"], evitar: ["Yoga muy suave", "Ejercicio en agua fría", "Actividades sedentarias", "Caminatas lentas"], frecuencia: "60-90 min, 6-7 días/semana", intensidad: "Alta, hasta sudar abundantemente", mejorHora: "Temprano mañana (5-7am), antes de comer" },
+        hierbas: [
+          { nombre: "Trikatu", beneficio: "Acelera metabolismo, quema grasa", dosis: "500mg antes de comidas" },
+          { nombre: "Guggulu", beneficio: "Reduce colesterol, quema grasa", dosis: "500mg 2x/día" },
+          { nombre: "Punarnava", beneficio: "Reduce retención de líquidos", dosis: "500mg/día" },
+          { nombre: "Chitrak", beneficio: "Enciende fuego digestivo", dosis: "250mg antes de comidas" }
+        ],
+        enfermedadesRiesgo: [
+          { nombre: "Obesidad", probabilidad: "Muy Alta" },
+          { nombre: "Diabetes tipo 2", probabilidad: "Alta" },
+          { nombre: "Colesterol alto", probabilidad: "Alta" },
+          { nombre: "Apnea del sueño", probabilidad: "Alta" },
+          { nombre: "Depresión", probabilidad: "Media-Alta" },
+          { nombre: "Hipotiroidismo", probabilidad: "Media-Alta" },
+          { nombre: "Enfermedades cardíacas", probabilidad: "Media" }
+        ]
+      }
+    };
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MUDRAS POR DOLENCIA DE DESEQUILIBRIO
+    // ═══════════════════════════════════════════════════════════════════════════════
+
+    const mudrasPorDolencia = {
+      // VATA - dolencias de desequilibrio
+      "Ansiedad y preocupación constante": { nombre: "Vayu-Mudra", mano: "👌🖐️", beneficio: "Reduce exceso de aire y calma el sistema nervioso", instrucciones: "Doblá el índice hasta la base del pulgar y presionalo. Los otros dedos extendidos.", duracion: "15-45 min cuando sientas ansiedad" },
+      "Insomnio o sueño fragmentado": { nombre: "Shakti-Mudra", mano: "🤲💤", beneficio: "Favorece el sueño profundo y relaja", instrucciones: "Anulares y meñiques se tocan punta con punta. Los otros dedos sobre pulgares ocultos.", duracion: "15 min antes de dormir" },
+      "Piel seca, cabello quebradizo": { nombre: "Varuna-Mudra", mano: "💧✋", beneficio: "Equilibra el elemento agua, hidrata desde adentro", instrucciones: "Meñique derecho a base del pulgar. Mano izquierda envuelve desde abajo.", duracion: "3 veces al día, 15 min" },
+      "Estreñimiento y gases": { nombre: "Apan-Mudra", mano: "🤟", beneficio: "Estimula eliminación y regula intestinos", instrucciones: "Uní puntas de pulgar, medio y anular. Índice y meñique extendidos.", duracion: "15-45 min, especialmente mañanas" },
+      "Dolor articular, crujidos": { nombre: "Prithivi-Mudra", mano: "🌍✋", beneficio: "Fortalece tejidos, estabiliza articulaciones", instrucciones: "Uní puntas del pulgar y anular. Demás dedos extendidos.", duracion: "3 veces al día, 15 min" },
+      "Mente dispersa, dificultad para concentrarse": { nombre: "Hakini-Mudra", mano: "🤝🧠", beneficio: "Sincroniza hemisferios, mejora concentración", instrucciones: "Uní puntas de todos los dedos de ambas manos entre sí. Palmas no se tocan.", duracion: "Cuando necesites concentrarte" },
+      "Pérdida de peso involuntaria": { nombre: "Pran-Mudra", mano: "🤟⚡", beneficio: "Activa energía vital, fortalece cuerpo", instrucciones: "Uní puntas de pulgar, anular y meñique. Índice y medio extendidos.", duracion: "15-30 min diarios" },
+      "Sensación de frío constante": { nombre: "Linga-Mudra", mano: "🤞👍", beneficio: "Genera calor interno", instrucciones: "Dedos entrelazados. Un pulgar erguido rodeado por el otro e índice.", duracion: "Hasta generar calor, máx 15 min" },
+
+      // PITTA - dolencias de desequilibrio
+      "Irritabilidad, ira, frustración fácil": { nombre: "Shankh-Mudra", mano: "🐚✋", beneficio: "Enfría, calma el fuego interno", instrucciones: "Pulgar izquierdo envuelto por dedos derechos. Pulgar derecho toca medio izquierdo.", duracion: "3 veces al día, 15 min" },
+      "Acidez, reflujo, úlceras": { nombre: "Apan-Mudra", mano: "🤟", beneficio: "Desintoxica, equilibra digestión", instrucciones: "Uní puntas de pulgar, medio y anular. Índice y meñique extendidos.", duracion: "Después de comidas, 10 min" },
+      "Inflamación en cualquier parte del cuerpo": { nombre: "Pran-Mudra", mano: "🤟⚡", beneficio: "Fortalece inmunidad, reduce inflamación", instrucciones: "Uní puntas de pulgar, anular y meñique. Índice y medio extendidos.", duracion: "3 veces al día, 15 min" },
+      "Piel con acné, rosácea, erupciones": { nombre: "Varuna-Mudra", mano: "💧✋", beneficio: "Equilibra elemento agua, purifica piel", instrucciones: "Meñique derecho a base del pulgar. Mano izquierda envuelve desde abajo.", duracion: "3 veces al día, 15 min" },
+      "Sudoración excesiva, sensación de calor": { nombre: "Shankh-Mudra", mano: "🐚✋", beneficio: "Efecto refrescante, reduce calor", instrucciones: "Pulgar izquierdo envuelto por dedos derechos. Pulgar derecho toca medio izquierdo.", duracion: "Cuando sientas calor excesivo" },
+      "Perfeccionismo extremo, crítica constante": { nombre: "Kalesvara-Mudra", mano: "🤲🧘", beneficio: "Calma mente, suelta control", instrucciones: "Puntas de medios unidas. Índices unidos. Pulgares al pecho.", duracion: "10-20 min diarios" },
+      "Diarrea o heces sueltas": { nombre: "Pushan-Mudra", mano: "🤲", beneficio: "Regula digestión y absorción", instrucciones: "Mano derecha: pulgar+índice+medio. Mano izquierda: pulgar+medio+anular.", duracion: "Antes de cada comida, 5 min" },
+      "Ojos rojos, sensibles a la luz": { nombre: "Pran-Mudra", mano: "🤟⚡", beneficio: "Mejora vista, reduce irritación ocular", instrucciones: "Uní puntas de pulgar, anular y meñique. Índice y medio extendidos.", duracion: "10 min, 3 veces al día" },
+
+      // KAPHA - dolencias de desequilibrio  
+      "Aumento de peso, retención de líquidos": { nombre: "Linga-Mudra", mano: "🤞👍", beneficio: "Genera calor, acelera metabolismo", instrucciones: "Dedos entrelazados. Un pulgar erguido rodeado por el otro e índice.", duracion: "3 veces al día, 15 min máx" },
+      "Letargo, pereza, falta de motivación": { nombre: "Ushas-Mudra", mano: "🤞🌅", beneficio: "Activa energía, despierta vitalidad", instrucciones: "Dedos entrelazados. Pulgar derecho sobre izquierdo.", duracion: "5-15 min al despertar" },
+      "Congestión, mucosidad excesiva": { nombre: "Mudra Bronquial", mano: "✊👆", beneficio: "Despeja vías respiratorias", instrucciones: "Meñique en base del pulgar, anular en articulación, medio en yema. Índice extendido.", duracion: "5 min, 5 veces al día" },
+      "Apego excesivo, resistencia al cambio": { nombre: "Ksepana-Mudra", mano: "👇🤞", beneficio: "Libera apegos, elimina energía estancada", instrucciones: "Dedos entrelazados, índices unidos hacia abajo. Pulgares cruzados.", duracion: "Solo 7-15 respiraciones" },
+      "Digestión lenta, pesadez después de comer": { nombre: "Pushan-Mudra", mano: "🤲", beneficio: "Activa fuego digestivo", instrucciones: "Mano derecha: pulgar+índice+medio. Mano izquierda: pulgar+medio+anular.", duracion: "Antes de comidas, 5 min" },
+      "Sueño excesivo, dificultad para despertar": { nombre: "Ushas-Mudra", mano: "🤞🌅", beneficio: "Energiza, activa el despertar", instrucciones: "Dedos entrelazados. Estirar brazos sobre cabeza al despertar.", duracion: "5-15 min en la cama al despertar" },
+      "Depresión, melancolía": { nombre: "Makara-Mudra", mano: "🐊🤲", beneficio: "Activa reservas de energía, eleva ánimo", instrucciones: "Una mano dentro de otra. Pulgar de abajo entre anular y meñique de arriba.", duracion: "3 veces al día, 10 min" },
+      "Piel grasa, quistes": { nombre: "Surya-Mudra", mano: "☀️✋", beneficio: "Activa elemento fuego, reduce grasa y quistes", instrucciones: "Doblá el anular hacia la palma y presionalo con el pulgar.", duracion: "2 veces al día, 15 min" }
+    };
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // RECETAS POR DOSHA
+    // ═══════════════════════════════════════════════════════════════════════════════
+
+    const recetasPorDosha = {
+      vata: [
+        { nombre: "Kitchari Reconfortante", tipo: "Principal", tiempo: "40 min", ingredientes: ["1 taza arroz basmati", "½ taza porotos mung", "1 cda ghee", "1 cdita comino", "1 cdita cúrcuma", "½ cdita jengibre", "Sal marina", "4 tazas agua"], instrucciones: "Lavá el arroz y los porotos. Calentá ghee, agregá especias 30 seg. Añadí arroz, porotos y agua. Cociná 35 min a fuego bajo.", beneficio: "Nutre tejidos, calma sistema nervioso, fácil digestión" },
+        { nombre: "Sopa de Calabaza y Jengibre", tipo: "Entrada", tiempo: "30 min", ingredientes: ["500g calabaza", "1 cda ghee", "1 cdita jengibre rallado", "½ cdita canela", "1 taza leche de coco", "Sal y pimienta"], instrucciones: "Saltear calabaza en ghee con jengibre. Agregar agua y cocinar hasta tierna. Licuar con leche de coco y especias.", beneficio: "Calienta, nutre, reduce ansiedad" },
+        { nombre: "Avena Cremosa con Dátiles", tipo: "Desayuno", tiempo: "15 min", ingredientes: ["1 taza avena", "2 tazas leche", "3 dátiles picados", "1 cda ghee", "½ cdita canela", "Nueces picadas"], instrucciones: "Cocinar avena en leche a fuego lento. Agregar dátiles, ghee y canela. Servir con nueces.", beneficio: "Enraíza, nutre, da energía estable" },
+        { nombre: "Arroz con Verduras Salteadas", tipo: "Principal", tiempo: "35 min", ingredientes: ["1 taza arroz basmati", "1 zanahoria", "1 zapallito", "1 cda ghee", "1 cdita comino", "Cilantro fresco"], instrucciones: "Cocinar arroz. Saltear verduras en ghee con comino. Mezclar y decorar con cilantro.", beneficio: "Equilibra Vata, fácil digestión" }
+      ],
+      pitta: [
+        { nombre: "Ensalada de Pepino y Menta", tipo: "Entrada", tiempo: "10 min", ingredientes: ["2 pepinos", "½ taza yogur natural", "Hojas de menta", "1 cdita comino", "Sal rosa", "Cilantro"], instrucciones: "Cortar pepinos en rodajas finas. Mezclar con yogur, menta y especias. Enfriar antes de servir.", beneficio: "Refresca, calma acidez, hidrata" },
+        { nombre: "Arroz con Coco y Cilantro", tipo: "Principal", tiempo: "25 min", ingredientes: ["1 taza arroz basmati", "1 taza leche de coco", "1 taza agua", "Cilantro fresco", "Cardamomo", "Sal"], instrucciones: "Cocinar arroz en mezcla de leche de coco y agua con cardamomo. Decorar con cilantro.", beneficio: "Enfría, nutre sin irritar" },
+        { nombre: "Smoothie de Coco y Mango", tipo: "Desayuno", tiempo: "5 min", ingredientes: ["1 mango maduro", "1 taza leche de coco", "½ taza agua de coco", "Hojas de menta", "Hielo"], instrucciones: "Licuar todos los ingredientes hasta obtener consistencia cremosa.", beneficio: "Refresca, dulce natural, calma Pitta" },
+        { nombre: "Porotos Mung con Espinaca", tipo: "Principal", tiempo: "45 min", ingredientes: ["1 taza porotos mung", "2 tazas espinaca", "1 cda ghee", "1 cdita cilantro molido", "½ cdita cúrcuma", "Limón"], instrucciones: "Cocinar porotos hasta tiernos. Saltear espinaca en ghee con especias. Mezclar y agregar limón.", beneficio: "Desintoxica, enfría, nutre" }
+      ],
+      kapha: [
+        { nombre: "Sopa Picante de Lentejas", tipo: "Principal", tiempo: "35 min", ingredientes: ["1 taza lentejas rojas", "1 cda aceite mostaza", "1 cdita jengibre", "½ cdita pimienta cayena", "1 cdita cúrcuma", "Espinaca", "Limón"], instrucciones: "Cocinar lentejas. Hacer tadka con aceite y especias. Agregar espinaca. Servir con limón.", beneficio: "Activa metabolismo, reduce mucosidad" },
+        { nombre: "Salteado de Verduras con Jengibre", tipo: "Principal", tiempo: "20 min", ingredientes: ["Brócoli", "Coliflor", "Zanahoria", "2 cdas jengibre rallado", "1 cda aceite sésamo", "Salsa de soja", "Semillas sésamo"], instrucciones: "Saltear verduras a fuego alto con jengibre. Agregar salsa de soja. Decorar con sésamo.", beneficio: "Liviano, activa digestión, calienta" },
+        { nombre: "Té de Especias Kapha", tipo: "Bebida", tiempo: "10 min", ingredientes: ["1 cdita jengibre", "½ cdita canela", "¼ cdita pimienta negra", "3 clavos", "Miel (opcional)", "2 tazas agua"], instrucciones: "Hervir especias en agua 5 min. Colar. Agregar miel si se desea (cuando esté tibio).", beneficio: "Activa metabolismo, despeja congestión" },
+        { nombre: "Ensalada Tibia de Quinoa", tipo: "Principal", tiempo: "25 min", ingredientes: ["1 taza quinoa", "Rúcula", "Tomates cherry", "1 cda mostaza", "Limón", "Pimienta negra", "Aceite oliva"], instrucciones: "Cocinar quinoa. Mezclar tibia con rúcula, tomates y aderezo de mostaza y limón.", beneficio: "Proteína liviana, no genera mucosidad" }
+      ]
+    };
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // TERAPIAS POR DOSHA
+    // ═══════════════════════════════════════════════════════════════════════════════
+
+    const terapiasPorDosha = {
+      vata: [
+        { nombre: "Abhyanga", emoji: "🧴", descripcion: "Auto-masaje con aceite tibio de sésamo", frecuencia: "Diario, 15-20 min antes del baño", beneficios: ["Calma sistema nervioso", "Nutre piel seca", "Mejora circulación", "Reduce ansiedad"], instrucciones: "Calentar aceite de sésamo. Masajear todo el cuerpo con movimientos largos en extremidades y circulares en articulaciones. Dejar 15 min y bañarse.", aceite: "Sésamo, almendras o aceite Vata" },
+        { nombre: "Shirodhara", emoji: "💧", descripcion: "Flujo continuo de aceite tibio sobre la frente", frecuencia: "1-2 veces por semana", beneficios: ["Calma mente hiperactiva", "Reduce insomnio", "Equilibra emociones", "Alivia dolor de cabeza"], instrucciones: "Terapia profesional: acostado, se vierte aceite tibio en flujo constante sobre el tercer ojo durante 30-45 min.", aceite: "Sésamo con brahmi" },
+        { nombre: "Basti", emoji: "🌿", descripcion: "Enema medicinal con aceites o decocciones", frecuencia: "Según indicación profesional", beneficios: ["Alivia estreñimiento", "Nutre colon", "Equilibra Vata en su sede", "Calma dolor lumbar"], instrucciones: "Solo bajo supervisión de terapeuta ayurvédico. Usar aceite de sésamo tibio o decocciones específicas.", aceite: "Sésamo medicado" },
+        { nombre: "Nasya", emoji: "👃", descripcion: "Aceite medicinal por vía nasal", frecuencia: "Diario por la mañana", beneficios: ["Despeja mente", "Mejora respiración", "Reduce sequedad nasal", "Calma ansiedad"], instrucciones: "2-3 gotas de aceite Anu en cada fosa nasal por la mañana, cabeza inclinada hacia atrás. Inhalar suavemente.", aceite: "Aceite Anu o ghee" },
+        { nombre: "Swedana", emoji: "♨️", descripcion: "Terapia de sudoración con vapor", frecuencia: "1-2 veces por semana", beneficios: ["Reduce rigidez", "Alivia dolor articular", "Elimina ama", "Relaja músculos"], instrucciones: "Después de abhyanga, aplicar vapor de hierbas al cuerpo (no la cabeza). 10-15 min.", aceite: "Previo abhyanga con sésamo" }
+      ],
+      pitta: [
+        { nombre: "Abhyanga Refrescante", emoji: "🧴", descripcion: "Auto-masaje con aceite de coco", frecuencia: "Diario o día por medio", beneficios: ["Enfría el cuerpo", "Calma irritación", "Nutre piel sensible", "Reduce inflamación"], instrucciones: "Usar aceite de coco a temperatura ambiente. Masajear con movimientos suaves, evitando fricción excesiva.", aceite: "Coco, girasol o aceite Pitta" },
+        { nombre: "Sheetali Pranayama", emoji: "🌬️", descripcion: "Respiración refrescante", frecuencia: "10-15 min diarios", beneficios: ["Enfría cuerpo y mente", "Reduce ira", "Calma acidez", "Baja presión arterial"], instrucciones: "Enrollar la lengua como tubo. Inhalar por la boca, exhalar por nariz. Si no podés enrollar, usar Sitkari (dientes juntos).", aceite: "No requiere" },
+        { nombre: "Netra Basti", emoji: "👁️", descripcion: "Baño de ojos con ghee medicado", frecuencia: "1 vez por semana", beneficios: ["Alivia ojos irritados", "Reduce sensibilidad a luz", "Mejora visión", "Relaja tensión ocular"], instrucciones: "Terapia profesional: se forma dique de masa alrededor de ojos y se llena con ghee tibio. Ojos abiertos bajo el ghee.", aceite: "Ghee medicado con triphala" },
+        { nombre: "Chandana Lepa", emoji: "🪷", descripcion: "Pasta de sándalo sobre la piel", frecuencia: "Cuando hay calor o irritación", beneficios: ["Enfría piel", "Reduce erupciones", "Calma quemaduras", "Efecto calmante mental"], instrucciones: "Mezclar polvo de sándalo con agua de rosas hasta formar pasta. Aplicar en piel irritada o frente. Dejar secar.", aceite: "Pasta de sándalo + agua de rosas" },
+        { nombre: "Pichu", emoji: "🩹", descripcion: "Compresa de algodón con aceite", frecuencia: "Según necesidad", beneficios: ["Alivia inflamación local", "Calma dolor", "Nutre tejido específico"], instrucciones: "Empapar algodón en aceite de coco tibio. Aplicar en zona afectada 20-30 min.", aceite: "Coco con brahmi" }
+      ],
+      kapha: [
+        { nombre: "Udvartana", emoji: "✨", descripcion: "Masaje seco con polvos de hierbas", frecuencia: "3-5 veces por semana", beneficios: ["Reduce celulitis", "Activa circulación", "Exfolia piel", "Acelera metabolismo"], instrucciones: "Usar polvo de garbanzo con jengibre seco. Masajear vigorosamente en dirección contraria al vello corporal. No usar aceite.", aceite: "SIN aceite - solo polvos" },
+        { nombre: "Garshana", emoji: "🧤", descripcion: "Cepillado en seco con guantes de seda", frecuencia: "Diario antes del baño", beneficios: ["Estimula linfa", "Reduce retención", "Activa energía", "Mejora textura piel"], instrucciones: "Con guantes de seda cruda, frotar todo el cuerpo con movimientos vigorosos hacia el corazón. 5-10 min.", aceite: "SIN aceite" },
+        { nombre: "Nasya Estimulante", emoji: "👃", descripcion: "Aceite picante por vía nasal", frecuencia: "Diario por la mañana", beneficios: ["Despeja congestión", "Activa mente", "Reduce sinusitis", "Mejora respiración"], instrucciones: "2-3 gotas de aceite con eucalipto o jengibre en cada fosa nasal. Inhalar profundo.", aceite: "Aceite Kapha o eucalipto" },
+        { nombre: "Swedana Intenso", emoji: "♨️", descripcion: "Sudoración con vapor de hierbas", frecuencia: "2-3 veces por semana", beneficios: ["Elimina toxinas", "Reduce peso", "Despeja mucosidad", "Activa metabolismo"], instrucciones: "Vapor con eucalipto, jengibre y canela. Cubrir cuerpo (no cabeza) con toalla. 15-20 min hasta sudar bien.", aceite: "Previo Garshana" },
+        { nombre: "Kapha Churna", emoji: "🌶️", descripcion: "Especias activadoras internas", frecuencia: "Con cada comida", beneficios: ["Activa digestión", "Reduce ama", "Calienta metabolismo", "Reduce pesadez"], instrucciones: "Mezclar jengibre, pimienta negra, canela y cardamomo. Agregar ½ cdita a comidas o té caliente.", aceite: "Mezcla de especias secas" }
+      ]
+    };
+
+    const nakshatras = [
+      { name: "Ashwini", ruler: "Ketu", quality: "Sanador veloz", elemento: "Tierra" },
+      { name: "Bharani", ruler: "Venus", quality: "Transformador", elemento: "Tierra" },
+      { name: "Krittika", ruler: "Sol", quality: "Purificador", elemento: "Fuego" },
+      { name: "Rohini", ruler: "Luna", quality: "Creativo", elemento: "Tierra" },
+      { name: "Mrigashira", ruler: "Marte", quality: "Buscador", elemento: "Tierra" },
+      { name: "Ardra", ruler: "Rahu", quality: "Intenso", elemento: "Agua" },
+      { name: "Punarvasu", ruler: "Júpiter", quality: "Renovador", elemento: "Agua" },
+      { name: "Pushya", ruler: "Saturno", quality: "Nutridor", elemento: "Agua" },
+      { name: "Ashlesha", ruler: "Mercurio", quality: "Místico", elemento: "Agua" },
+      { name: "Magha", ruler: "Ketu", quality: "Ancestral", elemento: "Fuego" },
+      { name: "Purva Phalguni", ruler: "Venus", quality: "Creativo", elemento: "Fuego" },
+      { name: "Uttara Phalguni", ruler: "Sol", quality: "Servicial", elemento: "Fuego" },
+      { name: "Hasta", ruler: "Luna", quality: "Hábil", elemento: "Fuego" },
+      { name: "Chitra", ruler: "Marte", quality: "Artístico", elemento: "Fuego" },
+      { name: "Swati", ruler: "Rahu", quality: "Independiente", elemento: "Aire" },
+      { name: "Vishakha", ruler: "Júpiter", quality: "Determinado", elemento: "Aire" },
+      { name: "Anuradha", ruler: "Saturno", quality: "Devoto", elemento: "Aire" },
+      { name: "Jyeshtha", ruler: "Mercurio", quality: "Protector", elemento: "Aire" },
+      { name: "Mula", ruler: "Ketu", quality: "Investigador", elemento: "Aire" },
+      { name: "Purva Ashadha", ruler: "Venus", quality: "Invencible", elemento: "Agua" },
+      { name: "Uttara Ashadha", ruler: "Sol", quality: "Universal", elemento: "Agua" },
+      { name: "Shravana", ruler: "Luna", quality: "Aprendiz", elemento: "Agua" },
+      { name: "Dhanishta", ruler: "Marte", quality: "Musical", elemento: "Éter" },
+      { name: "Shatabhisha", ruler: "Rahu", quality: "Sanador", elemento: "Éter" },
+      { name: "Purva Bhadrapada", ruler: "Júpiter", quality: "Espiritual", elemento: "Éter" },
+      { name: "Uttara Bhadrapada", ruler: "Saturno", quality: "Profundo", elemento: "Éter" },
+      { name: "Revati", ruler: "Mercurio", quality: "Protector", elemento: "Éter" }
+    ];
+
+    // Date Picker
+    const SimpleDatePicker = ({ value, onChange }) => {
+      const [dia, setDia] = useState(value?.day || '');
+      const [mes, setMes] = useState(value?.month || '');
+      const [anio, setAnio] = useState(value?.year || '');
+
+      const meses = [
+        { v: '01', l: 'Enero' }, { v: '02', l: 'Febrero' }, { v: '03', l: 'Marzo' },
+        { v: '04', l: 'Abril' }, { v: '05', l: 'Mayo' }, { v: '06', l: 'Junio' },
+        { v: '07', l: 'Julio' }, { v: '08', l: 'Agosto' }, { v: '09', l: 'Septiembre' },
+        { v: '10', l: 'Octubre' }, { v: '11', l: 'Noviembre' }, { v: '12', l: 'Diciembre' },
+      ];
+
+      const actualizarFecha = (d, m, a) => {
+        if (d && m && a && a.length === 4) {
+          const diaF = d.padStart(2, '0');
+          onChange({ day: diaF, month: m, year: a, formatted: `${a}-${m}-${diaF}` });
+        }
+      };
+
+      return (
+        <div className="space-y-3">
+          <div className="flex gap-2">
+            <div className="w-20">
+              <label className="block text-xs text-stone-400 mb-1">Día</label>
+              <select value={dia} onChange={(e) => { setDia(e.target.value); actualizarFecha(e.target.value, mes, anio); }}
+                className="w-full px-2 py-3 rounded-xl border-2 border-stone-200 focus:border-amber-400 outline-none bg-white text-center">
+                <option value="">--</option>
+                {[...Array(31)].map((_, i) => <option key={i + 1} value={String(i + 1)}>{i + 1}</option>)}
+              </select>
+            </div>
+            <div className="flex-1">
+              <label className="block text-xs text-stone-400 mb-1">Mes</label>
+              <select value={mes} onChange={(e) => { setMes(e.target.value); actualizarFecha(dia, e.target.value, anio); }}
+                className="w-full px-2 py-3 rounded-xl border-2 border-stone-200 focus:border-amber-400 outline-none bg-white">
+                <option value="">Mes</option>
+                {meses.map(m => <option key={m.v} value={m.v}>{m.l}</option>)}
+              </select>
+            </div>
+            <div className="w-24">
+              <label className="block text-xs text-stone-400 mb-1">Año</label>
+              <select value={anio} onChange={(e) => { setAnio(e.target.value); actualizarFecha(dia, mes, e.target.value); }}
+                className="w-full px-2 py-3 rounded-xl border-2 border-stone-200 focus:border-amber-400 outline-none bg-white">
+                <option value="">Año</option>
+                {[...Array(96)].map((_, i) => { const year = 2025 - i; return <option key={year} value={String(year)}>{year}</option>; })}
+              </select>
+            </div>
+          </div>
+          {dia && mes && anio && (
+            <div className="bg-amber-50 rounded-xl p-2 text-center text-sm text-amber-800">
+              ✓ {dia} de {meses.find(m => m.v === mes)?.l} de {anio}
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    // Time Picker
+    const SimpleTimePicker = ({ value, onChange }) => {
+      const [knowsTime, setKnowsTime] = useState(value?.unknown === true ? false : (value?.formatted ? true : null));
+      
+      if (knowsTime === null) {
+        return (
+          <div className="flex gap-2">
+            <button type="button" onClick={() => setKnowsTime(true)}
+              className="flex-1 py-3 px-4 rounded-xl border-2 border-stone-200 hover:border-amber-400 bg-white font-medium text-stone-700">
+              🕐 Sí, la sé
+            </button>
+            <button type="button" onClick={() => { setKnowsTime(false); onChange({ unknown: true }); }}
+              className="flex-1 py-3 px-4 rounded-xl border-2 border-stone-200 bg-stone-50 font-medium text-stone-500">
+              No la sé
+            </button>
+          </div>
+        );
+      }
+      if (knowsTime === false) {
+        return (
+          <div className="bg-stone-50 rounded-xl p-3 flex items-center justify-between">
+            <span className="text-sm text-stone-500">Hora no especificada</span>
+            <button type="button" onClick={() => { setKnowsTime(null); onChange(null); }} className="text-xs text-amber-600 underline">Cambiar</button>
+          </div>
+        );
+      }
+      return (
+        <div className="space-y-2">
+          <input type="time" value={value?.formatted || ''} onChange={(e) => onChange({ formatted: e.target.value })}
+            className="w-full px-4 py-3 rounded-xl border-2 border-stone-200 focus:border-amber-400 outline-none bg-white text-lg" />
+          <button type="button" onClick={() => { setKnowsTime(null); onChange(null); }} className="text-xs text-stone-400 hover:text-amber-600">← No sé mi hora</button>
+        </div>
+      );
+    };
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // PRANAYAMA, MEDITACIÓN Y CHAKRAS POR DOSHA
+    // ═══════════════════════════════════════════════════════════════════════════════
+    const pranayamaMeditacionChakras = {
+      vata: {
+        pranayamas: [
+          { nombre: "Nadi Shodhana", sanskrit: "नाडी शोधन", emoji: "🌬️", nivel: "Principal", beneficio: "Calma el sistema nervioso, equilibra los canales energéticos y reduce la ansiedad", instrucciones: ["Sentate cómodamente con la columna erguida", "Cerrá la fosa nasal derecha con el pulgar", "Inhalá lentamente por la fosa nasal izquierda (4 tiempos)", "Cerrá ambas fosas, retenés (4 tiempos)", "Soltá el pulgar, exhalá por la derecha (8 tiempos)", "Inhalá por la derecha (4), retenés (4), exhalá por la izquierda (8)", "Esto es 1 ronda. Realizá 10-15 rondas"], duracion: "10-15 minutos", mejorMomento: "Mañana temprano en ayunas o antes de dormir", contraindicaciones: "Evitar con congestión nasal severa", ritmo: "4-4-8 (inhala-retiene-exhala)" },
+          { nombre: "Ujjayi", sanskrit: "उज्जायी", emoji: "🌊", nivel: "Calmante", beneficio: "Calienta el cuerpo, centra la mente dispersa y reduce el frío interno", instrucciones: ["Cerrá la boca y contraé ligeramente la garganta", "Inhalá por la nariz produciendo un sonido suave como el mar", "Sentís el calor en la garganta al inhalar", "Exhalá con el mismo sonido suave y constante", "El sonido debe ser audible solo para vos"], duracion: "5-10 minutos", mejorMomento: "Durante el yoga o en momentos de ansiedad", contraindicaciones: "No hacer con hipertensión severa", ritmo: "Lento y continuo, sin retención" },
+          { nombre: "Bhramari", sanskrit: "भ्रामरी", emoji: "🐝", nivel: "Para el sueño", beneficio: "Induce el sueño, calma pensamientos acelerados y reduce el estrés mental", instrucciones: ["Cerrá los ojos y tagate los oídos con los pulgares", "Ponete los dedos índices sobre la frente", "Inhalá profundamente por la nariz", "Al exhalar, producí un zumbido suave 'mmmm' con la boca cerrada", "Sentís la vibración en la cabeza y el pecho", "Realizá 5-10 repeticiones"], duracion: "5-10 minutos", mejorMomento: "Antes de dormir o cuando la mente no para", contraindicaciones: "No practicar acostado (puede causar mareos)", ritmo: "Inhalación normal, exhalación prolongada con zumbido" }
+        ],
+        meditacion: { estilo: "Meditación de Enraizamiento y Estabilidad", descripcion: "Vata necesita meditaciones que anclen y estabilicen la energía mental dispersa. La Tierra y el fuego interno son aliados.", practicas: [ { nombre: "Meditación Trataka (Foco en llama)", duracion: "10-20 min", instrucciones: "Colocá una vela a altura de tus ojos a 50cm. Mirá la llama sin parpadear. Al cerrar los ojos visualizá la llama en tu tercer ojo. Alterna abierto/cerrado para anclar la mente volátil.", beneficio: "Concentración sostenida, calma mental" }, { nombre: "Body Scan con Tierra", duracion: "15-20 min", instrucciones: "Acostado, llevá la atención desde los pies hacia la cabeza muy lentamente. En cada parte decí mentalmente 'esta parte es tierra, esta parte es estable'. Sentite pesado/a y conectado/a al suelo.", beneficio: "Reduce ansiedad, calma sistema nervioso, induce sueño profundo" }, { nombre: "Mantra So'Ham", duracion: "15-30 min", instrucciones: "Al inhalar escuchá mentalmente 'So', al exhalar 'Ham'. No forzar, solo observar. Si la mente se va, volvé al mantra sin juzgar. Es el sonido natural de la respiración.", beneficio: "Unifica mente fragmentada, conecta con el ser" } ], mantraPrincipal: { mantra: "OM NAMAH SHIVAYA", significado: "Me rindo ante Shiva, principio de conciencia pura", repeticiones: "108 veces con mala" }, rutinaDiaria: "5 min respiración + 15 min meditación + 5 min silencio al despertar" },
+        chakras: [
+          { nombre: "Muladhara — Raíz", posicion: "Base de la columna", colorEmoji: "🔴", elemento: "Tierra", bija: "LAM", desequilibrio: "Ansiedad, miedo, inseguridad, falta de enraizamiento — síntomas típicos de Vata elevado", practica: "Visualizá un disco rojo brillante en la base de tu columna. Afirmación: 'Estoy seguro/a, estoy enraizado/a, pertenezco a la Tierra'", ejercicios: ["Caminar descalzo/a en tierra o pasto", "Poses de yoga en tierra (Tadasana, Balasana)", "Mantener rutinas fijas y horarios estables", "Comer alimentos raíz: zanahoria, remolacha, batata"] },
+          { nombre: "Anahata — Corazón", posicion: "Centro del pecho", colorEmoji: "💚", elemento: "Aire", bija: "YAM", desequilibrio: "Miedo al abandono, soledad, desconexión emocional — Vata pierde conexión con el amor propio", practica: "Poné las manos en el corazón. Meditá enviando amor primero a vos, luego a otros. Afirmación: 'Soy amado/a y estoy seguro/a'", ejercicios: ["Pranayama corazón: inhalar amor, exhalar miedo", "Abrazos conscientes y conexión física", "Journaling de gratitud diario", "Cantar o tararear mantras con vibración en el pecho"] },
+          { nombre: "Sahasrara — Corona", posicion: "Cima de la cabeza", colorEmoji: "💜", elemento: "Éter", bija: "OM", desequilibrio: "Pensamiento hiperactivo, desconexión espiritual, insomnio mental — la mente Vata nunca para", practica: "Al despertar y al dormir, visualizá una luz violeta suave entrando por la cima de tu cabeza calmando todos los pensamientos.", ejercicios: ["Meditación silenciosa sin objeto", "Contemplación en naturaleza", "Ayuno digital antes de dormir", "Nadi Shodhana enfocando en la coronilla"] }
+        ]
+      },
+      pitta: {
+        pranayamas: [
+          { nombre: "Sheetali", sanskrit: "शीतली", emoji: "❄️", nivel: "Principal", beneficio: "Enfría el cuerpo y la mente, reduce la ira, calma la acidez y la presión arterial", instrucciones: ["Sentate cómodamente", "Sacá la lengua y enrollala en forma de tubo (como una pajita)", "Inhalá el aire frío por la lengua enrollada, sentís el frescor", "Cerrá la boca y retené brevemente (2-4 tiempos)", "Exhalá lentamente por la nariz", "Realizá 15-20 repeticiones", "Si no podés enrollar la lengua, usá Sitkari: dientes juntos, labios abiertos"], duracion: "5-10 minutos", mejorMomento: "Al mediodía o cuando sentís calor/irritación, después del ejercicio", contraindicaciones: "Evitar en invierno o con presión muy baja", ritmo: "Inhalación lenta por la lengua, exhalación suave por nariz" },
+          { nombre: "Chandra Bhedana", sanskrit: "चन्द्र भेदन", emoji: "🌙", nivel: "Refrescante", beneficio: "Activa la energía lunar (Ida nadi), enfría y pacifica el fuego interno de Pitta", instrucciones: ["Cerrá la fosa nasal derecha con el pulgar", "Inhalá lentamente solo por la fosa izquierda (luna)", "Cerrá ambas fosas y retenés brevemente", "Exhalá por la fosa derecha (sol)", "Realizá 10-15 rondas — siempre inhala izquierda, exhala derecha"], duracion: "10 minutos", mejorMomento: "Tarde, antes de dormir, cuando sentís calor o enojo", contraindicaciones: "No combinar con Surya Bhedana el mismo día", ritmo: "Inhala izquierda, exhala derecha — siempre" },
+          { nombre: "Sitkari", sanskrit: "सीत्कारी", emoji: "🌿", nivel: "Alternativa", beneficio: "Alternativa a Sheetali. Mismo efecto refrescante para quienes no pueden enrollar la lengua", instrucciones: ["Juntá los dientes suavemente y separás los labios", "Inhalá el aire por los dientes haciendo un sonido 'ssss' suave", "Sentís el frescor en la boca y garganta", "Cerrá la boca y exhalá por la nariz lentamente", "Realizá 15-20 repeticiones"], duracion: "5-10 minutos", mejorMomento: "Mediodía, post ejercicio, momentos de irritabilidad", contraindicaciones: "No practicar con frío extremo", ritmo: "Inhalación sibilante, exhalación suave por nariz" }
+        ],
+        meditacion: { estilo: "Meditación de Compasión y Rendición", descripcion: "Pitta necesita meditaciones que suavicen el ego, disuelvan el control y cultiven compasión. El agua y la luna son sus aliados.", practicas: [ { nombre: "Meditación Metta (Amor Incondicional)", duracion: "15-20 min", instrucciones: "Comenzá enviándote amor a vos: 'Que yo sea feliz, que yo esté en paz'. Luego a personas amadas, luego a personas neutras, luego a personas difíciles. Pitta se suaviza aprendiendo a soltar el juicio.", beneficio: "Reduce perfeccionismo, suaviza ira, cultiva compasión" }, { nombre: "Visualización del Lago Sereno", duracion: "10-15 min", instrucciones: "Imaginá un lago de montaña perfectamente calmo al amanecer. Sos ese lago: la superficie es tu mente. Cada pensamiento es una piedra que cae, crea ondas y se calma solo. No intervenís.", beneficio: "Desarrolla la no-reacción, calma la mente analítica" }, { nombre: "Meditación de Rendición", duracion: "20 min", instrucciones: "Afirmación inicial: 'No necesito controlar todo'. Cada vez que la mente quiere resolver, planificar o juzgar, soltá y regresá al silencio. Practicá el no-hacer (Ishvara Pranidhana).", beneficio: "Reduce agotamiento por exceso de control, calma el ego" } ], mantraPrincipal: { mantra: "OM SHANTI SHANTI SHANTI", significado: "Paz en el cuerpo, paz en la mente, paz en el espíritu", repeticiones: "108 veces, voz suave o mental" }, rutinaDiaria: "5 min Sheetali + 15 min meditación compasión + 5 min intención del día" },
+        chakras: [
+          { nombre: "Manipura — Plexo Solar", posicion: "Abdomen, ombligo", colorEmoji: "🟡", elemento: "Fuego", bija: "RAM", desequilibrio: "Exceso de control, ira, ego inflado, competitividad tóxica — el fuego Pitta quema este chakra", practica: "Visualizá el fuego de tu plexo como una llama tranquila y estable. Afirmación: 'Tengo suficiente poder. Confío en el proceso'", ejercicios: ["Torsiones de yoga para liberar tensión digestiva", "Meditación de rendición del control", "Respiración Sheetali enfocada en el abdomen", "Actividades creativas sin objetivo de resultado"] },
+          { nombre: "Anahata — Corazón", posicion: "Centro del pecho", colorEmoji: "💚", elemento: "Aire/Agua", bija: "YAM", desequilibrio: "Pitta puede tener el corazón cerrado por exceso de crítica. Necesita abrir la compasión hacia sí mismo y sus errores.", practica: "Poné la mano en el corazón. Afirmación: 'Soy suficiente. No necesito ser perfecto/a para merecer amor'", ejercicios: ["Meditación Metta diaria", "Inhalar verde, exhalar rojo (ira)", "Contacto con agua: baños largos, nadar", "Contacto con naturaleza y animales"] },
+          { nombre: "Vishuddha — Garganta", posicion: "Garganta, cuello", colorEmoji: "🔵", elemento: "Éter/Sonido", bija: "HAM", desequilibrio: "Pitta puede ser cortante y dominante en la comunicación. Necesita equilibrar la verdad con la compasión.", practica: "Antes de hablar, una respiración. Preguntate: '¿Es verdad? ¿Es necesario? ¿Es amable?'", ejercicios: ["Canto de mantras para suavizar la voz", "Escucha activa sin interrumpir", "Journaling para procesar antes de hablar", "Ujjayi pranayama enfocado en la garganta"] }
+        ]
+      },
+      kapha: {
+        pranayamas: [
+          { nombre: "Kapalabhati", sanskrit: "कपालभाती", emoji: "🔥", nivel: "Principal", beneficio: "Activa el metabolismo, elimina toxinas, despeja congestión y enciende el fuego digestivo", instrucciones: ["Sentate erguido/a", "Inhalá profundo y naturalmente por la nariz", "Exhalá con fuerza y rapidez por la nariz, contrayendo el abdomen", "La inhalación es pasiva (automática), la exhalación es activa y fuerte", "Comenzá con 20 bombeos, aumentá gradualmente a 60-120", "Descansá y observá la energía generada", "Realizá 3 rondas"], duracion: "5-10 minutos", mejorMomento: "Primera hora de la mañana en ayunas — rompe la inercia Kapha", contraindicaciones: "Evitar con hipertensión severa, embarazo, hernias o problemas cardíacos", ritmo: "Exhala activa y rápida, inhala pasiva y automática" },
+          { nombre: "Bhastrika", sanskrit: "भस्त्रिका", emoji: "⚡", nivel: "Energizante", beneficio: "Genera calor intenso, activa todo el sistema, combate el letargo y la depresión Kapha", instrucciones: ["Sentate erguido/a con manos en rodillas", "Tanto la inhalación como la exhalación son forzadas y enérgicas", "Inhalá forzando el abdomen hacia afuera", "Exhalá con fuerza contrayendo el abdomen", "Ritmo de 1 inhalación + 1 exhalación por segundo", "Comenzá con 10 bombeos, aumentá a 20-30", "Descansá después de cada ronda"], duracion: "5 minutos (máximo al inicio)", mejorMomento: "Al despertar o antes del ejercicio matutino", contraindicaciones: "No para cardíacos, hipertensos, embarazadas o con problemas pulmonares", ritmo: "Ambas fases activas y enérgicas, ritmo de 1 por segundo" },
+          { nombre: "Surya Bhedana", sanskrit: "सूर्य भेदन", emoji: "☀️", nivel: "Activador", beneficio: "Activa la energía solar (Pingala), calienta, estimula el sistema nervioso y combate la pesadez", instrucciones: ["Cerrá la fosa nasal izquierda con el anular", "Inhalá lentamente solo por la fosa nasal derecha (sol)", "Cerrá ambas fosas y retenés (4 tiempos)", "Exhalá por la fosa nasal izquierda", "Realizá 10-15 rondas"], duracion: "10 minutos", mejorMomento: "Al despertar, antes del ejercicio, cuando hay letargo o tristeza", contraindicaciones: "No usar en verano intenso o con exceso de Pitta", ritmo: "Inhala derecha, retención, exhala izquierda" }
+        ],
+        meditacion: { estilo: "Meditación Activadora y de Desapego", descripcion: "Kapha necesita meditaciones que estimulen y muevan la energía estancada. El fuego, la luz y el movimiento son aliados. La clave es el desapego.", practicas: [ { nombre: "Meditación de Fuego Interno", duracion: "15 min", instrucciones: "Visualizá un fuego pequeño en tu plexo solar. Con cada Kapalabhati ese fuego crece y se expande hacia el pecho y los brazos. Ese fuego quema el estancamiento, la pereza y el apego. Al finalizar el fuego sigue encendido.", beneficio: "Activa metabolismo energético, combate depresión, genera motivación" }, { nombre: "Meditación de Desapego", duracion: "20 min", instrucciones: "Pensá en algo a lo que estás muy apegado. Visualizalo en tus manos abiertas. Abrís las manos lentamente y lo soltás. Afirmación: 'Puedo fluir. El cambio es vida.' Kapha necesita practicar soltar.", beneficio: "Reduce apego, resistencia al cambio y acumulación emocional" }, { nombre: "Meditación Caminando (Kinhin)", duracion: "20-30 min", instrucciones: "Caminá muy lentamente con plena conciencia de cada paso. Coordiná: 2 pasos = inhala, 2 pasos = exhala. Kapha necesita meditaciones activas, no solo sentado.", beneficio: "Activa energía, combate letargo, une cuerpo y mente en movimiento" } ], mantraPrincipal: { mantra: "OM HRIM NAMAH", significado: "Invocación al principio creador y transformador", repeticiones: "108 veces, con energía y claridad" }, rutinaDiaria: "10 min Kapalabhati + 15 min meditación activa + 5 min intención vibrante" },
+        chakras: [
+          { nombre: "Muladhara — Raíz", posicion: "Base de la columna", colorEmoji: "🔴", elemento: "Tierra", bija: "LAM", desequilibrio: "Kapha tiene exceso de Tierra: pesadez, apego, resistencia al cambio y acumulación. El chakra raíz hiperactivo limita el flujo.", practica: "Meditá visualizando el chakra raíz GIRANDO y liberando. Afirmación: 'Estoy enraizado/a Y fluyo. Suelto lo que no necesito'", ejercicios: ["Yoga dinámico y vigoroso (no estático)", "Cambiar rutinas cotidianas deliberadamente", "Limpiar y donar objetos acumulados", "Contacto con fuego: velas, sol directo"] },
+          { nombre: "Svadhisthana — Sacro", posicion: "Bajo abdomen, pelvis", colorEmoji: "🟠", elemento: "Agua", bija: "VAM", desequilibrio: "Creatividad suprimida, sensualidad apagada, placer reducido. La energía creativa está estancada en Kapha.", practica: "Movimiento de caderas consciente al despertar. Afirmación: 'Mi creatividad fluye libremente. Me permito sentir placer'", ejercicios: ["Danza libre o ritmos percutivos", "Actividades creativas manuales (pintar, cocinar)", "Movimientos de cadera en yoga (Pigeon, Hip Circles)", "Contacto con agua en movimiento: lluvia, mar, río"] },
+          { nombre: "Ajna — Tercer Ojo", posicion: "Entrecejo", colorEmoji: "🟣", elemento: "Luz/Intuición", bija: "OM", desequilibrio: "Rigidez mental de pensamiento: 'siempre se hizo así'. Kapha necesita abrir la intuición más allá de lo conocido.", practica: "Meditación Trataka (vela). Afirmación: 'Confío en mi intuición. Estoy abierto/a a nuevas perspectivas'", ejercicios: ["Meditación Trataka 10 min diarios", "Aprender algo nuevo cada semana", "Yoga inversiones (Sarvangasana)", "Kapalabhati enfocando en el entrecejo"] }
+        ]
+      }
+    };
+
+    // Main App
+    function Vedabite() {
+      const [step, setStep] = useState(0);
+      const [birthData, setBirthData] = useState({ name: '', email: '', birthPlace: '', date: null, time: null });
+      const [currentQuestion, setCurrentQuestion] = useState(0);
+      const [answers, setAnswers] = useState({});
+      const [results, setResults] = useState(null);
+      const [showSources, setShowSources] = useState(false);
+      const [activeTab, setActiveTab] = useState('resumen');
+      const [animateIn, setAnimateIn] = useState(true);
+      const [isPremium, setIsPremium] = useState(false);
+      const [showPaywall, setShowPaywall] = useState(false);
+      const [processingPayment, setProcessingPayment] = useState(false);
+      const [respSubTab, setRespSubTab] = useState('pranayama');
+
+      // Verificar si es premium al cargar
+      useEffect(() => {
+        const premium = localStorage.getItem('vedabite_premium');
+        const savedResults = localStorage.getItem('vedabite_results');
+        const savedBirthData = localStorage.getItem('vedabite_birthData');
+        
+        if (premium === 'true' && savedResults && savedBirthData) {
+          setIsPremium(true);
+          setResults(JSON.parse(savedResults));
+          setBirthData(JSON.parse(savedBirthData));
+          setStep(3); // Ir directo a resultados
+        }
+      }, []);
+
+      // Guardar datos si es premium
+      const saveIfPremium = (newResults, newBirthData) => {
+        if (isPremium) {
+          localStorage.setItem('vedabite_results', JSON.stringify(newResults));
+          localStorage.setItem('vedabite_birthData', JSON.stringify(newBirthData));
+        }
+      };
+
+      // Activar premium después del pago
+      const activatePremium = () => {
+        setIsPremium(true);
+        localStorage.setItem('vedabite_premium', 'true');
+        if (results && birthData) {
+          localStorage.setItem('vedabite_results', JSON.stringify(results));
+          localStorage.setItem('vedabite_birthData', JSON.stringify(birthData));
+        }
+        setShowPaywall(false);
+        alert('¡Premium activado! Tu perfil está guardado.');
+      };
+
+      // Iniciar pago con Mercado Pago
+      const initPayment = async () => {
+        setProcessingPayment(true);
+        try {
+          const mp = new MercadoPago(MP_PUBLIC_KEY, { locale: 'es-AR' });
+          
+          // Crear preferencia de pago (simplificado para demo)
+          // En producción necesitarías un backend para crear la preferencia
+          const bricksBuilder = mp.bricks();
+          
+          // Por ahora usamos un link de pago directo
+          // Reemplazar con tu link de Mercado Pago
+          window.open(`https://mpago.la/17oi5PU`, '_blank');
+          
+          // Simular activación (en producción verificarías el pago)
+          setTimeout(() => {
+            if (confirm('¿Completaste el pago de $10 USD?')) {
+              gtag('event', 'subscription_paid');
+              activatePremium();
+            }
+            setProcessingPayment(false);
+          }, 2000);
+          
+        } catch (error) {
+          console.error('Error:', error);
+          setProcessingPayment(false);
+          alert('Error al procesar. Intentá de nuevo.');
+        }
+      };
+
+      useEffect(() => { setAnimateIn(true); }, [step, currentQuestion]);
+
+      const calculateAge = (birthDate) => {
+        const today = new Date();
+        const birth = new Date(birthDate);
+        let age = today.getFullYear() - birth.getFullYear();
+        const m = today.getMonth() - birth.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+        return age;
+      };
+
+      const calculateDosha = () => {
+        const scores = { vata: 0, pitta: 0, kapha: 0 };
+        Object.entries(answers).forEach(([questionId, value]) => {
+          const question = doshaQuestions.find(q => q.id === parseInt(questionId));
+          if (question) scores[question.dosha] += value;
+        });
+        
+        const total = scores.vata + scores.pitta + scores.kapha;
+        const percentages = {
+          vata: Math.round((scores.vata / total) * 100),
+          pitta: Math.round((scores.pitta / total) * 100),
+          kapha: Math.round((scores.kapha / total) * 100)
+        };
+        
+        const dominant = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+        let nakshatra = null;
+        let age = null;
+        
+        if (birthData.date?.formatted) {
+          const date = new Date(birthData.date.formatted);
+          const dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+          nakshatra = nakshatras[dayOfYear % 27];
+          age = calculateAge(birthData.date.formatted);
+        }
+        
+        const maxScore = 60; // 20 preguntas x 3 puntos max
+        const desequilibrioLevel = Math.round((scores[dominant[0][0]] / maxScore) * 100);
+        
+        return { scores, percentages, primaryDosha: dominant[0][0], secondaryDosha: dominant[1][0], nakshatra, age, desequilibrioLevel };
+      };
+
+      const handleAnswer = (value) => {
+        setAnimateIn(false);
+        setTimeout(() => {
+          setAnswers({ ...answers, [doshaQuestions[currentQuestion].id]: value });
+          if (currentQuestion < doshaQuestions.length - 1) {
+            setCurrentQuestion(currentQuestion + 1);
+          } else {
+            const doshaResult = calculateDosha();
+            setResults(doshaResult);
+            gtag('event', 'test_completed');
+            gtag('event', 'dosha_result_viewed', { dosha: doshaResult.primaryDosha });
+            setStep(3);
+          }
+        }, 150);
+      };
+
+      const generatePDF = () => {
+        const primary = doshaInfo[results.primaryDosha];
+        const content = `VEDABITE - Tu Plan de Bienestar Personalizado
+================================================
+
+DATOS PERSONALES
+----------------
+Lugar de Nacimiento: ${birthData.birthPlace}
+Fecha de Nacimiento: ${birthData.date?.formatted}
+Hora de Nacimiento: ${birthData.time?.formatted || 'No especificada'}
+Edad: ${results.age} años
+
+RESULTADO DEL TEST (60 preguntas)
+---------------------------------
+Dosha Primario: ${primary.name} (${primary.element})
+Dosha Secundario: ${doshaInfo[results.secondaryDosha].name}
+Nivel de Desequilibrio: ${results.desequilibrioLevel}%
+
+Distribución:
+- Vata: ${results.percentages.vata}%
+- Pitta: ${results.percentages.pitta}%
+- Kapha: ${results.percentages.kapha}%
+
+${results.nakshatra ? `Nakshatra: ${results.nakshatra.name} (${results.nakshatra.quality})
+Regente: ${results.nakshatra.ruler}
+Elemento: ${results.nakshatra.elemento}` : ''}
+
+CARACTERÍSTICAS EN EQUILIBRIO
+-----------------------------
+${primary.enEquilibrio.map(s => `• ${s}`).join('\n')}
+
+SIGNOS DE DESEQUILIBRIO ACTUAL
+------------------------------
+${primary.signosDesequilibrio.map(s => `• ${s}`).join('\n')}
+
+PROYECCIÓN SI NO HACÉS CAMBIOS
+------------------------------
+5 años: ${primary.proyeccionSalud.años5.sintomas.join(', ')}
+10 años: ${primary.proyeccionSalud.años10.sintomas.join(', ')}
+20 años: ${primary.proyeccionSalud.años20.sintomas.join(', ')}
+
+PROYECCIÓN SI HACÉS LOS CAMBIOS
+-------------------------------
+3 meses: ${primary.proyeccionPositiva.meses3}
+6 meses: ${primary.proyeccionPositiva.meses6}
+1 año: ${primary.proyeccionPositiva.año1}
+5 años: ${primary.proyeccionPositiva.años5}
+
+ALIMENTOS RECOMENDADOS
+----------------------
+Cereales: ${primary.alimentosSI.cereales.join(', ')}
+Verduras: ${primary.alimentosSI.verduras.join(', ')}
+Frutas: ${primary.alimentosSI.frutas.join(', ')}
+Proteínas: ${primary.alimentosSI.proteinas.join(', ')}
+Lácteos: ${primary.alimentosSI.lacteos.join(', ')}
+Especias: ${primary.alimentosSI.especias.join(', ')}
+Bebidas: ${primary.alimentosSI.bebidas.join(', ')}
+Grasas: ${primary.alimentosSI.grasas.join(', ')}
+
+ALIMENTOS A EVITAR
+------------------
+Cereales: ${primary.alimentosNO.cereales.join(', ')}
+Verduras: ${primary.alimentosNO.verduras.join(', ')}
+Frutas: ${primary.alimentosNO.frutas.join(', ')}
+Proteínas: ${primary.alimentosNO.proteinas.join(', ')}
+Lácteos: ${primary.alimentosNO.lacteos.join(', ')}
+Otros: ${primary.alimentosNO.otros.join(', ')}
+Bebidas: ${primary.alimentosNO.bebidas.join(', ')}
+
+RUTINA DIARIA RECOMENDADA (DINACHARYA)
+--------------------------------------
+${Object.entries(primary.horarios).map(([k, v]) => `${v.hora} - ${k.charAt(0).toUpperCase() + k.slice(1).replace(/([A-Z])/g, ' $1')}: ${v.nota}`).join('\n')}
+
+EJERCICIO RECOMENDADO
+---------------------
+Actividades: ${primary.ejercicio.recomendados.join(', ')}
+Evitar: ${primary.ejercicio.evitar.join(', ')}
+Frecuencia: ${primary.ejercicio.frecuencia}
+Intensidad: ${primary.ejercicio.intensidad}
+Mejor horario: ${primary.ejercicio.mejorHora}
+
+SUPLEMENTOS Y HIERBAS RECOMENDADOS
+----------------------------------
+${primary.hierbas.map(h => `• ${h.nombre} (${h.dosis}): ${h.beneficio}`).join('\n')}
+
+RIESGOS DE SALUD POR DESEQUILIBRIO
+----------------------------------
+${primary.enfermedadesRiesgo.map(e => `• ${e.nombre}: ${e.probabilidad}`).join('\n')}
+
+================================================
+AVISO: Esta información es educativa y basada en 
+principios ayurvédicos tradicionales. No reemplaza 
+el diagnóstico médico profesional.
+
+Fuentes: Charaka Samhita, Sushruta Samhita, 
+Ashtanga Hridaya, Brihat Parashara Hora Shastra,
+OMS, Ministry of AYUSH, NAMA
+================================================
+
+Generado por Vedabite - GPS del Bienestar
+www.vedabite.com
+`;
+
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Vedabite_Plan.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      };
+
+      const progress = ((currentQuestion + 1) / doshaQuestions.length) * 100;
+      const currentCategoria = doshaQuestions[currentQuestion]?.categoria;
+      const isDateComplete = !!birthData.date?.formatted;
+      const isFormComplete = birthData.birthPlace && isDateComplete;
+
+      // Landing Screen
+      if (step === 0) {
+        return (
+          <div className={`min-h-screen flex flex-col relative overflow-hidden transition-all duration-500 ${animateIn ? 'opacity-100' : 'opacity-0'}`}
+            style={{ background: 'linear-gradient(180deg, #87CEEB 0%, #B0E0E6 50%, #ADD8E6 100%)' }}>
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              {[...Array(50)].map((_, i) => (
+                <div key={i} className="absolute text-white opacity-60"
+                  style={{ left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%`, fontSize: `${Math.random() * 10 + 6}px`,
+                    animation: `twinkle ${Math.random() * 3 + 2}s ease-in-out infinite`, animationDelay: `${Math.random() * 2}s` }}>✦</div>
+              ))}
+            </div>
+            <div className="flex-1 flex flex-col items-center justify-center px-6 py-8 text-center relative z-10">
+              <h1 className="text-6xl mb-6" style={{ fontFamily: "'Pacifico', cursive", color: '#F4C430', textShadow: '3px 3px 0px #B8860B' }}>Vedabite</h1>
+              <p className="text-white text-xl leading-relaxed max-w-sm mb-10" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.1)' }}>
+                Reprogramá tu ser con pequeños ajustes, guiado por algoritmos y tradición milenaria
+              </p>
+              <button onClick={() => { setAnimateIn(false); setTimeout(() => setStep(1), 200); }}
+                className="px-10 py-4 rounded-full font-semibold text-lg shadow-lg" style={{ backgroundColor: '#F4C430', color: '#5D4E37' }}>
+                Activá tu bienestar
+              </button>
+              <p className="mt-4 text-white/80 text-sm">60 preguntas • 10 minutos • Plan personalizado</p>
+              <button onClick={() => setShowSources(true)} className="mt-6 text-sm text-white/70 underline">Ver fuentes científicas</button>
+            </div>
+            {showSources && (
+              <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4" onClick={() => setShowSources(false)}>
+                <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-lg max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+                  <div className="sticky top-0 bg-white p-4 border-b flex justify-between items-center">
+                    <h3 className="font-bold text-stone-800">📚 Fuentes Científicas</h3>
+                    <button onClick={() => setShowSources(false)} className="p-2">✕</button>
+                  </div>
+                  <div className="p-4 space-y-4 text-sm text-stone-600">
+                    <div><strong className="text-stone-800">Textos Clásicos Ayurvédicos:</strong><br/>Charaka Samhita (400-200 BCE), Sushruta Samhita (~600 BCE), Ashtanga Hridaya (Vagbhata, ~400 CE), Bhavaprakasha Nighantu</div>
+                    <div><strong className="text-stone-800">Astrología Védica (Jyotish):</strong><br/>Brihat Parashara Hora Shastra, Sistema Nakshatra (27 constelaciones lunares)</div>
+                    <div><strong className="text-stone-800">Organismos Oficiales:</strong><br/>OMS (Organización Mundial de la Salud), Ministry of AYUSH (Gobierno de India), CCRAS, NAMA (National Ayurvedic Medical Association), Ayurvedic Pharmacopoeia of India</div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      // Birth Data Screen
+      if (step === 1) {
+        return (
+          <div className={`min-h-screen flex flex-col px-6 py-6 bg-gradient-to-b from-sky-100 to-sky-50 transition-all duration-500 ${animateIn ? 'opacity-100' : 'opacity-0'}`}>
+            <button onClick={() => { setAnimateIn(false); setTimeout(() => setStep(0), 200); }} className="self-start text-stone-400 mb-4">← Volver</button>
+            <div className="flex-1 flex flex-col max-w-sm mx-auto w-full">
+              <div className="text-center mb-6">
+                <span className="text-4xl mb-3 block">🌙</span>
+                <h2 className="text-xl font-bold text-stone-800">Tus Datos</h2>
+                <p className="text-stone-500 text-sm">Para calcular tu Nakshatra y proyecciones personalizadas</p>
+              </div>
+              <div className="space-y-4 flex-1 overflow-y-auto">
+                <div>
+                  <label className="block text-sm font-medium text-stone-600 mb-1.5">Lugar de Nacimiento</label>
+                  <input type="text" value={birthData.birthPlace} onChange={(e) => setBirthData(prev => ({ ...prev, birthPlace: e.target.value }))}
+                    className="w-full px-4 py-3 rounded-xl border-2 border-stone-200 focus:border-amber-400 outline-none bg-white" placeholder="Ciudad, País" autoComplete="off" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-stone-600 mb-2">Fecha de Nacimiento</label>
+                  <SimpleDatePicker value={birthData.date} onChange={(date) => setBirthData(prev => ({ ...prev, date }))} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-stone-600 mb-2">Hora de Nacimiento <span className="text-stone-400">(opcional pero recomendada)</span></label>
+                  <SimpleTimePicker value={birthData.time} onChange={(time) => setBirthData(prev => ({ ...prev, time }))} />
+                </div>
+              </div>
+              
+              <div className="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800">
+                <p>📋 <strong>Versión Gratuita:</strong> Podés hacer el test y ver tus resultados. Si cerrás la app, tendrás que repetirlo.</p>
+                <p className="mt-1">⭐ <strong>Premium ($10 USD/mes):</strong> Tu perfil queda guardado. Cancelá cuando quieras.</p>
+              </div>
+              
+              <button onClick={() => { gtag('event', 'test_started'); setAnimateIn(false); setTimeout(() => setStep(2), 200); }} disabled={!isFormComplete}
+                className="mt-4 w-full py-4 rounded-2xl font-semibold shadow-lg disabled:opacity-50" style={{ backgroundColor: '#F4C430', color: '#5D4E37' }}>
+                Comenzar Test (60 preguntas) →
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      // Question Screen
+      if (step === 2) {
+        return (
+          <div className={`min-h-screen flex flex-col px-6 py-4 bg-gradient-to-b from-sky-100 to-sky-50 transition-all duration-300 ${animateIn ? 'opacity-100' : 'opacity-0'}`}>
+            <div className="mb-4">
+              <div className="flex justify-between items-center text-xs text-stone-500 mb-1.5">
+                <span className="bg-stone-200 px-2 py-0.5 rounded-full">{currentCategoria}</span>
+                <span>{currentQuestion + 1}/60 • {Math.round(progress)}%</span>
+              </div>
+              <div className="h-2 bg-white rounded-full overflow-hidden shadow-inner">
+                <div className="h-full transition-all duration-500" style={{ width: `${progress}%`, backgroundColor: '#F4C430' }}></div>
+              </div>
+            </div>
+            <div className="flex-1 flex flex-col justify-center">
+              <div className="bg-white rounded-2xl p-6 shadow-xl mb-6">
+                <p className="text-lg text-stone-800 text-center font-medium leading-relaxed">{doshaQuestions[currentQuestion].question}</p>
+              </div>
+              <div className="space-y-2.5">
+                {[
+                  { value: 0, label: "No me identifica", emoji: "◯" },
+                  { value: 1, label: "A veces", emoji: "◔" },
+                  { value: 2, label: "Frecuentemente", emoji: "◕" },
+                  { value: 3, label: "Totalmente", emoji: "●" },
+                ].map((option) => (
+                  <button key={option.value} onClick={() => handleAnswer(option.value)}
+                    className="w-full bg-white hover:bg-amber-50 border-2 border-stone-200 hover:border-amber-400 rounded-xl py-3.5 px-5 flex items-center justify-between transition-all">
+                    <span className="text-stone-700 font-medium">{option.label}</span>
+                    <span className="text-lg" style={{ color: '#F4C430' }}>{option.emoji}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // Results Screen
+      if (step === 3 && results) {
+        const primary = doshaInfo[results.primaryDosha];
+        const secondary = doshaInfo[results.secondaryDosha];
+        const edad = results.age || 30;
+        
+        const tabs = [
+          { id: 'resumen', label: '📊 Resumen' },
+          { id: 'proyeccion', label: '🔮 Proyección' },
+          { id: 'alimentos', label: '🍽️ Alimentos' },
+          { id: 'recetas', label: '🍲 Recetas' },
+          { id: 'horarios', label: '⏰ Horarios' },
+          { id: 'ejercicio', label: '🏃 Ejercicio' },
+          { id: 'terapias', label: '💆 Terapias' },
+          { id: 'mudras', label: '🙏 Yoga de las Manos' },
+          { id: 'pranayama', label: '🌬️ Respiración' },
+          { id: 'meditacion', label: '🧘 Meditación' },
+          { id: 'chakras', label: '💜 Chakras' },
+          { id: 'ubicacion', label: '📍 Ubicación' },
+          { id: 'salud', label: '🏥 Salud' },
+        ];
+
+        const busquedasCercanas = [
+          { nombre: "Centros de Yoga", emoji: "🧘", query: "centros+de+yoga" },
+          { nombre: "Profesores de Yoga", emoji: "🧘‍♀️", query: "profesores+de+yoga" },
+          { nombre: "Ayurveda", emoji: "🌿", query: "ayurveda+terapias" },
+          { nombre: "Tiendas Naturistas", emoji: "🥗", query: "tiendas+naturistas+dieteticas" },
+          { nombre: "Spas y Masajes", emoji: "💆", query: "spa+masajes+terapeuticos" },
+          { nombre: "Restaurantes Veganos", emoji: "🥬", query: "restaurantes+veganos+vegetarianos" },
+          { nombre: "Astrología", emoji: "⭐", query: "astrologia+carta+natal" },
+          { nombre: "Tarot", emoji: "🔮", query: "tarot+lectura" },
+          { nombre: "Tiendas Esotéricas", emoji: "🕯️", query: "tiendas+esotericas+velas" },
+          { nombre: "Meditación", emoji: "🙏", query: "centros+meditacion" },
+          { nombre: "Reiki", emoji: "✨", query: "reiki+terapias+energeticas" },
+          { nombre: "Acupuntura", emoji: "📍", query: "acupuntura+medicina+china" },
+        ];
+
+        const abrirBusquedaMaps = (query) => {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                const { latitude, longitude } = position.coords;
+                const url = `https://www.google.com/maps/search/${query}/@${latitude},${longitude},14z`;
+                window.open(url, '_blank');
+              },
+              () => {
+                // Si no da permiso, abre sin ubicación
+                const url = `https://www.google.com/maps/search/${query}`;
+                window.open(url, '_blank');
+              }
+            );
+          } else {
+            const url = `https://www.google.com/maps/search/${query}`;
+            window.open(url, '_blank');
+          }
+        };
+
+        return (
+          <div className="min-h-screen bg-stone-50 pb-36">
+            {/* Header */}
+            <div className={`bg-gradient-to-br ${primary.color} text-white px-6 py-6 rounded-b-3xl`}>
+              <div className="text-center">
+                <p className="text-white/80 text-sm">{edad} años • {birthData.birthPlace}</p>
+                <h2 className="text-3xl font-bold">{primary.emoji} {primary.name}</h2>
+                <p className="text-white/90 text-sm">{primary.element}</p>
+                <p className="text-white/70 text-xs mt-1">Secundario: {secondary.emoji} {secondary.name}</p>
+                {results.nakshatra && (
+                  <div className="mt-2 inline-block bg-white/20 rounded-full px-3 py-1">
+                    <span className="text-xs">⭐ {results.nakshatra.name} • {results.nakshatra.quality}</span>
+                  </div>
+                )}
+                <div className="mt-4 bg-white/20 rounded-full p-1">
+                  <div className="flex items-center justify-between px-3 text-xs">
+                    <span>Equilibrado</span>
+                    <span>Desequilibrado</span>
+                  </div>
+                  <div className="h-3 bg-white/30 rounded-full overflow-hidden mt-1">
+                    <div className="h-full bg-yellow-300 transition-all" style={{ width: `${results.desequilibrioLevel}%` }}></div>
+                  </div>
+                  <p className="text-xs mt-1 text-white/80">{results.desequilibrioLevel}% de desequilibrio detectado</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Tabs */}
+            <div className="sticky top-0 bg-white border-b z-10 overflow-x-auto">
+              <div className="flex px-2 py-2 gap-1 min-w-max">
+                {tabs.map(tab => (
+                  <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                    className={`px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
+                      activeTab === tab.id ? 'bg-amber-100 text-amber-800' : 'text-stone-500 hover:bg-stone-100'
+                    }`}>
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="px-4 py-4 pb-24">
+              {activeTab === 'resumen' && (
+                <div className="space-y-4">
+                  <div className="bg-white rounded-2xl p-4 shadow">
+                    <h3 className="font-semibold text-stone-800 mb-3">Tu Constitución (Prakriti)</h3>
+                    {Object.entries(results.percentages).sort((a, b) => b[1] - a[1]).map(([dosha, pct]) => (
+                      <div key={dosha} className="mb-2">
+                        <div className="flex justify-between text-sm mb-1">
+                          <span>{doshaInfo[dosha].emoji} {doshaInfo[dosha].name}</span>
+                          <span className="font-semibold">{pct}%</span>
+                        </div>
+                        <div className="h-3 bg-stone-100 rounded-full overflow-hidden">
+                          <div className={`h-full bg-gradient-to-r ${doshaInfo[dosha].color}`} style={{ width: `${pct}%` }}></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-green-50 rounded-xl p-3 border border-green-200">
+                      <h4 className="font-semibold text-green-800 text-sm mb-2">✨ En Equilibrio</h4>
+                      <ul className="text-xs text-green-700 space-y-1">
+                        {primary.enEquilibrio.slice(0, 4).map((item, i) => <li key={i}>• {item}</li>)}
+                      </ul>
+                    </div>
+                    <div className="bg-red-50 rounded-xl p-3 border border-red-200">
+                      <h4 className="font-semibold text-red-800 text-sm mb-2">⚠️ Signos Actuales</h4>
+                      <ul className="text-xs text-red-700 space-y-1">
+                        {primary.signosDesequilibrio.slice(0, 4).map((item, i) => <li key={i}>• {item}</li>)}
+                      </ul>
+                    </div>
+                  </div>
+                  {results.nakshatra && (
+                    <div className="bg-indigo-50 rounded-xl p-4 border border-indigo-200">
+                      <h4 className="font-semibold text-indigo-800 mb-2">⭐ Tu Nakshatra: {results.nakshatra.name}</h4>
+                      <div className="text-xs text-indigo-700 grid grid-cols-3 gap-2">
+                        <div><strong>Regente:</strong> {results.nakshatra.ruler}</div>
+                        <div><strong>Cualidad:</strong> {results.nakshatra.quality}</div>
+                        <div><strong>Elemento:</strong> {results.nakshatra.elemento}</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'proyeccion' && (
+                <div className="space-y-4">
+                  <div className="bg-white rounded-2xl p-4 shadow">
+                    <h3 className="font-semibold text-stone-800 mb-4">🔮 Tu Futuro: Dos Caminos</h3>
+                    <div className="mb-6">
+                      <h4 className="text-red-600 font-semibold text-sm mb-3">❌ Si mantenés el desequilibrio:</h4>
+                      <div className="space-y-3">
+                        {Object.entries(primary.proyeccionSalud).map(([key, data]) => (
+                          <div key={key} className={`p-3 rounded-xl border-l-4 ${
+                            data.riesgo === 'medio' ? 'bg-yellow-50 border-yellow-400' :
+                            data.riesgo === 'alto' ? 'bg-orange-50 border-orange-400' : 'bg-red-50 border-red-400'
+                          }`}>
+                            <div className="flex justify-between items-center mb-1">
+                              <span className="font-semibold text-sm">{data.titulo}</span>
+                              <span className={`text-xs px-2 py-0.5 rounded-full ${
+                                data.riesgo === 'medio' ? 'bg-yellow-200 text-yellow-800' :
+                                data.riesgo === 'alto' ? 'bg-orange-200 text-orange-800' : 'bg-red-200 text-red-800'
+                              }`}>Riesgo {data.riesgo}</span>
+                            </div>
+                            <ul className="text-xs text-stone-600">
+                              {data.sintomas.map((s, i) => <li key={i}>• {s}</li>)}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="text-green-600 font-semibold text-sm mb-3">✅ Si hacés los cambios:</h4>
+                      <div className="space-y-2">
+                        {Object.entries(primary.proyeccionPositiva).map(([key, value]) => (
+                          <div key={key} className="bg-green-50 p-3 rounded-xl border-l-4 border-green-400">
+                            <span className="font-semibold text-sm text-green-800">{key.replace('meses', ' meses').replace('año', ' año').replace('años', ' años')}: </span>
+                            <span className="text-xs text-green-700">{value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'alimentos' && (
+                <div className="space-y-4">
+                  <div className="bg-green-50 rounded-2xl p-4 border border-green-200">
+                    <h3 className="font-semibold text-green-800 mb-3">✅ CONSUMIR</h3>
+                    {Object.entries(primary.alimentosSI).map(([cat, items]) => (
+                      <div key={cat} className="mb-3">
+                        <h4 className="font-medium text-green-700 text-sm capitalize mb-1">{cat}</h4>
+                        <div className="flex flex-wrap gap-1">
+                          {items.map((item, i) => <span key={i} className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">{item}</span>)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="bg-red-50 rounded-2xl p-4 border border-red-200">
+                    <h3 className="font-semibold text-red-800 mb-3">❌ EVITAR</h3>
+                    {Object.entries(primary.alimentosNO).map(([cat, items]) => (
+                      <div key={cat} className="mb-3">
+                        <h4 className="font-medium text-red-700 text-sm capitalize mb-1">{cat}</h4>
+                        <div className="flex flex-wrap gap-1">
+                          {items.map((item, i) => <span key={i} className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">{item}</span>)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'horarios' && (
+                <div className="bg-white rounded-2xl p-4 shadow">
+                  <h3 className="font-semibold text-stone-800 mb-3">⏰ Tu Rutina Diaria (Dinacharya)</h3>
+                  <div className="space-y-2">
+                    {Object.entries(primary.horarios).map(([key, data]) => (
+                      <div key={key} className="flex items-start gap-3 p-3 bg-stone-50 rounded-xl">
+                        <div className="bg-amber-100 text-amber-800 font-mono text-xs px-2 py-1 rounded min-w-[80px] text-center">
+                          {data.hora.split(' - ')[0]}
+                        </div>
+                        <div className="flex-1">
+                          <span className="font-medium text-sm text-stone-800 capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
+                          <p className="text-xs text-stone-500 mt-0.5">{data.nota}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'ejercicio' && (
+                <div className="space-y-4">
+                  <div className="bg-white rounded-2xl p-4 shadow">
+                    <h3 className="font-semibold text-stone-800 mb-3">🏃 Plan de Ejercicio</h3>
+                    <div className="grid grid-cols-2 gap-3 mb-4">
+                      <div className="bg-blue-50 rounded-xl p-3">
+                        <h4 className="font-medium text-blue-800 text-xs mb-1">Frecuencia</h4>
+                        <p className="text-sm text-blue-900">{primary.ejercicio.frecuencia}</p>
+                      </div>
+                      <div className="bg-purple-50 rounded-xl p-3">
+                        <h4 className="font-medium text-purple-800 text-xs mb-1">Intensidad</h4>
+                        <p className="text-sm text-purple-900">{primary.ejercicio.intensidad}</p>
+                      </div>
+                      <div className="bg-amber-50 rounded-xl p-3 col-span-2">
+                        <h4 className="font-medium text-amber-800 text-xs mb-1">Mejor Horario</h4>
+                        <p className="text-sm text-amber-900">{primary.ejercicio.mejorHora}</p>
+                      </div>
+                    </div>
+                    <div className="bg-green-50 rounded-xl p-3 mb-3">
+                      <h4 className="font-semibold text-green-800 text-sm mb-2">✅ Recomendados</h4>
+                      <div className="flex flex-wrap gap-1">
+                        {primary.ejercicio.recomendados.map((e, i) => <span key={i} className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">{e}</span>)}
+                      </div>
+                    </div>
+                    <div className="bg-red-50 rounded-xl p-3">
+                      <h4 className="font-semibold text-red-800 text-sm mb-2">❌ Evitar</h4>
+                      <div className="flex flex-wrap gap-1">
+                        {primary.ejercicio.evitar.map((e, i) => <span key={i} className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">{e}</span>)}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-2xl p-4 shadow">
+                    <h3 className="font-semibold text-stone-800 mb-3">🌿 Suplementos Recomendados</h3>
+                    <div className="space-y-2">
+                      {primary.hierbas.map((h, i) => (
+                        <div key={i} className="bg-emerald-50 rounded-xl p-3">
+                          <div className="flex justify-between items-start">
+                            <span className="font-medium text-emerald-800">{h.nombre}</span>
+                            <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">{h.dosis}</span>
+                          </div>
+                          <p className="text-xs text-emerald-600 mt-1">{h.beneficio}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'recetas' && (
+                <div className="space-y-4">
+                  <div className="bg-orange-50 rounded-2xl p-4 border border-orange-200">
+                    <h3 className="font-semibold text-orange-800 mb-2">🍲 Recetas para {primary.name}</h3>
+                    <p className="text-xs text-orange-600">Platos diseñados para equilibrar tu constitución y nutrir tu cuerpo:</p>
+                  </div>
+                  <div className="space-y-3">
+                    {recetasPorDosha[results.primaryDosha].map((receta, i) => (
+                      <div key={i} className="bg-white rounded-2xl p-4 shadow">
+                        <div className="flex justify-between items-start mb-2">
+                          <h4 className="font-semibold text-stone-800">{receta.nombre}</h4>
+                          <div className="flex gap-1">
+                            <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">{receta.tipo}</span>
+                            <span className="text-xs bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full">⏱️ {receta.tiempo}</span>
+                          </div>
+                        </div>
+                        <p className="text-xs text-green-600 mb-3">✨ {receta.beneficio}</p>
+                        <div className="bg-orange-50 rounded-xl p-3 mb-3">
+                          <h5 className="text-xs font-semibold text-orange-800 mb-2">📝 Ingredientes:</h5>
+                          <div className="flex flex-wrap gap-1">
+                            {receta.ingredientes.map((ing, j) => (
+                              <span key={j} className="text-xs bg-white text-stone-600 px-2 py-1 rounded-full border">{ing}</span>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="bg-stone-50 rounded-xl p-3">
+                          <h5 className="text-xs font-semibold text-stone-700 mb-1">👩‍🍳 Preparación:</h5>
+                          <p className="text-xs text-stone-600">{receta.instrucciones}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'terapias' && (
+                <div className="space-y-4">
+                  <div className="bg-teal-50 rounded-2xl p-4 border border-teal-200">
+                    <h3 className="font-semibold text-teal-800 mb-2">💆 Terapias Ayurvédicas para {primary.name}</h3>
+                    <p className="text-xs text-teal-600">Tratamientos tradicionales para equilibrar tu dosha y restaurar tu bienestar:</p>
+                  </div>
+                  <div className="space-y-3">
+                    {terapiasPorDosha[results.primaryDosha].map((terapia, i) => (
+                      <div key={i} className="bg-white rounded-2xl p-4 shadow border-l-4 border-teal-400">
+                        <div className="flex items-start gap-3">
+                          <div className="text-3xl">{terapia.emoji}</div>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-stone-800">{terapia.nombre}</h4>
+                            <p className="text-teal-600 text-sm mt-1">{terapia.descripcion}</p>
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {terapia.beneficios.map((b, j) => (
+                                <span key={j} className="text-xs bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full">{b}</span>
+                              ))}
+                            </div>
+                            <div className="mt-3 bg-teal-50 rounded-xl p-3">
+                              <p className="text-xs text-stone-600"><strong>Cómo:</strong> {terapia.instrucciones}</p>
+                              <p className="text-xs text-teal-700 mt-2"><strong>🧴 Aceite:</strong> {terapia.aceite}</p>
+                              <p className="text-xs text-teal-800 mt-1 font-medium">📅 {terapia.frecuencia}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="bg-amber-50 rounded-xl p-4 text-xs text-amber-800">
+                    <p>⚠️ <strong>Nota:</strong> Algunas terapias como Shirodhara, Basti y Netra Basti requieren supervisión profesional. Consultá con un terapeuta ayurvédico certificado.</p>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'mudras' && (
+                <div className="space-y-4">
+                  <div className="bg-purple-50 rounded-2xl p-4 border border-purple-200">
+                    <h3 className="font-semibold text-purple-800 mb-2">🙏 Mudras para tu Desequilibrio {primary.name}</h3>
+                    <p className="text-xs text-purple-600">Estos mudras están seleccionados específicamente para tratar tus signos de desequilibrio:</p>
+                  </div>
+                  <div className="space-y-3">
+                    {primary.signosDesequilibrio.map((signo, i) => {
+                      const mudra = mudrasPorDolencia[signo];
+                      if (!mudra) return null;
+                      return (
+                        <div key={i} className="bg-white rounded-2xl p-4 shadow border-l-4 border-purple-400">
+                          <div className="flex items-start gap-3">
+                            <div className="text-3xl">{mudra.mano}</div>
+                            <div className="flex-1">
+                              <p className="text-xs text-red-500 font-medium mb-1">Para: {signo}</p>
+                              <h4 className="font-semibold text-stone-800">{mudra.nombre}</h4>
+                              <p className="text-purple-600 text-sm mt-1">{mudra.beneficio}</p>
+                              <div className="mt-3 bg-purple-50 rounded-xl p-3">
+                                <p className="text-xs text-stone-600"><strong>Cómo:</strong> {mudra.instrucciones}</p>
+                                <p className="text-xs text-purple-700 mt-2 font-medium">⏱️ {mudra.duracion}</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="bg-stone-100 rounded-xl p-4 text-xs text-stone-600">
+                    <p>💡 <strong>Consejo:</strong> Practicá los mudras en un lugar tranquilo, con respiración lenta y profunda. Podés combinarlos con meditación.</p>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'pranayama' && (() => { const d = pranayamaMeditacionChakras[results.primaryDosha]; return (
+                <div className="space-y-4">
+                  <div className={`bg-gradient-to-br ${primary.color} rounded-2xl p-4 text-white`}>
+                    <h3 className="font-bold text-lg mb-1">🌬️ Pranayamas para {primary.name}</h3>
+                    <p className="text-xs text-white/80">Técnicas respiratorias para equilibrar tu biotipo</p>
+                  </div>
+                  {d.pranayamas.map((p, i) => (
+                    <div key={i} className="bg-white rounded-2xl p-4 shadow space-y-3">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <span className="text-2xl">{p.emoji}</span>
+                          <h4 className="font-bold text-stone-800 mt-1">{p.nombre}</h4>
+                          <p className="text-xs text-stone-400 italic">{p.sanskrit}</p>
+                        </div>
+                        <span className={`text-xs px-2 py-1 rounded-full font-medium ${p.nivel === 'Principal' ? 'bg-amber-100 text-amber-700' : 'bg-stone-100 text-stone-600'}`}>{p.nivel}</span>
+                      </div>
+                      <p className="text-sm text-stone-600">{p.beneficio}</p>
+                      <div className="bg-stone-50 rounded-xl p-3">
+                        <p className="text-xs font-semibold text-stone-700 mb-2">Paso a paso:</p>
+                        <ol className="space-y-1">
+                          {p.instrucciones.map((inst, j) => (
+                            <li key={j} className="text-xs text-stone-600 flex gap-2">
+                              <span className="text-amber-500 font-bold flex-shrink-0">{j+1}.</span>
+                              <span>{inst}</span>
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="bg-blue-50 rounded-xl p-2 text-center">
+                          <p className="text-xs text-blue-500 font-medium">⏱ Duración</p>
+                          <p className="text-xs text-blue-700">{p.duracion}</p>
+                        </div>
+                        <div className="bg-green-50 rounded-xl p-2 text-center">
+                          <p className="text-xs text-green-500 font-medium">🕐 Mejor momento</p>
+                          <p className="text-xs text-green-700">{p.mejorMomento}</p>
+                        </div>
+                      </div>
+                      <div className="bg-amber-50 rounded-xl p-2">
+                        <p className="text-xs text-amber-700"><strong>Ritmo:</strong> {p.ritmo}</p>
+                      </div>
+                      {p.contraindicaciones && (<div className="bg-red-50 rounded-xl p-2"><p className="text-xs text-red-600">⚠️ {p.contraindicaciones}</p></div>)}
+                    </div>
+                  ))}
+                  <div className="bg-stone-100 rounded-xl p-3 text-xs text-stone-600">
+                    <strong>🗓 Rutina diaria:</strong> {d.meditacion.rutinaDiaria}
+                  </div>
+                </div>
+              ); })()}
+
+              {activeTab === 'meditacion' && (() => { const d = pranayamaMeditacionChakras[results.primaryDosha]; return (
+                <div className="space-y-4">
+                  <div className={`bg-gradient-to-br ${primary.color} rounded-2xl p-4 text-white`}>
+                    <h3 className="font-bold text-lg mb-1">🧘 {d.meditacion.estilo}</h3>
+                    <p className="text-xs text-white/80">{d.meditacion.descripcion}</p>
+                  </div>
+                  {d.meditacion.practicas.map((m, i) => (
+                    <div key={i} className="bg-white rounded-2xl p-4 shadow space-y-3">
+                      <h4 className="font-bold text-stone-800">{m.nombre}</h4>
+                      <p className="text-xs text-stone-500">⏱ {m.duracion}</p>
+                      <div className="bg-stone-50 rounded-xl p-3">
+                        <p className="text-xs font-semibold text-stone-700 mb-1">Cómo practicarla:</p>
+                        <p className="text-xs text-stone-600 leading-relaxed">{m.instrucciones}</p>
+                      </div>
+                      <div className="bg-green-50 rounded-xl p-2">
+                        <p className="text-xs text-green-700">✨ <strong>Beneficio:</strong> {m.beneficio}</p>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="bg-white rounded-2xl p-4 shadow">
+                    <h4 className="font-bold text-stone-800 mb-3">🕉️ Mantra Principal</h4>
+                    <div className={`bg-gradient-to-br ${primary.color} rounded-xl p-4 text-center text-white mb-3`}>
+                      <p className="text-xl font-bold tracking-widest">{d.meditacion.mantraPrincipal.mantra}</p>
+                    </div>
+                    <p className="text-xs text-stone-600 text-center italic mb-2">"{d.meditacion.mantraPrincipal.significado}"</p>
+                    <p className="text-xs text-stone-500 text-center">{d.meditacion.mantraPrincipal.repeticiones}</p>
+                  </div>
+                  <div className="bg-amber-50 rounded-xl p-3 text-xs text-amber-800">
+                    <strong>🗓 Rutina sugerida:</strong> {d.meditacion.rutinaDiaria}
+                  </div>
+                </div>
+              ); })()}
+
+              {activeTab === 'chakras' && (() => { const d = pranayamaMeditacionChakras[results.primaryDosha]; return (
+                <div className="space-y-4">
+                  <div className={`bg-gradient-to-br ${primary.color} rounded-2xl p-4 text-white`}>
+                    <h3 className="font-bold text-lg mb-1">💜 Chakras a Trabajar</h3>
+                    <p className="text-xs text-white/80">Los centros energéticos que más impactan tu biotipo {primary.name}</p>
+                  </div>
+                  {d.chakras.map((ch, i) => (
+                    <div key={i} className="bg-white rounded-2xl p-4 shadow space-y-3">
+                      <div className="flex items-start gap-3">
+                        <div className="text-3xl">{ch.colorEmoji}</div>
+                        <div>
+                          <h4 className="font-bold text-stone-800">{ch.nombre}</h4>
+                          <p className="text-xs text-stone-500">{ch.posicion} · {ch.elemento}</p>
+                          <span className="text-xs bg-stone-100 rounded-full px-2 py-0.5 font-mono font-bold text-stone-600">Bija: {ch.bija}</span>
+                        </div>
+                      </div>
+                      <div className="bg-red-50 rounded-xl p-3">
+                        <p className="text-xs font-semibold text-red-700 mb-1">⚠️ Desequilibrio:</p>
+                        <p className="text-xs text-red-600">{ch.desequilibrio}</p>
+                      </div>
+                      <div className="bg-purple-50 rounded-xl p-3">
+                        <p className="text-xs font-semibold text-purple-700 mb-1">🧘 Práctica:</p>
+                        <p className="text-xs text-purple-600">{ch.practica}</p>
+                      </div>
+                      <div className="bg-stone-50 rounded-xl p-3">
+                        <p className="text-xs font-semibold text-stone-700 mb-2">✨ Actividades:</p>
+                        {ch.ejercicios.map((ej, j) => (<p key={j} className="text-xs text-stone-600">• {ej}</p>))}
+                      </div>
+                    </div>
+                  ))}
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800">
+                    💡 <strong>Tip:</strong> Entoná el mantra Bija de cada chakra 5 minutos para su activación directa.
+                  </div>
+                </div>
+              ); })()}
+
+
+              {activeTab === 'ubicacion' && (
+                <div className="space-y-4">
+                  <div className="bg-blue-50 rounded-2xl p-4 border border-blue-200">
+                    <h3 className="font-semibold text-blue-800 mb-2">📍 Encontrá Cerca de Vos</h3>
+                    <p className="text-xs text-blue-600">Tocá cualquier categoría para buscar lugares con rating 4+ estrellas cerca de tu ubicación:</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {busquedasCercanas.map((busqueda, i) => (
+                      <button key={i} onClick={() => abrirBusquedaMaps(busqueda.query)}
+                        className="bg-white rounded-2xl p-4 shadow hover:shadow-md transition-all text-left border border-stone-100 hover:border-blue-300">
+                        <div className="text-3xl mb-2">{busqueda.emoji}</div>
+                        <h4 className="font-semibold text-stone-800 text-sm">{busqueda.nombre}</h4>
+                        <p className="text-xs text-blue-500 mt-1">Ver en Maps →</p>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="bg-amber-50 rounded-xl p-4 text-xs text-amber-800">
+                    <p>💡 <strong>Tip:</strong> Permití el acceso a tu ubicación para ver resultados más precisos. Filtrá por "rating 4+" en Google Maps para ver solo los mejor puntuados.</p>
+                  </div>
+                  <div className="bg-stone-100 rounded-xl p-4 text-xs text-stone-600">
+                    <p>🔄 <strong>Actualizado:</strong> Los resultados provienen directamente de Google Maps en tiempo real.</p>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'salud' && (
+                <div className="space-y-4">
+                  <div className="bg-white rounded-2xl p-4 shadow">
+                    <h3 className="font-semibold text-stone-800 mb-3">🏥 Riesgos de Salud por Desequilibrio {primary.name}</h3>
+                    <p className="text-xs text-stone-500 mb-4">Si mantenés el desequilibrio actual, estas son las condiciones a las que sos más susceptible:</p>
+                    <div className="space-y-2">
+                      {primary.enfermedadesRiesgo.map((enf, i) => (
+                        <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-stone-50">
+                          <span className="text-sm text-stone-700">{enf.nombre}</span>
+                          <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                            enf.probabilidad.includes('Alta') || enf.probabilidad.includes('Muy') ? 'bg-red-100 text-red-700' :
+                            enf.probabilidad.includes('Media') ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'
+                          }`}>{enf.probabilidad}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs text-amber-800">
+                    <p><strong>⚠️ Aviso:</strong> Esta información es educativa y basada en principios ayurvédicos tradicionales. No reemplaza el diagnóstico médico profesional. Consultá a un profesional de salud para cualquier condición médica.</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 space-y-2">
+              {!isPremium && (
+                <button onClick={() => { gtag('event', 'subscription_clicked'); setShowPaywall(true); }} className="w-full py-3 rounded-xl font-semibold bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
+                  ⭐ Guardar Mi Perfil - $10 USD
+                </button>
+              )}
+              {isPremium && (
+                <div className="text-center text-green-600 text-sm font-medium">
+                  ⭐ Premium Activo - Tu perfil está guardado
+                </div>
+              )}
+              <button onClick={generatePDF} className="w-full py-3 rounded-xl font-semibold" style={{ backgroundColor: '#F4C430', color: '#5D4E37' }}>
+                📥 Descargar mi Plan Completo
+              </button>
+            </div>
+
+            {/* Paywall Modal */}
+            {showPaywall && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+                  <div className="text-center">
+                    <div className="text-5xl mb-4">⭐</div>
+                    <h3 className="text-xl font-bold text-stone-800 mb-2">VedaBite Premium</h3>
+                    <p className="text-stone-600 mb-4">Guardá tu perfil para siempre y accedé sin rehacer el test</p>
+                    
+                    <div className="bg-purple-50 rounded-xl p-4 mb-4">
+                      <div className="text-3xl font-bold text-purple-600">$10 USD/mes</div>
+                      <p className="text-purple-500 text-sm">Suscripción mensual</p>
+                    </div>
+                    
+                    <ul className="text-left text-sm text-stone-600 space-y-2 mb-6">
+                      <li>✅ Guardá tu perfil Dosha</li>
+                      <li>✅ Accedé sin rehacer el test</li>
+                      <li>✅ Actualizaciones automáticas</li>
+                      <li>✅ Cancelá cuando quieras</li>
+                    </ul>
+                    
+                    <button onClick={initPayment} disabled={processingPayment}
+                      className="w-full py-3 rounded-xl font-semibold bg-gradient-to-r from-purple-500 to-indigo-600 text-white disabled:opacity-50 mb-3">
+                      {processingPayment ? '⏳ Procesando...' : '💳 Pagar con Mercado Pago'}
+                    </button>
+                    
+                    <button onClick={() => setShowPaywall(false)} className="text-stone-400 text-sm">
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      return null;
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<Vedabite />);
+  </script>
+</body>
+</html>
