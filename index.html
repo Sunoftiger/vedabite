@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -41,7 +42,7 @@
     
     // Mercado Pago Config
     const MP_PUBLIC_KEY = 'APP_USR-cfbe2c27-b52d-4db4-89a1-d67ed5579bc7';
-    const PRECIO_PREMIUM = 3.99; // USD
+    const PRECIO_PREMIUM = 10; // USD
 
     // ═══════════════════════════════════════════════════════════════════════════════
     // 60 PREGUNTAS - 20 POR DOSHA
@@ -510,6 +511,60 @@
       );
     };
 
+    const PMC = {
+      vata: {
+        pranayamas: [
+          {emoji:"🌬️",nombre:"Nadi Shodhana",sanskrit:"nadi shodhana",nivel:"Principal",beneficio:"Calma el sistema nervioso y reduce la ansiedad",ritmo:"4-4-8",duracion:"10-15 min",momento:"Manana en ayunas o antes de dormir",contra:"Evitar con congestion nasal",instrucciones:["Cerra la fosa derecha con el pulgar","Inhala por la izquierda 4 tiempos","Cerra ambas, retenes 4 tiempos","Exhala por la derecha 8 tiempos","Inhala derecha 4, retenes 4, exhala izquierda 8","Repeti 10-15 rondas"]},
+          {emoji:"🌊",nombre:"Ujjayi",sanskrit:"ujjayi",nivel:"Calmante",beneficio:"Calienta el cuerpo y centra la mente dispersa",ritmo:"Lento y continuo",duracion:"5-10 min",momento:"Durante yoga o ansiedad",contra:"No con hipertension severa",instrucciones:["Contrae ligeramente la garganta","Inhala por nariz con sonido suave de mar","Sentis calor en la garganta","Exhala con el mismo sonido suave"]},
+          {emoji:"🐝",nombre:"Bhramari",sanskrit:"bhramari",nivel:"Para el sueno",beneficio:"Induce el sueno y calma pensamientos acelerados",ritmo:"Inhalacion normal, exhalacion con zumbido",duracion:"5-10 min",momento:"Antes de dormir",contra:"No acostado",instrucciones:["Cerra los ojos y tagate los oidos con pulgares","Inhala profundo","Al exhalar produce un zumbido mmm","Sentis vibracion en cabeza y pecho","Repeti 5-10 veces"]}
+        ],
+        meditacion:{estilo:"Enraizamiento y Estabilidad",desc:"Vata necesita meditaciones que anclen la energia mental dispersa.",mantra:"OM NAMAH SHIVAYA",mantraDesc:"Me rindo ante la conciencia pura",rutina:"5 min respiracion + 15 min meditacion al despertar",practicas:[
+          {nombre:"Trataka (Foco en llama)",duracion:"10-20 min",inst:"Mira una vela a 50cm sin parpadear. Al cerrar ojos visualiza la llama en el tercer ojo.",beneficio:"Concentracion sostenida, calma mental"},
+          {nombre:"Body Scan con Tierra",duracion:"15-20 min",inst:"Acostado, lleva la atencion de pies a cabeza. En cada zona di: esta parte es tierra, es estable.",beneficio:"Reduce ansiedad, induce sueno profundo"},
+          {nombre:"Mantra SoHam",duracion:"15-30 min",inst:"Al inhalar escucha So, al exhalar Ham. No forzar, solo observar.",beneficio:"Unifica mente fragmentada"}
+        ]},
+        chakras:[
+          {emoji:"🔴",nombre:"Muladhara - Raiz",posicion:"Base de la columna",elemento:"Tierra",bija:"LAM",desequilibrio:"Ansiedad y miedo - sintomas tipicos de Vata elevado",practica:"Visualiza un disco rojo en la base. Afirmacion: Estoy enraizado/a",actividades:["Caminar descalzo en tierra","Poses de yoga en suelo","Mantener rutinas fijas","Comer alimentos raiz"]},
+          {emoji:"💚",nombre:"Anahata - Corazon",posicion:"Centro del pecho",elemento:"Aire",bija:"YAM",desequilibrio:"Miedo al abandono - Vata pierde conexion con el amor propio",practica:"Manos en el corazon. Afirmacion: Soy amado/a y estoy seguro/a",actividades:["Inhalar amor exhalar miedo","Abrazos conscientes","Journaling de gratitud","Cantar mantras"]},
+          {emoji:"💜",nombre:"Sahasrara - Corona",posicion:"Cima de la cabeza",elemento:"Eter",bija:"OM",desequilibrio:"Pensamiento hiperactivo e insomnio mental",practica:"Visualiza luz violeta entrando por la cima calmando los pensamientos",actividades:["Meditacion silenciosa","Contemplacion en naturaleza","Ayuno digital antes de dormir","Nadi Shodhana"]}
+        ]
+      },
+      pitta: {
+        pranayamas: [
+          {emoji:"❄️",nombre:"Sheetali",sanskrit:"sheetali",nivel:"Principal",beneficio:"Enfria el cuerpo y reduce la ira y la acidez",ritmo:"Inhalacion por lengua enrollada, exhala por nariz",duracion:"5-10 min",momento:"Mediodia o cuando sentis calor",contra:"Evitar en invierno",instrucciones:["Saca la lengua y enrollala como tubito","Inhala el aire frio por la lengua","Sentis el frescor en boca y garganta","Cerra la boca y exhala lento por la nariz","Repeti 15-20 veces"]},
+          {emoji:"🌙",nombre:"Chandra Bhedana",sanskrit:"chandra bhedana",nivel:"Refrescante",beneficio:"Activa la energia lunar y enfria el fuego Pitta",ritmo:"Inhala izquierda exhala derecha",duracion:"10 min",momento:"Tarde o antes de dormir",contra:"No combinar con Surya Bhedana",instrucciones:["Cerra la fosa derecha con el pulgar","Inhala lento por la fosa izquierda","Cerra ambas retenes brevemente","Exhala por la fosa derecha","Repeti 10-15 rondas"]},
+          {emoji:"🌿",nombre:"Sitkari",sanskrit:"sitkari",nivel:"Alternativa",beneficio:"Igual efecto refrescante que Sheetali",ritmo:"Inhalacion sibilante exhalacion suave",duracion:"5-10 min",momento:"Mediodia post ejercicio",contra:"No con frio extremo",instrucciones:["Junta los dientes y abri los labios","Inhala por los dientes haciendo sss","Sentis frescor en boca y garganta","Cerra y exhala por la nariz","Repeti 15-20 veces"]}
+        ],
+        meditacion:{estilo:"Compasion y Rendicion",desc:"Pitta necesita meditaciones que suavicen el ego y cultiven compasion.",mantra:"OM SHANTI SHANTI SHANTI",mantraDesc:"Paz en cuerpo mente y espiritu",rutina:"5 min Sheetali + 15 min meditacion de compasion",practicas:[
+          {nombre:"Metta - Amor Incondicional",duracion:"15-20 min",inst:"Envia amor a vos: Que yo sea feliz. Luego a personas amadas, neutras y dificiles.",beneficio:"Reduce perfeccionismo y suaviza la ira"},
+          {nombre:"Lago Sereno",duracion:"10-15 min",inst:"Imagina un lago calmo. Sos ese lago. Cada pensamiento es una piedra que se calma solo. No intervengas.",beneficio:"Desarrolla la no-reaccion"},
+          {nombre:"Meditacion de Rendicion",duracion:"20 min",inst:"Afirmacion: No necesito controlar todo. Cuando la mente quiere resolver, solta y volvé al silencio.",beneficio:"Reduce agotamiento por control excesivo"}
+        ]},
+        chakras:[
+          {emoji:"🟡",nombre:"Manipura - Plexo Solar",posicion:"Abdomen ombligo",elemento:"Fuego",bija:"RAM",desequilibrio:"Exceso de control e ira - el fuego Pitta quema este chakra",practica:"Visualiza el plexo como llama tranquila. Afirmacion: Confio en el proceso",actividades:["Torsiones de yoga","Meditacion de rendicion","Sheetali en el abdomen","Actividades creativas sin objetivo"]},
+          {emoji:"💚",nombre:"Anahata - Corazon",posicion:"Centro del pecho",elemento:"Agua",bija:"YAM",desequilibrio:"Corazon cerrado por exceso de critica y perfeccionismo",practica:"Afirmacion: Soy suficiente. No necesito ser perfecto/a para merecer amor",actividades:["Meditacion Metta diaria","Inhalar verde exhalar rojo","Banos largos nadar","Contacto con naturaleza"]},
+          {emoji:"🔵",nombre:"Vishuddha - Garganta",posicion:"Garganta cuello",elemento:"Sonido",bija:"HAM",desequilibrio:"Comunicacion cortante y dominante",practica:"Antes de hablar: Es verdad? Es necesario? Es amable?",actividades:["Canto de mantras","Escucha activa","Journaling","Ujjayi en la garganta"]}
+        ]
+      },
+      kapha: {
+        pranayamas: [
+          {emoji:"🔥",nombre:"Kapalabhati",sanskrit:"kapalabhati",nivel:"Principal",beneficio:"Activa metabolismo elimina toxinas y enciende el fuego digestivo",ritmo:"Exhala activa y rapida inhala pasiva",duracion:"5-10 min",momento:"Primera hora manana en ayunas",contra:"Evitar con hipertension embarazo o hernias",instrucciones:["Senta te erguido/a","Inhala profundo naturalmente","Exhala con fuerza contrayendo el abdomen","La inhalacion es automatica","Empieza con 20 bombeos llega a 60-120","Realiza 3 rondas"]},
+          {emoji:"⚡",nombre:"Bhastrika",sanskrit:"bhastrika",nivel:"Energizante",beneficio:"Genera calor intenso y combate el letargo Kapha",ritmo:"Ambas fases activas 1 por segundo",duracion:"5 min",momento:"Al despertar o antes de ejercicio",contra:"No para cardiacos o hipertensos",instrucciones:["Senta te erguido/a","Inhala forzando abdomen hacia afuera","Exhala con fuerza contrayendo abdomen","Ritmo de 1 ciclo por segundo","Empieza con 10 llega a 20-30","Descansa entre rondas"]},
+          {emoji:"☀️",nombre:"Surya Bhedana",sanskrit:"surya bhedana",nivel:"Activador",beneficio:"Activa la energia solar calienta y combate la pesadez",ritmo:"Inhala derecha exhala izquierda",duracion:"10 min",momento:"Al despertar cuando hay letargo",contra:"No en verano intenso",instrucciones:["Cerra la fosa izquierda con el anular","Inhala lento por la fosa derecha","Cerra ambas retenes 4 tiempos","Exhala por la fosa izquierda","Repeti 10-15 rondas"]}
+        ],
+        meditacion:{estilo:"Activadora y de Desapego",desc:"Kapha necesita meditaciones que muevan la energia estancada. El fuego y el movimiento son aliados.",mantra:"OM HRIM NAMAH",mantraDesc:"Invocacion al principio creador y transformador",rutina:"10 min Kapalabhati + 15 min meditacion activa",practicas:[
+          {nombre:"Fuego Interno",duracion:"15 min",inst:"Visualiza un fuego en el plexo solar. Con cada Kapalabhati crece. Quema el estancamiento y la pereza.",beneficio:"Activa metabolismo y genera motivacion"},
+          {nombre:"Meditacion de Desapego",duracion:"20 min",inst:"Piensa en algo a lo que estas muy apegado. Visualizalo en tus manos abiertas y soltalo. Afirmacion: Puedo fluir.",beneficio:"Reduce apego y resistencia al cambio"},
+          {nombre:"Meditacion Caminando",duracion:"20-30 min",inst:"Camina muy lentamente. 2 pasos inhala 2 pasos exhala. Kapha necesita meditaciones activas.",beneficio:"Activa energia y combate el letargo"}
+        ]},
+        chakras:[
+          {emoji:"🔴",nombre:"Muladhara - Raiz",posicion:"Base de la columna",elemento:"Tierra",bija:"LAM",desequilibrio:"Exceso de Tierra: pesadez apego y resistencia al cambio",practica:"Visualiza el chakra GIRANDO y liberando. Afirmacion: Estoy enraizado/a Y fluyo",actividades:["Yoga dinamico y vigoroso","Cambiar rutinas deliberadamente","Limpiar y donar objetos","Exposicion al sol"]},
+          {emoji:"🟠",nombre:"Svadhisthana - Sacro",posicion:"Bajo abdomen pelvis",elemento:"Agua",bija:"VAM",desequilibrio:"Creatividad suprimida y energia estancada",practica:"Afirmacion: Mi creatividad fluye. Me permito sentir placer",actividades:["Danza libre","Actividades manuales creativas","Movimientos de cadera en yoga","Contacto con agua en movimiento"]},
+          {emoji:"🟣",nombre:"Ajna - Tercer Ojo",posicion:"Entrecejo",elemento:"Luz",bija:"OM",desequilibrio:"Rigidez mental y resistencia a nuevas perspectivas",practica:"Trataka. Afirmacion: Confio en mi intuicion. Estoy abierto/a al cambio",actividades:["Trataka 10 min diarios","Aprender algo nuevo cada semana","Inversiones de yoga","Kapalabhati en el entrecejo"]}
+        ]
+      }
+    };
+
     // Main App
     function Vedabite() {
       const [step, setStep] = useState(0);
@@ -523,6 +578,17 @@
       const [isPremium, setIsPremium] = useState(false);
       const [showPaywall, setShowPaywall] = useState(false);
       const [processingPayment, setProcessingPayment] = useState(false);
+      const [geoCoords, setGeoCoords] = useState(null);
+      const [bioManual, setBioManual] = useState({});
+      const [showBioModal, setShowBioModal] = useState(false);
+      const geocodeBirthPlace = async (place) => {
+        if (!place || place.length < 3) return;
+        try {
+          const res = await fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(place) + '&format=json&limit=1');
+          const data = await res.json();
+          if (data && data[0]) setGeoCoords({ lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) });
+        } catch(e) {}
+      };
 
       // Verificar si es premium al cargar
       useEffect(() => {
@@ -574,7 +640,7 @@
           
           // Simular activación (en producción verificarías el pago)
           setTimeout(() => {
-            if (confirm('¿Completaste el pago de $3.99 USD?')) {
+            if (confirm('¿Completaste el pago de $10 USD?')) {
               gtag('event', 'subscription_paid');
               activatePremium();
             }
@@ -617,17 +683,53 @@
         let nakshatra = null;
         let age = null;
         
+        let jyotish = null;
         if (birthData.date?.formatted) {
           const date = new Date(birthData.date.formatted);
           const dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
           nakshatra = nakshatras[dayOfYear % 27];
           age = calculateAge(birthData.date.formatted);
+          const rashis = [
+            {name:"Mesha (Aries)",ruler:"Marte",elemento:"Fuego",dosha:"Pitta"},
+            {name:"Vrishabha (Tauro)",ruler:"Venus",elemento:"Tierra",dosha:"Kapha"},
+            {name:"Mithuna (Geminis)",ruler:"Mercurio",elemento:"Aire",dosha:"Vata"},
+            {name:"Karka (Cancer)",ruler:"Luna",elemento:"Agua",dosha:"Kapha"},
+            {name:"Simha (Leo)",ruler:"Sol",elemento:"Fuego",dosha:"Pitta"},
+            {name:"Kanya (Virgo)",ruler:"Mercurio",elemento:"Tierra",dosha:"Vata"},
+            {name:"Tula (Libra)",ruler:"Venus",elemento:"Aire",dosha:"Vata"},
+            {name:"Vrishchika (Escorpio)",ruler:"Marte",elemento:"Agua",dosha:"Pitta"},
+            {name:"Dhanu (Sagitario)",ruler:"Jupiter",elemento:"Fuego",dosha:"Pitta"},
+            {name:"Makara (Capricornio)",ruler:"Saturno",elemento:"Tierra",dosha:"Vata"},
+            {name:"Kumbha (Acuario)",ruler:"Saturno",elemento:"Aire",dosha:"Vata"},
+            {name:"Meena (Piscis)",ruler:"Jupiter",elemento:"Agua",dosha:"Kapha"}
+          ];
+          const rl = [14,13,14,15,15,15,15,14,15,15,13,15];
+          const m = date.getMonth(); const d = date.getDate();
+          const rashi = rashis[(d <= rl[m]) ? m : (m+1)%12];
+          let lagna = null;
+          if (birthData.time && birthData.time.formatted && geoCoords) {
+            const parts = birthData.time.formatted.split(':');
+            const mins = parseInt(parts[0])*60 + parseInt(parts[1]);
+            lagna = rashis[Math.floor(((mins + geoCoords.lon*4 + 1440) % 1440) / 120) % 12];
+          }
+          const pMap = {
+            "Sol":{dosha:"Pitta",efecto:"Amplifica fuego interno, liderazgo, ego"},
+            "Luna":{dosha:"Kapha",efecto:"Nutre tejidos, emocionalidad, apego"},
+            "Marte":{dosha:"Pitta",efecto:"Agresividad, energia, inflamacion"},
+            "Mercurio":{dosha:"Vata",efecto:"Nerviosismo, comunicacion rapida"},
+            "Jupiter":{dosha:"Kapha",efecto:"Expansion, sabiduria, sobrepeso"},
+            "Venus":{dosha:"Kapha",efecto:"Sensualidad, deseo, fluidos"},
+            "Saturno":{dosha:"Vata",efecto:"Frialdad, lentitud, envejecimiento"},
+            "Rahu":{dosha:"Vata",efecto:"Ansiedad, obsesion, ilusion"},
+            "Ketu":{dosha:"Pitta",efecto:"Espiritualidad, desapego"}
+          };
+          jyotish = { rashi, lagna, nakshatra, coords: geoCoords, planeta: nakshatra ? pMap[nakshatra.ruler] : null };
         }
         
         const maxScore = 60; // 20 preguntas x 3 puntos max
         const desequilibrioLevel = Math.round((scores[dominant[0][0]] / maxScore) * 100);
         
-        return { scores, percentages, primaryDosha: dominant[0][0], secondaryDosha: dominant[1][0], nakshatra, age, desequilibrioLevel };
+        return { scores, percentages, primaryDosha: dominant[0][0], secondaryDosha: dominant[1][0], nakshatra, age, desequilibrioLevel, jyotish };
       };
 
       const handleAnswer = (value) => {
@@ -638,7 +740,7 @@
             setCurrentQuestion(currentQuestion + 1);
           } else {
             const doshaResult = calculateDosha();
-            setResults(doshaResult);
+            setResults({...doshaResult, bioInput: bioManual});
             gtag('event', 'test_completed');
             gtag('event', 'dosha_result_viewed', { dosha: doshaResult.primaryDosha });
             setStep(3);
@@ -784,7 +886,7 @@ www.vedabite.com
               </p>
               <button onClick={() => { setAnimateIn(false); setTimeout(() => setStep(1), 200); }}
                 className="px-10 py-4 rounded-full font-semibold text-lg shadow-lg" style={{ backgroundColor: '#F4C430', color: '#5D4E37' }}>
-                Activá tu GPS del bienestar
+                Activá tu bienestar
               </button>
               <p className="mt-4 text-white/80 text-sm">60 preguntas • 10 minutos • Plan personalizado</p>
               <button onClick={() => setShowSources(true)} className="mt-6 text-sm text-white/70 underline">Ver fuentes científicas</button>
@@ -823,7 +925,9 @@ www.vedabite.com
                 <div>
                   <label className="block text-sm font-medium text-stone-600 mb-1.5">Lugar de Nacimiento</label>
                   <input type="text" value={birthData.birthPlace} onChange={(e) => setBirthData(prev => ({ ...prev, birthPlace: e.target.value }))}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-stone-200 focus:border-amber-400 outline-none bg-white" placeholder="Ciudad, País" autoComplete="off" />
+                    className="w-full px-4 py-3 rounded-xl border-2 border-stone-200 focus:border-amber-400 outline-none bg-white" placeholder="Ciudad, País" autoComplete="off"
+                    onBlur={(e) => geocodeBirthPlace(e.target.value)} />
+                  {geoCoords && <p className="text-xs text-green-600 mt-1">✅ {geoCoords.lat.toFixed(2)}°, {geoCoords.lon.toFixed(2)}°</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-stone-600 mb-2">Fecha de Nacimiento</label>
@@ -835,9 +939,86 @@ www.vedabite.com
                 </div>
               </div>
               
+              <button onClick={() => setShowBioModal(true)}
+                className="mt-4 w-full py-3 rounded-2xl border-2 border-dashed border-stone-300 text-stone-500 text-sm font-medium bg-white hover:border-amber-400 hover:text-amber-600 transition-all">
+                📡 Agregar datos biométricos (opcional)
+                {Object.keys(bioManual).filter(k => bioManual[k]).length > 0 && (
+                  <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                    ✅ {Object.keys(bioManual).filter(k => bioManual[k]).length} datos cargados
+                  </span>
+                )}
+              </button>
+
+              {showBioModal && (
+                <div className="fixed inset-0 bg-black/50 flex items-end justify-center z-50 p-4">
+                  <div className="bg-white rounded-2xl p-5 w-full max-w-sm shadow-2xl">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="font-bold text-stone-800">📡 Datos Biométricos</h3>
+                      <button onClick={() => setShowBioModal(false)} className="text-stone-400 text-lg">✕</button>
+                    </div>
+                    <p className="text-xs text-stone-500 mb-4">Ingresá manualmente o conectá por Bluetooth. Estos datos validan tu biotipo.</p>
+                    <div className="grid grid-cols-2 gap-2 mb-4">
+                      {[
+                        {key:'fc', label:'❤️ Frec. Cardíaca', unit:'lpm', ph:'70'},
+                        {key:'spo2', label:'🫁 SpO2', unit:'%', ph:'98'},
+                        {key:'temp', label:'🌡️ Temperatura', unit:'°C', ph:'36.5'},
+                        {key:'peso', label:'⚖️ Peso', unit:'kg', ph:'70'},
+                        {key:'grasa', label:'🫧 Grasa', unit:'%', ph:'20'},
+                        {key:'musculo', label:'💪 Músculo', unit:'kg', ph:'30'},
+                      ].map(f => (
+                        <div key={f.key}>
+                          <label className="block text-xs text-stone-500 mb-1">{f.label}</label>
+                          <div className="flex items-center border-2 border-stone-200 rounded-xl overflow-hidden focus-within:border-amber-400">
+                            <input type="number" placeholder={f.ph} value={bioManual[f.key] || ''}
+                              onChange={(e) => setBioManual(prev => ({...prev, [f.key]: e.target.value}))}
+                              className="flex-1 px-2 py-2 text-sm outline-none w-0" />
+                            <span className="text-xs text-stone-400 pr-2 flex-shrink-0">{f.unit}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 mb-4">
+                      <button onClick={async () => {
+                        if (!navigator.bluetooth) { alert('Usa Chrome en Android o desktop.'); return; }
+                        try {
+                          const dev = await navigator.bluetooth.requestDevice({ filters:[{services:['heart_rate']}], optionalServices:['health_thermometer','pulse_oximeter'] });
+                          const srv = await dev.gatt.connect();
+                          let nd = {};
+                          try { const s=await srv.getPrimaryService('heart_rate'); const c=await s.getCharacteristic('heart_rate_measurement'); const v=await c.readValue(); nd.fc=(v.getUint8(0)&1)?v.getUint16(1,true):v.getUint8(1); } catch(e) {}
+                          try { const s=await srv.getPrimaryService('health_thermometer'); const c=await s.getCharacteristic('temperature_measurement'); const v=await c.readValue(); nd.temp=((v.getUint32(1,true)&0xFFFFFF)*Math.pow(10,v.getInt8(4))).toFixed(1); } catch(e) {}
+                          try { const s=await srv.getPrimaryService('pulse_oximeter'); const c=await s.getCharacteristic('plx_spot_check_measurement'); const v=await c.readValue(); nd.spo2=v.getUint8(3); } catch(e) {}
+                          setBioManual(prev => ({...prev, ...nd}));
+                          alert('Conectado: ' + dev.name);
+                        } catch(e) { if(e.name!=='NotFoundError') alert('Error: '+e.message); }
+                      }} className="py-2.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+                        ⌚ Reloj BT
+                      </button>
+                      <button onClick={async () => {
+                        if (!navigator.bluetooth) { alert('Usa Chrome en Android o desktop.'); return; }
+                        try {
+                          const dev = await navigator.bluetooth.requestDevice({ acceptAllDevices:true, optionalServices:['weight_scale','body_composition'] });
+                          const srv = await dev.gatt.connect();
+                          let nd = {};
+                          try { const s=await srv.getPrimaryService('weight_scale'); const c=await s.getCharacteristic('weight_measurement'); const v=await c.readValue(); nd.peso=(v.getUint16(1,true)*0.005).toFixed(1); } catch(e) {}
+                          try { const s=await srv.getPrimaryService('body_composition'); const c=await s.getCharacteristic('body_composition_measurement'); const v=await c.readValue(); nd.grasa=(v.getUint16(5,true)*0.1).toFixed(1); nd.musculo=(v.getUint16(9,true)*0.1).toFixed(1); nd.agua=(v.getUint16(7,true)*0.1).toFixed(1); } catch(e) {}
+                          setBioManual(prev => ({...prev, ...nd}));
+                          alert('Conectada: ' + dev.name);
+                        } catch(e) { if(e.name!=='NotFoundError') alert('Error: '+e.message); }
+                      }} className="py-2.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
+                        ⚖️ Balanza BT
+                      </button>
+                    </div>
+                    <button onClick={() => setShowBioModal(false)}
+                      className="w-full py-3 rounded-xl font-semibold text-white" style={{backgroundColor:'#F4C430', color:'#5D4E37'}}>
+                      Guardar y continuar
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <div className="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800">
                 <p>📋 <strong>Versión Gratuita:</strong> Podés hacer el test y ver tus resultados. Si cerrás la app, tendrás que repetirlo.</p>
-                <p className="mt-1">⭐ <strong>Premium ($3.99 USD/mes):</strong> Tu perfil queda guardado. Cancelá cuando quieras.</p>
+                <p className="mt-1">⭐ <strong>Premium ($10 USD/mes):</strong> Tu perfil queda guardado. Cancelá cuando quieras.</p>
               </div>
               
               <button onClick={() => { gtag('event', 'test_started'); setAnimateIn(false); setTimeout(() => setStep(2), 200); }} disabled={!isFormComplete}
@@ -899,9 +1080,14 @@ www.vedabite.com
           { id: 'horarios', label: '⏰ Horarios' },
           { id: 'ejercicio', label: '🏃 Ejercicio' },
           { id: 'terapias', label: '💆 Terapias' },
-          { id: 'mudras', label: '🙏 Mudras' },
+          { id: 'mudras', label: '🙏 Yoga de Manos' },
           { id: 'ubicacion', label: '📍 Ubicación' },
           { id: 'salud', label: '🏥 Salud' },
+          { id: 'pranayama', label: '🌬️ Respiracion' },
+          { id: 'meditacion', label: '🧘 Meditacion' },
+          { id: 'chakras', label: '💜 Chakras' },
+          { id: 'biometrica', label: '📡 Biometrica' },
+          { id: 'jyotish', label: '🪐 Jyotish' },
         ];
 
         const busquedasCercanas = [
@@ -940,7 +1126,7 @@ www.vedabite.com
         };
 
         return (
-          <div className="min-h-screen bg-stone-50">
+          <div className="min-h-screen bg-stone-50 pb-36">
             {/* Header */}
             <div className={`bg-gradient-to-br ${primary.color} text-white px-6 py-6 rounded-b-3xl`}>
               <div className="text-center">
@@ -1264,6 +1450,243 @@ www.vedabite.com
                 </div>
               )}
 
+
+              {activeTab === 'pranayama' && (
+                <div className="space-y-4">
+                  <div className={`bg-gradient-to-br ${primary.color} rounded-2xl p-4 text-white`}>
+                    <h3 className="font-bold text-lg">🌬️ Respiracion para {primary.name}</h3>
+                    <p className="text-xs text-white/80">Tecnicas para equilibrar tu biotipo</p>
+                  </div>
+                  {PMC[results.primaryDosha].pranayamas.map((p, i) => (
+                    <div key={i} className="bg-white rounded-2xl p-4 shadow space-y-3">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <span className="text-2xl">{p.emoji}</span>
+                          <h4 className="font-bold text-stone-800 mt-1">{p.nombre}</h4>
+                          <p className="text-xs text-stone-400 italic">{p.sanskrit}</p>
+                        </div>
+                        <span className={`text-xs px-2 py-1 rounded-full font-medium ${p.nivel === 'Principal' ? 'bg-amber-100 text-amber-700' : 'bg-stone-100 text-stone-600'}`}>{p.nivel}</span>
+                      </div>
+                      <p className="text-sm text-stone-600">{p.beneficio}</p>
+                      <div className="bg-stone-50 rounded-xl p-3">
+                        <p className="text-xs font-semibold text-stone-700 mb-2">Paso a paso:</p>
+                        {p.instrucciones.map((s, j) => (
+                          <p key={j} className="text-xs text-stone-600">• {s}</p>
+                        ))}
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="bg-blue-50 rounded-xl p-2 text-center"><p className="text-xs text-blue-600">⏱ {p.duracion}</p></div>
+                        <div className="bg-green-50 rounded-xl p-2 text-center"><p className="text-xs text-green-600">🕐 {p.momento}</p></div>
+                      </div>
+                      <p className="text-xs text-amber-700 bg-amber-50 rounded-xl p-2"><strong>Ritmo:</strong> {p.ritmo}</p>
+                      {p.contra && <p className="text-xs text-red-600 bg-red-50 rounded-xl p-2">⚠️ {p.contra}</p>}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {activeTab === 'meditacion' && (
+                <div className="space-y-4">
+                  <div className={`bg-gradient-to-br ${primary.color} rounded-2xl p-4 text-white`}>
+                    <h3 className="font-bold text-lg">🧘 {PMC[results.primaryDosha].meditacion.estilo}</h3>
+                    <p className="text-xs text-white/80">{PMC[results.primaryDosha].meditacion.desc}</p>
+                  </div>
+                  {PMC[results.primaryDosha].meditacion.practicas.map((m, i) => (
+                    <div key={i} className="bg-white rounded-2xl p-4 shadow space-y-2">
+                      <h4 className="font-bold text-stone-800">{m.nombre}</h4>
+                      <p className="text-xs text-stone-500">⏱ {m.duracion}</p>
+                      <div className="bg-stone-50 rounded-xl p-3">
+                        <p className="text-xs font-semibold text-stone-700 mb-1">Como practicarla:</p>
+                        <p className="text-xs text-stone-600 leading-relaxed">{m.inst}</p>
+                      </div>
+                      <p className="text-xs text-green-700 bg-green-50 rounded-xl p-2">✨ {m.beneficio}</p>
+                    </div>
+                  ))}
+                  <div className="bg-white rounded-2xl p-4 shadow">
+                    <h4 className="font-bold text-stone-800 mb-3">Mantra Principal</h4>
+                    <div className={`bg-gradient-to-br ${primary.color} rounded-xl p-4 text-center text-white mb-2`}>
+                      <p className="text-xl font-bold tracking-widest">{PMC[results.primaryDosha].meditacion.mantra}</p>
+                    </div>
+                    <p className="text-xs text-stone-500 text-center italic">{PMC[results.primaryDosha].meditacion.mantraDesc}</p>
+                  </div>
+                  <p className="text-xs text-amber-800 bg-amber-50 rounded-xl p-3">🗓 <strong>Rutina:</strong> {PMC[results.primaryDosha].meditacion.rutina}</p>
+                </div>
+              )}
+
+              {activeTab === 'chakras' && (
+                <div className="space-y-4">
+                  <div className={`bg-gradient-to-br ${primary.color} rounded-2xl p-4 text-white`}>
+                    <h3 className="font-bold text-lg">💜 Chakras para {primary.name}</h3>
+                    <p className="text-xs text-white/80">Los centros energeticos que mas impactan tu biotipo</p>
+                  </div>
+                  {PMC[results.primaryDosha].chakras.map((ch, i) => (
+                    <div key={i} className="bg-white rounded-2xl p-4 shadow space-y-3">
+                      <div className="flex items-start gap-3">
+                        <span className="text-3xl">{ch.emoji}</span>
+                        <div>
+                          <h4 className="font-bold text-stone-800">{ch.nombre}</h4>
+                          <p className="text-xs text-stone-500">{ch.posicion} · {ch.elemento}</p>
+                          <span className="text-xs bg-stone-100 rounded-full px-2 py-0.5 font-mono font-bold text-stone-600">Bija: {ch.bija}</span>
+                        </div>
+                      </div>
+                      <p className="text-xs text-red-600 bg-red-50 rounded-xl p-3">⚠️ {ch.desequilibrio}</p>
+                      <p className="text-xs text-purple-600 bg-purple-50 rounded-xl p-3">🧘 {ch.practica}</p>
+                      <div className="bg-stone-50 rounded-xl p-3">
+                        <p className="text-xs font-semibold text-stone-700 mb-1">✨ Actividades:</p>
+                        {ch.actividades.map((a, j) => <p key={j} className="text-xs text-stone-600">• {a}</p>)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {activeTab === 'biometrica' && (
+                <div className="space-y-4">
+                  <div className={`bg-gradient-to-br ${primary.color} rounded-2xl p-4 text-white`}>
+                    <h3 className="font-bold text-lg">📡 Biometrica</h3>
+                    <p className="text-xs text-white/80">Conecta dispositivos Bluetooth para validar tu biotipo</p>
+                  </div>
+                  <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-3">⚠️ <strong>Requiere Chrome/Edge en Android o desktop.</strong> No disponible en iOS Safari. Tene el Bluetooth activo y el dispositivo en modo pairing.</p>
+                  <div className="bg-white rounded-2xl p-4 shadow space-y-3">
+                    <h4 className="font-bold text-stone-800">⌚ Reloj / Smartwatch</h4>
+                    <p className="text-xs text-stone-500">Frecuencia cardiaca, SpO2, temperatura</p>
+                    <button onClick={async () => {
+                      if (!navigator.bluetooth) { alert('Web Bluetooth no disponible. Usa Chrome en Android o desktop.'); return; }
+                      try {
+                        const dev = await navigator.bluetooth.requestDevice({ filters: [{services:['heart_rate']}], optionalServices:['health_thermometer','pulse_oximeter'] });
+                        const srv = await dev.gatt.connect();
+                        let nd = { device: dev.name };
+                        try { const s=await srv.getPrimaryService('heart_rate'); const c=await s.getCharacteristic('heart_rate_measurement'); const v=await c.readValue(); nd.hr=(v.getUint8(0)&1)?v.getUint16(1,true):v.getUint8(1); } catch(e2) {}
+                        try { const s=await srv.getPrimaryService('health_thermometer'); const c=await s.getCharacteristic('temperature_measurement'); const v=await c.readValue(); nd.temp=((v.getUint32(1,true)&0xFFFFFF)*Math.pow(10,v.getInt8(4))).toFixed(1); } catch(e2) {}
+                        try { const s=await srv.getPrimaryService('pulse_oximeter'); const c=await s.getCharacteristic('plx_spot_check_measurement'); const v=await c.readValue(); nd.spo2=v.getUint8(3); } catch(e2) {}
+                        setResults(prev => ({...prev, bioData: nd}));
+                        alert('Conectado: ' + dev.name);
+                      } catch(e) { if(e.name!=='NotFoundError') alert('Error: '+e.message); }
+                    }} className="w-full py-3 rounded-xl font-semibold text-sm bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+                      🔵 Conectar Reloj por Bluetooth
+                    </button>
+                    {results.bioData && (
+                      <div className="space-y-2">
+                        <p className="text-xs text-green-600 font-medium">✅ {results.bioData.device}</p>
+                        <div className="grid grid-cols-3 gap-2">
+                          {results.bioData.hr && <div className="bg-red-50 rounded-xl p-3 text-center"><p className="text-xl font-bold text-red-600">{results.bioData.hr}</p><p className="text-xs text-red-500">❤️ lpm</p></div>}
+                          {results.bioData.spo2 && <div className="bg-blue-50 rounded-xl p-3 text-center"><p className="text-xl font-bold text-blue-600">{results.bioData.spo2}%</p><p className="text-xs text-blue-500">🫁 SpO2</p></div>}
+                          {results.bioData.temp && <div className="bg-orange-50 rounded-xl p-3 text-center"><p className="text-xl font-bold text-orange-600">{results.bioData.temp}</p><p className="text-xs text-orange-500">🌡️ C</p></div>}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="bg-white rounded-2xl p-4 shadow space-y-3">
+                    <h4 className="font-bold text-stone-800">⚖️ Balanza Inteligente</h4>
+                    <p className="text-xs text-stone-500">Peso, IMC, grasa, musculo, agua</p>
+                    <button onClick={async () => {
+                      if (!navigator.bluetooth) { alert('Web Bluetooth no disponible.'); return; }
+                      try {
+                        const dev = await navigator.bluetooth.requestDevice({ acceptAllDevices:true, optionalServices:['weight_scale','body_composition'] });
+                        const srv = await dev.gatt.connect();
+                        let nd = { device: dev.name };
+                        try { const s=await srv.getPrimaryService('weight_scale'); const c=await s.getCharacteristic('weight_measurement'); const v=await c.readValue(); nd.peso=(v.getUint16(1,true)*0.005).toFixed(1); nd.imc=(parseFloat(nd.peso)/2.89).toFixed(1); } catch(e2) {}
+                        try { const s=await srv.getPrimaryService('body_composition'); const c=await s.getCharacteristic('body_composition_measurement'); const v=await c.readValue(); nd.grasa=(v.getUint16(5,true)*0.1).toFixed(1); nd.musculo=(v.getUint16(9,true)*0.1).toFixed(1); nd.agua=(v.getUint16(7,true)*0.1).toFixed(1); } catch(e2) {}
+                        setResults(prev => ({...prev, scaleData: nd}));
+                        alert('Conectada: ' + dev.name);
+                      } catch(e) { if(e.name!=='NotFoundError') alert('Error: '+e.message); }
+                    }} className="w-full py-3 rounded-xl font-semibold text-sm bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
+                      🔵 Conectar Balanza por Bluetooth
+                    </button>
+                    {results.scaleData && (
+                      <div className="space-y-2">
+                        <p className="text-xs text-green-600 font-medium">✅ {results.scaleData.device}</p>
+                        <div className="grid grid-cols-3 gap-2">
+                          {results.scaleData.peso && <div className="bg-teal-50 rounded-xl p-3 text-center"><p className="text-xl font-bold text-teal-600">{results.scaleData.peso}</p><p className="text-xs text-teal-500">⚖️ kg</p></div>}
+                          {results.scaleData.imc && <div className="bg-indigo-50 rounded-xl p-3 text-center"><p className="text-xl font-bold text-indigo-600">{results.scaleData.imc}</p><p className="text-xs text-indigo-500">📊 IMC</p></div>}
+                          {results.scaleData.grasa && <div className="bg-yellow-50 rounded-xl p-3 text-center"><p className="text-xl font-bold text-yellow-600">{results.scaleData.grasa}%</p><p className="text-xs text-yellow-500">🫧 Grasa</p></div>}
+                          {results.scaleData.musculo && <div className="bg-red-50 rounded-xl p-3 text-center"><p className="text-xl font-bold text-red-600">{results.scaleData.musculo}</p><p className="text-xs text-red-500">💪 kg</p></div>}
+                          {results.scaleData.agua && <div className="bg-blue-50 rounded-xl p-3 text-center"><p className="text-xl font-bold text-blue-600">{results.scaleData.agua}%</p><p className="text-xs text-blue-500">💧 Agua</p></div>}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'jyotish' && (
+                <div className="space-y-4">
+                  <div className={`bg-gradient-to-br ${primary.color} rounded-2xl p-4 text-white`}>
+                    <h3 className="font-bold text-lg">🪐 Carta Jyotish</h3>
+                    <p className="text-xs text-white/80">Astrologia vedica calculada desde tu lugar de nacimiento</p>
+                    {results.jyotish && results.jyotish.coords && <p className="text-xs text-white/60 mt-1">📍 {results.jyotish.coords.lat.toFixed(3)}° lat · {results.jyotish.coords.lon.toFixed(3)}° lon</p>}
+                  </div>
+                  {!results.jyotish && (
+                    <div className="bg-amber-50 rounded-2xl p-6 text-center">
+                      <p className="text-4xl mb-3">🪐</p>
+                      <p className="text-stone-600 text-sm">Para calcular tu carta Jyotish ingresa lugar de nacimiento, fecha y hora.</p>
+                    </div>
+                  )}
+                  {results.jyotish && results.jyotish.nakshatra && (
+                    <div className="bg-white rounded-2xl p-4 shadow space-y-2">
+                      <h4 className="font-bold text-stone-800">⭐ Nakshatra de Nacimiento</h4>
+                      <div className="flex items-center gap-3 bg-indigo-50 rounded-xl p-3">
+                        <span className="text-3xl">⭐</span>
+                        <div>
+                          <p className="font-bold text-indigo-800">{results.jyotish.nakshatra.name}</p>
+                          <p className="text-xs text-indigo-600">{results.jyotish.nakshatra.quality} · Regente: {results.jyotish.nakshatra.ruler}</p>
+                          <p className="text-xs text-indigo-500">Elemento: {results.jyotish.nakshatra.elemento}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {results.jyotish && results.jyotish.rashi && (
+                    <div className="bg-white rounded-2xl p-4 shadow space-y-2">
+                      <h4 className="font-bold text-stone-800">🌙 Rashi (Signo Lunar Vedico)</h4>
+                      <div className="flex items-center gap-3 bg-blue-50 rounded-xl p-3">
+                        <span className="text-3xl">🌙</span>
+                        <div>
+                          <p className="font-bold text-blue-800">{results.jyotish.rashi.name}</p>
+                          <p className="text-xs text-blue-600">Regente: {results.jyotish.rashi.ruler} · Elemento: {results.jyotish.rashi.elemento}</p>
+                          <p className="text-xs text-blue-500">Influencia Dosha: <strong>{results.jyotish.rashi.dosha}</strong></p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {results.jyotish && results.jyotish.lagna && (
+                    <div className="bg-white rounded-2xl p-4 shadow space-y-2">
+                      <h4 className="font-bold text-stone-800">🌅 Lagna (Ascendente)</h4>
+                      <div className="flex items-center gap-3 bg-orange-50 rounded-xl p-3">
+                        <span className="text-3xl">🌅</span>
+                        <div>
+                          <p className="font-bold text-orange-800">{results.jyotish.lagna.name}</p>
+                          <p className="text-xs text-orange-600">Regente: {results.jyotish.lagna.ruler} · {results.jyotish.lagna.elemento}</p>
+                          <p className="text-xs text-orange-500">Dosha: <strong>{results.jyotish.lagna.dosha}</strong></p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {results.jyotish && results.jyotish.planeta && (
+                    <div className="bg-white rounded-2xl p-4 shadow space-y-2">
+                      <h4 className="font-bold text-stone-800">🔮 Influencia Planetaria</h4>
+                      <div className="bg-purple-50 rounded-xl p-3">
+                        <p className="font-semibold text-purple-800 mb-1">Regente: {results.jyotish.nakshatra && results.jyotish.nakshatra.ruler}</p>
+                        <p className="text-xs text-purple-700">Dosha activado: <strong>{results.jyotish.planeta.dosha}</strong></p>
+                        <p className="text-xs text-purple-600 mt-1">{results.jyotish.planeta.efecto}</p>
+                      </div>
+                    </div>
+                  )}
+                  {results.jyotish && (
+                    <div className="bg-white rounded-2xl p-4 shadow space-y-2">
+                      <h4 className="font-bold text-stone-800">🧬 Sintesis Jyotish + Ayurveda</h4>
+                      <div className={`bg-gradient-to-br ${primary.color} rounded-xl p-4 text-white`}>
+                        <p className="text-xs">🔥 Dosha: <strong>{primary.name}</strong> ({results.percentages[results.primaryDosha]}%)</p>
+                        {results.jyotish.nakshatra && <p className="text-xs mt-1">⭐ Nakshatra: <strong>{results.jyotish.nakshatra.name}</strong></p>}
+                        {results.jyotish.rashi && <p className="text-xs mt-1">🌙 Rashi: <strong>{results.jyotish.rashi.name}</strong></p>}
+                        {results.jyotish.lagna && <p className="text-xs mt-1">🌅 Lagna: <strong>{results.jyotish.lagna.name}</strong></p>}
+                        {results.jyotish.coords && <p className="text-xs mt-1">📍 {birthData.birthPlace}</p>}
+                      </div>
+                      <p className="text-xs text-amber-800 bg-amber-50 rounded-xl p-3">⚠️ El Lagna exacto requiere efemérides precisas. Esta es una aproximacion orientativa.</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {activeTab === 'ubicacion' && (
                 <div className="space-y-4">
                   <div className="bg-blue-50 rounded-2xl p-4 border border-blue-200">
@@ -1317,7 +1740,7 @@ www.vedabite.com
             <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 space-y-2">
               {!isPremium && (
                 <button onClick={() => { gtag('event', 'subscription_clicked'); setShowPaywall(true); }} className="w-full py-3 rounded-xl font-semibold bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
-                  ⭐ Guardar Mi Perfil - $3.99 USD
+                  ⭐ Guardar Mi Perfil - $10 USD
                 </button>
               )}
               {isPremium && (
@@ -1340,7 +1763,7 @@ www.vedabite.com
                     <p className="text-stone-600 mb-4">Guardá tu perfil para siempre y accedé sin rehacer el test</p>
                     
                     <div className="bg-purple-50 rounded-xl p-4 mb-4">
-                      <div className="text-3xl font-bold text-purple-600">$3.99 USD/mes</div>
+                      <div className="text-3xl font-bold text-purple-600">$10 USD/mes</div>
                       <p className="text-purple-500 text-sm">Suscripción mensual</p>
                     </div>
                     
