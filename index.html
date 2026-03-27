@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -865,17 +864,63 @@ www.vedabite.com
                     animation: `twinkle ${Math.random() * 3 + 2}s ease-in-out infinite`, animationDelay: `${Math.random() * 2}s` }}>✦</div>
               ))}
             </div>
-            <div className="flex-1 flex flex-col items-center justify-center px-6 py-8 text-center relative z-10">
-              <h1 className="text-6xl mb-6" style={{ fontFamily: "'Pacifico', cursive", color: '#F4C430', textShadow: '3px 3px 0px #B8860B' }}>Vedabite</h1>
-              <p className="text-white text-xl leading-relaxed max-w-sm mb-10" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.1)' }}>
-                Reprogramá tu ser con pequeños ajustes, guiado por algoritmos y tradición milenaria
+            <div className="flex-1 flex flex-col items-center justify-start px-6 py-6 text-center relative z-10">
+              {/* LOGO */}
+              <h1 className="text-5xl mb-3" style={{ fontFamily: "'Pacifico', cursive", color: '#F4C430', textShadow: '3px 3px 0px #B8860B' }}>Vedabite</h1>
+              
+              {/* PROPUESTA DE VALOR CLARA - Kotler P1 */}
+              <p className="text-white text-lg leading-relaxed max-w-sm mb-2" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.1)' }}>
+                Tu cuerpo es lo mejor que te pudo haber tocado.
               </p>
-              <button onClick={() => { setAnimateIn(false); setTimeout(() => setStep(1), 200); }}
-                className="px-10 py-4 rounded-full font-semibold text-lg shadow-lg" style={{ backgroundColor: '#F4C430', color: '#5D4E37' }}>
-                Activá tu bienestar
+              <p className="text-white/90 text-base max-w-sm mb-4" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.1)' }}>
+                Descubrí tu biotipo y recibí un <strong>plan personalizado</strong> de alimentación, ejercicio, meditación y más.
+              </p>
+
+              {/* BOTÓN PRINCIPAL VERDE - Kotler P3 + Crítico #1 y #2 */}
+              <button onClick={() => { gtag('event', 'landing_cta_clicked'); setAnimateIn(false); setTimeout(() => setStep(1), 200); }}
+                className="px-10 py-4 rounded-full font-bold text-lg shadow-xl transform hover:scale-105 transition-all"
+                style={{ backgroundColor: '#22c55e', color: 'white', minHeight: '56px', minWidth: '280px' }}>
+                🎯 Obtené tu Plan Personalizado
               </button>
-              <p className="mt-4 text-white/80 text-sm">60 preguntas • 10 minutos • Plan personalizado</p>
-              <button onClick={() => setShowSources(true)} className="mt-6 text-sm text-white/70 underline">Ver fuentes científicas</button>
+              
+              {/* URGENCIA + PRECIO - Kotler P2 + Problema #7 */}
+              <p className="mt-3 text-white font-semibold text-sm">✨ Test GRATIS • Plan completo $9.99/mes</p>
+              <p className="text-yellow-200 text-xs font-medium mt-1">⚡ Oferta de lanzamiento - Precio sube pronto</p>
+
+              {/* QUÉ INCLUYE - Kotler P1 */}
+              <div className="mt-5 bg-white/20 backdrop-blur-sm rounded-2xl p-4 max-w-sm w-full">
+                <p className="text-white text-xs font-semibold mb-2">📦 TU PLAN INCLUYE:</p>
+                <div className="grid grid-cols-3 gap-2 text-white text-xs">
+                  <span>🍽️ Alimentación</span>
+                  <span>🍲 Recetas</span>
+                  <span>🏃 Ejercicio</span>
+                  <span>🧘 Meditación</span>
+                  <span>🌬️ Respiración</span>
+                  <span>🔴 Chakras</span>
+                  <span>🙏 Mudras</span>
+                  <span>💆 Terapias</span>
+                  <span>⭐ +5 más</span>
+                </div>
+              </div>
+
+              {/* PRUEBA SOCIAL - Punto #8 */}
+              <div className="mt-4 flex items-center gap-2">
+                <div className="flex -space-x-2">
+                  <div className="w-8 h-8 rounded-full bg-amber-400 flex items-center justify-center text-xs">👩</div>
+                  <div className="w-8 h-8 rounded-full bg-emerald-400 flex items-center justify-center text-xs">👨</div>
+                  <div className="w-8 h-8 rounded-full bg-sky-400 flex items-center justify-center text-xs">👩</div>
+                </div>
+                <p className="text-white text-xs"><strong>+500 personas</strong> ya descubrieron su Dosha</p>
+              </div>
+
+              {/* GARANTÍA - Punto #10 */}
+              <p className="mt-3 text-white/80 text-xs">🔒 7 días de prueba gratis • Cancelá cuando quieras</p>
+              
+              {/* INFO SECUNDARIA */}
+              <p className="mt-2 text-white/70 text-xs">⏱️ 60 preguntas • 10 minutos • Resultados inmediatos</p>
+              
+              {/* FUENTES */}
+              <button onClick={() => setShowSources(true)} className="mt-4 text-xs text-white/60 underline">Ver fuentes científicas</button>
             </div>
             {showSources && (
               <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4" onClick={() => setShowSources(false)}>
@@ -1585,15 +1630,17 @@ www.vedabite.com
             </div>
 
             {/* Footer */}
-            <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 space-y-2">
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-3 space-y-2 shadow-lg">
               {!isPremium && (
-                <button onClick={() => { gtag('event', 'subscription_clicked'); setShowPaywall(true); }} className="w-full py-3 rounded-xl font-semibold bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
-                  ⭐ Guardar Mi Perfil - $10 USD
+                <button onClick={() => { gtag('event', 'subscription_clicked'); setShowPaywall(true); }} 
+                  className="w-full py-3 rounded-xl font-bold text-white shadow-lg transform hover:scale-[1.02] transition-all"
+                  style={{ backgroundColor: '#22c55e' }}>
+                  💎 Guardar Mi Plan - $9.99/mes <span className="text-green-200 text-xs ml-1">(Oferta)</span>
                 </button>
               )}
               {isPremium && (
-                <div className="text-center text-green-600 text-sm font-medium">
-                  ⭐ Premium Activo - Tu perfil está guardado
+                <div className="text-center text-green-600 text-sm font-medium py-2">
+                  ✅ Premium Activo - Tu perfil está guardado para siempre
                 </div>
               )}
               <button onClick={generatePDF} className="w-full py-3 rounded-xl font-semibold" style={{ backgroundColor: '#F4C430', color: '#5D4E37' }}>
@@ -1606,29 +1653,40 @@ www.vedabite.com
               <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                 <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
                   <div className="text-center">
-                    <div className="text-5xl mb-4">⭐</div>
-                    <h3 className="text-xl font-bold text-stone-800 mb-2">VedaBite Premium</h3>
-                    <p className="text-stone-600 mb-4">Guardá tu perfil para siempre y accedé sin rehacer el test</p>
+                    <div className="text-5xl mb-3">💎</div>
+                    <h3 className="text-xl font-bold text-stone-800 mb-1">Guardá tu Plan para Siempre</h3>
+                    <p className="text-stone-500 text-sm mb-4">Accedé a tu perfil sin volver a hacer el test</p>
                     
-                    <div className="bg-purple-50 rounded-xl p-4 mb-4">
-                      <div className="text-3xl font-bold text-purple-600">$10 USD/mes</div>
-                      <p className="text-purple-500 text-sm">Suscripción mensual</p>
+                    {/* PRECIO PSICOLÓGICO - Kotler P2 */}
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 mb-4 border-2 border-green-200">
+                      <p className="text-green-600 text-xs font-semibold mb-1">💰 OFERTA DE LANZAMIENTO</p>
+                      <div className="text-4xl font-bold text-green-600">$9.99<span className="text-lg font-normal text-green-500">/mes</span></div>
+                      <p className="text-green-500 text-xs mt-1">Precio normal: <span className="line-through">$19.99</span></p>
                     </div>
                     
-                    <ul className="text-left text-sm text-stone-600 space-y-2 mb-6">
-                      <li>✅ Guardá tu perfil Dosha</li>
-                      <li>✅ Accedé sin rehacer el test</li>
-                      <li>✅ Actualizaciones automáticas</li>
-                      <li>✅ Cancelá cuando quieras</li>
+                    {/* VALOR CLARO */}
+                    <ul className="text-left text-sm text-stone-600 space-y-2 mb-4">
+                      <li className="flex items-center gap-2">✅ <span>Tu perfil Dosha guardado</span></li>
+                      <li className="flex items-center gap-2">✅ <span>13 planes personalizados</span></li>
+                      <li className="flex items-center gap-2">✅ <span>Acceso inmediato sin retest</span></li>
+                      <li className="flex items-center gap-2">✅ <span>Actualizaciones incluidas</span></li>
                     </ul>
                     
+                    {/* URGENCIA */}
+                    <p className="text-amber-600 text-xs font-semibold mb-4">⚡ Quedan pocos lugares a este precio</p>
+                    
+                    {/* BOTÓN VERDE */}
                     <button onClick={initPayment} disabled={processingPayment}
-                      className="w-full py-3 rounded-xl font-semibold bg-gradient-to-r from-purple-500 to-indigo-600 text-white disabled:opacity-50 mb-3">
-                      {processingPayment ? '⏳ Procesando...' : '💳 Pagar con Mercado Pago'}
+                      className="w-full py-4 rounded-xl font-bold text-lg shadow-lg transform hover:scale-105 transition-all mb-2"
+                      style={{ backgroundColor: '#22c55e', color: 'white' }}>
+                      {processingPayment ? '⏳ Procesando...' : '🎯 Obtener mi Plan Ahora'}
                     </button>
                     
-                    <button onClick={() => setShowPaywall(false)} className="text-stone-400 text-sm">
-                      Cancelar
+                    {/* GARANTÍA */}
+                    <p className="text-stone-400 text-xs mb-3">🔒 7 días de prueba • Cancelá cuando quieras</p>
+                    
+                    <button onClick={() => setShowPaywall(false)} className="text-stone-400 text-sm hover:text-stone-600">
+                      Ahora no, gracias
                     </button>
                   </div>
                 </div>
