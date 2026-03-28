@@ -763,19 +763,12 @@
       const initPayment = async () => {
         setProcessingPayment(true);
         try {
-          const mp = new MercadoPago(MP_PUBLIC_KEY, { locale: 'es-AR' });
+          // Abrir Lemon Squeezy checkout
+          window.open('https://vedabite.lemonsqueezy.com/checkout/buy/d3318e6c-6da9-4989-8c79-44f3c01613a0', '_blank');
           
-          // Crear preferencia de pago (simplificado para demo)
-          // En producción necesitarías un backend para crear la preferencia
-          const bricksBuilder = mp.bricks();
-          
-          // Por ahora usamos un link de pago directo
-          // Reemplazar con tu link de Mercado Pago
-          window.open(`https://link.mercadopago.com.ar/vedabite`, '_blank');
-          
-          // Simular activación (en producción verificarías el pago)
+          // Simular activación (en producción verificarías el pago con webhook)
           setTimeout(() => {
-            if (confirm('¿Completaste el pago de USD $15?')) {
+            if (confirm('¿Completaste el pago de USD $20?')) {
               gtag('event', 'subscription_paid');
               activatePremium();
             }
@@ -1117,7 +1110,7 @@ www.vedabite.com
               {/* PRECIO + GARANTÍA */}
               <div className="max-w-md mx-auto mb-12 rounded-2xl p-6 text-white text-center" style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' }}>
                 <p className="text-lg mb-2">Test completamente <strong>GRATIS</strong></p>
-                <p className="text-3xl font-bold mb-2">Plan Premium: USD $15/mes</p>
+                <p className="text-3xl font-bold mb-2">Plan Premium: USD $20/mes</p>
                 <p style={{ color: '#bbf7d0' }}>🔒 7 días gratis • Cancelá cuando quieras</p>
                 <p className="font-semibold mt-3" style={{ color: '#fef08a' }}>⚡ Oferta de lanzamiento</p>
               </div>
@@ -1945,7 +1938,7 @@ www.vedabite.com
                 <button onClick={() => { gtag('event', 'subscription_clicked'); setShowPaywall(true); }} 
                   className="w-full py-3 rounded-xl font-bold text-white shadow-lg transform hover:scale-[1.02] transition-all"
                   style={{ backgroundColor: '#22c55e' }}>
-                  💎 Guardar Mi Plan - USD $15/mes <span className="text-green-200 text-xs ml-1">(Oferta)</span>
+                  💎 Guardar Mi Plan - USD $20/mes <span className="text-green-200 text-xs ml-1">(Oferta)</span>
                 </button>
               )}
               {isPremium && (
@@ -1995,8 +1988,8 @@ www.vedabite.com
                         {/* PRECIO PSICOLÓGICO - Kotler P2 */}
                         <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 mb-4 border-2 border-green-200">
                           <p className="text-green-600 text-xs font-semibold mb-1">💰 OFERTA DE LANZAMIENTO</p>
-                          <div className="text-4xl font-bold text-green-600">USD $15<span className="text-lg font-normal text-green-500">/mes</span></div>
-                          <p className="text-green-500 text-xs mt-1">Precio normal: <span className="line-through">USD $29</span></p>
+                          <div className="text-4xl font-bold text-green-600">USD $20<span className="text-lg font-normal text-green-500">/mes</span></div>
+                          <p className="text-green-500 text-xs mt-1">Precio normal: <span className="line-through">USD $39</span></p>
                         </div>
                         
                         {/* VALOR CLARO */}
