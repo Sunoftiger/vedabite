@@ -8,6 +8,14 @@
   <meta name="theme-color" content="#87CEEB">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
   
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-TG7WN9Z');</script>
+  <!-- End Google Tag Manager -->
+  
   <!-- Google Analytics 4 -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-HM7G4LZM70"></script>
   <script>
@@ -53,6 +61,11 @@
   </style>
 </head>
 <body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TG7WN9Z"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+  
   <div id="root"></div>
   
   <script type="text/babel">
@@ -60,7 +73,7 @@
     
     // Mercado Pago Config
     const MP_PUBLIC_KEY = 'APP_USR-cfbe2c27-b52d-4db4-89a1-d67ed5579bc7';
-    const PRECIO_PREMIUM = 10; // USD
+    const PRECIO_PREMIUM = 15; // USD
 
     // ═══════════════════════════════════════════════════════════════════════════════
     // 60 PREGUNTAS - 20 POR DOSHA
@@ -751,7 +764,7 @@
           
           // Simular activación (en producción verificarías el pago)
           setTimeout(() => {
-            if (confirm('¿Completaste el pago de $10 USD?')) {
+            if (confirm('¿Completaste el pago de USD $15?')) {
               gtag('event', 'subscription_paid');
               activatePremium();
             }
