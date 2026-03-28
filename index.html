@@ -1,4 +1,4 @@
-        <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -22,6 +22,25 @@
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://sdk.mercadopago.com/js/v2"></script>
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCxTOtGmdzdaYQghf270VenmVzMaeZnlOM",
+      authDomain: "vedabite-1b49a.firebaseapp.com",
+      projectId: "vedabite-1b49a",
+      storageBucket: "vedabite-1b49a.firebasestorage.app",
+      messagingSenderId: "435704386348",
+      appId: "1:435704386348:web:e6a7842f7fe9a10ed8d289",
+      measurementId: "G-Y0KHXLM0PJ"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+  </script>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -611,8 +630,78 @@
       const [isPremium, setIsPremium] = useState(false);
       const [showPaywall, setShowPaywall] = useState(false);
       const [processingPayment, setProcessingPayment] = useState(false);
+      const [user, setUser] = useState(null);
+      const [loadingAuth, setLoadingAuth] = useState(true);
 
-      // Verificar si es premium al cargar
+      // Escuchar cambios de autenticación
+      useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
+          if (firebaseUser) {
+            setUser(firebaseUser);
+            // Verificar si es premium en Firestore
+            try {
+              const userDoc = await db.collection('usuarios').doc(firebaseUser.uid).get();
+              if (userDoc.exists && userDoc.data().premium) {
+                setIsPremium(true);
+                // Cargar datos guardados
+                const savedData = userDoc.data();
+                if (savedData.results) setResults(savedData.results);
+                if (savedData.birthData) setBirthData(savedData.birthData);
+                if (savedData.results) setStep(3);
+              }
+            } catch (error) {
+              console.log('Error verificando premium:', error);
+            }
+          } else {
+            setUser(null);
+            setIsPremium(false);
+          }
+          setLoadingAuth(false);
+        });
+        return () => unsubscribe();
+      }, []);
+
+      // Login con Google
+      const loginWithGoogle = async () => {
+        try {
+          const provider = new firebase.auth.GoogleAuthProvider();
+          await auth.signInWithPopup(provider);
+        } catch (error) {
+          console.error('Error login:', error);
+          alert('Error al iniciar sesión. Intentá de nuevo.');
+        }
+      };
+
+      // Logout
+      const logout = async () => {
+        try {
+          await auth.signOut();
+          setStep(0);
+          setResults(null);
+          setIsPremium(false);
+        } catch (error) {
+          console.error('Error logout:', error);
+        }
+      };
+
+      // Guardar datos en Firestore cuando es premium
+      const saveUserData = async (newResults, newBirthData) => {
+        if (user && isPremium) {
+          try {
+            await db.collection('usuarios').doc(user.uid).set({
+              email: user.email,
+              premium: true,
+              results: newResults,
+              birthData: newBirthData,
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+          } catch (error) {
+            console.error('Error guardando datos:', error);
+          }
+        }
+      };
+
+      // Verificar si es premium al cargar (fallback localStorage)
       useEffect(() => {
         const premium = localStorage.getItem('vedabite_premium');
         const savedResults = localStorage.getItem('vedabite_results');
@@ -869,6 +958,15 @@ www.vedabite.com
             {/* PRIMER VIEWPORT - LO ESENCIAL */}
             <div className="flex-1 flex flex-col items-center justify-center px-6 py-8 text-center relative z-10 min-h-screen">
               
+              {/* USUARIO LOGUEADO - Mostrar arriba */}
+              {user && (
+                <div className="absolute top-4 right-4 flex items-center gap-2 bg-white/80 rounded-full px-3 py-2 shadow">
+                  <img src={user.photoURL} alt="" className="w-8 h-8 rounded-full" />
+                  <span className="text-sm text-stone-600 hidden sm:inline">{user.displayName?.split(' ')[0]}</span>
+                  <button onClick={logout} className="text-xs text-stone-400 hover:text-red-500">Salir</button>
+                </div>
+              )}
+              
               {/* LOGO */}
               <h1 className="text-5xl mb-6 font-semibold tracking-wide" style={{ fontFamily: "'Cormorant Garamond', serif", color: '#D4A017', textShadow: '1px 1px 0px #B8860B' }}>Vedabite</h1>
               
@@ -995,7 +1093,7 @@ www.vedabite.com
               {/* PRECIO + GARANTÍA */}
               <div className="max-w-md mx-auto mb-12 rounded-2xl p-6 text-white text-center" style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' }}>
                 <p className="text-lg mb-2">Test completamente <strong>GRATIS</strong></p>
-                <p className="text-3xl font-bold mb-2">Plan Premium: $9.99/mes</p>
+                <p className="text-3xl font-bold mb-2">Plan Premium: USD $15/mes</p>
                 <p style={{ color: '#bbf7d0' }}>🔒 7 días gratis • Cancelá cuando quieras</p>
                 <p className="font-semibold mt-3" style={{ color: '#fef08a' }}>⚡ Oferta de lanzamiento</p>
               </div>
@@ -1823,7 +1921,7 @@ www.vedabite.com
                 <button onClick={() => { gtag('event', 'subscription_clicked'); setShowPaywall(true); }} 
                   className="w-full py-3 rounded-xl font-bold text-white shadow-lg transform hover:scale-[1.02] transition-all"
                   style={{ backgroundColor: '#22c55e' }}>
-                  💎 Guardar Mi Plan - $9.99/mes <span className="text-green-200 text-xs ml-1">(Oferta)</span>
+                  💎 Guardar Mi Plan - USD $15/mes <span className="text-green-200 text-xs ml-1">(Oferta)</span>
                 </button>
               )}
               {isPremium && (
@@ -1839,39 +1937,87 @@ www.vedabite.com
             {/* Paywall Modal */}
             {showPaywall && (
               <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+                <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl max-h-[90vh] overflow-y-auto">
                   <div className="text-center">
                     <div className="text-5xl mb-3">💎</div>
                     <h3 className="text-xl font-bold text-stone-800 mb-1">Guardá tu Plan para Siempre</h3>
                     <p className="text-stone-500 text-sm mb-4">Accedé a tu perfil sin volver a hacer el test</p>
                     
-                    {/* PRECIO PSICOLÓGICO - Kotler P2 */}
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 mb-4 border-2 border-green-200">
-                      <p className="text-green-600 text-xs font-semibold mb-1">💰 OFERTA DE LANZAMIENTO</p>
-                      <div className="text-4xl font-bold text-green-600">$9.99<span className="text-lg font-normal text-green-500">/mes</span></div>
-                      <p className="text-green-500 text-xs mt-1">Precio normal: <span className="line-through">$19.99</span></p>
-                    </div>
-                    
-                    {/* VALOR CLARO */}
-                    <ul className="text-left text-sm text-stone-600 space-y-2 mb-4">
-                      <li className="flex items-center gap-2">✅ <span>Tu perfil Dosha guardado</span></li>
-                      <li className="flex items-center gap-2">✅ <span>13 planes personalizados</span></li>
-                      <li className="flex items-center gap-2">✅ <span>Acceso inmediato sin retest</span></li>
-                      <li className="flex items-center gap-2">✅ <span>Actualizaciones incluidas</span></li>
-                    </ul>
-                    
-                    {/* URGENCIA */}
-                    <p className="text-amber-600 text-xs font-semibold mb-4">⚡ Quedan pocos lugares a este precio</p>
-                    
-                    {/* BOTÓN VERDE */}
-                    <button onClick={initPayment} disabled={processingPayment}
-                      className="w-full py-4 rounded-xl font-bold text-lg shadow-lg transform hover:scale-105 transition-all mb-2"
-                      style={{ backgroundColor: '#22c55e', color: 'white' }}>
-                      {processingPayment ? '⏳ Procesando...' : '🎯 Obtener mi Plan Ahora'}
-                    </button>
-                    
-                    {/* GARANTÍA */}
-                    <p className="text-stone-400 text-xs mb-3">🔒 7 días de prueba • Cancelá cuando quieras</p>
+                    {/* SI NO ESTÁ LOGUEADO - MOSTRAR LOGIN */}
+                    {!user ? (
+                      <>
+                        <div className="bg-blue-50 rounded-xl p-4 mb-4 border border-blue-200">
+                          <p className="text-blue-800 text-sm mb-3">Primero, iniciá sesión para guardar tu plan:</p>
+                          <button onClick={loginWithGoogle}
+                            className="w-full py-3 rounded-xl font-bold text-base shadow-lg flex items-center justify-center gap-2 bg-white border-2 border-stone-200 hover:border-blue-400 transition-all">
+                            <svg className="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                            Continuar con Google
+                          </button>
+                        </div>
+                        <p className="text-stone-400 text-xs mb-3">🔒 Usamos Google para proteger tu cuenta de forma segura</p>
+                      </>
+                    ) : (
+                      <>
+                        {/* USUARIO LOGUEADO - MOSTRAR INFO */}
+                        <div className="bg-green-50 rounded-xl p-3 mb-4 flex items-center gap-3 border border-green-200">
+                          <img src={user.photoURL} alt="" className="w-10 h-10 rounded-full" />
+                          <div className="text-left">
+                            <p className="font-semibold text-stone-800 text-sm">{user.displayName}</p>
+                            <p className="text-stone-500 text-xs">{user.email}</p>
+                          </div>
+                          <span className="ml-auto text-green-500">✓</span>
+                        </div>
+                        
+                        {/* PRECIO PSICOLÓGICO - Kotler P2 */}
+                        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 mb-4 border-2 border-green-200">
+                          <p className="text-green-600 text-xs font-semibold mb-1">💰 OFERTA DE LANZAMIENTO</p>
+                          <div className="text-4xl font-bold text-green-600">USD $15<span className="text-lg font-normal text-green-500">/mes</span></div>
+                          <p className="text-green-500 text-xs mt-1">Precio normal: <span className="line-through">USD $29</span></p>
+                        </div>
+                        
+                        {/* VALOR CLARO */}
+                        <ul className="text-left text-sm text-stone-600 space-y-2 mb-4">
+                          <li className="flex items-center gap-2">✅ <span>Tu perfil Dosha guardado</span></li>
+                          <li className="flex items-center gap-2">✅ <span>14 planes personalizados</span></li>
+                          <li className="flex items-center gap-2">✅ <span>Acceso inmediato sin retest</span></li>
+                          <li className="flex items-center gap-2">✅ <span>Actualizaciones incluidas</span></li>
+                        </ul>
+                        
+                        {/* URGENCIA */}
+                        <p className="text-amber-600 text-xs font-semibold mb-4">⚡ Quedan pocos lugares a este precio</p>
+                        
+                        {/* BOTÓN VERDE */}
+                        <button onClick={initPayment} disabled={processingPayment}
+                          className="w-full py-4 rounded-xl font-bold text-lg shadow-lg transform hover:scale-105 transition-all mb-3"
+                          style={{ backgroundColor: '#22c55e', color: 'white' }}>
+                          {processingPayment ? '⏳ Procesando...' : '🎯 Obtener mi Plan Ahora'}
+                        </button>
+                        
+                        {/* LOGOS DE CONFIANZA */}
+                        <div className="bg-stone-50 rounded-xl p-3 mb-3">
+                          <div className="flex items-center justify-center gap-2 mb-2">
+                            <span className="text-blue-500 text-lg">🛡️</span>
+                            <span className="text-sm font-semibold text-stone-700">Pago 100% Seguro</span>
+                          </div>
+                          <div className="flex items-center justify-center gap-4 text-xs text-stone-500">
+                            <span className="flex items-center gap-1">
+                              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="#00AAFF"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                              Mercado Pago
+                            </span>
+                            <span className="flex items-center gap-1">🔐 SSL</span>
+                            <span className="flex items-center gap-1">💳 Datos protegidos</span>
+                          </div>
+                        </div>
+                        
+                        {/* GARANTÍA DESTACADA */}
+                        <div className="flex items-center justify-center gap-2 mb-3 text-green-600">
+                          <span className="text-lg">✅</span>
+                          <span className="text-sm font-medium">7 días de prueba gratis • Devolución garantizada</span>
+                        </div>
+                        
+                        <p className="text-stone-400 text-xs mb-3">🔒 Cancelá cuando quieras desde tu cuenta de Mercado Pago</p>
+                      </>
+                    )}
                     
                     <button onClick={() => setShowPaywall(false)} className="text-stone-400 text-sm hover:text-stone-600">
                       Ahora no, gracias
