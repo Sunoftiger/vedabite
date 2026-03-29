@@ -1110,9 +1110,9 @@ www.vedabite.com
               {/* PRECIO + GARANTÍA */}
               <div className="max-w-md mx-auto mb-12 rounded-2xl p-6 text-white text-center" style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' }}>
                 <p className="text-lg mb-2">Test completamente <strong>GRATIS</strong></p>
-                <p className="text-3xl font-bold mb-2">Plan Premium: US$20/mes</p>
+                <p className="text-3xl font-bold mb-2">Tu Transformación: US$20/mes</p>
                 <p style={{ color: '#bbf7d0' }}>🔒 7 días gratis • Cancelá cuando quieras</p>
-                <p className="font-semibold mt-3" style={{ color: '#fef08a' }}>⚡ Oferta de lanzamiento</p>
+                <p className="font-semibold mt-3" style={{ color: '#fef08a' }}>⚡ Dejá de vivir agotado</p>
               </div>
               
               {/* PRUEBA SOCIAL */}
@@ -1933,12 +1933,25 @@ www.vedabite.com
             </div>
 
             {/* Footer */}
-            <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-3 space-y-2 shadow-lg">
+            {/* STICKY BAR - Ajuste 5 Kotler - Solo para no premium */}
+            {!isPremium && (
+              <div className="fixed top-0 left-0 right-0 bg-gradient-to-r from-amber-500 to-orange-500 p-2 z-40 shadow-lg">
+                <div className="flex items-center justify-center gap-2">
+                  <span className="text-white text-sm font-medium">✨ ¿Listo para tu transformación?</span>
+                  <button onClick={() => { gtag('event', 'subscription_clicked'); setShowPaywall(true); }} 
+                    className="bg-white text-orange-600 px-4 py-1 rounded-full text-sm font-bold hover:scale-105 transition-all">
+                    7 días gratis →
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-3 space-y-2 shadow-lg" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
               {!isPremium && (
                 <button onClick={() => { gtag('event', 'subscription_clicked'); setShowPaywall(true); }} 
                   className="w-full py-3 rounded-xl font-bold text-white shadow-lg transform hover:scale-[1.02] transition-all"
                   style={{ backgroundColor: '#22c55e' }}>
-                  💎 Guardar Mi Plan - US$20/mes <span className="text-green-200 text-xs ml-1">(Oferta)</span>
+                  🚀 Activar Mi Transformación - 7 días gratis
                 </button>
               )}
               {isPremium && (
@@ -1947,7 +1960,7 @@ www.vedabite.com
                 </div>
               )}
               <button onClick={generatePDF} className="w-full py-3 rounded-xl font-semibold" style={{ backgroundColor: '#F4C430', color: '#5D4E37' }}>
-                📥 Descargar mi Plan Completo
+                📥 Descargar Resumen Básico
               </button>
             </div>
 
@@ -1956,9 +1969,9 @@ www.vedabite.com
               <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                 <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl max-h-[90vh] overflow-y-auto">
                   <div className="text-center">
-                    <div className="text-5xl mb-3">💎</div>
-                    <h3 className="text-xl font-bold text-stone-800 mb-1">Guardá tu Plan para Siempre</h3>
-                    <p className="text-stone-500 text-sm mb-4">Accedé a tu perfil sin volver a hacer el test</p>
+                    <div className="text-5xl mb-3">🌟</div>
+                    <h3 className="text-xl font-bold text-stone-800 mb-1">Activá Tu Transformación</h3>
+                    <p className="text-stone-500 text-sm mb-4">Dejá de vivir agotado. Empezá hoy.</p>
                     
                     {/* SI NO ESTÁ LOGUEADO - MOSTRAR LOGIN */}
                     {!user ? (
@@ -1987,28 +2000,33 @@ www.vedabite.com
                         
                         {/* PRECIO PSICOLÓGICO - Kotler P2 */}
                         <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 mb-4 border-2 border-green-200">
-                          <p className="text-green-600 text-xs font-semibold mb-1">💰 OFERTA DE LANZAMIENTO</p>
+                          <p className="text-green-600 text-xs font-semibold mb-1">🎁 7 DÍAS GRATIS + OFERTA</p>
                           <div className="text-4xl font-bold text-green-600">US$20<span className="text-lg font-normal text-green-500">/mes</span></div>
-                          <p className="text-green-500 text-xs mt-1">Precio normal: <span className="line-through">US$39</span></p>
+                          <p className="text-green-500 text-xs mt-1">Después de tu prueba gratis</p>
+                        </div>
+                        
+                        {/* TESTIMONIO - Ajuste 3 Kotler */}
+                        <div className="bg-amber-50 rounded-xl p-3 mb-4 border border-amber-200">
+                          <p className="text-stone-600 text-sm italic">"Pensé que US$20 era mucho, pero ahorré el doble al dejar de comprar suplementos que no eran para mi biotipo."</p>
+                          <p className="text-amber-600 text-xs font-semibold mt-1">— María L., Buenos Aires</p>
                         </div>
                         
                         {/* VALOR CLARO */}
                         <ul className="text-left text-sm text-stone-600 space-y-2 mb-4">
-                          <li className="flex items-center gap-2">✅ <span>Tu perfil Dosha guardado</span></li>
+                          <li className="flex items-center gap-2">✅ <span>Plan de comidas completo (bloqueado en versión gratis)</span></li>
+                          <li className="flex items-center gap-2">✅ <span>Proyección de salud a 20 años</span></li>
                           <li className="flex items-center gap-2">✅ <span>14 planes personalizados</span></li>
-                          <li className="flex items-center gap-2">✅ <span>Acceso inmediato sin retest</span></li>
-                          <li className="flex items-center gap-2">✅ <span>Actualizaciones incluidas</span></li>
-                          <li className="flex items-center gap-2">✅ <span>Recordatorios opcionales para tu rutina</span></li>
+                          <li className="flex items-center gap-2">✅ <span>Recordatorios para tu rutina</span></li>
                         </ul>
                         
                         {/* URGENCIA */}
-                        <p className="text-amber-600 text-xs font-semibold mb-4">⚡ Quedan pocos lugares a este precio</p>
+                        <p className="text-amber-600 text-xs font-semibold mb-4">⚡ Cancelá cuando quieras</p>
                         
                         {/* BOTÓN VERDE */}
                         <button onClick={initPayment} disabled={processingPayment}
                           className="w-full py-4 rounded-xl font-bold text-lg shadow-lg transform hover:scale-105 transition-all mb-3"
                           style={{ backgroundColor: '#22c55e', color: 'white' }}>
-                          {processingPayment ? '⏳ Procesando...' : '🎯 Obtener mi Plan Ahora'}
+                          {processingPayment ? '⏳ Procesando...' : '🚀 Empezar Mi Transformación'}
                         </button>
                         
                         {/* LOGOS DE CONFIANZA */}
