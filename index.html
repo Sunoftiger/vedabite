@@ -840,118 +840,350 @@
         }, 150);
       };
 
-      const generatePDF = () => {
+      // PDF GRATIS - Vendedor con contenido bloqueado
+      const generatePDFGratis = () => {
         const primary = doshaInfo[results.primaryDosha];
-        const content = `VEDABITE - Tu Plan de Bienestar Personalizado
-================================================
-
-DATOS PERSONALES
-----------------
-Lugar de Nacimiento: ${birthData.birthPlace}
-Fecha de Nacimiento: ${birthData.date?.formatted}
-Hora de Nacimiento: ${birthData.time?.formatted || 'No especificada'}
-Edad: ${results.age} años
-
-RESULTADO DEL TEST (60 preguntas)
----------------------------------
-Dosha Primario: ${primary.name} (${primary.element})
-Dosha Secundario: ${doshaInfo[results.secondaryDosha].name}
-Nivel de Desequilibrio: ${results.desequilibrioLevel}%
-
-Distribución:
-- Vata: ${results.percentages.vata}%
-- Pitta: ${results.percentages.pitta}%
-- Kapha: ${results.percentages.kapha}%
-
-${results.nakshatra ? `Nakshatra: ${results.nakshatra.name} (${results.nakshatra.quality})
-Regente: ${results.nakshatra.ruler}
-Elemento: ${results.nakshatra.elemento}` : ''}
-
-CARACTERÍSTICAS EN EQUILIBRIO
------------------------------
-${primary.enEquilibrio.map(s => `• ${s}`).join('\n')}
-
-SIGNOS DE DESEQUILIBRIO ACTUAL
-------------------------------
-${primary.signosDesequilibrio.map(s => `• ${s}`).join('\n')}
-
-PROYECCIÓN SI NO HACÉS CAMBIOS
-------------------------------
-5 años: ${primary.proyeccionSalud.años5.sintomas.join(', ')}
-10 años: ${primary.proyeccionSalud.años10.sintomas.join(', ')}
-20 años: ${primary.proyeccionSalud.años20.sintomas.join(', ')}
-
-PROYECCIÓN SI HACÉS LOS CAMBIOS
--------------------------------
-3 meses: ${primary.proyeccionPositiva.meses3}
-6 meses: ${primary.proyeccionPositiva.meses6}
-1 año: ${primary.proyeccionPositiva.año1}
-5 años: ${primary.proyeccionPositiva.años5}
-
-ALIMENTOS RECOMENDADOS
-----------------------
-Cereales: ${primary.alimentosSI.cereales.join(', ')}
-Verduras: ${primary.alimentosSI.verduras.join(', ')}
-Frutas: ${primary.alimentosSI.frutas.join(', ')}
-Proteínas: ${primary.alimentosSI.proteinas.join(', ')}
-Lácteos: ${primary.alimentosSI.lacteos.join(', ')}
-Especias: ${primary.alimentosSI.especias.join(', ')}
-Bebidas: ${primary.alimentosSI.bebidas.join(', ')}
-Grasas: ${primary.alimentosSI.grasas.join(', ')}
-
-ALIMENTOS A EVITAR
-------------------
-Cereales: ${primary.alimentosNO.cereales.join(', ')}
-Verduras: ${primary.alimentosNO.verduras.join(', ')}
-Frutas: ${primary.alimentosNO.frutas.join(', ')}
-Proteínas: ${primary.alimentosNO.proteinas.join(', ')}
-Lácteos: ${primary.alimentosNO.lacteos.join(', ')}
-Otros: ${primary.alimentosNO.otros.join(', ')}
-Bebidas: ${primary.alimentosNO.bebidas.join(', ')}
-
-RUTINA DIARIA RECOMENDADA (DINACHARYA)
---------------------------------------
-${Object.entries(primary.horarios).map(([k, v]) => `${v.hora} - ${k.charAt(0).toUpperCase() + k.slice(1).replace(/([A-Z])/g, ' $1')}: ${v.nota}`).join('\n')}
-
-EJERCICIO RECOMENDADO
----------------------
-Actividades: ${primary.ejercicio.recomendados.join(', ')}
-Evitar: ${primary.ejercicio.evitar.join(', ')}
-Frecuencia: ${primary.ejercicio.frecuencia}
-Intensidad: ${primary.ejercicio.intensidad}
-Mejor horario: ${primary.ejercicio.mejorHora}
-
-SUPLEMENTOS Y HIERBAS RECOMENDADOS
-----------------------------------
-${primary.hierbas.map(h => `• ${h.nombre} (${h.dosis}): ${h.beneficio}`).join('\n')}
-
-RIESGOS DE SALUD POR DESEQUILIBRIO
-----------------------------------
-${primary.enfermedadesRiesgo.map(e => `• ${e.nombre}: ${e.probabilidad}`).join('\n')}
-
-================================================
-AVISO: Esta información es educativa y basada en 
-principios ayurvédicos tradicionales. No reemplaza 
-el diagnóstico médico profesional.
-
-Fuentes: Charaka Samhita, Sushruta Samhita, 
-Ashtanga Hridaya, Brihat Parashara Hora Shastra,
-OMS, Ministry of AYUSH, NAMA
-================================================
-
-Generado por Vedabite - GPS del Bienestar
-www.vedabite.com
-`;
-
-        const blob = new Blob([content], { type: 'text/plain' });
+        const secondary = doshaInfo[results.secondaryDosha];
+        const htmlContent = `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>VedaBite - Tu Resultado</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: #f5f5f5; padding: 20px; }
+    .page { max-width: 595px; margin: 0 auto 20px; background: white; padding: 40px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+    .page-1 { background: linear-gradient(180deg, #FFF8F0 0%, #FFFAF5 100%); }
+    .header { text-align: center; margin-bottom: 30px; }
+    .logo { font-family: 'Cormorant Garamond', serif; font-size: 42px; font-weight: 700; color: #D4A017; }
+    .tagline { font-size: 14px; color: #666; margin-top: 5px; }
+    .dosha-badge { width: 180px; height: 180px; margin: 30px auto; background: linear-gradient(135deg, ${primary.name === 'Vata' ? '#60a5fa, #3b82f6' : primary.name === 'Pitta' ? '#f97316, #ea580c' : '#22c55e, #16a34a'}); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    .dosha-name { font-size: 32px; font-weight: 700; }
+    .dosha-element { font-size: 14px; opacity: 0.9; }
+    .result-box { background: white; border-radius: 16px; padding: 25px; margin: 25px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .result-title { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px; }
+    .bar-container { margin: 10px 0; }
+    .bar-label { display: flex; justify-content: space-between; font-size: 14px; color: #666; }
+    .bar { height: 24px; background: #f0f0f0; border-radius: 12px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 12px; color: white; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; }
+    .locked { background: linear-gradient(135deg, #f8f8f8, #eee); border: 2px dashed #ccc; border-radius: 16px; padding: 30px; text-align: center; margin: 20px 0; }
+    .lock-icon { font-size: 48px; margin-bottom: 15px; }
+    .locked-title { font-size: 18px; font-weight: 600; color: #666; margin-bottom: 15px; }
+    .locked-items { font-size: 14px; color: #888; line-height: 2; text-align: left; max-width: 280px; margin: 0 auto; }
+    .cta { background: linear-gradient(135deg, #D4A017, #B8860B); border-radius: 16px; padding: 30px; text-align: center; margin-top: 30px; color: white; }
+    .cta-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+    .cta-button { display: inline-block; background: white; color: #D4A017; padding: 15px 40px; border-radius: 30px; font-weight: 700; font-size: 16px; text-decoration: none; margin-top: 15px; }
+    .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #999; }
+    @media print { body { background: white; } .page { box-shadow: none; } }
+  </style>
+</head>
+<body>
+  <div class="page page-1">
+    <div class="header">
+      <div class="logo">Vedabite</div>
+      <div class="tagline">GPS del Bienestar • Tu Mapa Ayurvédico Personal</div>
+    </div>
+    <div class="dosha-badge">
+      <div class="dosha-name">${primary.name.toUpperCase()}</div>
+      <div class="dosha-element">${primary.element}</div>
+    </div>
+    <div class="result-box">
+      <div class="result-title">📊 Tu Constitución Única</div>
+      <div class="bar-container">
+        <div class="bar-label"><span>Vata (Aire)</span><span>${results.percentages.vata}%</span></div>
+        <div class="bar"><div class="bar-fill" style="width: ${results.percentages.vata}%; background: linear-gradient(90deg, #60a5fa, #3b82f6);">${results.percentages.vata}%</div></div>
+      </div>
+      <div class="bar-container">
+        <div class="bar-label"><span>Pitta (Fuego)</span><span>${results.percentages.pitta}%</span></div>
+        <div class="bar"><div class="bar-fill" style="width: ${results.percentages.pitta}%; background: linear-gradient(90deg, #f97316, #ea580c);">${results.percentages.pitta}%</div></div>
+      </div>
+      <div class="bar-container">
+        <div class="bar-label"><span>Kapha (Tierra)</span><span>${results.percentages.kapha}%</span></div>
+        <div class="bar"><div class="bar-fill" style="width: ${results.percentages.kapha}%; background: linear-gradient(90deg, #22c55e, #16a34a);">${results.percentages.kapha}%</div></div>
+      </div>
+    </div>
+    <div class="result-box">
+      <div class="result-title">⚠️ Nivel de Desequilibrio: ${results.desequilibrioLevel}%</div>
+      <p style="font-size: 14px; color: #666; line-height: 1.6;">Tu biotipo ${primary.name} muestra signos de desequilibrio. Con los cambios correctos, podés equilibrarte en 3-6 meses.</p>
+    </div>
+    <div class="locked">
+      <div class="lock-icon">🔒</div>
+      <div class="locked-title">Tu Plan Completo Está Bloqueado</div>
+      <div class="locked-items">
+        ✦ 📊 Resumen Completo<br>
+        ✦ 🔮 Proyección a 5, 10, 20 años<br>
+        ✦ 🍽️ Plan de Alimentación<br>
+        ✦ 🍲 Recetas Personalizadas<br>
+        ✦ ⏰ Horarios Óptimos<br>
+        ✦ 🏃 Ejercicio Recomendado<br>
+        ✦ 💆 Terapias Naturales<br>
+        ✦ 🙏 Mudras Sanadores<br>
+        ✦ 🔴 Equilibrio de Chakras<br>
+        ✦ 🌬️ Técnicas de Respiración<br>
+        ✦ 🧘 Meditación Guiada<br>
+        ✦ ⭐ Astrología Védica<br>
+        ✦ 📍 Clima Ideal para Vos<br>
+        ✦ 🏥 Alertas de Salud
+      </div>
+    </div>
+    <div class="cta">
+      <div class="cta-title">🚀 Activá Tu Transformación</div>
+      <div style="font-size: 14px; opacity: 0.9;">Dejá de vivir agotado. Empezá hoy con 7 días gratis.</div>
+      <a href="https://vedabite.com" class="cta-button">DESBLOQUEAR MI PLAN →</a>
+      <div style="margin-top: 15px; font-size: 13px; opacity: 0.8;">Después: US$20/mes • Cancelá cuando quieras</div>
+    </div>
+    <div class="footer">
+      <div>Este documento es un resumen. El plan completo incluye 14 secciones personalizadas.</div>
+      <div style="color: #D4A017; margin-top: 5px; font-weight: 600;">www.vedabite.com</div>
+    </div>
+  </div>
+</body>
+</html>`;
+        const blob = new Blob([htmlContent], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `Vedabite_Plan.txt`;
+        a.download = 'Vedabite_Resumen.html';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+      };
+
+      // PDF PREMIUM - Completo para abonados
+      const generatePDFPremium = () => {
+        const primary = doshaInfo[results.primaryDosha];
+        const secondary = doshaInfo[results.secondaryDosha];
+        const today = new Date().toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' });
+        const htmlContent = `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>VedaBite Premium - ${birthData.name || 'Tu Plan'}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: #1a1a1a; padding: 20px; }
+    .page { max-width: 595px; margin: 0 auto 20px; background: white; padding: 40px; min-height: 842px; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+    .cover { background: linear-gradient(180deg, #1a1a1a 0%, #2d2d2d 100%); color: white; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+    .premium-badge { background: linear-gradient(135deg, #D4A017, #FFD700); color: #1a1a1a; padding: 8px 20px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; margin-bottom: 30px; }
+    .cover-logo { font-family: 'Cormorant Garamond', serif; font-size: 56px; font-weight: 700; color: #D4A017; }
+    .cover-subtitle { font-size: 16px; color: #888; margin-top: 10px; letter-spacing: 3px; }
+    .cover-dosha { width: 200px; height: 200px; margin: 40px auto; background: linear-gradient(135deg, #D4A017, #B8860B); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 60px rgba(212, 160, 23, 0.3); }
+    .cover-dosha-name { font-size: 36px; font-weight: 700; color: white; }
+    .cover-dosha-element { font-size: 14px; color: rgba(255,255,255,0.8); }
+    .cover-user { margin-top: 40px; }
+    .cover-user-name { font-size: 24px; font-weight: 600; }
+    .cover-user-date { font-size: 14px; color: #888; margin-top: 5px; }
+    .interior { background: #FFFAF5; }
+    .watermark { position: absolute; top: 20px; right: 20px; background: linear-gradient(135deg, #D4A017, #FFD700); color: #1a1a1a; padding: 5px 12px; border-radius: 12px; font-size: 10px; font-weight: 700; }
+    .section-header { background: linear-gradient(90deg, #D4A017, transparent); padding: 15px 20px; margin: -40px -40px 30px -40px; display: flex; align-items: center; gap: 15px; }
+    .section-icon { font-size: 32px; }
+    .section-title { font-size: 24px; font-weight: 700; color: #333; }
+    .section-number { background: #D4A017; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; margin-left: auto; }
+    .content-box { background: white; border-radius: 16px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .content-title { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 15px; }
+    .food-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .food-category { background: #f9f9f9; border-radius: 12px; padding: 15px; }
+    .food-yes { border-left: 3px solid #22c55e; }
+    .food-no { border-left: 3px solid #ef4444; }
+    .food-category-title { font-size: 12px; font-weight: 600; color: #D4A017; margin-bottom: 8px; }
+    .food-items { font-size: 13px; color: #666; line-height: 1.6; }
+    .schedule-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+    .schedule-time { background: #D4A017; color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; min-width: 70px; text-align: center; }
+    .schedule-activity { margin-left: 15px; }
+    .schedule-activity-title { font-size: 14px; font-weight: 600; color: #333; }
+    .schedule-activity-desc { font-size: 12px; color: #888; }
+    .footer-page { position: absolute; bottom: 20px; left: 40px; right: 40px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #999; border-top: 1px solid #eee; padding-top: 15px; }
+    .page-number { background: #D4A017; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
+    @media print { body { background: white; } .page { box-shadow: none; page-break-after: always; } }
+  </style>
+</head>
+<body>
+  <!-- PORTADA -->
+  <div class="page cover">
+    <div class="premium-badge">✦ DOCUMENTO PREMIUM ✦</div>
+    <div class="cover-logo">Vedabite</div>
+    <div class="cover-subtitle">TU MAPA AYURVÉDICO PERSONAL</div>
+    <div class="cover-dosha">
+      <div class="cover-dosha-name">${primary.name.toUpperCase()}</div>
+      <div class="cover-dosha-element">${primary.element}</div>
+    </div>
+    <div class="cover-user">
+      <div class="cover-user-name">Juan Sebastián Favareto</div>
+      <div class="cover-user-date">Generado el ${today}</div>
+    </div>
+    <div style="position: absolute; bottom: 40px; left: 0; right: 0; text-align: center;">
+      <div style="font-size: 12px; color: #666;">Este documento contiene tu plan personalizado completo</div>
+      <div style="color: #D4A017; margin-top: 5px;">www.vedabite.com</div>
+    </div>
+  </div>
+
+  <!-- PÁGINA 2: RESUMEN -->
+  <div class="page interior">
+    <div class="watermark">PREMIUM</div>
+    <div class="section-header">
+      <span class="section-icon">📊</span>
+      <span class="section-title">Tu Perfil Completo</span>
+      <span class="section-number">1</span>
+    </div>
+    <div class="content-box">
+      <div class="content-title">🧬 Constitución (Prakriti)</div>
+      <div style="display: flex; gap: 15px; margin-top: 15px;">
+        <div style="flex: 1; text-align: center; padding: 20px; background: linear-gradient(135deg, ${primary.name === 'Vata' ? '#60a5fa, #3b82f6' : primary.name === 'Pitta' ? '#f97316, #ea580c' : '#22c55e, #16a34a'}); border-radius: 12px; color: white;">
+          <div style="font-size: 28px; font-weight: 700;">${results.percentages[results.primaryDosha]}%</div>
+          <div style="font-size: 14px;">${primary.name.toUpperCase()}</div>
+          <div style="font-size: 11px; opacity: 0.8;">Dominante</div>
+        </div>
+        <div style="flex: 1; text-align: center; padding: 20px; background: #f0f0f0; border-radius: 12px;">
+          <div style="font-size: 28px; font-weight: 700; color: #333;">${results.percentages[results.secondaryDosha]}%</div>
+          <div style="font-size: 14px; color: #666;">${secondary.name.toUpperCase()}</div>
+          <div style="font-size: 11px; color: #999;">Secundario</div>
+        </div>
+      </div>
+    </div>
+    <div class="content-box">
+      <div class="content-title">⚠️ Estado Actual: ${results.desequilibrioLevel}% Desequilibrio</div>
+      <p style="font-size: 14px; color: #666; line-height: 1.6;">${primary.signosDesequilibrio.slice(0, 3).join('. ')}.</p>
+    </div>
+    <div class="content-box">
+      <div class="content-title">✅ Tu Potencial en Equilibrio</div>
+      <p style="font-size: 14px; color: #666; line-height: 1.6;">${primary.enEquilibrio.slice(0, 4).join('. ')}.</p>
+    </div>
+    <div class="footer-page">
+      <span>Vedabite Premium • ${birthData.name || 'Tu Plan Personal'}</span>
+      <span class="page-number">2</span>
+    </div>
+  </div>
+
+  <!-- PÁGINA 3: ALIMENTACIÓN -->
+  <div class="page interior">
+    <div class="watermark">PREMIUM</div>
+    <div class="section-header">
+      <span class="section-icon">🍽️</span>
+      <span class="section-title">Plan de Alimentación</span>
+      <span class="section-number">2</span>
+    </div>
+    <div class="content-box">
+      <div class="content-title" style="color: #22c55e;">✅ Alimentos Recomendados</div>
+      <div class="food-grid">
+        <div class="food-category food-yes">
+          <div class="food-category-title">CEREALES</div>
+          <div class="food-items">${primary.alimentosSI.cereales.join(', ')}</div>
+        </div>
+        <div class="food-category food-yes">
+          <div class="food-category-title">VERDURAS</div>
+          <div class="food-items">${primary.alimentosSI.verduras.join(', ')}</div>
+        </div>
+        <div class="food-category food-yes">
+          <div class="food-category-title">FRUTAS</div>
+          <div class="food-items">${primary.alimentosSI.frutas.join(', ')}</div>
+        </div>
+        <div class="food-category food-yes">
+          <div class="food-category-title">PROTEÍNAS</div>
+          <div class="food-items">${primary.alimentosSI.proteinas.join(', ')}</div>
+        </div>
+      </div>
+    </div>
+    <div class="content-box">
+      <div class="content-title" style="color: #ef4444;">❌ Alimentos a Evitar</div>
+      <div class="food-grid">
+        <div class="food-category food-no">
+          <div class="food-category-title">CEREALES</div>
+          <div class="food-items">${primary.alimentosNO.cereales.join(', ')}</div>
+        </div>
+        <div class="food-category food-no">
+          <div class="food-category-title">OTROS</div>
+          <div class="food-items">${primary.alimentosNO.otros.join(', ')}</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-page">
+      <span>Vedabite Premium • ${birthData.name || 'Tu Plan Personal'}</span>
+      <span class="page-number">3</span>
+    </div>
+  </div>
+
+  <!-- PÁGINA 4: RUTINA -->
+  <div class="page interior">
+    <div class="watermark">PREMIUM</div>
+    <div class="section-header">
+      <span class="section-icon">⏰</span>
+      <span class="section-title">Tu Rutina Diaria</span>
+      <span class="section-number">3</span>
+    </div>
+    <div class="content-box">
+      <div class="content-title">🌅 Dinacharya Personalizada</div>
+      ${Object.entries(primary.horarios).map(([key, val]) => `
+      <div class="schedule-item">
+        <div class="schedule-time">${val.hora}</div>
+        <div class="schedule-activity">
+          <div class="schedule-activity-title">${key.charAt(0).toUpperCase() + key.slice(1)}</div>
+          <div class="schedule-activity-desc">${val.nota}</div>
+        </div>
+      </div>`).join('')}
+    </div>
+    <div class="footer-page">
+      <span>Vedabite Premium • ${birthData.name || 'Tu Plan Personal'}</span>
+      <span class="page-number">4</span>
+    </div>
+  </div>
+
+  <!-- PÁGINA 5: PROYECCIÓN -->
+  <div class="page interior">
+    <div class="watermark">PREMIUM</div>
+    <div class="section-header">
+      <span class="section-icon">🔮</span>
+      <span class="section-title">Proyección de Salud</span>
+      <span class="section-number">4</span>
+    </div>
+    <div class="content-box">
+      <div class="content-title" style="color: #ef4444;">⚠️ Si NO Hacés Cambios</div>
+      <div style="padding-left: 20px; border-left: 3px solid #ef4444;">
+        <p style="margin-bottom: 15px;"><strong>5 años:</strong> ${primary.proyeccionSalud.años5.sintomas.join(', ')}</p>
+        <p style="margin-bottom: 15px;"><strong>10 años:</strong> ${primary.proyeccionSalud.años10.sintomas.join(', ')}</p>
+        <p><strong>20 años:</strong> ${primary.proyeccionSalud.años20.sintomas.join(', ')}</p>
+      </div>
+    </div>
+    <div class="content-box">
+      <div class="content-title" style="color: #22c55e;">✅ Si Seguís Tu Plan</div>
+      <div style="padding-left: 20px; border-left: 3px solid #22c55e;">
+        <p style="margin-bottom: 15px;"><strong>3 meses:</strong> ${primary.proyeccionPositiva.meses3}</p>
+        <p style="margin-bottom: 15px;"><strong>6 meses:</strong> ${primary.proyeccionPositiva.meses6}</p>
+        <p style="margin-bottom: 15px;"><strong>1 año:</strong> ${primary.proyeccionPositiva.año1}</p>
+        <p><strong>5 años:</strong> ${primary.proyeccionPositiva.años5}</p>
+      </div>
+    </div>
+    <div style="background: linear-gradient(135deg, #22c55e, #16a34a); border-radius: 12px; padding: 25px; color: white; text-align: center; margin-top: 20px;">
+      <div style="font-size: 18px; font-weight: 700;">Tu Futuro Está en Tus Manos</div>
+      <div style="font-size: 14px; opacity: 0.9; margin-top: 10px;">Cada pequeño cambio hoy es un gran resultado mañana.</div>
+    </div>
+    <div class="footer-page">
+      <span>Vedabite Premium • ${birthData.name || 'Tu Plan Personal'}</span>
+      <span class="page-number">5</span>
+    </div>
+  </div>
+</body>
+</html>`;
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Vedabite_Premium_JuanSebastianFavareto.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      };
+
+      // Función que decide qué PDF generar
+      const generatePDF = () => {
+        if (isPremium) {
+          generatePDFPremium();
+        } else {
+          generatePDFGratis();
+        }
       };
 
       const progress = ((currentQuestion + 1) / doshaQuestions.length) * 100;
