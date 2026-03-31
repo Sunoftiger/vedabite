@@ -1328,6 +1328,15 @@
                 <span>✓ Resultados al instante</span>
               </div>
               
+              {/* NUEVO: Leyenda del escáner */}
+              <div className="bg-gradient-to-r from-purple-100 to-indigo-100 rounded-xl p-3 max-w-xs shadow-sm mb-4 border border-purple-200">
+                <div className="flex items-center gap-2 justify-center">
+                  <span className="text-2xl">📷</span>
+                  <p className="text-sm font-semibold" style={{ color: '#5B21B6' }}>¡NUEVO! Escaneá el menú</p>
+                </div>
+                <p className="text-xs text-center mt-1" style={{ color: '#7C3AED' }}>Te decimos qué te equilibra y qué te desequilibra</p>
+              </div>
+              
               {/* TESTIMONIOS RÁPIDO - Kotler */}
               <div className="bg-white/80 rounded-xl p-3 max-w-xs shadow-sm">
                 <p className="text-sm italic" style={{ color: '#555' }}>"Descubrí que comía todo lo que me inflamaba. En 2 semanas me sentí otra persona."</p>
@@ -1383,18 +1392,21 @@
                 <h3 className="text-2xl font-bold text-center mb-2" style={{ color: '#22c55e' }}>✅ VedaBite resuelve TODO</h3>
                 <p className="text-center text-stone-500 mb-6">En 10 minutos descubrís qué necesita TU cuerpo</p>
                 
-                {/* Video YouTube */}
-                <div className="rounded-2xl overflow-hidden mb-6 shadow-lg">
-                  <iframe 
-                    width="100%" 
-                    height="250" 
-                    src="https://www.youtube.com/embed/ORBj4yiYdyE" 
-                    title="Cómo funciona VedaBite" 
-                    frameBorder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowFullScreen>
-                  </iframe>
-                </div>
+                {/* Video YouTube con thumbnail */}
+                <a href="https://youtu.be/D597FiRJI3U" target="_blank" rel="noopener noreferrer" 
+                  onClick={() => gtag('event', 'video_clicked', { video: 'intro_vedabite' })}
+                  className="block rounded-2xl overflow-hidden mb-6 shadow-lg relative"
+                  style={{ background: 'linear-gradient(135deg, #1a1a1a, #333)' }}>
+                  <div className="aspect-video flex items-center justify-center relative">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
+                      <div className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center shadow-xl mb-4 hover:scale-110 transition-transform">
+                        <span className="text-4xl ml-1">▶</span>
+                      </div>
+                      <p className="text-lg font-semibold">🎬 Ver video: Cómo funciona</p>
+                      <p className="text-sm text-stone-400">(1 minuto en YouTube)</p>
+                    </div>
+                  </div>
+                </a>
                 
                 <div className="bg-green-50 rounded-xl p-4 border border-green-200">
                   <p className="text-center text-green-800 font-medium">
@@ -1883,6 +1895,7 @@
         
         const tabs = [
           { id: 'resumen', label: '📊 Resumen' },
+          { id: 'escaner', label: '📷 Escáner', premium: true },
           { id: 'proyeccion', label: '🔮 Proyección' },
           { id: 'alimentos', label: '🍽️ Alimentos' },
           { id: 'recetas', label: '🍲 Recetas' },
@@ -2012,6 +2025,207 @@
                         <div><strong>Regente:</strong> {results.nakshatra.ruler}</div>
                         <div><strong>Cualidad:</strong> {results.nakshatra.quality}</div>
                         <div><strong>Elemento:</strong> {results.nakshatra.elemento}</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'escaner' && (
+                <div className="space-y-4">
+                  {!isPremium ? (
+                    <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-6 text-center border-2 border-amber-200">
+                      <span className="text-6xl block mb-4">🔒</span>
+                      <h3 className="text-xl font-bold text-amber-800 mb-2">Función Premium</h3>
+                      <p className="text-amber-700 mb-4">Escaneá productos y descubrí si son buenos para tu biotipo {primary.name}.</p>
+                      <button onClick={() => { gtag('event', 'subscription_clicked', { source: 'escaner_tab' }); setShowPaywall(true); }}
+                        className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-3 rounded-xl font-bold">
+                        🚀 Desbloquear Escáner
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {/* Escáner de productos */}
+                      <div className="bg-white rounded-2xl p-5 shadow">
+                        <h3 className="font-bold text-stone-800 mb-2 text-center">📷 Escáner de Productos</h3>
+                        <p className="text-sm text-stone-500 text-center mb-4">Escaneá el código de barras o escribí el nombre del producto</p>
+                        
+                        <div className="space-y-3">
+                          <input 
+                            type="text" 
+                            placeholder="🔍 Buscar producto (ej: Coca Cola, Arroz, etc.)"
+                            className="w-full px-4 py-3 rounded-xl border-2 border-stone-200 focus:border-amber-400 outline-none"
+                            id="productSearch"
+                          />
+                          <button 
+                            onClick={() => {
+                              const input = document.getElementById('productSearch').value.toLowerCase();
+                              gtag('event', 'product_scanned', { product: input, dosha: results.primaryDosha });
+                              
+                              // Base de datos simple de productos
+                              const productosNO = {
+                                vata: ['café', 'coca cola', 'pepsi', 'refresco', 'gaseosa', 'helado', 'ensalada cruda', 'galletas', 'chips', 'papas fritas', 'alcohol', 'cerveza', 'vino', 'lechuga', 'brócoli crudo'],
+                                pitta: ['picante', 'ají', 'chile', 'salsa tabasco', 'alcohol', 'cerveza', 'vino', 'café', 'tomate', 'vinagre', 'mostaza', 'ketchup', 'carne roja', 'embutidos', 'frituras'],
+                                kapha: ['helado', 'lácteos', 'queso', 'yogurt', 'leche', 'dulces', 'chocolate', 'torta', 'galletitas', 'pan blanco', 'frituras', 'papas fritas', 'gaseosa', 'azúcar']
+                              };
+                              
+                              const productosSI = {
+                                vata: ['arroz', 'avena', 'sopa', 'guiso', 'té', 'jengibre', 'banana', 'palta', 'ghee', 'leche tibia', 'nueces', 'almendras'],
+                                pitta: ['arroz', 'pepino', 'sandía', 'melón', 'leche', 'ghee', 'coco', 'menta', 'cilantro', 'pepino', 'calabaza'],
+                                kapha: ['jengibre', 'té verde', 'miel', 'legumbres', 'verduras', 'especias', 'pimienta', 'manzana', 'pera', 'quinoa', 'mijo']
+                              };
+                              
+                              const dosha = results.primaryDosha;
+                              const esNocivo = productosNO[dosha].some(p => input.includes(p));
+                              const esBueno = productosSI[dosha].some(p => input.includes(p));
+                              
+                              let mensaje = '';
+                              let color = '';
+                              
+                              if (esNocivo) {
+                                mensaje = `⚠️ CUIDADO: "${input}" puede desequilibrar tu ${primary.name}. Te genera ${dosha === 'vata' ? 'ansiedad, gases e insomnio' : dosha === 'pitta' ? 'acidez, irritabilidad e inflamación' : 'pesadez, retención y letargo'}.`;
+                                color = 'bg-red-50 border-red-300 text-red-800';
+                              } else if (esBueno) {
+                                mensaje = `✅ EXCELENTE: "${input}" es ideal para tu biotipo ${primary.name}. Te ayuda a mantener el equilibrio.`;
+                                color = 'bg-green-50 border-green-300 text-green-800';
+                              } else if (input.length > 0) {
+                                mensaje = `🤔 "${input}" - No tenemos info específica. En general, consumilo con moderación y observá cómo te sentís.`;
+                                color = 'bg-yellow-50 border-yellow-300 text-yellow-800';
+                              }
+                              
+                              document.getElementById('scanResult').innerHTML = mensaje ? `<div class="p-4 rounded-xl border-2 ${color}">${mensaje}</div>` : '';
+                            }}
+                            className="w-full py-3 rounded-xl font-bold text-white bg-gradient-to-r from-emerald-500 to-green-600">
+                            🔍 Analizar Producto
+                          </button>
+                        </div>
+                        
+                        <div id="scanResult" className="mt-4"></div>
+                      </div>
+                      
+                      {/* Planificador de fechas */}
+                      <div className="bg-white rounded-2xl p-5 shadow">
+                        <h3 className="font-bold text-stone-800 mb-2 text-center">🗓️ Planificador de Fechas</h3>
+                        <p className="text-sm text-stone-500 text-center mb-4">¿Cuándo es mejor para vos hacer ciertas actividades?</p>
+                        
+                        <div className="space-y-3">
+                          <select 
+                            className="w-full px-4 py-3 rounded-xl border-2 border-stone-200 focus:border-amber-400 outline-none"
+                            id="activitySelect"
+                          >
+                            <option value="">Seleccioná una actividad...</option>
+                            <option value="vacaciones">🏖️ Vacaciones</option>
+                            <option value="ejercicio">🏃 Empezar ejercicio intenso</option>
+                            <option value="ayuno">🍃 Hacer ayuno/detox</option>
+                            <option value="proyecto">💼 Iniciar proyecto importante</option>
+                            <option value="mudanza">🏠 Mudanza</option>
+                            <option value="dieta">🥗 Comenzar dieta estricta</option>
+                          </select>
+                          
+                          <input 
+                            type="date" 
+                            className="w-full px-4 py-3 rounded-xl border-2 border-stone-200 focus:border-amber-400 outline-none"
+                            id="dateSelect"
+                          />
+                          
+                          <button 
+                            onClick={() => {
+                              const actividad = document.getElementById('activitySelect').value;
+                              const fecha = document.getElementById('dateSelect').value;
+                              
+                              if (!actividad || !fecha) {
+                                document.getElementById('dateResult').innerHTML = '<div class="p-4 rounded-xl bg-stone-100 text-stone-600">Seleccioná actividad y fecha</div>';
+                                return;
+                              }
+                              
+                              gtag('event', 'date_analyzed', { activity: actividad, dosha: results.primaryDosha });
+                              
+                              const fechaObj = new Date(fecha);
+                              const mes = fechaObj.getMonth();
+                              const dosha = results.primaryDosha;
+                              
+                              // Estaciones y doshas
+                              const estacion = mes >= 2 && mes <= 4 ? 'primavera' : mes >= 5 && mes <= 7 ? 'verano' : mes >= 8 && mes <= 10 ? 'otoño' : 'invierno';
+                              
+                              const recomendaciones = {
+                                vata: {
+                                  mejor: ['verano', 'primavera'],
+                                  evitar: ['otoño', 'invierno'],
+                                  mensaje_bueno: 'El clima cálido te equilibra. ¡Excelente momento!',
+                                  mensaje_malo: 'El frío y viento agravan tu Vata. Mejor esperar a primavera/verano o abrigarte muy bien.'
+                                },
+                                pitta: {
+                                  mejor: ['otoño', 'invierno'],
+                                  evitar: ['verano'],
+                                  mensaje_bueno: 'El clima fresco te equilibra. ¡Buen momento!',
+                                  mensaje_malo: 'El calor del verano agrava tu Pitta. Mejor otoño/invierno o elegir destinos frescos.'
+                                },
+                                kapha: {
+                                  mejor: ['primavera', 'verano'],
+                                  evitar: ['invierno'],
+                                  mensaje_bueno: 'El clima seco y cálido te activa. ¡Adelante!',
+                                  mensaje_malo: 'El invierno húmedo agrava tu Kapha. Mejor primavera/verano o destinos secos.'
+                                }
+                              };
+                              
+                              const rec = recomendaciones[dosha];
+                              const esBueno = rec.mejor.includes(estacion);
+                              
+                              let mensaje = '';
+                              let alternativas = '';
+                              
+                              if (esBueno) {
+                                mensaje = `✅ ¡EXCELENTE FECHA! ${rec.mensaje_bueno}`;
+                              } else {
+                                mensaje = `⚠️ NO ES IDEAL: ${rec.mensaje_malo}`;
+                                
+                                // Calcular fechas alternativas
+                                const mejorMes = rec.mejor[0] === 'primavera' ? 'Marzo-Mayo' : rec.mejor[0] === 'verano' ? 'Junio-Agosto' : rec.mejor[0] === 'otoño' ? 'Septiembre-Noviembre' : 'Diciembre-Febrero';
+                                alternativas = `<div class="mt-3 p-3 bg-green-50 rounded-lg"><strong>📅 Fechas recomendadas:</strong> ${mejorMes}</div>`;
+                              }
+                              
+                              document.getElementById('dateResult').innerHTML = `
+                                <div class="p-4 rounded-xl border-2 ${esBueno ? 'bg-green-50 border-green-300 text-green-800' : 'bg-amber-50 border-amber-300 text-amber-800'}">
+                                  <p class="font-semibold">${mensaje}</p>
+                                  <p class="text-sm mt-2">Estación: ${estacion.charAt(0).toUpperCase() + estacion.slice(1)} | Tu biotipo: ${primary.name}</p>
+                                  ${alternativas}
+                                </div>
+                              `;
+                            }}
+                            className="w-full py-3 rounded-xl font-bold text-white bg-gradient-to-r from-indigo-500 to-purple-600">
+                            🔮 Analizar Fecha
+                          </button>
+                        </div>
+                        
+                        <div id="dateResult" className="mt-4"></div>
+                      </div>
+                      
+                      {/* Tips rápidos */}
+                      <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-4 border border-emerald-200">
+                        <h4 className="font-bold text-emerald-800 mb-3">💡 Tips para {primary.name}</h4>
+                        <ul className="text-sm text-emerald-700 space-y-2">
+                          {results.primaryDosha === 'vata' && (
+                            <>
+                              <li>• Evitá bebidas frías y gaseosas</li>
+                              <li>• Preferí comidas calientes y cocidas</li>
+                              <li>• El mejor momento para viajar: primavera/verano</li>
+                            </>
+                          )}
+                          {results.primaryDosha === 'pitta' && (
+                            <>
+                              <li>• Evitá picantes, alcohol y café</li>
+                              <li>• Preferí alimentos frescos y dulces</li>
+                              <li>• El mejor momento para viajar: otoño/invierno</li>
+                            </>
+                          )}
+                          {results.primaryDosha === 'kapha' && (
+                            <>
+                              <li>• Evitá lácteos, dulces y frituras</li>
+                              <li>• Preferí especias y comidas livianas</li>
+                              <li>• El mejor momento para viajar: primavera/verano</li>
+                            </>
+                          )}
+                        </ul>
                       </div>
                     </div>
                   )}
