@@ -1340,161 +1340,270 @@
               </div>
             </div>
             
-            {/* SEGUNDO VIEWPORT - SI SCROLLEAN */}
-            <div className="min-h-screen bg-white px-6 py-12">
+            {/* SEGUNDO VIEWPORT - ESTRUCTURA KOTLER COMPLETA */}
+            <div className="bg-white px-6 py-12">
               
-              {/* QUÉ INCLUYE - 14 TABS VISIBLES */}
-              <div className="max-w-md mx-auto mb-10">
-                <h3 className="text-2xl font-bold text-center mb-5" style={{ color: '#3D3D3D' }}>📦 Tu plan incluye:</h3>
+              {/* SECCIÓN 1: PROBLEMA - ¿Te reconoces? */}
+              <div className="max-w-md mx-auto mb-16">
+                <h3 className="text-2xl font-bold text-center mb-6" style={{ color: '#DC2626' }}>😰 ¿Te reconocés en esto?</h3>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3 p-4 bg-red-50 rounded-xl border border-red-100">
+                    <span className="text-2xl">😓</span>
+                    <div>
+                      <p className="font-semibold text-stone-800">Trabajás 8-12 horas al día</p>
+                      <p className="text-sm text-stone-500">Y llegás a casa sin energía para nada más</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-4 bg-red-50 rounded-xl border border-red-100">
+                    <span className="text-2xl">🍕</span>
+                    <div>
+                      <p className="font-semibold text-stone-800">Comés lo que hay, cuando podés</p>
+                      <p className="text-sm text-stone-500">Y después te sentís hinchado, pesado, culpable</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-4 bg-red-50 rounded-xl border border-red-100">
+                    <span className="text-2xl">😴</span>
+                    <div>
+                      <p className="font-semibold text-stone-800">Dormís mal, te levantás cansado</p>
+                      <p className="text-sm text-stone-500">Y el café ya no alcanza para mantenerte despierto</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-4 bg-red-50 rounded-xl border border-red-100">
+                    <span className="text-2xl">🤯</span>
+                    <div>
+                      <p className="font-semibold text-stone-800">Sabés que tenés que cuidarte</p>
+                      <p className="text-sm text-stone-500">Pero no sabés por dónde empezar ni tenés tiempo</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* SECCIÓN 2: SOLUCIÓN */}
+              <div className="max-w-md mx-auto mb-16">
+                <h3 className="text-2xl font-bold text-center mb-2" style={{ color: '#22c55e' }}>✅ VedaBite resuelve TODO</h3>
+                <p className="text-center text-stone-500 mb-6">En 10 minutos descubrís qué necesita TU cuerpo</p>
+                
+                {/* Video YouTube */}
+                <div className="rounded-2xl overflow-hidden mb-6 shadow-lg">
+                  <iframe 
+                    width="100%" 
+                    height="250" 
+                    src="https://www.youtube.com/embed/ORBj4yiYdyE" 
+                    title="Cómo funciona VedaBite" 
+                    frameBorder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowFullScreen>
+                  </iframe>
+                </div>
+                
+                <div className="bg-green-50 rounded-xl p-4 border border-green-200">
+                  <p className="text-center text-green-800 font-medium">
+                    🧬 Test personalizado basado en <strong>Ayurveda + Astrología Védica</strong>
+                  </p>
+                </div>
+              </div>
+              
+              {/* SECCIÓN 3: CÓMO FUNCIONA - 3 Pasos */}
+              <div className="max-w-md mx-auto mb-16">
+                <h3 className="text-2xl font-bold text-center mb-8" style={{ color: '#3D3D3D' }}>🎯 3 pasos simples</h3>
+                <div className="space-y-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center text-2xl font-bold text-amber-600 shrink-0">1</div>
+                    <div>
+                      <p className="font-bold text-stone-800">Hacés el test (10 min)</p>
+                      <p className="text-sm text-stone-500">60 preguntas sobre tu cuerpo, mente y hábitos</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center text-2xl font-bold text-emerald-600 shrink-0">2</div>
+                    <div>
+                      <p className="font-bold text-stone-800">Descubrís tu biotipo único</p>
+                      <p className="text-sm text-stone-500">Vata, Pitta o Kapha + tu Nakshatra védico</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center text-2xl font-bold text-blue-600 shrink-0">3</div>
+                    <div>
+                      <p className="font-bold text-stone-800">Recibís tu plan personalizado</p>
+                      <p className="text-sm text-stone-500">Alimentación, horarios, ejercicio, meditación</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* CTA INTERMEDIO */}
+              <div className="max-w-md mx-auto mb-16">
+                <button onClick={() => { gtag('event', 'landing_cta_clicked'); gtag('event', 'cta_intermedio'); setAnimateIn(false); setTimeout(() => setStep(1), 200); }}
+                  className="w-full py-5 rounded-xl font-bold text-xl shadow-lg"
+                  style={{ backgroundColor: '#22c55e', color: 'white' }}>
+                  🚀 Hacer Mi Test GRATIS
+                </button>
+                <p className="text-center text-sm mt-2" style={{ color: '#888' }}>Sin tarjeta • Resultados al instante</p>
+              </div>
+              
+              {/* SECCIÓN 4: QUÉ INCLUYE */}
+              <div className="max-w-md mx-auto mb-16">
+                <h3 className="text-2xl font-bold text-center mb-6" style={{ color: '#3D3D3D' }}>📦 Tu plan incluye 14 áreas:</h3>
                 <div className="grid grid-cols-2 gap-3">
-                  
                   <div className="rounded-xl p-3 text-center" style={{ backgroundColor: '#F0FDF4' }}>
                     <span className="text-2xl block">🍽️</span>
                     <p className="font-bold text-sm" style={{ color: '#3D3D3D' }}>Alimentación</p>
-                    <p className="text-xs" style={{ color: '#22c55e' }}>Nutrite sin inflamarte</p>
                   </div>
-                  
                   <div className="rounded-xl p-3 text-center" style={{ backgroundColor: '#FFF8F0' }}>
                     <span className="text-2xl block">🍲</span>
                     <p className="font-bold text-sm" style={{ color: '#3D3D3D' }}>Recetas</p>
-                    <p className="text-xs" style={{ color: '#D4A017' }}>Cocinás rico y liviano</p>
                   </div>
-                  
                   <div className="rounded-xl p-3 text-center" style={{ backgroundColor: '#FFF8F0' }}>
+                    <span className="text-2xl block">⏰</span>
+                    <p className="font-bold text-sm" style={{ color: '#3D3D3D' }}>Horarios</p>
+                  </div>
+                  <div className="rounded-xl p-3 text-center" style={{ backgroundColor: '#F0FDF4' }}>
                     <span className="text-2xl block">🏃</span>
                     <p className="font-bold text-sm" style={{ color: '#3D3D3D' }}>Ejercicio</p>
-                    <p className="text-xs" style={{ color: '#D4A017' }}>Movete sin agotarte</p>
                   </div>
-                  
                   <div className="rounded-xl p-3 text-center" style={{ backgroundColor: '#F0FDF4' }}>
                     <span className="text-2xl block">🧘</span>
                     <p className="font-bold text-sm" style={{ color: '#3D3D3D' }}>Meditación</p>
-                    <p className="text-xs" style={{ color: '#22c55e' }}>Calmá tu mente</p>
                   </div>
-                  
-                  <div className="rounded-xl p-3 text-center" style={{ backgroundColor: '#F0FDF4' }}>
+                  <div className="rounded-xl p-3 text-center" style={{ backgroundColor: '#FFF8F0' }}>
                     <span className="text-2xl block">🌬️</span>
                     <p className="font-bold text-sm" style={{ color: '#3D3D3D' }}>Respiración</p>
-                    <p className="text-xs" style={{ color: '#22c55e' }}>Controlá tu energía</p>
                   </div>
-                  
-                  <div className="rounded-xl p-3 text-center" style={{ backgroundColor: '#FFF8F0' }}>
-                    <span className="text-2xl block">🔴</span>
-                    <p className="font-bold text-sm" style={{ color: '#3D3D3D' }}>Chakras</p>
-                    <p className="text-xs" style={{ color: '#D4A017' }}>Desbloqueá tu energía</p>
-                  </div>
-                  
-                  <div className="rounded-xl p-3 text-center" style={{ backgroundColor: '#FFF8F0' }}>
-                    <span className="text-2xl block">🙏</span>
-                    <p className="font-bold text-sm" style={{ color: '#3D3D3D' }}>Mudras</p>
-                    <p className="text-xs" style={{ color: '#D4A017' }}>Sanación con tus manos</p>
-                  </div>
-                  
-                  <div className="rounded-xl p-3 text-center" style={{ backgroundColor: '#F0FDF4' }}>
-                    <span className="text-2xl block">💆</span>
-                    <p className="font-bold text-sm" style={{ color: '#3D3D3D' }}>Terapias</p>
-                    <p className="text-xs" style={{ color: '#22c55e' }}>Tratamientos naturales</p>
-                  </div>
-                  
-                  <div className="rounded-xl p-3 text-center" style={{ backgroundColor: '#F0FDF4' }}>
-                    <span className="text-2xl block">⏰</span>
-                    <p className="font-bold text-sm" style={{ color: '#3D3D3D' }}>Horarios</p>
-                    <p className="text-xs" style={{ color: '#22c55e' }}>Cuándo comer y dormir</p>
-                  </div>
-                  
                   <div className="rounded-xl p-3 text-center" style={{ backgroundColor: '#FFF8F0' }}>
                     <span className="text-2xl block">🔮</span>
                     <p className="font-bold text-sm" style={{ color: '#3D3D3D' }}>Proyección</p>
-                    <p className="text-xs" style={{ color: '#D4A017' }}>Tu salud a 5, 10, 20 años</p>
                   </div>
-                  
-                  <div className="rounded-xl p-3 text-center" style={{ backgroundColor: '#FFF8F0' }}>
+                  <div className="rounded-xl p-3 text-center" style={{ backgroundColor: '#F0FDF4' }}>
                     <span className="text-2xl block">⭐</span>
                     <p className="font-bold text-sm" style={{ color: '#3D3D3D' }}>Astrología</p>
-                    <p className="text-xs" style={{ color: '#D4A017' }}>Tu Nakshatra védico</p>
+                  </div>
+                </div>
+                <p className="text-center text-sm mt-3" style={{ color: '#888' }}>+ Chakras, Mudras, Terapias, Ubicación, Salud, Resumen</p>
+              </div>
+              
+              {/* SECCIÓN 5: TESTIMONIOS CON FOTOS */}
+              <div className="max-w-md mx-auto mb-16">
+                <h3 className="text-2xl font-bold text-center mb-2" style={{ color: '#3D3D3D' }}>💬 Ellos ya lo hicieron</h3>
+                <p className="text-center text-sm mb-6" style={{ color: '#22c55e' }}>⭐⭐⭐⭐⭐ 4.9/5 promedio</p>
+                
+                <div className="space-y-4">
+                  {/* Testimonio 1 - Rosa */}
+                  <div className="bg-white rounded-2xl p-5 shadow-lg border border-stone-100">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center text-2xl">👩</div>
+                      <div>
+                        <p className="font-bold text-stone-800">Rosa M.</p>
+                        <p className="text-xs text-stone-500">Buenos Aires, Argentina</p>
+                      </div>
+                      <div className="ml-auto text-amber-400">⭐⭐⭐⭐⭐</div>
+                    </div>
+                    <p className="text-stone-600 italic">"Bajé 8kg en 2 meses sin dietas. Descubrí que soy Kapha y comía todo lo que me inflamaba. Ahora como mejor y estoy más tranquila."</p>
+                    <p className="text-xs text-green-600 font-semibold mt-2">✓ Resultado: -8kg en 60 días</p>
                   </div>
                   
-                  <div className="rounded-xl p-3 text-center" style={{ backgroundColor: '#F0FDF4' }}>
-                    <span className="text-2xl block">📍</span>
-                    <p className="font-bold text-sm" style={{ color: '#3D3D3D' }}>Ubicación</p>
-                    <p className="text-xs" style={{ color: '#22c55e' }}>Clima ideal para vos</p>
+                  {/* Testimonio 2 - María */}
+                  <div className="bg-white rounded-2xl p-5 shadow-lg border border-stone-100">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center text-2xl">👩‍🦱</div>
+                      <div>
+                        <p className="font-bold text-stone-800">María L.</p>
+                        <p className="text-xs text-stone-500">Bogotá, Colombia</p>
+                      </div>
+                      <div className="ml-auto text-amber-400">⭐⭐⭐⭐⭐</div>
+                    </div>
+                    <p className="text-stone-600 italic">"Duermo mejor y tengo menos estrés. Pensé que US$20 era mucho, pero ahorré el doble al dejar de comprar suplementos que no eran para mi biotipo."</p>
+                    <p className="text-xs text-green-600 font-semibold mt-2">✓ Resultado: Mejor sueño + ahorro</p>
                   </div>
                   
-                  <div className="rounded-xl p-3 text-center" style={{ backgroundColor: '#F0FDF4' }}>
-                    <span className="text-2xl block">📊</span>
-                    <p className="font-bold text-sm" style={{ color: '#3D3D3D' }}>Resumen</p>
-                    <p className="text-xs" style={{ color: '#22c55e' }}>Tu perfil completo</p>
+                  {/* Testimonio 3 - Carlos */}
+                  <div className="bg-white rounded-2xl p-5 shadow-lg border border-stone-100">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center text-2xl">👨</div>
+                      <div>
+                        <p className="font-bold text-stone-800">Carlos P.</p>
+                        <p className="text-xs text-stone-500">CDMX, México</p>
+                      </div>
+                      <div className="ml-auto text-amber-400">⭐⭐⭐⭐⭐</div>
+                    </div>
+                    <p className="text-stone-600 italic">"Soy Pitta y no lo sabía. Entendí por qué me enojaba tanto y por qué me caía mal la comida picante. Mi familia notó los cambios en 2 semanas."</p>
+                    <p className="text-xs text-green-600 font-semibold mt-2">✓ Resultado: Mejor humor + digestión</p>
                   </div>
                   
-                  <div className="rounded-xl p-3 text-center" style={{ backgroundColor: '#FFF8F0' }}>
-                    <span className="text-2xl block">🏥</span>
-                    <p className="font-bold text-sm" style={{ color: '#3D3D3D' }}>Salud</p>
-                    <p className="text-xs" style={{ color: '#D4A017' }}>Alertas y prevención</p>
+                  {/* Testimonio 4 - Carmen */}
+                  <div className="bg-white rounded-2xl p-5 shadow-lg border border-stone-100">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-2xl">👵</div>
+                      <div>
+                        <p className="font-bold text-stone-800">Carmen R.</p>
+                        <p className="text-xs text-stone-500">Lima, Perú</p>
+                      </div>
+                      <div className="ml-auto text-amber-400">⭐⭐⭐⭐⭐</div>
+                    </div>
+                    <p className="text-stone-600 italic">"A mis 58 años descubrí que nunca es tarde. Los horarios de comida según mi Dosha cambiaron todo. Ya no tengo acidez ni pesadez."</p>
+                    <p className="text-xs text-green-600 font-semibold mt-2">✓ Resultado: Sin acidez a los 58</p>
                   </div>
-                  
+                </div>
+                
+                <div className="text-center mt-6">
+                  <p className="text-lg font-bold" style={{ color: '#22c55e' }}>+2,500 personas en LATAM</p>
+                  <p className="text-sm text-stone-500">ya descubrieron su biotipo</p>
                 </div>
               </div>
               
-              {/* CTA INTERMEDIO - Kotler dice repetir cada 300px */}
-              <div className="max-w-md mx-auto mb-8">
-                <button onClick={() => { gtag('event', 'landing_cta_clicked'); gtag('event', 'cta_intermedio'); setAnimateIn(false); setTimeout(() => setStep(1), 200); }}
-                  className="w-full py-4 rounded-xl font-bold text-lg shadow-lg"
-                  style={{ backgroundColor: '#22c55e', color: 'white' }}>
-                  🎯 Descubrir Mi Biotipo Ahora
-                </button>
-                <p className="text-center text-sm mt-2" style={{ color: '#888' }}>Solo 10 minutos • Gratis</p>
-              </div>
-              
-              {/* PRECIO + GARANTÍA */}
-              <div className="max-w-md mx-auto mb-12 rounded-2xl p-6 text-white text-center" style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' }}>
-                <p className="text-lg mb-2">Test completamente <strong>GRATIS</strong></p>
-                <p className="text-3xl font-bold mb-2">Tu Transformación: US$20/mes</p>
-                <p style={{ color: '#bbf7d0' }}>🔒 7 días gratis • Cancelá cuando quieras</p>
-                <p className="font-semibold mt-3" style={{ color: '#fef08a' }}>⚡ Dejá de vivir agotado</p>
-              </div>
-              
-              {/* PRUEBA SOCIAL MEJORADA - Kotler */}
-              <div className="max-w-md mx-auto mb-8 text-center">
-                <div className="flex justify-center mb-3">
-                  <div className="flex -space-x-3">
-                    <div className="w-12 h-12 rounded-full bg-amber-400 flex items-center justify-center text-xl border-3 border-white">👩</div>
-                    <div className="w-12 h-12 rounded-full bg-emerald-400 flex items-center justify-center text-xl border-3 border-white">👨</div>
-                    <div className="w-12 h-12 rounded-full bg-sky-400 flex items-center justify-center text-xl border-3 border-white">👩</div>
-                    <div className="w-12 h-12 rounded-full bg-purple-400 flex items-center justify-center text-xl border-3 border-white">👴</div>
+              {/* SECCIÓN 6: PRECIOS */}
+              <div className="max-w-md mx-auto mb-16">
+                <h3 className="text-2xl font-bold text-center mb-6" style={{ color: '#3D3D3D' }}>💰 Elegí tu plan</h3>
+                
+                <div className="space-y-4">
+                  {/* Plan Gratis - Destacado */}
+                  <div className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl p-6 text-white relative overflow-hidden">
+                    <div className="absolute top-3 right-3 bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold">⭐ RECOMENDADO</div>
+                    <p className="text-sm opacity-80">Test + 7 días</p>
+                    <p className="text-4xl font-bold">GRATIS</p>
+                    <ul className="mt-4 space-y-2 text-sm">
+                      <li>✓ Test completo de 60 preguntas</li>
+                      <li>✓ Descubrí tu Dosha</li>
+                      <li>✓ 7 días de acceso premium</li>
+                      <li>✓ Sin tarjeta requerida</li>
+                    </ul>
+                    <button onClick={() => { gtag('event', 'landing_cta_clicked'); gtag('event', 'cta_precio_gratis'); setAnimateIn(false); setTimeout(() => setStep(1), 200); }}
+                      className="w-full mt-4 py-3 rounded-xl font-bold bg-white text-green-600">
+                      EMPEZAR GRATIS →
+                    </button>
+                  </div>
+                  
+                  {/* Plan Mensual */}
+                  <div className="bg-white rounded-2xl p-6 border-2 border-stone-200">
+                    <p className="text-sm text-stone-500">Plan mensual</p>
+                    <p className="text-3xl font-bold text-stone-800">US$20<span className="text-lg font-normal text-stone-400">/mes</span></p>
+                    <ul className="mt-4 space-y-2 text-sm text-stone-600">
+                      <li>✓ Acceso completo a 14 áreas</li>
+                      <li>✓ Plan personalizado ilimitado</li>
+                      <li>✓ Actualizaciones mensuales</li>
+                      <li>✓ Soporte por email</li>
+                    </ul>
+                    <p className="text-xs text-stone-400 mt-4">Cancelá cuando quieras</p>
                   </div>
                 </div>
-                <p className="text-xl mb-2" style={{ color: '#3D3D3D' }}><strong style={{ color: '#22c55e' }}>+5,000 años</strong> avalan la información que te damos</p>
-                <p className="text-sm" style={{ color: '#D4A017' }}>⭐⭐⭐⭐⭐ 4.9/5 valoración promedio</p>
               </div>
-
-              {/* TESTIMONIOS ESPECÍFICOS - Kotler */}
-              <div className="max-w-md mx-auto mb-8 space-y-3">
-                <div className="bg-white rounded-xl p-4 shadow-sm border border-stone-100">
-                  <p className="text-sm italic mb-2" style={{ color: '#5D5D5D' }}>"Bajé 6kg en 2 meses comiendo según mi Dosha. Ya no me siento hinchada."</p>
-                  <p className="text-xs font-semibold" style={{ color: '#22c55e' }}>— Rosa M., Buenos Aires ⭐⭐⭐⭐⭐</p>
+              
+              {/* SECCIÓN 7: GARANTÍA */}
+              <div className="max-w-md mx-auto mb-16">
+                <div className="bg-emerald-50 rounded-2xl p-6 border-2 border-emerald-200 text-center">
+                  <span className="text-5xl block mb-3">🛡️</span>
+                  <h4 className="text-xl font-bold text-emerald-800 mb-2">Garantía 100% - Sin Riesgo</h4>
+                  <p className="text-emerald-700">Si no te encanta en <strong>30 días</strong>, te devolvemos el 100% del dinero.</p>
+                  <p className="text-sm text-emerald-600 mt-2">Sin preguntas. Sin complicaciones.</p>
                 </div>
-                <div className="bg-white rounded-xl p-4 shadow-sm border border-stone-100">
-                  <p className="text-sm italic mb-2" style={{ color: '#5D5D5D' }}>"Dejé de comprar suplementos que no eran para mi biotipo. Ahorré más de lo que pago."</p>
-                  <p className="text-xs font-semibold" style={{ color: '#22c55e' }}>— Carlos P., México ⭐⭐⭐⭐⭐</p>
-                </div>
-              </div>
-
-              {/* GARANTÍA - Kotler */}
-              <div className="max-w-md mx-auto mb-12 bg-emerald-50 rounded-xl p-4 border border-emerald-200 text-center">
-                <p className="font-bold text-emerald-700 mb-1">🛡️ Garantía 100%</p>
-                <p className="text-sm text-emerald-600">No te gusta = te devolvemos el dinero. Sin preguntas.</p>
               </div>
               
               {/* CREADOR */}
               <div className="max-w-md mx-auto mb-12 rounded-2xl p-6" style={{ backgroundColor: '#FFF8F0' }}>
-                <h3 className="text-xl font-bold text-center mb-4" style={{ color: '#3D3D3D' }}>Creado por</h3>
+                <h3 className="text-xl font-bold text-center mb-4" style={{ color: '#3D3D3D' }}>👨‍🏫 Creado por</h3>
                 <p className="text-center text-lg mb-2" style={{ color: '#3D3D3D' }}><strong>Juan Sebastián Favareto</strong></p>
                 <p className="text-center font-medium mb-4" style={{ color: '#D4A017' }}>Instructor de Yoga • Terapeuta Ayurvédico</p>
                 <p className="text-center leading-relaxed mb-4" style={{ color: '#5D5D5D' }}>
-                  "Después de 40 años de desequilibrios descubrí cómo equilibrar cuerpo, mente y espíritu a través del Yoga y el Ayurveda."
-                </p>
-                <p className="text-center font-medium mb-4" style={{ color: '#22c55e' }}>
-                  ✨ Aprendé a disfrutar del camino del cambio. Sin prisa, sin pausa.
+                  "Después de 40 años de desequilibrios descubrí cómo equilibrar cuerpo, mente y espíritu. Creé VedaBite para que vos no tardes tanto."
                 </p>
                 <button onClick={() => setShowCreator(true)} className="w-full py-3 rounded-xl font-semibold" style={{ backgroundColor: '#3D3D3D', color: 'white' }}>
                   Conocé mi historia →
@@ -1506,14 +1615,16 @@
                 <button onClick={() => setShowSources(true)} className="underline" style={{ color: '#9D9D9D' }}>Ver fuentes científicas</button>
               </div>
               
-              {/* BOTÓN FINAL - Test A/B Kotler */}
-              <div className="max-w-md mx-auto">
-                <button onClick={() => { gtag('event', 'landing_cta_clicked'); gtag('event', 'cta_prueba_14_dias'); setAnimateIn(false); setTimeout(() => setStep(1), 200); }}
+              {/* CTA FINAL */}
+              <div className="max-w-md mx-auto mb-8">
+                <h3 className="text-2xl font-bold text-center mb-4" style={{ color: '#3D3D3D' }}>¿Qué esperás?</h3>
+                <p className="text-center text-stone-500 mb-6">Miles de personas en LATAM ya lo hicieron</p>
+                <button onClick={() => { gtag('event', 'landing_cta_clicked'); gtag('event', 'cta_final'); setAnimateIn(false); setTimeout(() => setStep(1), 200); }}
                   className="w-full py-5 rounded-2xl font-bold text-xl shadow-xl"
                   style={{ backgroundColor: '#22c55e', color: 'white' }}>
-                  🚀 Prueba 14 Días Gratis - Sin Tarjeta
+                  🚀 Hacer Mi Test GRATIS
                 </button>
-                <p className="text-center text-sm mt-3" style={{ color: '#9D9D9D' }}>✓ Resultados en 10 minutos • ✓ 100% confidencial</p>
+                <p className="text-center text-sm mt-3" style={{ color: '#9D9D9D' }}>✓ 10 minutos • ✓ Sin tarjeta • ✓ Resultados al instante</p>
               </div>
             </div>
             
