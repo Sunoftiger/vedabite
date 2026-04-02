@@ -787,6 +787,7 @@
       showScreen('testScreen');
       renderQuestion();
     }
+    window.startTest = startTest;
     
     function renderQuestion() {
       const q = questions[currentQuestion];
@@ -934,6 +935,7 @@
       document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
       if (!isActive) item.classList.add('active');
     }
+    window.toggleFaq = toggleFaq;
     
     // Check auth state
     auth.onAuthStateChanged(user => {
@@ -944,6 +946,19 @@
         document.getElementById('userInfo').textContent = '✓ ' + user.email;
       }
     });
+
+    // Expose all inline-onclick functions to global scope
+    // Fixes "X is not defined" errors on mobile (timing/scope issues)
+    window.showScreen      = showScreen;
+    window.renderQuestion  = renderQuestion;
+    window.answerQuestion  = answerQuestion;
+    window.prevQuestion    = prevQuestion;
+    window.submitEmail     = submitEmail;
+    window.showResults     = showResults;
+    window.openPaywall     = openPaywall;
+    window.closePaywall    = closePaywall;
+    window.loginGoogle     = loginGoogle;
+    window.trackPayment    = trackPayment;
   </script>
 
 </body>
