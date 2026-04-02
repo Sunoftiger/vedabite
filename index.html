@@ -940,4 +940,11 @@
       if (user) {
         currentUser = user;
         document.getElementById('loginSection').style.display = 'none';
-        document.getElementById('paySection').s
+        document.getElementById('paySection').style.display = 'block';
+        document.getElementById('userInfo').textContent = '✓ ' + user.email;
+      }
+    });
+  </script>
+
+</body>
+</html>
