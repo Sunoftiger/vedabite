@@ -1,50 +1,950 @@
 
-Skip to content
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  
+  <!-- SEO Meta Tags -->
+  <title>Vedabite — Tu plan de alimentación personalizado | Test gratuito</title>
+  <meta name="description" content="Descubrí qué necesita TU cuerpo con nuestro test gratuito de 2 minutos. Plan de alimentación personalizado basado en tu constitución única.">
+  <meta name="keywords" content="test ayurveda, que dosha soy, dieta personalizada, plan alimentación, nutrición personalizada">
+  <link rel="canonical" href="https://vedabite.com">
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://vedabite.com">
+  <meta property="og:title" content="Vedabite — Tu plan de alimentación personalizado">
+  <meta property="og:description" content="Test gratuito de 2 minutos. Descubrí qué necesita TU cuerpo.">
+  <meta property="og:image" content="https://vedabite.com/og-image.jpg">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥗</text></svg>">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HM7G4LZM70"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HM7G4LZM70');
+  </script>
+  
+  <!-- Microsoft Clarity -->
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "w2xvsd3oxf");
+  </script>
 
-    Sunoftiger
-    vedabite
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCxTOtGmdzdaYQghf270VenmVzMaeZnlOM",
+      authDomain: "vedabite-1b49a.firebaseapp.com",
+      projectId: "vedabite-1b49a",
+      storageBucket: "vedabite-1b49a.firebasestorage.app",
+      messagingSenderId: "435704386348",
+      appId: "1:435704386348:web:e6a7842f7fe9a10ed8d289"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+  </script>
 
-Repository navigation
+  <style>
+    :root {
+      --cream: #FFFDF7;
+      --sage: #7C9A73;
+      --sage-dark: #5A7A53;
+      --terracotta: #C67D4A;
+      --terracotta-dark: #A65D2A;
+      --text: #1a1a1a;
+      --text-light: #4a4a4a;
+      --text-muted: #7a7a7a;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; font-size: 16px; line-height: 1.6; color: var(--text); background: var(--cream); }
+    
+    h1, h2, h3 { font-family: 'Lora', serif; font-weight: 600; line-height: 1.3; }
+    h1 { font-size: 1.875rem; }
+    h2 { font-size: 1.5rem; }
+    h3 { font-size: 1.25rem; }
+    
+    .container { max-width: 480px; margin: 0 auto; padding: 0 1.25rem; }
+    .section { padding: 3rem 0; }
+    .section-alt { background: white; }
+    
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+      padding: 1rem 2rem; min-height: 56px; font-family: 'DM Sans', sans-serif;
+      font-size: 1rem; font-weight: 700; text-decoration: none; text-transform: uppercase;
+      border: none; border-radius: 12px; cursor: pointer; transition: all 0.2s;
+      width: 100%;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: linear-gradient(135deg, var(--terracotta), var(--terracotta-dark)); color: white; box-shadow: 0 4px 14px rgba(198, 125, 74, 0.4); }
+    .btn-secondary { background: white; color: var(--terracotta); border: 2px solid var(--terracotta); }
+    .btn-sage { background: linear-gradient(135deg, var(--sage), var(--sage-dark)); color: white; }
+    
+    /* SCREENS */
+    .screen { display: none; min-height: 100vh; min-height: 100dvh; }
+    .screen.active { display: block; }
+    
+    /* ══════════════════════════════════════════════════════════════
+       LANDING PAGE
+       ══════════════════════════════════════════════════════════════ */
+    
+    .hero { padding: 2rem 0 3rem; text-align: center; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: rgba(124, 154, 115, 0.15); color: var(--sage-dark); border-radius: 100px; font-size: 0.875rem; font-weight: 600; margin-bottom: 1.5rem; }
+    .hero-avatars { display: flex; margin-right: 0.25rem; }
+    .hero-avatar { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--cream); margin-left: -8px; }
+    .hero-avatar:first-child { margin-left: 0; }
+    .hero h1 { margin-bottom: 1rem; }
+    .hero h1 span { color: var(--terracotta); }
+    .hero-subtitle { font-size: 1.125rem; color: var(--text-light); margin-bottom: 2rem; }
+    .hero-cta { margin-bottom: 1.5rem; }
+    .hero-trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; font-size: 0.875rem; color: var(--text-muted); }
+    .hero-image { width: 200px; height: 200px; margin: 2rem auto 0; background: linear-gradient(135deg, #F0F7EE, #E8F5E3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 6rem; }
+    
+    /* Problema */
+    .problema { text-align: center; }
+    .problema-cards { display: flex; flex-direction: column; gap: 1rem; margin: 2rem 0; }
+    .problema-card { display: flex; align-items: flex-start; gap: 1rem; padding: 1.25rem; background: white; border-radius: 16px; text-align: left; }
+    .problema-card-icon { width: 48px; height: 48px; background: linear-gradient(135deg, #FFF0E6, #FFE4D4); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
+    .problema-card h3 { font-size: 1rem; margin-bottom: 0.25rem; }
+    .problema-card p { font-size: 0.875rem; color: var(--text-muted); margin: 0; }
+    .problema-conclusion { background: linear-gradient(135deg, var(--sage), var(--sage-dark)); color: white; padding: 1.5rem; border-radius: 16px; font-size: 1.125rem; }
+    
+    /* Pasos */
+    .pasos { display: flex; flex-direction: column; gap: 1.5rem; margin: 2rem 0; }
+    .paso { display: flex; align-items: center; gap: 1rem; text-align: left; }
+    .paso-numero { width: 56px; height: 56px; background: white; border: 3px solid var(--sage); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Lora', serif; font-size: 1.5rem; font-weight: 700; color: var(--sage); flex-shrink: 0; }
+    .paso:nth-child(2) .paso-numero { border-color: var(--terracotta); color: var(--terracotta); }
+    .paso:nth-child(3) .paso-numero { border-color: #D4A017; color: #D4A017; }
+    .paso-content h3 { margin-bottom: 0.25rem; }
+    .paso-content p { font-size: 0.875rem; color: var(--text-muted); margin: 0; }
+    
+    /* Propuesta */
+    .propuesta-lista { text-align: left; margin: 2rem 0; }
+    .propuesta-item { display: flex; align-items: flex-start; gap: 0.75rem; padding: 1rem 0; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .propuesta-check { width: 24px; height: 24px; background: var(--sage); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.875rem; flex-shrink: 0; }
+    .precio-box { background: white; border-radius: 20px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 2px solid var(--sage); position: relative; }
+    .precio-badge { position: absolute; top: 0; right: 0; background: var(--sage); color: white; padding: 0.5rem 1rem; font-size: 0.75rem; font-weight: 700; border-radius: 0 0 0 12px; }
+    .precio-comparacion { text-decoration: line-through; color: var(--text-muted); font-size: 0.875rem; }
+    .precio-actual { display: flex; align-items: baseline; justify-content: center; gap: 0.25rem; margin: 0.5rem 0; }
+    .precio-numero { font-family: 'Lora', serif; font-size: 3rem; font-weight: 700; color: var(--sage-dark); }
+    .precio-trial { background: linear-gradient(135deg, #FFF9E6, #FFF3CC); color: var(--terracotta-dark); padding: 0.75rem; border-radius: 8px; font-weight: 600; font-size: 0.875rem; margin: 1rem 0; }
+    
+    /* Testimonios */
+    .testimonios-grid { display: flex; flex-direction: column; gap: 1rem; margin-top: 2rem; }
+    .testimonio { background: white; border-radius: 16px; padding: 1.5rem; text-align: left; }
+    .testimonio-stars { color: #F59E0B; margin-bottom: 0.75rem; letter-spacing: 2px; }
+    .testimonio-texto { font-style: italic; margin-bottom: 1rem; }
+    .testimonio-autor { display: flex; align-items: center; gap: 0.75rem; }
+    .testimonio-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--sage), var(--terracotta)); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; }
+    .testimonio-nombre { font-weight: 600; font-size: 0.875rem; }
+    .testimonio-edad { font-size: 0.75rem; color: var(--text-muted); }
+    
+    /* Equipo */
+    .equipo { text-align: center; }
+    .equipo-foto { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 1.5rem; background: linear-gradient(135deg, var(--sage), var(--terracotta)); display: flex; align-items: center; justify-content: center; font-size: 3rem; }
+    .equipo-titulo { color: var(--sage-dark); font-weight: 600; font-size: 0.875rem; margin-bottom: 1rem; }
+    .equipo-bio { color: var(--text-light); max-width: 320px; margin: 0 auto 1.5rem; }
+    .equipo-credenciales { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
+    .equipo-credencial { background: white; padding: 0.5rem 1rem; border-radius: 100px; font-size: 0.75rem; font-weight: 600; color: var(--text-light); }
+    
+    /* FAQ */
+    .faq-lista { text-align: left; }
+    .faq-item { background: white; border-radius: 12px; margin-bottom: 0.75rem; overflow: hidden; }
+    .faq-pregunta { width: 100%; padding: 1.25rem; background: white; border: none; text-align: left; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .faq-pregunta::after { content: '+'; font-size: 1.5rem; color: var(--sage); transition: transform 0.2s; }
+    .faq-item.active .faq-pregunta::after { transform: rotate(45deg); }
+    .faq-respuesta { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+    .faq-item.active .faq-respuesta { max-height: 200px; }
+    .faq-respuesta-inner { padding: 0 1.25rem 1.25rem; color: var(--text-light); font-size: 0.9375rem; }
+    
+    /* CTA Final */
+    .cta-final { text-align: center; background: linear-gradient(180deg, var(--cream) 0%, #F0F7EE 100%); padding-bottom: 100px; }
+    .cta-final-trust { margin-top: 1rem; font-size: 0.875rem; color: var(--text-muted); }
+    
+    /* Footer */
+    .footer { background: white; padding: 2rem 0; text-align: center; border-top: 1px solid rgba(0,0,0,0.06); margin-bottom: 80px; }
+    .footer-links { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1rem; }
+    .footer-links a { color: var(--text-muted); text-decoration: none; font-size: 0.875rem; }
+    
+    /* Sticky CTA */
+    .sticky-cta { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 1rem; box-shadow: 0 -4px 20px rgba(0,0,0,0.1); z-index: 100; }
+    
+    /* WhatsApp */
+    .whatsapp-btn { position: fixed; bottom: 90px; right: 1rem; width: 56px; height: 56px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(37, 211, 102, 0.4); z-index: 99; text-decoration: none; }
+    .whatsapp-btn svg { width: 28px; height: 28px; fill: white; }
+    
+    /* ══════════════════════════════════════════════════════════════
+       TEST SCREEN
+       ══════════════════════════════════════════════════════════════ */
+    
+    .test-screen { background: linear-gradient(180deg, #FEF3C7, #FDE68A); padding: 1.5rem; }
+    .test-header { text-align: center; margin-bottom: 1.5rem; }
+    .test-progress { height: 8px; background: white; border-radius: 100px; overflow: hidden; margin-bottom: 0.5rem; }
+    .test-progress-bar { height: 100%; background: linear-gradient(90deg, var(--sage), var(--terracotta)); transition: width 0.3s; }
+    .test-count { font-size: 0.875rem; color: var(--text-muted); }
+    .test-question { background: white; border-radius: 20px; padding: 2rem 1.5rem; text-align: center; margin-bottom: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+    .test-question h2 { font-size: 1.25rem; margin-bottom: 0.5rem; }
+    .test-categoria { font-size: 0.75rem; color: var(--sage); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
+    .test-options { display: flex; flex-direction: column; gap: 0.75rem; }
+    .test-option { background: white; border: 2px solid #E5E5E5; border-radius: 12px; padding: 1rem 1.25rem; text-align: left; font-family: 'DM Sans', sans-serif; font-size: 1rem; cursor: pointer; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; }
+    .test-option:hover, .test-option:active { border-color: var(--terracotta); background: #FFF9F5; }
+    .test-option-emoji { font-size: 1.25rem; }
+    .test-back { background: none; border: none; color: var(--text-muted); font-size: 0.875rem; cursor: pointer; margin-top: 1rem; }
+    
+    /* ══════════════════════════════════════════════════════════════
+       EMAIL GATE
+       ══════════════════════════════════════════════════════════════ */
+    
+    .email-screen { background: linear-gradient(180deg, #D1FAE5, #A7F3D0); padding: 2rem 1.5rem; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+    .email-celebration { font-size: 4rem; margin-bottom: 1rem; }
+    .email-screen h2 { margin-bottom: 0.5rem; }
+    .email-screen p { color: var(--text-light); margin-bottom: 2rem; }
+    .email-result-preview { background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem; text-align: left; }
+    .email-dosha { font-size: 3rem; text-align: center; margin-bottom: 0.5rem; }
+    .email-dosha-name { font-family: 'Lora', serif; font-size: 1.5rem; font-weight: 600; text-align: center; margin-bottom: 1rem; }
+    .email-traits { font-size: 0.875rem; color: var(--text-light); }
+    .email-input { width: 100%; padding: 1rem 1.25rem; font-size: 1rem; font-family: 'DM Sans', sans-serif; border: 2px solid #E5E5E5; border-radius: 12px; margin-bottom: 1rem; }
+    .email-input:focus { outline: none; border-color: var(--sage); }
+    .email-privacy { font-size: 0.75rem; color: var(--text-muted); margin-top: 1rem; }
+    
+    /* ══════════════════════════════════════════════════════════════
+       RESULTS SCREEN
+       ══════════════════════════════════════════════════════════════ */
+    
+    .results-screen { padding-bottom: 100px; }
+    .results-header { text-align: center; padding: 2rem 1.5rem; }
+    .results-dosha-big { font-size: 5rem; margin-bottom: 0.5rem; }
+    .results-dosha-name { font-family: 'Lora', serif; font-size: 2rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .results-subtitle { color: var(--text-light); }
+    .results-percentages { display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem; }
+    .results-pct { text-align: center; padding: 0.75rem 1rem; background: white; border-radius: 12px; }
+    .results-pct-value { font-size: 1.25rem; font-weight: 700; }
+    .results-pct-label { font-size: 0.75rem; color: var(--text-muted); }
+    
+    .results-section { padding: 1.5rem; }
+    .results-card { background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; }
+    .results-card h3 { margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .results-card ul { list-style: none; }
+    .results-card li { padding: 0.5rem 0; border-bottom: 1px solid #F0F0F0; font-size: 0.9375rem; }
+    .results-card li:last-child { border-bottom: none; }
+    
+    .results-cta { background: linear-gradient(135deg, var(--sage), var(--sage-dark)); color: white; border-radius: 16px; padding: 1.5rem; margin: 1.5rem; text-align: center; }
+    .results-cta h3 { color: white; margin-bottom: 0.5rem; }
+    .results-cta p { opacity: 0.9; margin-bottom: 1rem; font-size: 0.9375rem; }
+    
+    /* Results Footer */
+    .results-footer { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 1rem; box-shadow: 0 -4px 20px rgba(0,0,0,0.1); z-index: 100; }
+    
+    /* ══════════════════════════════════════════════════════════════
+       PAYWALL MODAL
+       ══════════════════════════════════════════════════════════════ */
+    
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; display: none; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.active { display: flex; }
+    .modal-content { background: var(--cream); width: 100%; max-width: 400px; max-height: 90vh; border-radius: 24px; overflow-y: auto; }
+    .modal-header { padding: 1.5rem; text-align: center; position: relative; }
+    .modal-close { position: absolute; right: 1rem; top: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
+    .modal-body { padding: 0 1.5rem 1.5rem; }
+    
+    .paywall-price { text-align: center; margin-bottom: 1.5rem; }
+    .paywall-price-old { text-decoration: line-through; color: var(--text-muted); font-size: 0.875rem; }
+    .paywall-price-new { font-family: 'Lora', serif; font-size: 2.5rem; font-weight: 700; color: var(--sage-dark); }
+    .paywall-price-period { color: var(--text-muted); }
+    .paywall-trial { background: #FEF3C7; color: var(--terracotta-dark); padding: 0.75rem; border-radius: 8px; font-weight: 600; text-align: center; margin-bottom: 1.5rem; }
+    .paywall-features { margin-bottom: 1.5rem; }
+    .paywall-feature { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0; font-size: 0.9375rem; }
+    .paywall-feature-icon { color: var(--sage); font-size: 1.25rem; }
+    .paywall-garantia { text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 1rem; }
+    
+    /* Google Login Button */
+    .btn-google { background: white; color: var(--text); border: 2px solid #E5E5E5; display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 1rem; }
+    .btn-google svg { width: 20px; height: 20px; }
+    
+    /* Hide on desktop */
+    @media (min-width: 768px) {
+      .sticky-cta { display: none; }
+      .whatsapp-btn { bottom: 2rem; }
+      .footer { margin-bottom: 0; }
+      .cta-final { padding-bottom: 4rem; }
+      .results-footer { display: none; }
+    }
+  </style>
 
-    Code
-    Issues
-    Pull requests
-    Actions
-    Projects
-    Wiki
-    Security and quality1 (1)
-    Insights
-    Settings
+  <!-- Schema.org FAQ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {"@type": "Question", "name": "¿Esto es una dieta?", "acceptedAnswer": {"@type": "Answer", "text": "No, es un plan de alimentación personalizado basado en tu constitución. No contamos calorías ni prohibimos alimentos."}},
+      {"@type": "Question", "name": "¿Necesito saber de Ayurveda?", "acceptedAnswer": {"@type": "Answer", "text": "Para nada. Te explicamos todo en lenguaje simple, sin jerga."}},
+      {"@type": "Question", "name": "¿Puedo cancelar cuando quiera?", "acceptedAnswer": {"@type": "Answer", "text": "Sí, sin compromisos. Cancelás con un clic."}}
+    ]
+  }
+  </script>
+</head>
+<body>
 
-Comparing changes
-Choose two branches to see what’s changed or to start a new pull request. If you need to, you can also or learn more about diff comparisons.
-...
+  <!-- ══════════════════════════════════════════════════════════════
+       SCREEN 1: LANDING
+       ══════════════════════════════════════════════════════════════ -->
+  <div class="screen active" id="landingScreen">
+    
+    <!-- HERO -->
+    <section class="hero section">
+      <div class="container">
+        <div class="hero-badge">
+          <div class="hero-avatars">
+            <div class="hero-avatar" style="background: linear-gradient(135deg, #F9A8D4, #EC4899);"></div>
+            <div class="hero-avatar" style="background: linear-gradient(135deg, #A78BFA, #7C3AED);"></div>
+            <div class="hero-avatar" style="background: linear-gradient(135deg, #6EE7B7, #10B981);"></div>
+          </div>
+          +847 mujeres esta semana
+        </div>
+        
+        <h1>¿Cansada de dietas que <span>no te funcionan?</span></h1>
+        <p class="hero-subtitle">Tu cuerpo es único. Tu alimentación también debería serlo.</p>
+        
+        <div class="hero-cta">
+          <button class="btn btn-primary" onclick="startTest()" data-cta="hero">
+            HACÉ EL TEST GRATIS →
+          </button>
+        </div>
+        
+        <div class="hero-trust">
+          <span>✓ 2 minutos</span>
+          <span>✓ Sin tarjeta</span>
+          <span>✓ 100% personalizado</span>
+        </div>
+        
+        <div class="hero-image">🥗</div>
+      </div>
+    </section>
+    
+    <!-- PROBLEMA -->
+    <section class="section section-alt problema">
+      <div class="container">
+        <h2>¿Te sentís identificada?</h2>
+        <p style="color: var(--text-muted);">No sos vos. Es que nadie te dio un plan hecho PARA VOS.</p>
+        
+        <div class="problema-cards">
+          <div class="problema-card">
+            <div class="problema-card-icon">😣</div>
+            <div>
+              <h3>Hinchazón constante</h3>
+              <p>Después de comer te sentís pesada, inflada, incómoda.</p>
+            </div>
+          </div>
+          <div class="problema-card">
+            <div class="problema-card-icon">😴</div>
+            <div>
+              <h3>Cansancio que no se va</h3>
+              <p>Dormís 8 horas y seguís agotada. El café ya no alcanza.</p>
+            </div>
+          </div>
+          <div class="problema-card">
+            <div class="problema-card-icon">😤</div>
+            <div>
+              <h3>Dietas que no funcionan</h3>
+              <p>Probaste keto, ayuno, detox... y nada se adapta a vos.</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="problema-conclusion">
+          <strong>No es tu culpa.</strong><br>
+          Cada cuerpo es diferente. Lo que le funciona a tu amiga, puede inflamarte a vos.
+        </div>
+      </div>
+    </section>
+    
+    <!-- CÓMO FUNCIONA -->
+    <section class="section" style="text-align: center;">
+      <div class="container">
+        <h2>Así de simple funciona</h2>
+        
+        <div class="pasos">
+          <div class="paso">
+            <div class="paso-numero">1</div>
+            <div class="paso-content">
+              <h3>Hacé el test de 2 minutos</h3>
+              <p>15 preguntas sobre tu cuerpo y cómo te sentís.</p>
+            </div>
+          </div>
+          <div class="paso">
+            <div class="paso-numero">2</div>
+            <div class="paso-content">
+              <h3>Recibí tu perfil personalizado</h3>
+              <p>Te decimos exactamente qué tipo de cuerpo tenés.</p>
+            </div>
+          </div>
+          <div class="paso">
+            <div class="paso-numero">3</div>
+            <div class="paso-content">
+              <h3>Empezá tu plan a medida</h3>
+              <p>Qué comer, qué evitar, y recetas semanales.</p>
+            </div>
+          </div>
+        </div>
+        
+        <button class="btn btn-primary" onclick="startTest()" data-cta="como-funciona">
+          QUIERO MI PLAN PERSONALIZADO →
+        </button>
+      </div>
+    </section>
+    
+    <!-- PROPUESTA DE VALOR -->
+    <section class="section section-alt" style="text-align: center;">
+      <div class="container">
+        <h2>Todo lo que incluye</h2>
+        <p style="color: var(--text-muted);">Sin complicaciones. Sin contar calorías.</p>
+        
+        <div class="propuesta-lista">
+          <div class="propuesta-item">
+            <div class="propuesta-check">✓</div>
+            <p><strong>Plan semanal de comidas</strong> personalizado según tu perfil</p>
+          </div>
+          <div class="propuesta-item">
+            <div class="propuesta-check">✓</div>
+            <p><strong>Recetas fáciles</strong> con ingredientes locales</p>
+          </div>
+          <div class="propuesta-item">
+            <div class="propuesta-check">✓</div>
+            <p><strong>Lista de alimentos</strong> qué te hace bien y qué evitar</p>
+          </div>
+          <div class="propuesta-item">
+            <div class="propuesta-check">✓</div>
+            <p><strong>Soporte por WhatsApp</strong> para tus dudas</p>
+          </div>
+        </div>
+        
+        <div class="precio-box">
+          <div class="precio-badge">⭐ Más elegido</div>
+          <p class="precio-comparacion">Nutricionista: $25.000 - $40.000 por sesión</p>
+          <div class="precio-actual">
+            <span style="font-size: 1.5rem;">US$</span>
+            <span class="precio-numero">20</span>
+            <span style="color: var(--text-muted);">/mes</span>
+          </div>
+          <div class="precio-trial">🎁 7 DÍAS GRATIS — Sin tarjeta</div>
+          <button class="btn btn-primary" onclick="startTest()" data-cta="precio">
+            EMPEZAR MI PRUEBA GRATIS →
+          </button>
+          <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 1rem;">✓ Cancelás cuando quieras</p>
+        </div>
+      </div>
+    </section>
+    
+    <!-- TESTIMONIOS -->
+    <section class="section" style="text-align: center;">
+      <div class="container">
+        <h2>Lo que dicen ellas</h2>
+        
+        <div class="testimonios-grid">
+          <div class="testimonio">
+            <div class="testimonio-stars">★★★★★</div>
+            <p class="testimonio-texto">"En 2 semanas dejé de sentirme hinchada. Ahora sé exactamente qué comer."</p>
+            <div class="testimonio-autor">
+              <div class="testimonio-avatar">L</div>
+              <div>
+                <div class="testimonio-nombre">Laura M.</div>
+                <div class="testimonio-edad">38 años, Buenos Aires</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonio">
+            <div class="testimonio-stars">★★★★★</div>
+            <p class="testimonio-texto">"Probé mil dietas. Esto es diferente porque está hecho para MI cuerpo."</p>
+            <div class="testimonio-autor">
+              <div class="testimonio-avatar">M</div>
+              <div>
+                <div class="testimonio-nombre">María C.</div>
+                <div class="testimonio-edad">45 años, Córdoba</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonio">
+            <div class="testimonio-stars">★★★★★</div>
+            <p class="testimonio-texto">"El test me describió perfecto. Las recetas son ricas y fáciles."</p>
+            <div class="testimonio-autor">
+              <div class="testimonio-avatar">S</div>
+              <div>
+                <div class="testimonio-nombre">Silvia R.</div>
+                <div class="testimonio-edad">52 años, Mendoza</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- EQUIPO -->
+    <section class="section section-alt equipo">
+      <div class="container">
+        <div class="equipo-foto">👨‍🏫</div>
+        <h3>Juan Sebastián Favareto</h3>
+        <p class="equipo-titulo">Instructor de Yoga · Terapeuta Ayurvédico</p>
+        <p class="equipo-bio">"Creé Vedabite porque creo que la nutrición personalizada no debería ser un lujo."</p>
+        <div class="equipo-credenciales">
+          <span class="equipo-credencial">+10 años experiencia</span>
+          <span class="equipo-credencial">+500 personas ayudadas</span>
+        </div>
+      </div>
+    </section>
+    
+    <!-- FAQ -->
+    <section class="section" style="text-align: center;">
+      <div class="container">
+        <h2>Preguntas frecuentes</h2>
+        <div class="faq-lista" style="margin-top: 2rem;">
+          <div class="faq-item">
+            <button class="faq-pregunta" onclick="toggleFaq(this)">¿Esto es una dieta?</button>
+            <div class="faq-respuesta"><div class="faq-respuesta-inner">No. Es un plan de alimentación personalizado. No contamos calorías ni prohibimos alimentos.</div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-pregunta" onclick="toggleFaq(this)">¿Necesito saber de Ayurveda?</button>
+            <div class="faq-respuesta"><div class="faq-respuesta-inner">Para nada. Te explicamos todo en lenguaje simple, sin jerga.</div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-pregunta" onclick="toggleFaq(this)">¿Puedo cancelar cuando quiera?</button>
+            <div class="faq-respuesta"><div class="faq-respuesta-inner">Sí, sin compromisos. Cancelás con un clic.</div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-pregunta" onclick="toggleFaq(this)">¿Las recetas son con ingredientes de Argentina?</button>
+            <div class="faq-respuesta"><div class="faq-respuesta-inner">Sí. Todo con ingredientes que conseguís en cualquier supermercado.</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- CTA FINAL -->
+    <section class="section cta-final">
+      <div class="container">
+        <h2>Tu cuerpo ya sabe lo que necesita</h2>
+        <p style="color: var(--text-light); margin-bottom: 2rem;">Nosotros te ayudamos a escucharlo.</p>
+        <button class="btn btn-primary" onclick="startTest()" data-cta="cierre">HACÉ EL TEST GRATIS →</button>
+        <p class="cta-final-trust">Sin tarjeta · 2 minutos · 100% personalizado</p>
+      </div>
+    </section>
+    
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-links">
+          <a href="#">Términos</a>
+          <a href="#">Privacidad</a>
+          <a href="mailto:hola@vedabite.com">Contacto</a>
+        </div>
+        <p style="font-size: 0.75rem; color: var(--text-muted);">© 2026 Vedabite</p>
+      </div>
+    </footer>
+    
+    <!-- STICKY CTA -->
+    <div class="sticky-cta">
+      <button class="btn btn-primary" onclick="startTest()" data-cta="sticky">HACÉ EL TEST GRATIS →</button>
+    </div>
+    
+    <!-- WHATSAPP -->
+    <a href="https://wa.me/5491123456789?text=Hola%2C%20quiero%20saber%20m%C3%A1s%20sobre%20Vedabite" target="_blank" class="whatsapp-btn">
+      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    </a>
+    
+  </div>
 
-    1 commit
-    1 file changed
-    1 contributor
+  <!-- ══════════════════════════════════════════════════════════════
+       SCREEN 2: TEST
+       ══════════════════════════════════════════════════════════════ -->
+  <div class="screen" id="testScreen">
+    <div class="test-screen">
+      <div class="test-header">
+        <div class="test-progress">
+          <div class="test-progress-bar" id="progressBar" style="width: 0%;"></div>
+        </div>
+        <div class="test-count"><span id="currentQ">1</span> de 15</div>
+      </div>
+      
+      <div class="test-question">
+        <div class="test-categoria" id="testCategoria">Constitución</div>
+        <h2 id="testQuestion">Cargando...</h2>
+      </div>
+      
+      <div class="test-options" id="testOptions">
+        <!-- Options will be inserted here -->
+      </div>
+      
+      <button class="test-back" onclick="prevQuestion()">← Volver</button>
+    </div>
+  </div>
 
-Commits on Apr 2, 2026
+  <!-- ══════════════════════════════════════════════════════════════
+       SCREEN 3: EMAIL GATE
+       ══════════════════════════════════════════════════════════════ -->
+  <div class="screen" id="emailScreen">
+    <div class="email-screen">
+      <div class="container">
+        <div class="email-celebration">🎉</div>
+        <h2>¡Test completado!</h2>
+        <p>Tu perfil está listo. Ingresá tu email para recibir el resultado completo.</p>
+        
+        <div class="email-result-preview">
+          <div class="email-dosha" id="emailDosha">🌿</div>
+          <div class="email-dosha-name" id="emailDoshaName">Tu perfil</div>
+          <p class="email-traits" id="emailTraits">Cargando...</p>
+        </div>
+        
+        <input type="email" class="email-input" placeholder="Tu email" id="userEmail" required>
+        <button class="btn btn-primary" onclick="submitEmail()">ENVIARME MI RESULTADO →</button>
+        <p class="email-privacy">🔒 No compartimos tu email con nadie.</p>
+      </div>
+    </div>
+  </div>
 
-    index.html
-    @Sunoftiger
-    Sunoftiger authored 8 minutes ago
+  <!-- ══════════════════════════════════════════════════════════════
+       SCREEN 4: RESULTS
+       ══════════════════════════════════════════════════════════════ -->
+  <div class="screen" id="resultsScreen">
+    <div class="results-screen">
+      <div class="results-header" id="resultsHeader" style="background: linear-gradient(180deg, #D1FAE5, #A7F3D0);">
+        <div class="results-dosha-big" id="resultsDoshaEmoji">🌿</div>
+        <div class="results-dosha-name" id="resultsDoshaName">Tu Perfil</div>
+        <p class="results-subtitle" id="resultsDoshaDesc">Cargando...</p>
+        <div class="results-percentages" id="resultsPercentages"></div>
+      </div>
+      
+      <div class="results-section">
+        <div class="results-card">
+          <h3>✨ Así sos vos</h3>
+          <ul id="resultsTraits"></ul>
+        </div>
+        
+        <div class="results-card">
+          <h3>🍽️ Alimentos que te hacen bien</h3>
+          <ul id="resultsGoodFoods"></ul>
+        </div>
+        
+        <div class="results-card">
+          <h3>⚠️ Alimentos a evitar</h3>
+          <ul id="resultsBadFoods"></ul>
+        </div>
+        
+        <div class="results-cta">
+          <h3>¿Querés tu plan semanal completo?</h3>
+          <p>Recetas, horarios y ajustes personalizados para vos.</p>
+          <button class="btn" style="background: white; color: var(--sage-dark);" onclick="openPaywall()">
+            EMPEZAR 7 DÍAS GRATIS →
+          </button>
+        </div>
+      </div>
+      
+      <div class="results-footer">
+        <button class="btn btn-sage" onclick="openPaywall()">🚀 ACTIVAR MI PLAN COMPLETO</button>
+      </div>
+    </div>
+  </div>
 
-Showing with 1,498 additions and 2,869 deletions.
-4,367 changes: 1,498 additions & 2,869 deletions 4,367
-index.html
+  <!-- ══════════════════════════════════════════════════════════════
+       PAYWALL MODAL
+       ══════════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="paywallModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="modal-close" onclick="closePaywall()">✕</button>
+        <h3>🌟 Activá Tu Plan Completo</h3>
+      </div>
+      <div class="modal-body">
+        <div class="paywall-price">
+          <p class="paywall-price-old">Nutricionista: $40.000/mes</p>
+          <div class="paywall-price-new">US$20<span class="paywall-price-period">/mes</span></div>
+        </div>
+        <div class="paywall-trial">🎁 7 DÍAS GRATIS — Cancelá cuando quieras</div>
+        
+        <div class="paywall-features">
+          <div class="paywall-feature"><span class="paywall-feature-icon">✓</span> Plan de comidas semanal personalizado</div>
+          <div class="paywall-feature"><span class="paywall-feature-icon">✓</span> Recetas fáciles con ingredientes locales</div>
+          <div class="paywall-feature"><span class="paywall-feature-icon">✓</span> Lista de compras automática</div>
+          <div class="paywall-feature"><span class="paywall-feature-icon">✓</span> Soporte por WhatsApp</div>
+        </div>
+        
+        <div id="loginSection">
+          <button class="btn btn-google" onclick="loginGoogle()">
+            <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Continuar con Google
+          </button>
+        </div>
+        
+        <div id="paySection" style="display: none;">
+          <div style="background: #F0FDF4; padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem; text-align: center;">
+            <span id="userInfo" style="font-size: 0.875rem;"></span>
+          </div>
+          <a href="https://vedabite.lemonsqueezy.com/checkout/buy/d3318e6c-6da9-4989-8c79-44f3c01613a0" target="_blank" class="btn btn-sage" onclick="trackPayment()">
+            🚀 EMPEZAR MI TRANSFORMACIÓN
+          </a>
+        </div>
+        
+        <p class="paywall-garantia">🛡️ Garantía 30 días — Si no te gusta, te devolvemos el dinero</p>
+      </div>
+    </div>
+  </div>
 
-Large diffs are not rendered by default.
-Footer
-© 2026 GitHub, Inc.
-Footer navigation
+  <script>
+    // ══════════════════════════════════════════════════════════════
+    // TEST DATA - 15 preguntas rápidas
+    // ══════════════════════════════════════════════════════════════
+    
+    const questions = [
+      { q: "Mi cuerpo es naturalmente delgado y me cuesta subir de peso", dosha: "vata", cat: "Constitución" },
+      { q: "Tengo buena musculatura y complexión media", dosha: "pitta", cat: "Constitución" },
+      { q: "Tiendo a subir de peso fácilmente y me cuesta bajarlo", dosha: "kapha", cat: "Constitución" },
+      { q: "Mi piel es seca y se agrieta fácilmente", dosha: "vata", cat: "Piel" },
+      { q: "Mi piel es sensible, con tendencia a enrojecerse", dosha: "pitta", cat: "Piel" },
+      { q: "Mi piel es suave, gruesa y con tendencia a ser grasa", dosha: "kapha", cat: "Piel" },
+      { q: "Mi digestión es irregular - a veces bien, a veces con gases", dosha: "vata", cat: "Digestión" },
+      { q: "Tengo mucho apetito y me pongo de mal humor si no como", dosha: "pitta", cat: "Digestión" },
+      { q: "Puedo saltear comidas sin problema y digiero lento", dosha: "kapha", cat: "Digestión" },
+      { q: "Me cuesta dormir y me despierto varias veces", dosha: "vata", cat: "Sueño" },
+      { q: "Duermo bien pero a veces me cuesta relajarme", dosha: "pitta", cat: "Sueño" },
+      { q: "Duermo profundo y me cuesta levantarme temprano", dosha: "kapha", cat: "Sueño" },
+      { q: "Tiendo a sentir ansiedad y preocupación", dosha: "vata", cat: "Emociones" },
+      { q: "Me irrito o enojo con facilidad", dosha: "pitta", cat: "Emociones" },
+      { q: "Tiendo a la pereza y me cuesta motivarme", dosha: "kapha", cat: "Emociones" }
+    ];
+    
+    const doshaInfo = {
+      vata: {
+        emoji: "🌬️",
+        name: "Aire & Movimiento",
+        color: "#3B82F6",
+        bg: "linear-gradient(180deg, #DBEAFE, #93C5FD)",
+        desc: "Tu cuerpo es ligero y creativo. Necesitás calma, rutina y alimentos calientes.",
+        traits: ["Creativa e imaginativa", "Rápida para aprender", "Entusiasta y vital", "Flexible y adaptable"],
+        goodFoods: ["Sopas y guisos calientes", "Arroz y avena cocida", "Verduras cocidas", "Frutas dulces (banana, mango)", "Lácteos tibios"],
+        badFoods: ["Bebidas frías y helado", "Ensaladas crudas", "Café en exceso", "Comidas secas (galletas, crackers)", "Legumbres en exceso"]
+      },
+      pitta: {
+        emoji: "🔥",
+        name: "Fuego & Transformación",
+        color: "#F97316",
+        bg: "linear-gradient(180deg, #FED7AA, #FDBA74)",
+        desc: "Tu cuerpo es intenso y determinado. Necesitás frescura y evitar el exceso de calor.",
+        traits: ["Determinada y enfocada", "Buena líder", "Inteligente y aguda", "Valiente y directa"],
+        goodFoods: ["Ensaladas frescas", "Frutas dulces (sandía, melón)", "Lácteos fríos", "Verduras de hoja verde", "Arroz y trigo"],
+        badFoods: ["Comidas muy picantes", "Alcohol y café", "Carnes rojas", "Frituras", "Tomate y vinagre"]
+      },
+      kapha: {
+        emoji: "🌍",
+        name: "Tierra & Estabilidad",
+        color: "#22C55E",
+        bg: "linear-gradient(180deg, #D1FAE5, #6EE7B7)",
+        desc: "Tu cuerpo es sólido y constante. Necesitás movimiento, ligereza y especias.",
+        traits: ["Calmada y paciente", "Leal y confiable", "Fuerte y resistente", "Amorosa y compasiva"],
+        goodFoods: ["Verduras al vapor", "Legumbres y especias", "Frutas ácidas (manzana, pera)", "Miel en lugar de azúcar", "Jengibre y pimienta"],
+        badFoods: ["Lácteos en exceso", "Dulces y postres", "Comidas fritas", "Exceso de sal", "Comidas pesadas de noche"]
+      }
+    };
+    
+    // ══════════════════════════════════════════════════════════════
+    // APP STATE
+    // ══════════════════════════════════════════════════════════════
+    
+    let currentQuestion = 0;
+    let answers = { vata: 0, pitta: 0, kapha: 0 };
+    let userEmail = "";
+    let currentUser = null;
+    
+    // ══════════════════════════════════════════════════════════════
+    // FUNCTIONS
+    // ══════════════════════════════════════════════════════════════
+    
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+      window.scrollTo(0, 0);
+    }
+    
+    function startTest() {
+      gtag('event', 'test_started');
+      currentQuestion = 0;
+      answers = { vata: 0, pitta: 0, kapha: 0 };
+      showScreen('testScreen');
+      renderQuestion();
+    }
+    
+    function renderQuestion() {
+      const q = questions[currentQuestion];
+      document.getElementById('currentQ').textContent = currentQuestion + 1;
+      document.getElementById('progressBar').style.width = ((currentQuestion + 1) / questions.length * 100) + '%';
+      document.getElementById('testCategoria').textContent = q.cat;
+      document.getElementById('testQuestion').textContent = q.q;
+      
+      const options = [
+        { value: 0, label: "No me identifica", emoji: "◯" },
+        { value: 1, label: "A veces", emoji: "◔" },
+        { value: 2, label: "Frecuentemente", emoji: "◕" },
+        { value: 3, label: "Totalmente", emoji: "●" }
+      ];
+      
+      document.getElementById('testOptions').innerHTML = options.map(opt => `
+        <button class="test-option" onclick="answerQuestion('${q.dosha}', ${opt.value})">
+          <span>${opt.label}</span>
+          <span class="test-option-emoji">${opt.emoji}</span>
+        </button>
+      `).join('');
+    }
+    
+    function answerQuestion(dosha, value) {
+      answers[dosha] += value;
+      currentQuestion++;
+      
+      if (currentQuestion >= questions.length) {
+        gtag('event', 'test_completed');
+        showEmailGate();
+      } else {
+        renderQuestion();
+      }
+    }
+    
+    function prevQuestion() {
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        renderQuestion();
+      } else {
+        showScreen('landingScreen');
+      }
+    }
+    
+    function getResult() {
+      const total = answers.vata + answers.pitta + answers.kapha;
+      const percentages = {
+        vata: Math.round(answers.vata / total * 100),
+        pitta: Math.round(answers.pitta / total * 100),
+        kapha: Math.round(answers.kapha / total * 100)
+      };
+      
+      let primary = 'vata';
+      if (answers.pitta > answers[primary]) primary = 'pitta';
+      if (answers.kapha > answers[primary]) primary = 'kapha';
+      
+      return { primary, percentages };
+    }
+    
+    function showEmailGate() {
+      const result = getResult();
+      const info = doshaInfo[result.primary];
+      
+      document.getElementById('emailDosha').textContent = info.emoji;
+      document.getElementById('emailDoshaName').textContent = info.name;
+      document.getElementById('emailTraits').textContent = info.traits.slice(0, 2).join(' · ');
+      
+      showScreen('emailScreen');
+    }
+    
+    function submitEmail() {
+      userEmail = document.getElementById('userEmail').value;
+      if (!userEmail || !userEmail.includes('@')) {
+        alert('Por favor ingresá un email válido');
+        return;
+      }
+      
+      gtag('event', 'generate_lead', { email: userEmail });
+      
+      // Save to Firestore
+      db.collection('leads').add({
+        email: userEmail,
+        answers: answers,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      
+      showResults();
+    }
+    
+    function showResults() {
+      const result = getResult();
+      const info = doshaInfo[result.primary];
+      
+      document.getElementById('resultsHeader').style.background = info.bg;
+      document.getElementById('resultsDoshaEmoji').textContent = info.emoji;
+      document.getElementById('resultsDoshaName').textContent = info.name;
+      document.getElementById('resultsDoshaDesc').textContent = info.desc;
+      
+      document.getElementById('resultsPercentages').innerHTML = Object.entries(result.percentages)
+        .sort((a, b) => b[1] - a[1])
+        .map(([d, p]) => `
+          <div class="results-pct">
+            <div class="results-pct-value" style="color: ${doshaInfo[d].color}">${p}%</div>
+            <div class="results-pct-label">${doshaInfo[d].emoji}</div>
+          </div>
+        `).join('');
+      
+      document.getElementById('resultsTraits').innerHTML = info.traits.map(t => `<li>✓ ${t}</li>`).join('');
+      document.getElementById('resultsGoodFoods').innerHTML = info.goodFoods.map(f => `<li>✓ ${f}</li>`).join('');
+      document.getElementById('resultsBadFoods').innerHTML = info.badFoods.map(f => `<li>✗ ${f}</li>`).join('');
+      
+      showScreen('resultsScreen');
+    }
+    
+    function openPaywall() {
+      gtag('event', 'subscription_clicked');
+      document.getElementById('paywallModal').classList.add('active');
+    }
+    
+    function closePaywall() {
+      document.getElementById('paywallModal').classList.remove('active');
+    }
+    
+    function loginGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).then(result => {
+        currentUser = result.user;
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('paySection').style.display = 'block';
+        document.getElementById('userInfo').textContent = '✓ ' + currentUser.email;
+        gtag('event', 'login_success', { method: 'google' });
+      }).catch(err => {
+        console.error(err);
+        alert('Error al iniciar sesión. Intentá de nuevo.');
+      });
+    }
+    
+    function trackPayment() {
+      gtag('event', 'payment_initiated', { email: currentUser?.email || userEmail });
+    }
+    
+    function toggleFaq(btn) {
+      const item = btn.parentElement;
+      const isActive = item.classList.contains('active');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+      if (!isActive) item.classList.add('active');
+    }
+    
+    // Check auth state
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user;
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('paySection').style.display = 'block';
+        document.getElementById('userInfo').textContent = '✓ ' + user.email;
+      }
+    });
+  </script>
 
-    Terms
-    Privacy
-    Security
-    Status
-    Community
-    Docs
-    Contact
-
-Comparing 7c406ed02a6af95382ef4e200e2119b0a257f07e...ec09ac40c6087d105c76f0e7f1ccb81e85f388a1 · Sunoftiger/vedabite
+</body>
+</html>
