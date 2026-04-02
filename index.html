@@ -973,49 +973,6 @@
       showResults();
     }
 
-    // ── TRIAL: detectar estado al cargar la página ──────────────────
-    function checkTrialStatus() {
-      const email      = localStorage.getItem('vb_email');
-      const dosha      = localStorage.getItem('vb_dosha');
-      const trialStart = parseInt(localStorage.getItem('vb_trialStart') || '0');
-      if (!email || !trialStart) return;
-
-      const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
-      const elapsed    = Date.now() - trialStart;
-      const daysLeft   = Math.ceil((SEVEN_DAYS - elapsed) / (24 * 60 * 60 * 1000));
-
-      if (elapsed < SEVEN_DAYS) {
-        // Trial activo → mostrar resultados directo sin pedir nada
-        userEmail = email;
-        answers   = { vata: 1, pitta: 1, kapha: 1 }; // fallback para getResult
-        // Restaurar dosha guardado
-        const info = doshaInfo[dosha];
-        document.getElementById('resultsHeader').style.background  = info.bg;
-        document.getElementById('resultsDoshaEmoji').textContent   = info.emoji;
-        document.getElementById('resultsDoshaName').textContent    = info.name;
-        document.getElementById('resultsDoshaDesc').textContent    = info.desc;
-        document.getElementById('resultsTraits').innerHTML    = info.traits.map(t => `<li>✓ ${t}</li>`).join('');
-        document.getElementById('resultsGoodFoods').innerHTML = info.goodFoods.map(f => `<li>✓ ${f}</li>`).join('');
-        document.getElementById('resultsBadFoods').innerHTML  = info.badFoods.map(f => `<li>✗ ${f}</li>`).join('');
-        document.getElementById('resultsPercentages').innerHTML = `
-          <div class="results-pct">
-            <div class="results-pct-value" style="color:${info.color}">${daysLeft}</div>
-            <div class="results-pct-label">días gratis</div>
-          </div>`;
-        // Ocultar botones de paywall durante trial activo
-        document.querySelectorAll('[onclick="openPaywall()"]').forEach(b => {
-          b.textContent = `✓ Plan activo — ${daysLeft} días gratis`;
-          b.style.opacity = '0.7';
-          b.onclick = null;
-        });
-        showScreen('resultsScreen');
-      } else {
-        // Trial vencido → mostrar paywall de conversión
-        showScreen('resultsScreen');
-        document.getElementById('paywallModal').classList.add('active');
-        gtag('event', 'trial_expired', { email });
-      }
-    }
 
     function openPaywall() {
       // Solo se abre manualmente si el trial ya venció
@@ -1063,7 +1020,55 @@
       if (user) currentUser = user;
     });
 
-    // Al cargar: verificar si hay trial activo o vencido
+    // Al cargar: mostrar banner si hay trial activo, NO redirigir
+    function checkTrialStatus() {
+      const email      = localStorage.getItem('vb_email');
+      const dosha      = localStorage.getItem('vb_dosha');
+      const trialStart = parseInt(localStorage.getItem('vb_trialStart') || '0');
+      if (!email || !trialStart) return;
+
+      const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
+      const elapsed    = Date.now() - trialStart;
+      const daysLeft   = Math.ceil((SEVEN_DAYS - elapsed) / (24 * 60 * 60 * 1000));
+
+      if (elapsed < SEVEN_DAYS) {
+        // Trial activo: mostrar banner con botón ver resultados
+        const heroCta = document.querySelector('.hero-cta');
+        const banner = document.createElement('div');
+        banner.style.cssText = 'background:#EAF3DE;color:#3B6D11;padding:0.75rem 1rem;border-radius:12px;font-size:0.9rem;font-weight:600;text-align:center;margin-bottom:1rem;';
+        banner.innerHTML = `✓ Tu plan está activo — ${daysLeft} días gratis restantes &nbsp;<button onclick="verResultados()" style="background:#3B6D11;color:white;border:none;padding:0.4rem 1rem;border-radius:8px;cursor:pointer;font-size:0.85rem;">Ver mis resultados</button>`;
+        heroCta.parentNode.insertBefore(banner, heroCta);
+        window._savedDosha = dosha;
+        window._savedDaysLeft = daysLeft;
+      }
+    }
+
+    function verResultados() {
+      const dosha = window._savedDosha || localStorage.getItem('vb_dosha');
+      const daysLeft = window._savedDaysLeft || 1;
+      const info = doshaInfo[dosha];
+      if (!info) return;
+      document.getElementById('resultsHeader').style.background  = info.bg;
+      document.getElementById('resultsDoshaEmoji').textContent   = info.emoji;
+      document.getElementById('resultsDoshaName').textContent    = info.name;
+      document.getElementById('resultsDoshaDesc').textContent    = info.desc;
+      document.getElementById('resultsTraits').innerHTML    = info.traits.map(t => `<li>✓ ${t}</li>`).join('');
+      document.getElementById('resultsGoodFoods').innerHTML = info.goodFoods.map(f => `<li>✓ ${f}</li>`).join('');
+      document.getElementById('resultsBadFoods').innerHTML  = info.badFoods.map(f => `<li>✗ ${f}</li>`).join('');
+      document.getElementById('resultsPercentages').innerHTML = `
+        <div class="results-pct">
+          <div class="results-pct-value" style="color:${info.color}">${daysLeft}</div>
+          <div class="results-pct-label">días gratis</div>
+        </div>`;
+      document.querySelectorAll('[onclick="openPaywall()"]').forEach(b => {
+        b.textContent = `✓ Plan activo — ${daysLeft} días gratis`;
+        b.style.opacity = '0.7';
+        b.onclick = null;
+      });
+      showScreen('resultsScreen');
+    }
+    window.verResultados = verResultados;
+
     checkTrialStatus();
     
     function toggleFaq(btn) {
@@ -1097,6 +1102,7 @@
     window.closePaywall    = closePaywall;
     window.trackPayment    = trackPayment;
     window.toggleFaq       = toggleFaq;
+    window.resetTrial      = resetTrial;
   </script>
 
 </body>
