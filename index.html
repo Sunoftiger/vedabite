@@ -7,7 +7,7 @@
   
   <!-- SEO Meta Tags -->
   <title>Vedabite — Tu plan de alimentación personalizado | Test gratuito</title>
-  <meta name="description" content="Descubrí qué necesita TU cuerpo con nuestro test gratuito de 2 minutos. Plan de alimentación personalizado basado en tu constitución única.">
+  <meta name="description" content="Descubrí qué necesita TU cuerpo con nuestro test gratuito de 5 minutos. Plan de alimentación personalizado basado en tu constitución única.">
   <meta name="keywords" content="test ayurveda, que dosha soy, dieta personalizada, plan alimentación, nutrición personalizada">
   <link rel="canonical" href="https://vedabite.com">
   
@@ -15,7 +15,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://vedabite.com">
   <meta property="og:title" content="Vedabite — Tu plan de alimentación personalizado">
-  <meta property="og:description" content="Test gratuito de 2 minutos. Descubrí qué necesita TU cuerpo.">
+  <meta property="og:description" content="Test gratuito de 5 minutos. Descubrí qué necesita TU cuerpo.">
   <meta property="og:image" content="https://vedabite.com/og-image.jpg">
   
   <!-- Favicon -->
@@ -26,6 +26,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   
+  <!-- EmailJS -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    (function(){
+      // PASO 1: reemplazá "TU_PUBLIC_KEY" con tu Public Key de EmailJS
+      // Creá cuenta gratis en https://emailjs.com → Account → API Keys
+      emailjs.init("JMQ2KR7QlswM5Xe3N");
+    })();
+  </script>
+
   <!-- Google Analytics 4 -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-HM7G4LZM70"></script>
   <script>
@@ -331,7 +341,7 @@
         </div>
         
         <div class="hero-trust">
-          <span>✓ 2 minutos</span>
+          <span>✓ 5 minutos</span>
           <span>✓ Sin tarjeta</span>
           <span>✓ 100% personalizado</span>
         </div>
@@ -386,8 +396,8 @@
           <div class="paso">
             <div class="paso-numero">1</div>
             <div class="paso-content">
-              <h3>Hacé el test de 2 minutos</h3>
-              <p>15 preguntas sobre tu cuerpo y cómo te sentís.</p>
+              <h3>Hacé el test de 5 minutos</h3>
+              <p>60 preguntas sobre tu cuerpo y cómo te sentís.</p>
             </div>
           </div>
           <div class="paso">
@@ -542,7 +552,7 @@
         <h2>Tu cuerpo ya sabe lo que necesita</h2>
         <p style="color: var(--text-light); margin-bottom: 2rem;">Nosotros te ayudamos a escucharlo.</p>
         <button class="btn btn-primary" onclick="startTest()" data-cta="cierre">HACÉ EL TEST GRATIS →</button>
-        <p class="cta-final-trust">Sin tarjeta · 2 minutos · 100% personalizado</p>
+        <p class="cta-final-trust">Sin tarjeta · 5 minutos · 100% personalizado</p>
       </div>
     </section>
     
@@ -564,7 +574,7 @@
     </div>
     
     <!-- WHATSAPP -->
-    <a href="https://wa.me/5491123456789?text=Hola%2C%20quiero%20saber%20m%C3%A1s%20sobre%20Vedabite" target="_blank" class="whatsapp-btn">
+    <a href="https://wa.me/5491153149117?text=Hola%2C%20quiero%20saber%20m%C3%A1s%20sobre%20Vedabite" target="_blank" class="whatsapp-btn">
       <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
     </a>
     
@@ -579,7 +589,7 @@
         <div class="test-progress">
           <div class="test-progress-bar" id="progressBar" style="width: 0%;"></div>
         </div>
-        <div class="test-count"><span id="currentQ">1</span> de 15</div>
+        <div class="test-count"><span id="currentQ">1</span> de 60</div>
       </div>
       
       <div class="test-question">
@@ -656,50 +666,38 @@
       </div>
       
       <div class="results-footer">
-        <button class="btn btn-sage" onclick="openPaywall()">🚀 ACTIVAR MI PLAN COMPLETO</button>
+        <button class="btn btn-sage" onclick="openPaywall()">🌿 VER MI PLAN COMPLETO</button>
       </div>
     </div>
   </div>
 
   <!-- ══════════════════════════════════════════════════════════════
-       PAYWALL MODAL
+       PAYWALL MODAL — solo se muestra cuando el trial de 7 días expiró
        ══════════════════════════════════════════════════════════════ -->
   <div class="modal-overlay" id="paywallModal">
     <div class="modal-content">
       <div class="modal-header">
-        <button class="modal-close" onclick="closePaywall()">✕</button>
-        <h3>🌟 Activá Tu Plan Completo</h3>
+        <h3>⏰ Tu prueba gratuita terminó</h3>
       </div>
       <div class="modal-body">
+        <p style="text-align:center; color:var(--text-light); margin-bottom:1.5rem;">
+          Probaste Vedabite durante 7 días. ¿Querés seguir con tu plan personalizado?
+        </p>
         <div class="paywall-price">
           <p class="paywall-price-old">Nutricionista: $40.000/mes</p>
           <div class="paywall-price-new">US$20<span class="paywall-price-period">/mes</span></div>
         </div>
-        <div class="paywall-trial">🎁 7 DÍAS GRATIS — Cancelá cuando quieras</div>
-        
         <div class="paywall-features">
           <div class="paywall-feature"><span class="paywall-feature-icon">✓</span> Plan de comidas semanal personalizado</div>
           <div class="paywall-feature"><span class="paywall-feature-icon">✓</span> Recetas fáciles con ingredientes locales</div>
           <div class="paywall-feature"><span class="paywall-feature-icon">✓</span> Lista de compras automática</div>
           <div class="paywall-feature"><span class="paywall-feature-icon">✓</span> Soporte por WhatsApp</div>
         </div>
-        
-        <div id="loginSection">
-          <button class="btn btn-google" onclick="loginGoogle()">
-            <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-            Continuar con Google
-          </button>
-        </div>
-        
-        <div id="paySection" style="display: none;">
-          <div style="background: #F0FDF4; padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem; text-align: center;">
-            <span id="userInfo" style="font-size: 0.875rem;"></span>
-          </div>
-          <a href="https://vedabite.lemonsqueezy.com/checkout/buy/d3318e6c-6da9-4989-8c79-44f3c01613a0" target="_blank" class="btn btn-sage" onclick="trackPayment()">
-            🚀 EMPEZAR MI TRANSFORMACIÓN
-          </a>
-        </div>
-        
+        <a href="https://vedabite.lemonsqueezy.com/checkout/buy/d3318e6c-6da9-4989-8c79-44f3c01613a0"
+           target="_blank" class="btn btn-sage" onclick="trackPayment()"
+           style="display:flex; text-decoration:none; margin-bottom:0.75rem;">
+          🚀 SUSCRIBIRME POR US$20/MES →
+        </a>
         <p class="paywall-garantia">🛡️ Garantía 30 días — Si no te gusta, te devolvemos el dinero</p>
       </div>
     </div>
@@ -711,21 +709,85 @@
     // ══════════════════════════════════════════════════════════════
     
     const questions = [
+      // ── CONSTITUCIÓN FÍSICA (6) ──────────────────────────────────
       { q: "Mi cuerpo es naturalmente delgado y me cuesta subir de peso", dosha: "vata", cat: "Constitución" },
       { q: "Tengo buena musculatura y complexión media", dosha: "pitta", cat: "Constitución" },
       { q: "Tiendo a subir de peso fácilmente y me cuesta bajarlo", dosha: "kapha", cat: "Constitución" },
-      { q: "Mi piel es seca y se agrieta fácilmente", dosha: "vata", cat: "Piel" },
-      { q: "Mi piel es sensible, con tendencia a enrojecerse", dosha: "pitta", cat: "Piel" },
-      { q: "Mi piel es suave, gruesa y con tendencia a ser grasa", dosha: "kapha", cat: "Piel" },
-      { q: "Mi digestión es irregular - a veces bien, a veces con gases", dosha: "vata", cat: "Digestión" },
+      { q: "Mis huesos son finos y mis articulaciones crujen con frecuencia", dosha: "vata", cat: "Constitución" },
+      { q: "Mi cuerpo genera calor fácilmente y sudo bastante", dosha: "pitta", cat: "Constitución" },
+      { q: "Tengo una estructura grande, robusta y resistente", dosha: "kapha", cat: "Constitución" },
+
+      // ── PIEL Y CABELLO (6) ───────────────────────────────────────
+      { q: "Mi piel es seca, delgada y se agrieta con el frío", dosha: "vata", cat: "Piel & Cabello" },
+      { q: "Mi piel es sensible, con tendencia a enrojecerse o tener manchas", dosha: "pitta", cat: "Piel & Cabello" },
+      { q: "Mi piel es suave, gruesa y tiende a ser grasa", dosha: "kapha", cat: "Piel & Cabello" },
+      { q: "Mi cabello es seco, ondulado o rizado y se rompe fácil", dosha: "vata", cat: "Piel & Cabello" },
+      { q: "Mi cabello es fino, lacio y tiendo a tener canas o pérdida de pelo", dosha: "pitta", cat: "Piel & Cabello" },
+      { q: "Mi cabello es grueso, abundante, liso y algo graso", dosha: "kapha", cat: "Piel & Cabello" },
+
+      // ── DIGESTIÓN (6) ────────────────────────────────────────────
+      { q: "Mi digestión es irregular: a veces bien, a veces con gases o distensión", dosha: "vata", cat: "Digestión" },
       { q: "Tengo mucho apetito y me pongo de mal humor si no como", dosha: "pitta", cat: "Digestión" },
-      { q: "Puedo saltear comidas sin problema y digiero lento", dosha: "kapha", cat: "Digestión" },
-      { q: "Me cuesta dormir y me despierto varias veces", dosha: "vata", cat: "Sueño" },
-      { q: "Duermo bien pero a veces me cuesta relajarme", dosha: "pitta", cat: "Sueño" },
-      { q: "Duermo profundo y me cuesta levantarme temprano", dosha: "kapha", cat: "Sueño" },
-      { q: "Tiendo a sentir ansiedad y preocupación", dosha: "vata", cat: "Emociones" },
-      { q: "Me irrito o enojo con facilidad", dosha: "pitta", cat: "Emociones" },
-      { q: "Tiendo a la pereza y me cuesta motivarme", dosha: "kapha", cat: "Emociones" }
+      { q: "Puedo saltear comidas sin problema y digiero lento y pesado", dosha: "kapha", cat: "Digestión" },
+      { q: "Suelo tener constipación o heces secas y duras", dosha: "vata", cat: "Digestión" },
+      { q: "Tiendo a la acidez, reflujo o heces blandas", dosha: "pitta", cat: "Digestión" },
+      { q: "Mi digestión es lenta, me siento pesada después de comer", dosha: "kapha", cat: "Digestión" },
+
+      // ── SUEÑO (6) ────────────────────────────────────────────────
+      { q: "Me cuesta dormirme y me despierto varias veces en la noche", dosha: "vata", cat: "Sueño" },
+      { q: "Duermo bien en general pero a veces me cuesta apagar la mente", dosha: "pitta", cat: "Sueño" },
+      { q: "Duermo profundo y me cuesta mucho levantarme temprano", dosha: "kapha", cat: "Sueño" },
+      { q: "Soy una persona de sueño liviano, me despiertan los ruidos", dosha: "vata", cat: "Sueño" },
+      { q: "Necesito pocas horas de sueño y me despierto activa", dosha: "pitta", cat: "Sueño" },
+      { q: "Necesito más de 8 horas para sentirme descansada", dosha: "kapha", cat: "Sueño" },
+
+      // ── EMOCIONES (6) ────────────────────────────────────────────
+      { q: "Tiendo a sentir ansiedad, miedo o preocupación con facilidad", dosha: "vata", cat: "Emociones" },
+      { q: "Me irrito o enojo con facilidad cuando algo no sale como espero", dosha: "pitta", cat: "Emociones" },
+      { q: "Tiendo a la tristeza, apego o me cuesta soltar situaciones", dosha: "kapha", cat: "Emociones" },
+      { q: "Mis emociones cambian rápido: paso de alegría a tristeza fácilmente", dosha: "vata", cat: "Emociones" },
+      { q: "Soy perfeccionista y me frustra mucho cuando algo falla", dosha: "pitta", cat: "Emociones" },
+      { q: "Evito los conflictos y prefiero ceder antes que discutir", dosha: "kapha", cat: "Emociones" },
+
+      // ── ENERGÍA Y ACTIVIDAD (6) ──────────────────────────────────
+      { q: "Tengo energía en ráfagas: mucha intensidad y luego agotamiento", dosha: "vata", cat: "Energía" },
+      { q: "Tengo energía sostenida y constante durante el día", dosha: "pitta", cat: "Energía" },
+      { q: "Me cuesta arrancar pero una vez en movimiento soy constante", dosha: "kapha", cat: "Energía" },
+      { q: "Me muevo rápido, hablo rápido y pienso rápido", dosha: "vata", cat: "Energía" },
+      { q: "Soy muy enfocada y eficiente cuando tengo una meta clara", dosha: "pitta", cat: "Energía" },
+      { q: "Prefiero los ritmos tranquilos y el descanso al movimiento intenso", dosha: "kapha", cat: "Energía" },
+
+      // ── MENTE Y APRENDIZAJE (6) ──────────────────────────────────
+      { q: "Aprendo rápido pero también olvido rápido", dosha: "vata", cat: "Mente" },
+      { q: "Tengo buena concentración y excelente memoria", dosha: "pitta", cat: "Mente" },
+      { q: "Aprendo despacio pero lo que aprendo lo recuerdo por mucho tiempo", dosha: "kapha", cat: "Mente" },
+      { q: "Mi mente salta de un tema a otro constantemente", dosha: "vata", cat: "Mente" },
+      { q: "Me gustan los debates, los retos intelectuales y tener razón", dosha: "pitta", cat: "Mente" },
+      { q: "Prefiero pensar bien las cosas antes de actuar o decidir", dosha: "kapha", cat: "Mente" },
+
+      // ── RELACIONES Y CONDUCTA (6) ────────────────────────────────
+      { q: "Soy muy sociable pero me canso rápido de la gente", dosha: "vata", cat: "Relaciones" },
+      { q: "Soy directa, a veces demasiado, y me incomoda la indecisión ajena", dosha: "pitta", cat: "Relaciones" },
+      { q: "Soy cálida, leal y me cuesta terminar vínculos aunque no me hagan bien", dosha: "kapha", cat: "Relaciones" },
+      { q: "Cambio de planes, hobbies y amistades con frecuencia", dosha: "vata", cat: "Relaciones" },
+      { q: "Soy competitiva y me importa mucho el reconocimiento", dosha: "pitta", cat: "Relaciones" },
+      { q: "Soy muy comprometida con mis relaciones y detesto los cambios bruscos", dosha: "kapha", cat: "Relaciones" },
+
+      // ── CLIMA Y TEMPERATURA (6) ──────────────────────────────────
+      { q: "El frío me afecta mucho, siempre tengo las manos y pies fríos", dosha: "vata", cat: "Temperatura" },
+      { q: "El calor me incomoda, prefiero climas frescos o templados", dosha: "pitta", cat: "Temperatura" },
+      { q: "Me adapto bien a casi cualquier clima pero el frío húmedo me pesa", dosha: "kapha", cat: "Temperatura" },
+      { q: "Me encanta el calor del sol y en invierno me siento lenta", dosha: "vata", cat: "Temperatura" },
+      { q: "Prefiero el invierno al verano, el calor me irrita", dosha: "pitta", cat: "Temperatura" },
+      { q: "El tiempo nublado y la humedad me ponen sin energía", dosha: "kapha", cat: "Temperatura" },
+
+      // ── ALIMENTACIÓN Y HÁBITOS (6) ───────────────────────────────
+      { q: "Como a deshoras, olvido comer o como muy rápido sin disfrutar", dosha: "vata", cat: "Alimentación" },
+      { q: "Como con horario fijo y me molesta mucho saltear una comida", dosha: "pitta", cat: "Alimentación" },
+      { q: "Como poco pero lo poco que como me llena por mucho tiempo", dosha: "kapha", cat: "Alimentación" },
+      { q: "Me atraen los sabores dulces, salados y crujientes", dosha: "vata", cat: "Alimentación" },
+      { q: "Me gustan los sabores intensos, picantes o ácidos", dosha: "pitta", cat: "Alimentación" },
+      { q: "Prefiero comidas suaves, cremosas y reconfortantes", dosha: "kapha", cat: "Alimentación" }
     ];
     
     const doshaInfo = {
@@ -864,20 +926,105 @@
         alert('Por favor ingresá un email válido');
         return;
       }
-      
+
+      const btn = document.querySelector('#emailScreen .btn-primary');
+      btn.textContent = 'Guardando...';
+      btn.disabled = true;
+
       gtag('event', 'generate_lead', { email: userEmail });
-      
-      // Save to Firestore
+
+      const result = getResult();
+      const info   = doshaInfo[result.primary];
+      const trialStart = Date.now();
+
+      // Guardar en Firestore con fecha de inicio de trial
       db.collection('leads').add({
-        email: userEmail,
-        answers: answers,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        email:       userEmail,
+        dosha:       result.primary,
+        percentages: result.percentages,
+        answers:     answers,
+        trialStart:  trialStart,
+        trialEnd:    trialStart + (7 * 24 * 60 * 60 * 1000),
+        paid:        false,
+        timestamp:   firebase.firestore.FieldValue.serverTimestamp()
       });
-      
+
+      // Guardar en localStorage para detectar trial en visitas futuras
+      localStorage.setItem('vb_email',      userEmail);
+      localStorage.setItem('vb_dosha',      result.primary);
+      localStorage.setItem('vb_trialStart', trialStart);
+
+      // Enviar email de bienvenida con resultado via EmailJS
+      // CONFIGURAR: reemplazá TU_PUBLIC_KEY en el <head>, TU_SERVICE_ID y TU_TEMPLATE_ID abajo
+      emailjs.send("service_xf7v0x7", "template_cwvkmyu", {
+        to_email:    userEmail,
+        dosha_emoji: info.emoji,
+        dosha_name:  info.name,
+        dosha_desc:  info.desc,
+        traits:      info.traits.join(', '),
+        good_foods:  info.goodFoods.join(', '),
+        bad_foods:   info.badFoods.join(', '),
+        pct_vata:    result.percentages.vata  + '%',
+        pct_pitta:   result.percentages.pitta + '%',
+        pct_kapha:   result.percentages.kapha + '%'
+      })
+      .catch(function(err) { console.error('EmailJS error:', err); });
+
       showResults();
     }
-    
-    function showResults() {
+
+    // ── TRIAL: detectar estado al cargar la página ──────────────────
+    function checkTrialStatus() {
+      const email      = localStorage.getItem('vb_email');
+      const dosha      = localStorage.getItem('vb_dosha');
+      const trialStart = parseInt(localStorage.getItem('vb_trialStart') || '0');
+      if (!email || !trialStart) return;
+
+      const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
+      const elapsed    = Date.now() - trialStart;
+      const daysLeft   = Math.ceil((SEVEN_DAYS - elapsed) / (24 * 60 * 60 * 1000));
+
+      if (elapsed < SEVEN_DAYS) {
+        // Trial activo → mostrar resultados directo sin pedir nada
+        userEmail = email;
+        answers   = { vata: 1, pitta: 1, kapha: 1 }; // fallback para getResult
+        // Restaurar dosha guardado
+        const info = doshaInfo[dosha];
+        document.getElementById('resultsHeader').style.background  = info.bg;
+        document.getElementById('resultsDoshaEmoji').textContent   = info.emoji;
+        document.getElementById('resultsDoshaName').textContent    = info.name;
+        document.getElementById('resultsDoshaDesc').textContent    = info.desc;
+        document.getElementById('resultsTraits').innerHTML    = info.traits.map(t => `<li>✓ ${t}</li>`).join('');
+        document.getElementById('resultsGoodFoods').innerHTML = info.goodFoods.map(f => `<li>✓ ${f}</li>`).join('');
+        document.getElementById('resultsBadFoods').innerHTML  = info.badFoods.map(f => `<li>✗ ${f}</li>`).join('');
+        document.getElementById('resultsPercentages').innerHTML = `
+          <div class="results-pct">
+            <div class="results-pct-value" style="color:${info.color}">${daysLeft}</div>
+            <div class="results-pct-label">días gratis</div>
+          </div>`;
+        // Ocultar botones de paywall durante trial activo
+        document.querySelectorAll('[onclick="openPaywall()"]').forEach(b => {
+          b.textContent = `✓ Plan activo — ${daysLeft} días gratis`;
+          b.style.opacity = '0.7';
+          b.onclick = null;
+        });
+        showScreen('resultsScreen');
+      } else {
+        // Trial vencido → mostrar paywall de conversión
+        showScreen('resultsScreen');
+        document.getElementById('paywallModal').classList.add('active');
+        gtag('event', 'trial_expired', { email });
+      }
+    }
+
+    function openPaywall() {
+      // Solo se abre manualmente si el trial ya venció
+      const trialStart = parseInt(localStorage.getItem('vb_trialStart') || '0');
+      const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
+      if (trialStart && (Date.now() - trialStart) < SEVEN_DAYS) return; // trial activo, no abrir
+      gtag('event', 'subscription_clicked');
+      document.getElementById('paywallModal').classList.add('active');
+    }
       const result = getResult();
       const info = doshaInfo[result.primary];
       
@@ -902,32 +1049,22 @@
       showScreen('resultsScreen');
     }
     
-    function openPaywall() {
-      gtag('event', 'subscription_clicked');
-      document.getElementById('paywallModal').classList.add('active');
-    }
-    
     function closePaywall() {
       document.getElementById('paywallModal').classList.remove('active');
     }
-    
-    function loginGoogle() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).then(result => {
-        currentUser = result.user;
-        document.getElementById('loginSection').style.display = 'none';
-        document.getElementById('paySection').style.display = 'block';
-        document.getElementById('userInfo').textContent = '✓ ' + currentUser.email;
-        gtag('event', 'login_success', { method: 'google' });
-      }).catch(err => {
-        console.error(err);
-        alert('Error al iniciar sesión. Intentá de nuevo.');
-      });
-    }
-    
+
     function trackPayment() {
-      gtag('event', 'payment_initiated', { email: currentUser?.email || userEmail });
+      const email = localStorage.getItem('vb_email') || userEmail;
+      gtag('event', 'payment_initiated', { email });
     }
+
+    // Check auth state (mantener por si hay usuarios ya logueados)
+    auth.onAuthStateChanged(user => {
+      if (user) currentUser = user;
+    });
+
+    // Al cargar: verificar si hay trial activo o vencido
+    checkTrialStatus();
     
     function toggleFaq(btn) {
       const item = btn.parentElement;
@@ -950,6 +1087,7 @@
     // Expose all inline-onclick functions to global scope
     // Fixes "X is not defined" errors on mobile (timing/scope issues)
     window.showScreen      = showScreen;
+    window.startTest       = startTest;
     window.renderQuestion  = renderQuestion;
     window.answerQuestion  = answerQuestion;
     window.prevQuestion    = prevQuestion;
@@ -957,8 +1095,8 @@
     window.showResults     = showResults;
     window.openPaywall     = openPaywall;
     window.closePaywall    = closePaywall;
-    window.loginGoogle     = loginGoogle;
     window.trackPayment    = trackPayment;
+    window.toggleFaq       = toggleFaq;
   </script>
 
 </body>
