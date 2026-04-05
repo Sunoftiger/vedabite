@@ -54,6 +54,7 @@ h1,h2,h3,h4{font-family:'Lora',serif}.container{max-width:480px;margin:0 auto;pa
 .chart-cell.empty{background:var(--cream)}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
 <script>emailjs.init("JMQ2KR7QlswM5Xe3N");</script>
 </head>
 <body>
@@ -114,7 +115,7 @@ h1,h2,h3,h4{font-family:'Lora',serif}.container{max-width:480px;margin:0 auto;pa
 </div>
 <div class="tabs-grid" id="tabsGrid"></div>
 <div id="tabContents"></div>
-<div style="padding:20px;text-align:center"><button class="btn btn-outline" onclick="confirmRestart()">🔄 Rehacer el test</button></div>
+<div style="padding:20px;text-align:center"><button class="btn btn-gold" style="margin-bottom:12px" onclick="downloadPDF()">📥 DESCARGAR MI INFORME COMPLETO (PDF)</button><button class="btn btn-outline" onclick="confirmRestart()">🔄 Rehacer el test</button></div>
 </div>
 </div>
 <div class="nav-bar" id="navBar">
@@ -136,6 +137,47 @@ function saveSession(){try{localStorage.setItem('vb_res',JSON.stringify(res));lo
 function loadSession(){try{var saved=localStorage.getItem('vb_res');if(saved){res=JSON.parse(saved);userEmail=localStorage.getItem('vb_email')||'';showResults();return true}}catch(e){}return false}
 function checkSaved(){try{if(localStorage.getItem('vb_res')){document.getElementById('savedSession').style.display='block'}}catch(e){}}
 function clearSession(){try{localStorage.removeItem('vb_res');localStorage.removeItem('vb_email');localStorage.removeItem('vb_dosha');document.getElementById('savedSession').style.display='none'}catch(e){}}
+function downloadPDF(){
+var i=D[res.p];
+var h='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>VedaBite - Informe '+i.n+'</title>';
+h+='<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Helvetica,Arial,sans-serif;color:#1a1a1a;background:#fff;padding:20px;max-width:500px;margin:0 auto}';
+h+='h1{font-size:22px;margin:8px 0}h3{font-size:16px;margin:0 0 8px}p{margin:4px 0;font-size:13px;line-height:1.5}';
+h+='.hdr{text-align:center;padding:20px;background:#D1FAE5;border-radius:12px;margin-bottom:16px}';
+h+='.sec{background:#f9f9f9;border-radius:10px;padding:14px;margin-bottom:12px;page-break-inside:avoid}';
+h+='.good{background:#D1FAE5;padding:8px 12px;border-radius:8px;margin:6px 0}.bad{background:#FEE2E2;padding:8px 12px;border-radius:8px;margin:6px 0}';
+h+='.tip{background:#F0FDF4;border-left:3px solid #7C9A73;padding:6px 10px;margin:4px 0;font-size:12px}';
+h+='.astro-card{background:linear-gradient(135deg,#1E1B4B,#312E81);color:#fff;padding:20px;border-radius:14px;margin-bottom:12px}';
+h+='.astro-card h3,.astro-card h4{color:#FDE68A}.pr{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.15);font-size:13px}';
+h+='.footer{text-align:center;color:#999;font-size:11px;margin-top:20px;padding:16px}';
+h+='@media print{body{padding:10px}}</style></head><body>';
+h+='<div class="hdr"><div style="font-size:50px">'+i.e+'</div><h1>'+i.n+'</h1><p>'+i.desc+'</p>';
+h+='<div style="display:flex;justify-content:center;gap:10px;margin-top:10px">';
+Object.entries(res.pct).sort(function(a,b){return b[1]-a[1]}).forEach(function(x){h+='<div style="background:#fff;padding:4px 12px;border-radius:6px"><strong style="color:'+D[x[0]].c+'">'+x[1]+'%</strong><br><small>'+D[x[0]].n.split(' ')[0]+'</small></div>'});
+h+='</div></div>';
+function sec(em,ti,co){return '<div class="sec"><h3>'+em+' '+ti+'</h3>'+co+'</div>'}
+function tipBlock(arr){if(!arr||!arr.length)return '';return arr.map(function(t,j){return '<div class="tip"><strong>'+(j+1)+'.</strong> '+t+'</div>'}).join('')}
+h+=sec('📊','Tu Resumen','<p><strong>Características:</strong> '+i.traits.join(' · ')+'</p>');
+h+=sec('🍽️','Alimentos','<div class="good"><strong>✅ Te hacen bien:</strong> '+i.good.join(', ')+'</div><div class="bad"><strong>⚠️ Evitar:</strong> '+i.bad.join(', ')+'</div>');
+h+=sec('🍲','Recetas','<p><strong>🍳 Desayuno:</strong> '+i.recetas.d+'</p><p><strong>🥗 Almuerzo:</strong> '+i.recetas.a+'</p><p><strong>🍵 Cena:</strong> '+i.recetas.c+'</p>'+tipBlock(i.recetasTips));
+h+=sec('⏰','Tu Rutina',i.horarios.map(function(x){return '<p>🕐 '+x+'</p>'}).join(''));
+h+=sec('🔮','Proyección','<p><strong>1 mes:</strong> '+i.proy.m1+'</p><p><strong>3 meses:</strong> '+i.proy.m3+'</p><p><strong>6 meses:</strong> '+i.proy.m6+'</p><p><strong>1 año:</strong> '+i.proy.a+'</p>');
+h+=sec('🏃','Ejercicio','<p>'+i.ejercicios.join(' · ')+'</p>'+tipBlock(i.ejerciciosTips));
+h+=sec('💆','Terapias','<p>'+i.terapias.join(' · ')+'</p>'+tipBlock(i.terapiasTips));
+h+=sec('🙏','Mudras',i.mudras.map(function(m){return '<p><strong>'+m.n+':</strong> '+m.d+' — <em>'+m.c+'</em></p>'}).join('')+tipBlock(i.mudrasTips));
+h+=sec('🔴','Chakras',i.chakras.map(function(c){return '<p><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:'+c.c+';vertical-align:middle;margin-right:4px"></span><strong>'+c.n+':</strong> '+c.e+' — '+c.t+'</p>'}).join(''));
+h+=sec('🌬️','Respiración: '+i.resp.n,'<p>'+i.resp.d+'</p>'+i.resp.p.map(function(p,j){return '<p>'+(j+1)+'. '+p+'</p>'}).join('')+tipBlock(i.respiracionTips));
+h+=sec('🧘','Meditación: '+i.medit.n,'<p>Duración: '+i.medit.d+'</p>'+i.medit.p.map(function(p,j){return '<p>'+(j+1)+'. '+p+'</p>'}).join('')+tipBlock(i.meditacionTips));
+h+=sec('🏥','Salud','<div class="bad"><strong>⚠️ Riesgos:</strong> '+i.salud.r.join(', ')+'</div><div class="good"><strong>✅ Prevención:</strong> '+i.salud.p.join(', ')+'</div>'+tipBlock(i.saludTips));
+var astroEl=document.getElementById('astroResult');
+if(astroEl&&astroEl.innerHTML.trim()){h+='<div class="sec"><h3>⭐ Carta Natal Védica</h3>'+astroEl.innerHTML+'</div>'}
+h+='<div class="footer"><p><strong>VedaBite</strong> — Tu guía de bienestar ayurvédico</p></div>';
+h+='</body></html>';
+var w=window.open('','_blank');
+if(!w){alert('Permití las ventanas emergentes para descargar el PDF');return}
+w.document.write(h);
+w.document.close();
+w.onload=function(){setTimeout(function(){w.print()},300)};
+}
 function confirmRestart(){if(confirm('¿Querés rehacer el test? Tus resultados actuales se perderán.')){clearSession();startTest()}}
 checkSaved();
 function show(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});document.getElementById(id).classList.add('active');window.scrollTo(0,0);document.getElementById('navBar').classList.toggle('active',id==='s4')}
@@ -439,8 +481,30 @@ x+='<div class="card" style="margin-top:16px;background:linear-gradient(135deg,#
 x+='<div style="font-size:32px;margin-bottom:8px">⭐</div>';
 x+='<p style="font-size:14px">Carta Natal Védica by <strong>VedaBite</strong></p>';
 x+='<p style="font-size:11px;color:#888;margin-top:4px">Cálculos basados en efemérides astronómicas</p></div>';
+x+='<div style="margin-top:16px"><button class="btn btn-gold" onclick="downloadAstro()">📥 DESCARGAR CARTA NATAL (PDF)</button></div>';
 
 document.getElementById('astroResult').innerHTML=x;
+}
+
+function downloadAstro(){
+var astro=document.getElementById('astroResult').innerHTML;
+if(!astro||!astro.trim()){alert('Primero generá tu carta natal');return}
+var h='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>VedaBite - Carta Natal</title>';
+h+='<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Helvetica,Arial,sans-serif;color:#1a1a1a;background:#fff;padding:20px;max-width:500px;margin:0 auto}';
+h+='.pr{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.15);font-size:13px}';
+h+='.chart-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:#CBD5E1;padding:2px;border-radius:8px}';
+h+='.chart-cell{background:#fff;padding:8px;text-align:center;font-size:11px;min-height:45px;display:flex;flex-direction:column;justify-content:center}';
+h+='.chart-cell.empty{background:#FFFDF7}';
+h+='.footer{text-align:center;color:#999;font-size:11px;margin-top:20px;padding:16px}';
+h+='@media print{body{padding:10px}}</style></head><body>';
+h+=astro;
+h+='<div class="footer"><p><strong>VedaBite</strong> — Tu guía de bienestar ayurvédico</p></div>';
+h+='</body></html>';
+var w=window.open('','_blank');
+if(!w){alert('Permití las ventanas emergentes para descargar');return}
+w.document.write(h);
+w.document.close();
+w.onload=function(){setTimeout(function(){w.print()},300)};
 }
 
 </script>
