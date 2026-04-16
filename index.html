@@ -86,6 +86,13 @@ t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
 y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
 })(window, document, "clarity", "script", "w2xvsd3oxf");
 </script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({apiKey:"AIzaSyCxTOtGmdzdaYQghf270VenmVzMaeZnlOM",authDomain:"vedabite-1b49a.firebaseapp.com",projectId:"vedabite-1b49a",storageBucket:"vedabite-1b49a.firebasestorage.app",messagingSenderId:"435704386348",appId:"1:435704386348:web:e6a7842f7fe9a10ed8d289",measurementId:"G-Y0KHXLM0PJ"});
+window._vbDB=firebase.firestore();
+window._vbSaveLead=function(d){try{return window._vbDB.collection("leads").add(Object.assign({},d,{timestamp:firebase.firestore.FieldValue.serverTimestamp(),createdAt:new Date().toISOString()}));}catch(e){return Promise.reject(e);}};
+</script>
 </head>
 <body>
 <script>
@@ -291,7 +298,7 @@ function answer(a,e){ans[a]+=e,(60<=++qi?showEmail:renderQ)()}
 function prevQ(){0<qi?(qi--,renderQ()):show("s1")}
 function getRes(){var a=ans.vata+ans.pitta+ans.kapha||1,e="vata";return ans.pitta>ans[e]&&(e="pitta"),{p:e=ans.kapha>ans[e]?"kapha":e,pct:{vata:Math.round(ans.vata/a*100),pitta:Math.round(ans.pitta/a*100),kapha:Math.round(ans.kapha/a*100)}}}
 function showEmail(){res=getRes();var a=D[res.p];document.getElementById("eDosha").textContent=a.e,document.getElementById("eName").textContent=a.n,show("s3")}
-function submitEmail(){var a=document.getElementById("emailIn").value;if(!a||!a.includes("@"))return alert("Email inválido");userEmail=a;var e=D[res.p];emailjs.send("service_xf7v0x7","template_vzggqyx",{to_email:a,dosha_name:e.n,dosha_emoji:e.e,dosha_desc:e.desc,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha}).then(function(){}).catch(function(a){});try{gtag("event","generate_lead");if(window._vbTrack)window._vbTrack()}catch(a){}saveSession(),showResults()}
+function submitEmail(){var a=document.getElementById("emailIn").value;if(!a||!a.includes("@"))return alert("Email inválido");userEmail=a;var e=D[res.p];emailjs.send("service_xf7v0x7","template_vzggqyx",{to_email:a,dosha_name:e.n,dosha_emoji:e.e,dosha_desc:e.desc,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha}).then(function(){}).catch(function(a){});try{if(window._vbSaveLead)window._vbSaveLead({email:a,dosha:res.p,dosha_name:e.n,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha,trialStart:new Date().toISOString(),trialEnd:new Date(Date.now()+7*24*60*60*1000).toISOString(),paid:false,source:document.referrer||"direct",utm:location.search||""}).catch(function(){});}catch(e){}try{gtag("event","generate_lead");if(window._vbTrack)window._vbTrack()}catch(a){}saveSession(),showResults()}
 function showResults(){var a=D[res.p];document.getElementById("resHeader").style.background=a.bg,document.getElementById("resEmoji").textContent=a.e,document.getElementById("resName").textContent=a.n,document.getElementById("resDesc").textContent=a.desc,document.getElementById("resPct").innerHTML=Object.entries(res.pct).sort(function(a,e){return e[1]-a[1]}).map(function(a){return'<div style="background:#fff;padding:8px 16px;border-radius:8px"><div style="font-weight:700;color:'+D[a[0]].c+'">'+a[1]+'%</div><div style="font-size:12px">'+D[a[0]].e+"</div></div>"}).join(""),document.getElementById("tabsGrid").innerHTML=T.map(function(a){return'<div class="tab-card'+(a.p?" premium":"")+'" style="position:relative" onclick="showTab(\''+a.id+"')\"><span>"+a.e+"</span><strong>"+a.t+"</strong>"+(a.p?'<span class="premium-tag">PREMIUM</span>':"")+"</div>"}).join(""),renderTabs(a),show("s4")}
 function tips(a){return a&&a.length?'<div style="margin-top:20px"><h4 style="margin-bottom:12px">💡 7 Tips Personalizados</h4>'+a.map(function(a,e){return'<div class="tip-card"><span class="tip-num">'+(e+1)+"</span>"+a+"</div>"}).join("")+"</div>":""}
 function showTab(a){document.querySelectorAll(".tab-content").forEach(function(a){a.classList.remove("active")});var el=document.getElementById("t-"+a);if(el){el.classList.add("active");document.getElementById("tabsGrid").style.display="none";window.scrollTo(0,0)}}
