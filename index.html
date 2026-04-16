@@ -92,7 +92,7 @@ y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
 firebase.initializeApp({apiKey:"AIzaSyCxTOtGmdzdaYQghf270VenmVzMaeZnlOM",authDomain:"vedabite-1b49a.firebaseapp.com",projectId:"vedabite-1b49a",storageBucket:"vedabite-1b49a.firebasestorage.app",messagingSenderId:"435704386348",appId:"1:435704386348:web:e6a7842f7fe9a10ed8d289",measurementId:"G-Y0KHXLM0PJ"});
 window._vbDB=firebase.firestore();
 window._vbSaveLead=function(d){try{return window._vbDB.collection("leads").add(Object.assign({},d,{timestamp:firebase.firestore.FieldValue.serverTimestamp(),createdAt:new Date().toISOString()})).catch(function(e){console.warn('Firestore lead no guardado:',e.code);try{var leads=JSON.parse(localStorage.getItem('vb_leads_pendientes')||'[]');leads.push(Object.assign({},d,{createdAt:new Date().toISOString()}));localStorage.setItem('vb_leads_pendientes',JSON.stringify(leads));}catch(err){}return null;});}catch(e){return Promise.resolve(null);}};
-function _vbMostrarSuscripcion(){var html='<div onclick="this.remove()" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:4000;display:flex;align-items:center;justify-content:center;padding:20px"><div onclick="event.stopPropagation()" style="background:#fff;padding:24px;border-radius:20px;max-width:380px;width:100%;text-align:center"><div style="font-size:40px;margin-bottom:8px">🔥</div><h2 style="margin:0 0 8px">Vedabite Práctica</h2><p style="color:#666;font-size:13px;margin:0 0 16px">Acceso completo al CÓMO se hace cada cosa</p><div style="background:#F0FDF4;padding:14px;border-radius:10px;margin-bottom:12px;text-align:left;font-size:13px;line-height:1.7"><strong>Incluye:</strong><br>✓ Mudras paso a paso<br>✓ Meditaciones guiadas<br>✓ Recetas detalladas<br>✓ Horarios con porqués<br>✓ Proyección a 5/10/20 años<br>✓ Scanner de menús ilimitado<br>✓ Ubicación con búsquedas inteligentes</div><div style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);padding:16px;border-radius:12px;margin-bottom:16px"><div style="text-decoration:line-through;color:#999;font-size:14px">USD 20/mes</div><div style="font-size:28px;font-weight:700;color:#92400E">USD 10/mes</div><div style="font-size:11px;color:#92400E">los primeros 3 meses · luego USD 20</div></div><div style="background:#FEF3C7;padding:10px;border-radius:8px;margin-bottom:12px;font-size:12px;color:#92400E">🎁 Próximamente vas a poder suscribirte. ¡Estamos terminando los últimos detalles!</div><button class="btn btn-outline" style="width:100%" onclick="this.parentElement.parentElement.remove()">Cerrar</button></div></div>';document.body.insertAdjacentHTML('beforeend',html);}
+function _vbMostrarSuscripcion(){var html='<div onclick="this.remove()" style="position:fixed;inset:0;background:rgba(45,66,38,0.85);z-index:4000;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto"><div onclick="event.stopPropagation()" style="background:#FAF7F0;padding:32px 24px;border-radius:22px;max-width:420px;width:100%;text-align:center;margin:20px 0;border:1px solid #E8DFC8">'+'<div style="background:linear-gradient(135deg,#3D5A36,#2D4226);color:#F5F1E8;padding:24px 20px;border-radius:18px;margin-bottom:24px;text-align:center">'+'<div style="font-size:20px;letter-spacing:5px;opacity:0.6;margin-bottom:10px">॥ ॐ ॥</div>'+'<p style="font-size:10px;letter-spacing:2.5px;margin:0 0 12px;opacity:0.85;text-transform:uppercase">Manifiesto Vedabite</p>'+'<p style="font-size:18px;line-height:1.4;margin:0 0 12px;font-weight:400;color:#F5F1E8">Invertí en longevidad.<br><em style="color:#D4B896">Recuperá hábitos naturales.</em></p>'+'<div style="width:30px;height:1px;background:#D4B896;margin:14px auto"></div>'+'<p style="font-size:12px;line-height:1.6;margin:0;opacity:0.9;font-style:italic;color:#E8DFC8">No gastes en remedios.<br>Gastá en la calidad de vida<br>que te rejuvenece.</p>'+'</div>'+'<div style="margin-bottom:6px">'+'<span style="display:inline-block;padding:5px 14px;background:#fff;border:1px solid #D4B896;border-radius:50px;font-size:10px;font-weight:600;color:#8B7355;letter-spacing:2px">SEGUNDO PASO</span>'+'</div>'+'<h2 style="margin:18px 0 6px;font-size:26px;color:#3D5A36;font-weight:500;letter-spacing:1px">Práctica</h2>'+'<p style="font-size:13px;color:#8B7355;font-style:italic;margin:0 0 22px">El qué · El cómo · Los porqués</p>'+'<div style="background:#fff;padding:18px 16px;border-radius:14px;margin-bottom:22px;font-size:14px;line-height:1.7;color:#3D5A36;font-style:italic;border:1px solid #E8DFC8">'+'"No solo te decimos qué hacer.<br>Te enseñamos cómo."'+'</div>'+'<div style="text-align:left;margin-bottom:22px">'+'<p style="font-size:11px;color:#8B7355;text-transform:uppercase;letter-spacing:1.5px;margin:0 0 14px;text-align:center">Tu práctica completa</p>'+'<div style="font-size:13px;line-height:2;color:#4A4A4A">'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🪷 <strong>Mudras</strong> con instrucciones detalladas</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🧘 <strong>Meditaciones</strong> guiadas paso a paso</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🌬️ <strong>Pranayamas</strong> técnica completa</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🍃 <strong>Recetas</strong> con preparación detallada</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">⏳ <strong>Dinacharya</strong> tu rutina con porqués</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🌿 <strong>Yoga</strong> personalizado por dosha</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">💆 <strong>Terapias</strong> ayurvédicas aplicadas</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🕉️ <strong>Chakras</strong> activación según tu energía</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🔮 <strong>Tu proyección</strong> a 5, 10 y 20 años</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🌾 <strong>Salud preventiva</strong> con plan semanal</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">📷 <strong>Escáner</strong> de menús sin límites</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">📍 <strong>Lugares cerca tuyo</strong> para tu dosha</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">⭐ <strong>Carta natal</strong> védica completa</div>'+'<div style="padding:6px 0">💌 <strong>Acompañamiento</strong> directo por mail</div>'+'</div>'+'</div>'+'<div style="background:#fff;padding:18px;border-radius:14px;margin-bottom:22px;border:1px solid #E8DFC8;text-align:left">'+'<p style="font-size:11px;color:#8B7355;text-transform:uppercase;letter-spacing:1.5px;margin:0 0 8px">Lo que te llevás</p>'+'<p style="font-size:14px;line-height:1.6;color:#3D5A36;margin:0;font-style:italic">Una guía completa para revertir el desequilibrio que muestra tu informe.<br>Pasos claros para vivir más años. Mejor.</p>'+'</div>'+'<div style="margin-bottom:22px">'+'<div style="font-size:11px;color:#8B7355;letter-spacing:2px;margin-bottom:6px">TU INVERSIÓN</div>'+'<div style="font-size:13px;color:#999;text-decoration:line-through;margin-bottom:2px">USD 20 al mes</div>'+'<div style="font-size:36px;font-weight:300;color:#3D5A36;line-height:1;letter-spacing:0.5px">USD 10<span style="font-size:16px;color:#7C9A73">/mes</span></div>'+'<div style="font-size:12px;color:#7C9A73;margin-top:8px;font-style:italic">los primeros tres meses</div>'+'<div style="font-size:11px;color:#999;margin-top:2px">después USD 20/mes</div>'+'</div>'+'<div style="background:#fff;border:1px solid #E8DFC8;padding:14px;border-radius:12px;margin-bottom:18px;font-size:12px;color:#8B7355;line-height:1.6;font-style:italic">🌱 Estamos terminando los últimos detalles.<br>Pronto vas a poder comenzar tu camino.</div>'+'<button class="btn btn-outline" style="width:100%;color:#3D5A36;border-color:#7C9A73" onclick="this.parentElement.parentElement.remove()">Cerrar</button>'+'<p style="margin:16px 0 0;font-size:11px;color:#8B7355;letter-spacing:0.5px;line-height:1.6">🌱 30 días gratis para probarlo<br>Sin tarjeta · Cancelás cuando quieras</p>'+'</div></div>';document.body.insertAdjacentHTML('beforeend',html);}
 function _vbAccionPracticaPostInforme(){try{if(typeof gtag==='function')gtag('event','cta_post_informe',{event_category:'conversion',event_label:'click_empezar_ahora'});if(typeof window.clarity==='function')window.clarity('event','cta_post_informe_click');}catch(e){}_vbMostrarSuscripcion();}
 </script>
 </head>
@@ -166,36 +166,102 @@ gtag('event','conversion',{send_to:'AW-632212911/generate_lead'});
 <div id="tabContents"></div>
 <div style="padding:20px"><div class="card" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);text-align:center"><h4 style="margin-bottom:12px">📥 Descargá tu informe</h4><p style="font-size:13px;color:#666;margin-bottom:14px">Elegí en qué voz querés leerlo:</p><div style="display:grid;gap:10px"><button class="btn btn-sage" onclick="downloadPDF('medico')">🩺 Médico Occidental</button><button class="btn btn-primary" onclick="downloadPDF('ayurveda')">🌿 Terapeuta Ayurvédico</button><button class="btn btn-gold" onclick="downloadPDF('amiga')">💚 Como una Amiga</button></div></div>
 
-<div id="vbBloquePostInforme" style="margin-top:20px">
-<div class="card" style="background:#F0FDF4;border-left:4px solid #7C9A73;padding:18px">
-<p style="font-size:15px;line-height:1.6;margin:0 0 8px"><strong>🌿 Hoy probaste Vedabite Esencia.</strong></p>
-<p style="font-size:14px;color:#5A7A53;margin:0">Es tuya, gratis, para siempre.</p>
+<div id="vbBloquePostInforme" style="margin-top:24px;font-family:inherit">
+
+<div style="text-align:center;padding:8px 0 20px">
+<div style="font-size:32px;letter-spacing:8px;color:#7C9A73;margin-bottom:4px">·  ·  ·</div>
+<p style="font-size:14px;color:#5A7A53;font-style:italic;margin:0;letter-spacing:0.3px">Bienvenida a tu camino</p>
 </div>
 
-<p style="text-align:center;font-size:13px;color:#666;margin:20px 0 12px">Si querés profundizar:</p>
-
-<div class="card" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:2px solid #D97706;padding:20px;text-align:center">
-<div style="font-size:36px;margin-bottom:8px">🔥</div>
-<h3 style="margin:0 0 4px;font-size:20px;color:#92400E">PRÁCTICA</h3>
-<p style="margin:0 0 16px;font-size:14px;color:#92400E"><strong>USD 20/mes</strong></p>
-
-<p style="font-size:15px;line-height:1.5;margin:0 0 16px;color:#1F2937"><strong>No solo qué hacer:</strong><br>te enseñamos cómo.</p>
-
-<div style="background:rgba(255,255,255,0.6);padding:14px;border-radius:10px;margin-bottom:16px;text-align:left;font-size:13px;line-height:1.9;color:#1F2937">
-<div>✓ Recetas paso a paso</div>
-<div>✓ Yoga con instrucciones</div>
-<div>✓ Meditaciones guiadas</div>
-<div>✓ Scanner ilimitado</div>
+<div style="background:#FAF7F0;border-radius:18px;padding:24px 22px;margin-bottom:24px;border:1px solid #E8DFC8">
+<div style="text-align:center;margin-bottom:16px">
+<div style="font-size:36px;margin-bottom:8px">🌿</div>
+<h3 style="margin:0;font-size:19px;color:#3D5A36;font-weight:600;letter-spacing:0.3px">Hoy probaste<br>Vedabite Esencia</h3>
+<p style="font-size:13px;color:#7C9A73;margin:8px 0 0;font-style:italic">Es tuya. Gratis. Para siempre.</p>
 </div>
 
-<button class="btn btn-gold" style="width:100%;font-weight:600" onclick="_vbAccionPracticaPostInforme()">Empezar ahora</button>
-<p style="margin:10px 0 0;font-size:11px;color:#92400E">30 días gratis · 50% off los primeros 3 meses</p>
+<div style="border-top:1px solid #E8DFC8;padding-top:16px;margin-top:16px">
+<p style="font-size:12px;color:#8B7355;text-transform:uppercase;letter-spacing:1.5px;margin:0 0 12px;text-align:center">Lo que llevás contigo</p>
+<div style="font-size:13px;line-height:2;color:#4A4A4A">
+<div>· Tu test ayurvédico de 60 preguntas</div>
+<div>· Tu carta natal védica</div>
+<div>· Tu informe en tres voces</div>
+<div>· Lista de alimentos según tu dosha</div>
+<div>· Resumen de tu constitución</div>
+<div>· 17 herramientas de bienestar</div>
+</div>
+</div>
 </div>
 
-<p style="text-align:center;font-size:13px;color:#888;margin:20px 0 0;font-style:italic">¿No estás lista? Volvé cuando quieras.<br>Tu Esencia está siempre acá.</p>
+<div style="background:linear-gradient(135deg,#3D5A36,#2D4226);color:#F5F1E8;padding:32px 24px;border-radius:20px;margin:32px 0;text-align:center;position:relative;overflow:hidden">
+<div style="font-size:24px;letter-spacing:6px;opacity:0.6;margin-bottom:12px">॥ ॐ ॥</div>
+<p style="font-size:11px;letter-spacing:2.5px;margin:0 0 16px;opacity:0.85;text-transform:uppercase">Manifiesto Vedabite</p>
+<p style="font-size:22px;line-height:1.45;margin:0 0 16px;font-weight:400;letter-spacing:0.3px;color:#F5F1E8">Invertí en longevidad.<br><em style="color:#D4B896">Recuperá hábitos naturales.</em></p>
+<div style="width:40px;height:1px;background:#D4B896;margin:18px auto"></div>
+<p style="font-size:14px;line-height:1.7;margin:0;opacity:0.9;font-style:italic;color:#E8DFC8">No gastes en remedios.<br>Gastá en la calidad de vida<br>que te rejuvenece.</p>
 </div>
 
-<button class="btn btn-outline" style="margin-top:20px" onclick="confirmRestart()">🔄 Rehacer el test</button></div>
+<p style="text-align:center;font-size:13px;color:#8B7355;margin:28px 0 16px;font-style:italic;letter-spacing:0.3px">Cuando estés lista para profundizar</p>
+
+<div style="background:linear-gradient(180deg,#FAF7F0,#F5EFE0);padding:32px 24px;text-align:center;border-radius:22px;border:1px solid #D4B896;box-shadow:0 4px 20px rgba(139,115,85,0.08)">
+
+<div style="margin-bottom:6px">
+<span style="display:inline-block;padding:5px 14px;background:#fff;border:1px solid #D4B896;border-radius:50px;font-size:10px;font-weight:600;color:#8B7355;letter-spacing:2px">SEGUNDO PASO</span>
+</div>
+
+<h3 style="margin:18px 0 6px;font-size:26px;color:#3D5A36;font-weight:500;letter-spacing:1px">Práctica</h3>
+<p style="font-size:13px;color:#8B7355;font-style:italic;margin:0 0 24px">El qué · El cómo · Los porqués</p>
+
+<div style="background:#fff;padding:20px 18px;border-radius:14px;margin-bottom:20px;font-size:14px;line-height:1.7;color:#3D5A36;font-style:italic;border:1px solid #E8DFC8">
+"No solo te decimos qué hacer.<br>Te enseñamos cómo."
+</div>
+
+<div style="text-align:left;margin-bottom:24px">
+<p style="font-size:11px;color:#8B7355;text-transform:uppercase;letter-spacing:1.5px;margin:0 0 14px;text-align:center">Tu práctica completa</p>
+<div style="font-size:13px;line-height:2;color:#4A4A4A">
+<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🪷 <strong>Mudras</strong> con instrucciones detalladas</div>
+<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🧘 <strong>Meditaciones</strong> guiadas paso a paso</div>
+<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🌬️ <strong>Pranayamas</strong> técnica completa</div>
+<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🍃 <strong>Recetas</strong> con preparación detallada</div>
+<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">⏳ <strong>Dinacharya</strong> tu rutina con porqués</div>
+<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🌿 <strong>Yoga</strong> personalizado por dosha</div>
+<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">💆 <strong>Terapias</strong> ayurvédicas aplicadas</div>
+<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🕉️ <strong>Chakras</strong> activación según tu energía</div>
+<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🔮 <strong>Tu proyección</strong> a 5, 10 y 20 años</div>
+<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🌾 <strong>Salud preventiva</strong> con plan semanal</div>
+<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">📷 <strong>Escáner</strong> de menús sin límites</div>
+<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">📍 <strong>Lugares cerca tuyo</strong> para tu dosha</div>
+<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">⭐ <strong>Carta natal</strong> védica completa</div>
+<div style="padding:6px 0">💌 <strong>Acompañamiento</strong> directo por mail</div>
+</div>
+</div>
+
+<div style="background:#fff;padding:20px;border-radius:14px;margin-bottom:24px;border:1px solid #E8DFC8;text-align:left">
+<p style="font-size:11px;color:#8B7355;text-transform:uppercase;letter-spacing:1.5px;margin:0 0 8px">Lo que te llevás</p>
+<p style="font-size:14px;line-height:1.6;color:#3D5A36;margin:0;font-style:italic">Una guía completa para revertir el desequilibrio que muestra tu informe.<br>Pasos claros para vivir más años. Mejor.</p>
+</div>
+
+<div style="margin-bottom:22px">
+<div style="font-size:11px;color:#8B7355;letter-spacing:2px;margin-bottom:6px">TU INVERSIÓN</div>
+<div style="font-size:13px;color:#999;text-decoration:line-through;margin-bottom:2px">USD 20 al mes</div>
+<div style="font-size:36px;font-weight:300;color:#3D5A36;line-height:1;letter-spacing:0.5px">USD 10<span style="font-size:16px;color:#7C9A73">/mes</span></div>
+<div style="font-size:12px;color:#7C9A73;margin-top:8px;font-style:italic">los primeros tres meses</div>
+<div style="font-size:11px;color:#999;margin-top:2px">después USD 20/mes</div>
+</div>
+
+<button class="btn btn-sage" style="width:100%;font-weight:500;font-size:15px;padding:16px;letter-spacing:0.5px;background:#5A7A53;border:none" onclick="_vbAccionPracticaPostInforme()">Comenzar mi camino</button>
+
+<div style="margin-top:16px;font-size:11px;color:#8B7355;letter-spacing:0.5px">
+<div style="margin-bottom:4px">🌱 30 días gratis para probarlo</div>
+<div>Sin tarjeta · Cancelás cuando quieras</div>
+</div>
+
+</div>
+
+<p style="text-align:center;font-size:13px;color:#8B7355;margin:28px 0 0;font-style:italic;line-height:1.7;letter-spacing:0.3px">¿No es el momento? Está bien.<br>Tu Esencia te espera siempre.</p>
+</div>
+
+<button class="btn btn-outline" style="margin-top:24px" onclick="confirmRestart()">🔄 Rehacer el test</button></div>
 </div>
 </div>
 <div class="nav-bar" id="navBar">
