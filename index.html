@@ -17,12 +17,6 @@ if(e.key==='F12')return e.preventDefault(),false;
 if(e.ctrlKey&&e.shiftKey&&/^[IJCijc]$/.test(e.key))return e.preventDefault(),false;
 if(e.ctrlKey&&/^[UuSsAaPp]$/.test(e.key))return e.preventDefault(),false;
 });
-(function(){
-  var _b=false;
-  function _block(){if(_b)return;_b=true;document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;background:#111;color:#fff"><h1>⚠️ Acceso no autorizado</h1></div>';}
-  var _h=0;
-  setInterval(function(){var t=performance.now();debugger;var dt=performance.now()-t;if(dt>80){_h++;if(_h>=2)_block();}else{_h=0;}},1200);
-})();
 window.addEventListener('load',function(){
   ['log','warn','error','info','debug','table','trace','dir','group','groupEnd'].forEach(function(m){console[m]=function(){};});
 });
@@ -119,7 +113,7 @@ window.clarity('event',eventName+(label?'_'+label:''));
 <div class="screen active" id="s1">
 <div style="padding:40px 20px;text-align:center">
 <div class="container">
-<p style="background:rgba(124,154,115,.15);color:#5A7A53;padding:8px 16px;border-radius:50px;display:inline-block;font-size:14px;font-weight:600;margin-bottom:24px">Ya realizaron el test <span id="vbContador">331</span> personas</p>
+<p style="background:rgba(124,154,115,.15);color:#5A7A53;padding:8px 16px;border-radius:50px;display:inline-block;font-size:14px;font-weight:600;margin-bottom:24px">Ya realizaron el test <span id="vbContador">370</span> personas</p>
 <h1 style="font-size:28px;margin-bottom:24px">Tu cuerpo <span style="color:var(--terracotta)">habla.</span></h1>
 <div style="position:relative;display:inline-block;width:100%">
 <button class="btn btn-cta-hero" onclick="startTest()">VEDABITE LO TRADUCE · DESCUBRILO</button>
@@ -134,11 +128,11 @@ window.clarity('event',eventName+(label?'_'+label:''));
 </style>
 <p style="font-size:14px;color:#7a7a7a;margin-top:16px">✓ 5 minutos · ✓ 100% gratis · ✓ 17 herramientas</p>
 <div style="display:flex;justify-content:center;gap:14px;margin-top:28px;flex-wrap:wrap">
-<div style="text-align:center;max-width:70px"><span style="font-size:28px;display:block">📋</span><span style="font-size:10px;color:#7a7a7a;line-height:1.3;display:block">Test<br>Dosha</span></div>
-<div style="text-align:center;max-width:70px"><span style="font-size:28px;display:block">📷</span><span style="font-size:10px;color:#7a7a7a;line-height:1.3;display:block">Escáner<br>de Menú</span></div>
-<div style="text-align:center;max-width:70px"><span style="font-size:28px;display:block">📄</span><span style="font-size:10px;color:#7a7a7a;line-height:1.3;display:block">Informe<br>3 Voces</span></div>
-<div style="text-align:center;max-width:70px"><span style="font-size:28px;display:block">🪐</span><span style="font-size:10px;color:#7a7a7a;line-height:1.3;display:block">Carta Astral<br>Védica</span></div>
-<div style="text-align:center;max-width:70px"><span style="font-size:28px;display:block">🧘</span><span style="font-size:10px;color:#7a7a7a;line-height:1.3;display:block">17 Áreas<br>a Ajustar</span></div>
+<div onclick="startTest()" style="text-align:center;max-width:70px;cursor:pointer;transition:transform .2s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"><span style="font-size:28px;display:block">📋</span><span style="font-size:10px;color:#7a7a7a;line-height:1.3;display:block">Test<br>Dosha</span></div>
+<div onclick="startTest()" style="text-align:center;max-width:70px;cursor:pointer;transition:transform .2s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"><span style="font-size:28px;display:block">📷</span><span style="font-size:10px;color:#7a7a7a;line-height:1.3;display:block">Escáner<br>de Menú</span></div>
+<div onclick="startTest()" style="text-align:center;max-width:70px;cursor:pointer;transition:transform .2s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"><span style="font-size:28px;display:block">📄</span><span style="font-size:10px;color:#7a7a7a;line-height:1.3;display:block">Informe<br>3 Voces</span></div>
+<div onclick="startTest()" style="text-align:center;max-width:70px;cursor:pointer;transition:transform .2s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"><span style="font-size:28px;display:block">🪐</span><span style="font-size:10px;color:#7a7a7a;line-height:1.3;display:block">Carta Astral<br>Védica</span></div>
+<div onclick="startTest()" style="text-align:center;max-width:70px;cursor:pointer;transition:transform .2s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"><span style="font-size:28px;display:block">🧘</span><span style="font-size:10px;color:#7a7a7a;line-height:1.3;display:block">17 Áreas<br>a Ajustar</span></div>
 </div>
 <div id="savedSession" style="display:none;margin-top:24px"><div class="card"><p style="margin-bottom:12px">🎉 ¡Tenés una sesión guardada!</p><button class="btn btn-sage" onclick="loadSession()">CONTINUAR MI PERFIL →</button><button class="btn btn-outline" style="margin-top:8px" onclick="clearSession()">Empezar de nuevo</button></div></div>
 </div>
@@ -282,7 +276,8 @@ window.clarity('event',eventName+(label?'_'+label:''));
 <p style="text-align:center;font-size:13px;color:#8B7355;margin:28px 0 0;font-style:italic;line-height:1.7;letter-spacing:0.3px">¿No es el momento? Está bien.<br>Tu Esencia te espera siempre.</p>
 </div>
 
-<button class="btn btn-outline" style="margin-top:24px" onclick="confirmRestart()">🔄 Rehacer el test</button></div>
+<button class="btn btn-outline" style="margin-top:24px" onclick="confirmRestart()">🔄 Rehacer el test</button>
+</div>
 </div>
 </div>
 <div class="nav-bar" id="navBar">
@@ -419,7 +414,7 @@ function answer(a,e){ans[a]+=e,(60<=++qi?showEmail:renderQ)()}
 function prevQ(){0<qi?(qi--,renderQ()):show("s1")}
 function getRes(){var a=ans.vata+ans.pitta+ans.kapha||1,e="vata";return ans.pitta>ans[e]&&(e="pitta"),{p:e=ans.kapha>ans[e]?"kapha":e,pct:{vata:Math.round(ans.vata/a*100),pitta:Math.round(ans.pitta/a*100),kapha:Math.round(ans.kapha/a*100)}}}
 function showEmail(){res=getRes();var a=D[res.p];document.getElementById("eDosha").textContent=a.e,document.getElementById("eName").textContent=a.n,show("s3")}
-function submitEmail(){var a=document.getElementById("emailIn").value;if(!a||!a.includes("@"))return alert("Email inválido");userEmail=a;var e=D[res.p];emailjs.send("service_xf7v0x7","template_vzggqyx",{to_email:a,dosha_name:e.n,dosha_emoji:e.e,dosha_desc:e.desc,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha}).then(function(){}).catch(function(a){});try{if(window._vbSaveLead)window._vbSaveLead({email:a,dosha:res.p,dosha_name:e.n,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha,trialStart:new Date().toISOString(),trialEnd:new Date(Date.now()+7*24*60*60*1000).toISOString(),paid:false,source:document.referrer||"direct",utm:location.search||""}).catch(function(){});}catch(e){}try{gtag("event","generate_lead");if(window._vbTrack)window._vbTrack()}catch(a){}saveSession(),showResults()}
+function submitEmail(){var a=document.getElementById("emailIn").value;if(!a||!a.includes("@"))return alert("Email inválido");userEmail=a;var e=D[res.p];emailjs.send("service_xf7v0x7","template_vzggqyx",{to_email:a,dosha_name:e.n,dosha_emoji:e.e,dosha_desc:e.desc,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha}).then(function(){}).catch(function(a){});try{if(window._vbSaveLead)window._vbSaveLead({email:a,dosha:res.p,dosha_name:e.n,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha,trialStart:new Date().toISOString(),trialEnd:new Date(Date.now()+10*24*60*60*1000).toISOString(),paid:false,source:document.referrer||"direct",utm:location.search||""}).catch(function(){});}catch(e){}try{localStorage.setItem("vb_trialStart",new Date().toISOString());gtag("event","generate_lead");if(window._vbTrack)window._vbTrack()}catch(a){}saveSession(),showResults()}
 function showResults(){var a=D[res.p];document.getElementById("resHeader").style.background=a.bg,document.getElementById("resEmoji").textContent=a.e,document.getElementById("resName").textContent=a.n,document.getElementById("resDesc").textContent=a.desc,document.getElementById("resPct").innerHTML=Object.entries(res.pct).sort(function(a,e){return e[1]-a[1]}).map(function(a){return'<div style="background:#fff;padding:8px 16px;border-radius:8px"><div style="font-weight:700;color:'+D[a[0]].c+'">'+a[1]+'%</div><div style="font-size:12px">'+D[a[0]].e+"</div></div>"}).join(""),document.getElementById("tabsGrid").innerHTML=T.map(function(a){var emojiHTML=a.id==="escanerEquilibrio"?'<span style="font-size:1.3rem;letter-spacing:3px;display:block;margin-bottom:8px">'+a.e+'</span>':'<span>'+a.e+'</span>';return'<div class="tab-card'+(a.p?" premium":"")+'" style="position:relative" onclick="showTab(\''+a.id+"')\">"+emojiHTML+"<strong>"+a.t+"</strong>"+(a.p?'<span class="premium-tag">PREMIUM</span>':"")+"</div>"}).join(""),renderTabs(a),show("s4")}
 function tips(a){return a&&a.length?'<div style="margin-top:20px"><h4 style="margin-bottom:12px">💡 7 Tips Personalizados</h4>'+a.map(function(a,e){return'<div class="tip-card"><span class="tip-num">'+(e+1)+"</span>"+a+"</div>"}).join("")+"</div>":""}
 function showTab(a){document.querySelectorAll(".tab-content").forEach(function(a){a.classList.remove("active")});var el=document.getElementById("t-"+a);if(el){el.classList.add("active");document.getElementById("tabsGrid").style.display="none";window.scrollTo(0,0);if(a==="escanerEquilibrio"){try{var dd=res&&res.p?res.p:"desconocido";if(window._vbTrack)window._vbTrack("tab_abierto",{tab:"escaner_equilibrio",dosha:dd});if(typeof window._vbFetchEstadoEscaner==='function')window._vbFetchEstadoEscaner();if(!el._vbBound){el._vbBound=true;el.addEventListener("click",function(ev){var card=ev.target.closest("[data-sec]");if(card){try{if(window._vbTrack)window._vbTrack("escaner_seccion",{seccion:card.getAttribute("data-sec"),dosha:card.getAttribute("data-dosha")});}catch(e){}}});}}catch(e){}}}}
@@ -1481,6 +1476,498 @@ window._vbFetchEstadoEscaner=function(){
     }catch(err){}
   },true);
   console.log('VedaBite tracking global activo');
+})();
+</script>
+
+<script>
+/* ============================================
+   VEDABITE — DETECTOR DE TRIAL + REGALO SIMPLE
+   ============================================ */
+(function(){
+  // DETECTOR DE TRIAL VENCIDO
+  try{
+    var trialStart=localStorage.getItem('vb_trialStart');
+    var hasSesion=localStorage.getItem('vb_res');
+    
+    if(hasSesion){
+      var diasDesdeTest=0;
+      if(trialStart){
+        diasDesdeTest=Math.floor((Date.now()-new Date(trialStart).getTime())/(1000*60*60*24));
+      }
+      
+      // Trackear retorno
+      if(typeof gtag==='function'){
+        gtag('event','sesion_retorno',{
+          event_category:'retention',
+          event_label:'dia_'+diasDesdeTest,
+          dias_desde_test:diasDesdeTest,
+          trial_vencido:diasDesdeTest>10
+        });
+      }
+      
+      // Si pasaron más de 10 días
+      if(diasDesdeTest>10){
+        if(typeof gtag==='function'){
+          gtag('event','trial_vencido',{
+            event_category:'conversion',
+            event_label:'dia_'+diasDesdeTest,
+            dias_desde_test:diasDesdeTest
+          });
+        }
+        if(typeof window.clarity==='function') window.clarity('event','trial_vencido_dia_'+diasDesdeTest);
+        
+        // Guardar en Firebase
+        if(window._vbDB){
+          var email=localStorage.getItem('vb_email')||'anon';
+          window._vbDB.collection('trial_vencidos').add({
+            email:email,
+            dias:diasDesdeTest,
+            timestamp:firebase.firestore.FieldValue.serverTimestamp()
+          }).catch(function(){});
+        }
+      }
+      
+      // Trackear en qué rango está
+      if(diasDesdeTest>=1 && diasDesdeTest<=3){
+        if(typeof gtag==='function') gtag('event','retorno_temprano',{event_category:'retention',dias:diasDesdeTest});
+      } else if(diasDesdeTest>=4 && diasDesdeTest<=7){
+        if(typeof gtag==='function') gtag('event','retorno_medio',{event_category:'retention',dias:diasDesdeTest});
+      } else if(diasDesdeTest>=8 && diasDesdeTest<=10){
+        if(typeof gtag==='function') gtag('event','retorno_pre_vencimiento',{event_category:'retention',dias:diasDesdeTest});
+      } else if(diasDesdeTest>10){
+        if(typeof gtag==='function') gtag('event','retorno_post_vencimiento',{event_category:'retention',dias:diasDesdeTest});
+      }
+    }
+  }catch(e){}
+
+  // REGALO — CUPÓN DESCARGABLE
+  var origShowResults=window.showResults;
+  if(origShowResults){
+    window.showResults=function(){
+      origShowResults();
+      setTimeout(function(){
+        var header=document.getElementById('resHeader');
+        if(header && !document.getElementById('vbCuponBtn')){
+          var div=document.createElement('div');
+          div.id='vbCuponBtn';
+          div.innerHTML='<div style="margin:16px 20px;text-align:center">'
+            +'<button onclick="generarCupon()" style="display:inline-block;padding:14px 28px;background:linear-gradient(135deg,#E67E22,#D35400);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(230,126,34,.3)">🎁 REGALÁ BIENESTAR</button>'
+            +'<p style="font-size:11px;color:#8B7355;margin-top:8px">Descargá un cupón y mandalo a quien quieras</p>'
+            +'</div>';
+          header.after(div);
+        }
+      },500);
+    };
+  }
+})();
+
+// Generar cupón como imagen descargable
+function generarCupon(){
+  try{if(typeof gtag==='function')gtag('event','cupon_generado',{event_category:'referido'})}catch(e){}
+  
+  var dosha=res&&res.p?res.p:'vata';
+  var doshaInfo={vata:{emoji:'🌬️',color:'#B482DC',nombre:'Vata'},pitta:{emoji:'🔥',color:'#DC82A0',nombre:'Pitta'},kapha:{emoji:'🌍',color:'#82DCAA',nombre:'Kapha'}};
+  var d=doshaInfo[dosha]||doshaInfo.vata;
+  
+  var canvas=document.createElement('canvas');
+  canvas.width=1080;
+  canvas.height=1920;
+  var ctx=canvas.getContext('2d');
+  
+  // Fondo violeta profundo
+  var grad=ctx.createLinearGradient(0,0,0,1920);
+  grad.addColorStop(0,'#1a1020');
+  grad.addColorStop(0.3,'#2d1a3d');
+  grad.addColorStop(0.6,'#1a1020');
+  grad.addColorStop(1,'#2d1a3d');
+  ctx.fillStyle=grad;
+  ctx.fillRect(0,0,1080,1920);
+  
+  // Glow central sutil
+  var glow=ctx.createRadialGradient(540,700,0,540,700,500);
+  glow.addColorStop(0,'rgba(180,130,220,.08)');
+  glow.addColorStop(1,'transparent');
+  ctx.fillStyle=glow;
+  ctx.fillRect(0,0,1080,1920);
+  
+  // Borde sutil
+  ctx.strokeStyle='rgba(180,130,220,.2)';
+  ctx.lineWidth=2;
+  ctx.strokeRect(40,40,1000,1840);
+  ctx.strokeStyle='rgba(180,130,220,.1)';
+  ctx.lineWidth=1;
+  ctx.strokeRect(55,55,970,1810);
+  
+  // Puntos en las esquinas
+  ctx.fillStyle='rgba(180,130,220,.4)';
+  [[55,55],[1025,55],[55,1865],[1025,1865]].forEach(function(c){
+    ctx.beginPath();ctx.arc(c[0],c[1],4,0,Math.PI*2);ctx.fill();
+  });
+  
+  // Mandala — dibujar uno geométrico con canvas
+  ctx.save();
+  ctx.translate(540,380);
+  // Círculos concéntricos
+  [120,100,80,60,40].forEach(function(r,i){
+    ctx.strokeStyle='rgba(180,130,220,'+(0.15+i*0.05)+')';
+    ctx.lineWidth=1;
+    ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.stroke();
+  });
+  // Pétalos
+  ctx.strokeStyle='rgba(180,130,220,.25)';
+  ctx.lineWidth=1;
+  for(var i=0;i<12;i++){
+    ctx.save();
+    ctx.rotate(i*Math.PI/6);
+    ctx.beginPath();
+    ctx.ellipse(0,-70,15,40,0,0,Math.PI*2);
+    ctx.stroke();
+    ctx.restore();
+  }
+  // Pétalos internos
+  ctx.strokeStyle='rgba(180,130,220,.35)';
+  for(var i=0;i<8;i++){
+    ctx.save();
+    ctx.rotate(i*Math.PI/4);
+    ctx.beginPath();
+    ctx.ellipse(0,-45,10,25,0,0,Math.PI*2);
+    ctx.stroke();
+    ctx.restore();
+  }
+  // Centro
+  ctx.fillStyle='rgba(180,130,220,.3)';
+  ctx.beginPath();ctx.arc(0,0,12,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(228,213,245,.5)';
+  ctx.beginPath();ctx.arc(0,0,5,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+  
+  // Om debajo del mandala
+  ctx.fillStyle='rgba(180,130,220,.6)';
+  ctx.font='32px serif';
+  ctx.textAlign='center';
+  ctx.fillText('ॐ',540,540);
+  
+  // Título
+  ctx.fillStyle='#B482DC';
+  ctx.font='600 20px sans-serif';
+  ctx.letterSpacing='4px';
+  ctx.fillText('EL CAMINO SE ABRE',540,620);
+  
+  // Línea
+  ctx.strokeStyle='rgba(180,130,220,.3)';
+  ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(400,650);ctx.lineTo(680,650);ctx.stroke();
+  
+  // Subtítulo
+  ctx.fillStyle='#8B6AAE';
+  ctx.font='italic 22px serif';
+  ctx.fillText('Una invitación al autoconocimiento',540,700);
+  
+  // Invitación
+  ctx.fillStyle='#E8D5F5';
+  ctx.font='700 52px sans-serif';
+  ctx.fillText('10 días gratis',540,810);
+  ctx.font='300 36px sans-serif';
+  ctx.fillText('de Vedabite',540,870);
+  
+  // GPS
+  ctx.fillStyle='#B482DC';
+  ctx.font='italic 24px serif';
+  ctx.fillText('Tu GPS del Bienestar',540,930);
+  
+  // Línea
+  ctx.strokeStyle='rgba(180,130,220,.3)';
+  ctx.beginPath();ctx.moveTo(380,970);ctx.lineTo(700,970);ctx.stroke();
+  
+  // Mensaje central — hook
+  ctx.fillStyle='#E8D5F5';
+  ctx.font='italic 30px serif';
+  ctx.fillText('Tu cuerpo habla.',540,1060);
+  ctx.fillStyle='#B482DC';
+  ctx.font='italic 26px serif';
+  ctx.fillText('Vedabite lo traduce.',540,1110);
+  ctx.fillStyle='#8B6AAE';
+  ctx.font='italic 24px serif';
+  ctx.fillText('¿Ya escuchaste el tuyo?',540,1170);
+  
+  // Línea
+  ctx.strokeStyle='rgba(180,130,220,.3)';
+  ctx.beginPath();ctx.moveTo(380,1220);ctx.lineTo(700,1220);ctx.stroke();
+  
+  // Link grande
+  ctx.fillStyle='#E8D5F5';
+  ctx.font='700 24px sans-serif';
+  ctx.fillText('ENTRÁ ACÁ',540,1300);
+  ctx.font='700 42px sans-serif';
+  ctx.fillText('vedabite.com',540,1360);
+  
+  ctx.fillStyle='#8B6AAE';
+  ctx.font='400 22px sans-serif';
+  ctx.fillText('Hacé el test · 5 minutos · Gratis',540,1420);
+  
+  // Línea
+  ctx.strokeStyle='rgba(180,130,220,.2)';
+  ctx.beginPath();ctx.moveTo(400,1470);ctx.lineTo(680,1470);ctx.stroke();
+  
+  // Quién regala con dosha
+  ctx.fillStyle=d.color;
+  ctx.font='44px serif';
+  ctx.fillText(d.emoji,540,1550);
+  ctx.fillStyle='#B482DC';
+  ctx.font='italic 22px serif';
+  ctx.fillText('Te lo regala alguien',540,1600);
+  ctx.fillText('que ya descubrió su '+d.nombre+'.',540,1640);
+  ctx.fillStyle='#8B6AAE';
+  ctx.font='italic 20px serif';
+  ctx.fillText('¿Vos ya sabés cuál es el tuyo?',540,1690);
+  
+  // Footer
+  ctx.strokeStyle='rgba(180,130,220,.2)';
+  ctx.beginPath();ctx.moveTo(400,1740);ctx.lineTo(680,1740);ctx.stroke();
+  ctx.fillStyle='rgba(180,130,220,.5)';
+  ctx.font='400 18px sans-serif';
+  ctx.fillText('॥ ॐ ॥ · Invertí en longevidad',540,1790);
+  ctx.fillStyle='rgba(139,106,174,.5)';
+  ctx.font='400 14px sans-serif';
+  ctx.fillText('Sin tarjeta · Cancelás cuando quieras',540,1830);
+  
+  // Pequeños destellos decorativos
+  ctx.fillStyle='rgba(180,130,220,.3)';
+  [[150,200,3],[900,300,2],[120,800,2],[950,900,3],[180,1400,2],[880,1500,3],[200,1700,2],[850,1750,2]].forEach(function(s){
+    ctx.beginPath();ctx.arc(s[0],s[1],s[2],0,Math.PI*2);ctx.fill();
+  });
+  
+  // Descargar
+  canvas.toBlob(function(blob){
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;
+    a.download='Vedabite-Invitacion.png';
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    var msg=document.createElement('div');
+    msg.innerHTML='<div style="position:fixed;bottom:20px;left:20px;right:20px;background:linear-gradient(135deg,#2d1a3d,#1a1020);padding:16px;border-radius:12px;text-align:center;z-index:5000;box-shadow:0 4px 20px rgba(0,0,0,.3);border:1px solid rgba(180,130,220,.3)"><p style="margin:0 0 8px;font-size:14px;color:#E8D5F5;font-weight:600">☸️ ¡Invitación descargada!</p><p style="margin:0;font-size:12px;color:#B482DC">Mandala por WhatsApp, Instagram o como quieras. Sin límite 🌿</p></div>';
+    document.body.appendChild(msg);
+    setTimeout(function(){msg.remove()},5000);
+    
+    try{if(typeof gtag==='function')gtag('event','cupon_descargado',{event_category:'referido',dosha:dosha,diseno:'mandala'})}catch(e){}
+    try{if(window._vbDB)window._vbDB.collection('cupones').add({email:userEmail||'anon',dosha:dosha,diseno:'mandala',timestamp:firebase.firestore.FieldValue.serverTimestamp()}).catch(function(){})}catch(e){}
+  },'image/png');
+}
+</script>
+
+<script>
+/* ============================================
+   VEDABITE — SISTEMA DE REGALO / REFERIDOS
+   ============================================ */
+function enviarRegalo(){
+  var nombre=document.getElementById('regaloNombre').value.trim();
+  var contacto=document.getElementById('regaloContacto').value.trim();
+  if(!nombre){alert('Poné el nombre de tu amiga/o');return}
+  if(!contacto){alert('Poné el WhatsApp o email');return}
+  
+  var esWhatsApp=contacto.match(/^\+?\d[\d\s\-]{6,}/);
+  var esEmail=contacto.includes('@');
+  
+  if(!esWhatsApp && !esEmail){alert('Ingresá un WhatsApp válido (con código de país) o un email');return}
+  
+  // Guardar en Firebase
+  try{
+    if(window._vbDB){
+      window._vbDB.collection('regalos').add({
+        de_email:window.userEmail||'anónimo',
+        de_dosha:window.res?window.res.p:'desconocido',
+        para_nombre:nombre,
+        para_contacto:contacto,
+        tipo:esWhatsApp?'whatsapp':'email',
+        timestamp:firebase.firestore.FieldValue.serverTimestamp(),
+        createdAt:new Date().toISOString(),
+        enviado:false
+      }).catch(function(){});
+    }
+  }catch(e){}
+  
+  // Tracking GA4
+  try{
+    if(typeof gtag==='function'){
+      gtag('event','regalo_enviado',{
+        event_category:'referido',
+        event_label:esWhatsApp?'whatsapp':'email',
+        de_dosha:window.res?window.res.p:'desconocido'
+      });
+    }
+    if(typeof window.clarity==='function') window.clarity('event','regalo_enviado');
+  }catch(e){}
+  
+  if(esWhatsApp){
+    // Abrir WhatsApp con mensaje predefinido
+    var tel=contacto.replace(/[\s\-\(\)]/g,'');
+    if(!tel.startsWith('+'))tel='+'+tel;
+    var msg=encodeURIComponent('¡Hola '+nombre+'! 🌿\n\nTe regalo algo que me hizo conocerme mejor: el Test de Bienestar de Vedabite.\n\nEn 5 minutos descubrís qué dice tu cuerpo y qué necesita.\n\n👉 vedabite.com\n\nEs gratis. Probalo. 💚');
+    window.open('https://wa.me/'+tel.replace('+','')+'?text='+msg,'_blank');
+  } else {
+    // Para email: guardar en Firebase y mostrar confirmación
+    // El email se envía desde Firebase (server-side)
+  }
+  
+  // Mostrar confirmación
+  document.getElementById('regaloOk').style.display='block';
+  document.getElementById('regaloNombre').value='';
+  document.getElementById('regaloContacto').value='';
+  
+  // Ocultar después de 5 segundos
+  setTimeout(function(){document.getElementById('regaloOk').style.display='none'},5000);
+}
+
+<script>
+/* ============================================
+   VEDABITE — BOTONES DE COMPRA MÚLTIPLES
+   4 touchpoints según los maestros
+   ============================================ */
+(function(){
+  var lsURL='https://vedabite.lemonsqueezy.com/checkout/buy/ec74072d-7b30-4273-b369-1950cc7820d0';
+  
+  function ctaHTML(texto,subtexto,estilo){
+    return '<div class="vb-cta-practica" style="margin:20px 0;padding:20px;background:linear-gradient(135deg,#FAF7F0,#F5EFE0);border-radius:16px;border:1px solid #E8DFC8;text-align:center'+(estilo||'')+'">'
+      +'<p style="font-size:13px;color:#5A7A53;margin:0 0 12px;font-style:italic">'+subtexto+'</p>'
+      +'<a href="'+lsURL+'" target="_blank" onclick="try{gtag(\'event\',\'click_compra_inline\',{event_category:\'conversion\',event_label:\''+texto.substring(0,30)+'\'})}catch(e){}" style="display:block;padding:14px 20px;background:linear-gradient(135deg,#E67E22,#D35400);color:#fff;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:0.3px">'+texto+'</a>'
+      +'<p style="font-size:11px;color:#8B7355;margin:10px 0 0">🌱 10 días gratis · Cancelás cuando quieras</p>'
+      +'</div>';
+  }
+
+  // PUNTO 1: Después de descargar el PDF
+  var origDownload=window.downloadPDF;
+  if(origDownload){
+    window.downloadPDF=function(voz){
+      origDownload(voz);
+      // Después de la descarga, insertar CTA si no existe
+      setTimeout(function(){
+        var pdfSection=document.querySelector('#vbBloquePostInforme');
+        if(pdfSection && !pdfSection.querySelector('.vb-cta-post-pdf')){
+          var div=document.createElement('div');
+          div.className='vb-cta-post-pdf';
+          div.innerHTML=ctaHTML(
+            '🌿 QUIERO SABER CÓMO EQUILIBRARME',
+            'Tu informe te dice QUÉ pasa. Práctica te enseña CÓMO resolverlo.'
+          );
+          pdfSection.insertBefore(div,pdfSection.firstChild);
+          try{gtag('event','cta_post_pdf_mostrado',{event_category:'conversion'})}catch(e){}
+        }
+      },1500);
+    };
+  }
+
+  // PUNTO 2: Después de explorar 3 tabs
+  var tabCount=0;
+  var origShowTab=window.showTab;
+  if(origShowTab){
+    window.showTab=function(id){
+      origShowTab(id);
+      tabCount++;
+      if(tabCount===3){
+        setTimeout(function(){
+          var tabContents=document.getElementById('tabContents');
+          if(tabContents && !document.querySelector('.vb-cta-3tabs')){
+            var div=document.createElement('div');
+            div.className='vb-cta-3tabs';
+            div.innerHTML=ctaHTML(
+              '🧘 ACCEDÉ A TU PRÁCTICA COMPLETA',
+              'Ya exploraste 3 áreas. Imaginate tener las 17 con instrucciones paso a paso.'
+            );
+            // Insertar como banner flotante temporal
+            div.style.cssText='position:fixed;bottom:0;left:0;right:0;z-index:3000;padding:0 12px 12px;animation:slideUp .4s ease';
+            document.body.appendChild(div);
+            try{gtag('event','cta_3tabs_mostrado',{event_category:'conversion'})}catch(e){}
+            // Cerrar después de 15 segundos si no toca
+            setTimeout(function(){if(div.parentNode)div.style.opacity='0';setTimeout(function(){if(div.parentNode)div.remove()},500)},15000);
+          }
+        },2000);
+      }
+    };
+  }
+
+  // PUNTO 3: Botón en la navbar inferior
+  var navbar=document.querySelector('.bottom-nav');
+  if(navbar){
+    var pracBtn=document.createElement('button');
+    pracBtn.className='nb4';
+    pracBtn.onclick=function(){
+      window._vbMostrarSuscripcion();
+      try{gtag('event','cta_navbar_practica',{event_category:'conversion'})}catch(e){}
+    };
+    pracBtn.textContent='🌿 Práctica';
+    pracBtn.style.cssText='background:linear-gradient(135deg,#E67E22,#D35400);color:#fff;border:none;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer';
+    navbar.appendChild(pracBtn);
+  }
+
+  // Animación slideUp para el banner
+  var style=document.createElement('style');
+  style.textContent='@keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}.vb-cta-practica a:active{transform:scale(0.97)}';
+  document.head.appendChild(style);
+})();
+</script>
+
+<script>
+/* ============================================
+   VEDABITE — ADAPTACIÓN REGIONAL
+   Colombia/México = tú | Argentina = vos
+   ============================================ */
+(function(){
+  try{
+    fetch('https://ipapi.co/json/',{signal:AbortSignal.timeout(3000)}).then(function(r){return r.json()}).then(function(data){
+      var pais=data.country_code||'';
+      if(typeof gtag==='function') gtag('event','pais_detectado',{event_category:'geo',pais:pais});
+      
+      // Si NO es Argentina, cambiar a "tú"
+      if(pais && pais!=='AR'){
+        // Botón CTA
+        var cta=document.querySelector('.btn-cta-hero');
+        if(cta) cta.textContent='VEDABITE LO TRADUCE · DESCÚBRELO';
+        
+        // Textos del hero
+        var h1=document.querySelector('h1');
+        if(h1 && h1.textContent.includes('habla')){
+          // h1 no cambia — "Tu cuerpo habla" es universal
+        }
+        
+        // Textos de botones y labels
+        document.querySelectorAll('button, a, p, h2, h3, h4, span, div').forEach(function(el){
+          if(el.children.length>3) return; // skip containers
+          var t=el.textContent;
+          if(!t || t.length>200) return;
+          // Cambios específicos de vos → tú
+          var changed=t
+            .replace(/\bDescubrilo\b/g,'Descúbrelo')
+            .replace(/\bDescubrí\b/g,'Descubre')
+            .replace(/\bConocé\b/g,'Conoce')
+            .replace(/\bHacé\b/g,'Haz')
+            .replace(/\bCompletá\b/g,'Completa')
+            .replace(/\bMejorá\b/g,'Mejora')
+            .replace(/\bElegí\b/g,'Elige')
+            .replace(/\bProbá\b/g,'Prueba')
+            .replace(/\bComé\b/g,'Come')
+            .replace(/\bEvitá\b/g,'Evita')
+            .replace(/\bTomá\b/g,'Toma')
+            .replace(/\bSentate\b/g,'Siéntate')
+            .replace(/\bMantené\b/g,'Mantén')
+            .replace(/\bRegalá\b/g,'Regala')
+            .replace(/\bDescargá\b/g,'Descarga')
+            .replace(/\bMandalo\b/g,'Mándalo')
+            .replace(/\bSos\b/g,'Eres')
+            .replace(/\bTenés\b/g,'Tienes')
+            .replace(/\bNecesitás\b/g,'Necesitas')
+            .replace(/\bPodés\b/g,'Puedes')
+            .replace(/\bQuerés\b/g,'Quieres')
+            .replace(/\bSentís\b/g,'Sientes')
+            .replace(/\btu dosha\b/gi,'tu dosha')
+            .replace(/\bpara vos\b/gi,'para ti')
+            .replace(/\bCancelás\b/g,'Cancelas');
+          if(changed!==t) el.textContent=changed;
+        });
+      }
+    }).catch(function(){});
+  }catch(e){}
 })();
 </script>
 
