@@ -87,7 +87,7 @@ firebase.initializeApp({apiKey:"AIzaSyCxTOtGmdzdaYQghf270VenmVzMaeZnlOM",authDom
 window._vbDB=firebase.firestore();
 window._vbSaveLead=function(d){try{return window._vbDB.collection("leads").add(Object.assign({},d,{timestamp:firebase.firestore.FieldValue.serverTimestamp(),createdAt:new Date().toISOString()})).catch(function(e){console.warn('Firestore lead no guardado:',e.code);try{var leads=JSON.parse(localStorage.getItem('vb_leads_pendientes')||'[]');leads.push(Object.assign({},d,{createdAt:new Date().toISOString()}));localStorage.setItem('vb_leads_pendientes',JSON.stringify(leads));}catch(err){}return null;});}catch(e){return Promise.resolve(null);}};
 function _vbMostrarSuscripcion(){var html='<div onclick="this.remove()" style="position:fixed;inset:0;background:rgba(45,66,38,0.85);z-index:4000;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto"><div onclick="event.stopPropagation()" style="background:#FAF7F0;padding:32px 24px;border-radius:22px;max-width:420px;width:100%;text-align:center;margin:20px 0;border:1px solid #E8DFC8">'+'<div style="background:linear-gradient(135deg,#3D5A36,#2D4226);color:#F5F1E8;padding:24px 20px;border-radius:18px;margin-bottom:24px;text-align:center">'+'<div style="font-size:20px;letter-spacing:5px;opacity:0.6;margin-bottom:10px">॥ ॐ ॥</div>'+'<p style="font-size:10px;letter-spacing:2.5px;margin:0 0 12px;opacity:0.85;text-transform:uppercase">Manifiesto Vedabite</p>'+'<p style="font-size:18px;line-height:1.4;margin:0 0 12px;font-weight:400;color:#F5F1E8">Invertí en longevidad.<br><em style="color:#D4B896">Recuperá hábitos naturales.</em></p>'+'<div style="width:30px;height:1px;background:#D4B896;margin:14px auto"></div>'+'<p style="font-size:12px;line-height:1.6;margin:0;opacity:0.9;font-style:italic;color:#E8DFC8">No gastes en remedios.<br>Gastá en la calidad de vida<br>que te rejuvenece.</p>'+'</div>'+'<div style="margin-bottom:6px">'+'<span style="display:inline-block;padding:5px 14px;background:#fff;border:1px solid #D4B896;border-radius:50px;font-size:10px;font-weight:600;color:#8B7355;letter-spacing:2px">SEGUNDO PASO</span>'+'</div>'+'<h2 style="margin:18px 0 6px;font-size:26px;color:#3D5A36;font-weight:500;letter-spacing:1px">Práctica</h2>'+'<p style="font-size:13px;color:#8B7355;font-style:italic;margin:0 0 22px">El qué · El cómo · Los porqués</p>'+'<div style="background:#fff;padding:18px 16px;border-radius:14px;margin-bottom:22px;font-size:14px;line-height:1.7;color:#3D5A36;font-style:italic;border:1px solid #E8DFC8">'+'"No solo te decimos qué hacer.<br>Te enseñamos cómo."'+'</div>'+'<div style="text-align:left;margin-bottom:22px">'+'<p style="font-size:11px;color:#8B7355;text-transform:uppercase;letter-spacing:1.5px;margin:0 0 14px;text-align:center">Tu práctica completa</p>'+'<div style="font-size:13px;line-height:2;color:#4A4A4A">'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🪷 <strong>Mudras</strong> con instrucciones detalladas</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🧘 <strong>Meditaciones</strong> guiadas paso a paso</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🌬️ <strong>Pranayamas</strong> técnica completa</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🍃 <strong>Recetas</strong> con preparación detallada</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">⏳ <strong>Dinacharya</strong> tu rutina con porqués</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🌿 <strong>Yoga</strong> personalizado por dosha</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">💆 <strong>Terapias</strong> ayurvédicas aplicadas</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🕉️ <strong>Chakras</strong> activación según tu energía</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🔮 <strong>Tu proyección</strong> a 5, 10 y 20 años</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🌾 <strong>Salud preventiva</strong> con plan semanal</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">📷 <strong>Escáner</strong> de menús sin límites</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">📍 <strong>Lugares cerca tuyo</strong> para tu dosha</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🪐 <strong>Carta astral</strong> védica completa</div>'+'<div style="padding:6px 0">💌 <strong>Acompañamiento</strong> directo por mail</div>'+'</div>'+'</div>'+'<div style="background:#fff;padding:18px;border-radius:14px;margin-bottom:22px;border:1px solid #E8DFC8;text-align:left">'+'<p style="font-size:11px;color:#8B7355;text-transform:uppercase;letter-spacing:1.5px;margin:0 0 8px">Lo que te llevás</p>'+'<p style="font-size:14px;line-height:1.6;color:#3D5A36;margin:0;font-style:italic">Una guía completa para revertir el desequilibrio que muestra tu informe.<br>Pasos claros para vivir más años. Mejor.</p>'+'</div>'+'<div style="margin-bottom:22px">'+'<div style="font-size:11px;color:#8B7355;letter-spacing:2px;margin-bottom:6px">TU INVERSIÓN</div>'+'<div style="font-size:36px;font-weight:300;color:#3D5A36;line-height:1;letter-spacing:0.5px">USD 20<span style="font-size:16px;color:#7C9A73">/mes</span></div>'+'</div>'+'<div style="background:#fff;border:1px solid #E8DFC8;padding:14px;border-radius:12px;margin-bottom:18px;font-size:12px;color:#8B7355;line-height:1.6;font-style:italic">🌱 <a href="https://vedabite.lemonsqueezy.com/checkout/buy/ec74072d-7b30-4273-b369-1950cc7820d0" target="_blank" style="display:inline-block;width:100%;padding:16px;background:#5A7A53;color:#fff;border-radius:14px;font-size:15px;font-weight:500;text-align:center;text-decoration:none">Comenzar mi camino</a></div>'+'<button class="btn btn-outline" style="width:100%;color:#3D5A36;border-color:#7C9A73" onclick="this.parentElement.parentElement.remove()">Tal vez después</button>'+'<p style="margin:16px 0 0;font-size:11px;color:#8B7355;letter-spacing:0.5px;line-height:1.6">🌱 10 días gratis para probarlo<br>Cancelás cuando quieras</p>'+'</div></div>';document.body.insertAdjacentHTML('beforeend',html);}
-function _vbAccionPracticaPostInforme(){try{if(typeof gtag==='function')gtag('event','cta_post_informe',{event_category:'conversion',event_label:'click_empezar_ahora'});if(typeof window.clarity==='function')window.clarity('event','cta_post_informe_click');}catch(e){}window.open('https://vedabite.lemonsqueezy.com/checkout/buy/ec74072d-7b30-4273-b369-1950cc7820d0','_blank');}
+function _vbAccionPracticaPostInforme(variant){try{var v=variant||'boton_sage_original';if(typeof gtag==='function')gtag('event','cta_post_informe',{event_category:'conversion',event_label:'click_empezar_ahora',variant:v});if(typeof window.clarity==='function'){window.clarity('set','cta_variant',v);window.clarity('event','cta_post_informe_click_'+v);}}catch(e){}window.open('https://vedabite.lemonsqueezy.com/checkout/buy/ec74072d-7b30-4273-b369-1950cc7820d0','_blank');}
 </script>
 </head>
 <body>
@@ -116,10 +116,10 @@ window.clarity('event',eventName+(label?'_'+label:''));
 <p style="background:rgba(124,154,115,.15);color:#5A7A53;padding:8px 16px;border-radius:50px;display:inline-block;font-size:14px;font-weight:600;margin-bottom:24px">Ya realizaron el test <span id="vbContador">370</span> personas</p>
 <h1 style="font-size:28px;margin-bottom:24px">Tu cuerpo <span style="color:var(--terracotta)">habla.</span></h1>
 <div style="position:relative;display:inline-block;width:100%">
-<button class="btn btn-cta-hero" onclick="startTest()">VEDABITE LO TRADUCE · DESCUBRILO</button>
+<button class="btn btn-cta-hero" onclick="startTest()">VEDABITE LO TRADUCE · DESCUBRILO<div style="font-size:11px;font-weight:500;color:#FFF;opacity:0.9;margin-top:4px;letter-spacing:0.5px">👇 Hacé el test ahora · 5 minutos</div></button>
 </div>
 <style>
-.btn-cta-hero{background:linear-gradient(135deg,#E67E22,#D35400);color:#fff;font-size:15px;padding:18px 14px;border-radius:14px;width:100%;border:none;cursor:pointer;font-weight:700;letter-spacing:0.3px;box-shadow:0 4px 15px rgba(230,126,34,.35);position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s;white-space:nowrap}
+.btn-cta-hero{background:linear-gradient(135deg,#E67E22,#D35400);color:#fff;font-size:15px;padding:16px 14px;border-radius:14px;width:100%;border:none;cursor:pointer;font-weight:700;letter-spacing:0.3px;box-shadow:0 4px 15px rgba(230,126,34,.35);position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s;line-height:1.3}
 .btn-cta-hero:hover{transform:scale(1.02);box-shadow:0 6px 20px rgba(230,126,34,.45)}
 .btn-cta-hero:active{transform:scale(0.97)}
 
@@ -170,7 +170,6 @@ window.clarity('event',eventName+(label?'_'+label:''));
 <div class="screen" id="s4">
 <div style="padding-bottom:80px">
 <div class="results-header" id="resHeader" style="background:linear-gradient(180deg,#D1FAE5,#A7F3D0)">
-<span class="vip-badge">⭐ ACCESO COMPLETO</span>
 <div style="font-size:80px" id="resEmoji">🌿</div>
 <h2 id="resName">Tu Perfil</h2>
 <p style="color:#4a4a4a" id="resDesc"></p>
@@ -227,7 +226,7 @@ window.clarity('event',eventName+(label?'_'+label:''));
 <span style="display:inline-block;padding:5px 14px;background:#fff;border:1px solid #D4B896;border-radius:50px;font-size:10px;font-weight:600;color:#8B7355;letter-spacing:2px">SEGUNDO PASO</span>
 </div>
 
-<div style="margin:28px 16px 24px 16px;padding:24px 20px;background:linear-gradient(135deg,#FFF4E6 0%,#FFE0B2 100%);border:2px solid #F57C00;border-radius:16px;text-align:center;box-shadow:0 4px 14px rgba(245,124,0,0.15);"><div style="font-size:12px;color:#F57C00;font-weight:700;letter-spacing:1.5px;margin-bottom:6px;">TU PRÓXIMO PASO</div><h3 style="font-size:22px;color:#1a1a1a;margin:0 0 10px 0;font-weight:700;line-height:1.25;">Convertí tu dosha en un plan personalizado</h3><p style="font-size:14px;color:#555;margin:0 0 18px 0;line-height:1.5;">Vedabite Práctica te muestra <strong>qué hacer cada día</strong> según tu constitución: alimentos, horarios, rutinas y acompañamiento.</p><button onclick="_vbAccionPracticaPostInforme()" style="display:inline-block;background:#1a1a1a;color:white;padding:16px 28px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.2);min-width:260px;">Empezá 10 días gratis →</button><div style="font-size:12px;color:#777;margin-top:10px;">USD 20/mes después del trial · Cancelás cuando quierás</div><div style="font-size:11px;color:#999;margin-top:12px;padding-top:10px;border-top:1px solid rgba(0,0,0,0.08);">✓ Sin tarjeta para empezar · ✓ Soporte por WhatsApp · ✓ Acceso inmediato</div></div><h3 style="margin:18px 0 6px;font-size:26px;color:#3D5A36;font-weight:500;letter-spacing:1px">Práctica</h3>
+<div style="margin:28px 16px 24px 16px;padding:24px 20px;background:linear-gradient(135deg,#FFF4E6 0%,#FFE0B2 100%);border:2px solid #F57C00;border-radius:16px;text-align:center;box-shadow:0 4px 14px rgba(245,124,0,0.15);"><div style="font-size:12px;color:#F57C00;font-weight:700;letter-spacing:1.5px;margin-bottom:6px;">TU PRÓXIMO PASO</div><h3 style="font-size:22px;color:#1a1a1a;margin:0 0 10px 0;font-weight:700;line-height:1.25;">Convertí tu dosha en un plan personalizado</h3><p style="font-size:14px;color:#555;margin:0 0 18px 0;line-height:1.5;">Vedabite Práctica te muestra <strong>qué hacer cada día</strong> según tu constitución: alimentos, horarios, rutinas y acompañamiento.</p><button onclick="_vbAccionPracticaPostInforme('cta_naranja_nuevo')" style="display:inline-block;background:#1a1a1a;color:white;padding:16px 28px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.2);min-width:260px;">Empezá 10 días gratis →</button><div style="font-size:12px;color:#777;margin-top:10px;">USD 20/mes después del trial · Cancelás cuando querés</div><div style="font-size:11px;color:#999;margin-top:12px;padding-top:10px;border-top:1px solid rgba(0,0,0,0.08);">✓ Sin tarjeta para empezar · ✓ Soporte por WhatsApp · ✓ Acceso inmediato</div></div><h3 style="margin:18px 0 6px;font-size:26px;color:#3D5A36;font-weight:500;letter-spacing:1px">Práctica</h3>
 <p style="font-size:13px;color:#8B7355;font-style:italic;margin:0 0 24px">El qué · El cómo · Los porqués</p>
 
 <div style="background:#fff;padding:20px 18px;border-radius:14px;margin-bottom:20px;font-size:14px;line-height:1.7;color:#3D5A36;font-style:italic;border:1px solid #E8DFC8">
@@ -264,7 +263,7 @@ window.clarity('event',eventName+(label?'_'+label:''));
 <div style="font-size:36px;font-weight:300;color:#3D5A36;line-height:1;letter-spacing:0.5px">USD 20<span style="font-size:16px;color:#7C9A73">/mes</span></div>
 </div>
 
-<button class="btn btn-sage" style="width:100%;font-weight:500;font-size:15px;padding:16px;letter-spacing:0.5px;background:#5A7A53;border:none" onclick="_vbAccionPracticaPostInforme()">Comenzar mi camino</button>
+<button class="btn btn-sage" style="width:100%;font-weight:500;font-size:15px;padding:16px;letter-spacing:0.5px;background:#5A7A53;border:none" onclick="_vbAccionPracticaPostInforme('boton_sage_original')">Comenzar mi camino</button>
 
 <div style="margin-top:16px;font-size:11px;color:#8B7355;letter-spacing:0.5px">
 <div style="margin-bottom:4px">🌱 10 días gratis para probarlo</div>
@@ -1349,50 +1348,37 @@ window._vbFetchEstadoEscaner=function(){
 
 })();
 </script>
-<!-- BOTÓN WHATSAPP FLOTANTE -->
-<a href="https://wa.me/5491153149117?text=Hola%2C%20quiero%20saber%20m%C3%A1s%20sobre%20Vedabite" target="_blank" style="position:fixed;bottom:20px;right:20px;width:56px;height:56px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.25);z-index:9999;text-decoration:none;transition:transform .15s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"><svg width="28" height="28" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+<!-- BOTÓN WHATSAPP FLOTANTE — solo si pagó -->
+<a id="vbWhatsAppBtn" href="https://wa.me/5491153149117?text=Hola%2C%20quiero%20saber%20m%C3%A1s%20sobre%20Vedabite" target="_blank" style="display:none;position:fixed;bottom:20px;right:20px;width:56px;height:56px;background:#25D366;border-radius:50%;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.25);z-index:9999;text-decoration:none;transition:transform .15s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"><svg width="28" height="28" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+<script>(function(){try{if(localStorage.getItem('vb_paid')==='true'){var w=document.getElementById('vbWhatsAppBtn');if(w)w.style.display='flex';}}catch(e){}})();</script>
 
-<!-- CONTADOR DINÁMICO DESDE FIREBASE -->
+<!-- CONTADOR DINÁMICO DESDE FIREBASE — v2 -->
 <script>
 (function(){
   if(!window._vbDB) return;
-  // Intentar leer un documento contador dedicado primero
-  window._vbDB.collection('config').doc('contador').get().then(function(doc){
-    if(doc.exists && doc.data().total){
-      var el=document.getElementById('vbContador');
-      if(el) el.textContent=doc.data().total;
-    } else {
-      // Fallback: contar leads
-      window._vbDB.collection('leads').get().then(function(snap){
-        var c=snap.size;
-        if(c>0){
-          var el=document.getElementById('vbContador');
-          if(el) el.textContent=c;
-          // Guardar para la próxima vez
-          window._vbDB.collection('config').doc('contador').set({total:c,updated:new Date().toISOString()}).catch(function(){});
-        }
-      }).catch(function(e){console.warn('Contador leads:',e.code);});
-    }
-  }).catch(function(){
-    // Si config no existe, intentar contar leads directo
+  function actualizarContador(){
     window._vbDB.collection('leads').get().then(function(snap){
       var c=snap.size;
       if(c>0){
         var el=document.getElementById('vbContador');
         if(el) el.textContent=c;
+        window._vbDB.collection('config').doc('contador').set({total:c,updated:new Date().toISOString()},{merge:true}).catch(function(){});
       }
-    }).catch(function(){});
-  });
-  // Incrementar contador cuando se guarda un lead nuevo
+    }).catch(function(){
+      window._vbDB.collection('config').doc('contador').get().then(function(doc){
+        if(doc.exists && doc.data().total){
+          var el=document.getElementById('vbContador');
+          if(el) el.textContent=doc.data().total;
+        }
+      }).catch(function(){});
+    });
+  }
+  actualizarContador();
   var origSave=window._vbSaveLead;
   if(origSave){
     window._vbSaveLead=function(d){
       var result=origSave(d);
-      try{
-        var el=document.getElementById('vbContador');
-        if(el){var n=parseInt(el.textContent)||0;el.textContent=n+1;}
-        window._vbDB.collection('config').doc('contador').set({total:firebase.firestore.FieldValue.increment(1),updated:new Date().toISOString()},{merge:true}).catch(function(){});
-      }catch(e){}
+      setTimeout(actualizarContador,1500);
       return result;
     };
   }
@@ -1401,11 +1387,12 @@ window._vbFetchEstadoEscaner=function(){
 
 <script>
 /* ============================================
-   VEDABITE — TRACKING AUTOMATICO GLOBAL
-   No toca botones individuales, captura todo
+   VEDABITE — TRACKING AUTOMATICO GLOBAL v2
+   Captura TODO click + scroll + pantallas + tiempo
    ============================================ */
 (function(){
   if(typeof gtag!=='function') return;
+  
   var trackMap={
     'startTest':'cta_hero_start_test',
     'loadSession':'sesion_retomada',
@@ -1413,69 +1400,192 @@ window._vbFetchEstadoEscaner=function(){
     'confirmRestart':'rehacer_test',
     'calcAstro':'carta_natal_calculada',
     'backIdx':'nav_menu',
-    '_vbMostrarSuscripcion':'modal_suscripcion_abierto'
+    '_vbMostrarSuscripcion':'modal_suscripcion_abierto',
+    'submitEmail':'email_submit_click',
+    'prevQ':'test_pregunta_atras',
+    'showTab':'tab_abierto_directo',
+    '_vbEntenderResultado':'cta_entender_resultado',
+    '_vbPlanPersonalizado':'cta_plan_personalizado',
+    '_vbCerrarTerapeuta':'pantalla_terapeuta_cerrada',
+    '_vbAbrirTuCamino':'tu_camino_boton_click',
+    'downloadPDF':'download_pdf_click',
+    'downloadAstro':'download_astro_click'
   };
-  document.addEventListener('click',function(e){
-    var el=e.target.closest('button,a,.tab-card,.quick-tag,.nb1,.nb2,.nb3');
-    if(!el) return;
+  
+  var textMap={
+    'tal vez':'cta_rechazo_tal_vez',
+    'sigo mirando':'cta_rechazo_sigo_mirando',
+    'todavía no':'cta_rechazo_todavia_no',
+    'ahora no':'cta_rechazo_ahora_no',
+    'empezá':'cta_empezar',
+    'comenzar':'cta_comenzar',
+    'activar':'cta_activar',
+    'rehacer':'cta_rehacer',
+    'volver':'nav_volver_texto',
+    'continuar':'cta_continuar',
+    'cancelar':'cta_cancelar'
+  };
+  
+  function getContexto(el){
+    var screen=el.closest('.screen');
+    if(screen) return screen.id||'desconocido';
+    var modal=el.closest('[style*="position:fixed"]');
+    if(modal && modal.id) return modal.id;
+    return 'general';
+  }
+  
+  function enviarEvento(nombre,params){
     try{
+      var p=params||{};
+      p.event_category=p.event_category||'interaccion';
+      gtag('event',nombre,p);
+      if(typeof window.clarity==='function'){
+        var label=nombre;
+        if(p.event_label) label+='_'+p.event_label;
+        window.clarity('event',label.substring(0,60));
+      }
+    }catch(e){}
+  }
+  
+  document.addEventListener('click',function(e){
+    var el=e.target.closest('button,a,.tab-card,.quick-tag,.nb1,.nb2,.nb3,.nb4,.test-opt,[role="button"],[onclick]');
+    if(!el) return;
+    
+    try{
+      var contexto=getContexto(el);
+      var texto=(el.textContent||'').trim().toLowerCase().substring(0,50);
+      var onclick=el.getAttribute('onclick')||'';
+      
       if(el.closest('a[href*="wa.me"]')){
-        gtag('event','click_whatsapp',{event_category:'contacto',event_label:'boton_flotante'});
-        if(typeof window.clarity==='function') window.clarity('event','click_whatsapp');
+        enviarEvento('click_whatsapp',{event_category:'contacto',event_label:'boton_flotante',contexto:contexto});
         return;
       }
+      
       if(el.tagName==='A' && el.target==='_blank'){
-        var href=el.href||'';var label='externo';
-        if(href.includes('maps')) label='ubicacion_'+el.textContent.trim().substring(0,20);
-        else if(href.includes('lemonsqueezy')) label='click_compra_modal';
+        var href=el.href||'';
+        var label='externo';
+        if(href.includes('maps')) label='ubicacion';
+        else if(href.includes('lemonsqueezy')) label='click_compra_externo';
         else if(href.includes('youtube')) label='link_youtube';
-        gtag('event','click_externo',{event_category:'engagement',event_label:label,url:href.substring(0,100)});
-        if(typeof window.clarity==='function') window.clarity('event','click_externo_'+label);
+        else if(href.includes('instagram')) label='link_instagram';
+        else if(href.includes('facebook')) label='link_facebook';
+        enviarEvento('click_externo',{event_category:'engagement',event_label:label,contexto:contexto,url:href.substring(0,100)});
         return;
       }
+      
       if(el.classList.contains('tab-card')){
         var tabName=el.querySelector('strong');
-        if(tabName){
-          gtag('event','tab_abierto',{event_category:'engagement',event_label:tabName.textContent.trim()});
-          if(typeof window.clarity==='function') window.clarity('event','tab_'+tabName.textContent.trim().substring(0,15));
-        }
+        var nombreTab=tabName?tabName.textContent.trim():(el.textContent.trim().substring(0,20));
+        enviarEvento('tab_abierto',{event_category:'engagement',event_label:nombreTab,contexto:contexto});
         return;
       }
+      
       if(el.classList.contains('quick-tag')){
-        gtag('event','scanner_quick_tag',{event_category:'engagement',event_label:el.textContent.trim()});
+        enviarEvento('scanner_quick_tag',{event_category:'escaner',event_label:el.textContent.trim().substring(0,30)});
         return;
       }
-      if(el.classList.contains('nb1')||el.classList.contains('nb2')||el.classList.contains('nb3')){
-        gtag('event','navbar_click',{event_category:'navegacion',event_label:el.textContent.trim()});
+      
+      if(el.classList.contains('nb1')||el.classList.contains('nb2')||el.classList.contains('nb3')||el.classList.contains('nb4')){
+        enviarEvento('navbar_click',{event_category:'navegacion',event_label:el.textContent.trim().substring(0,30)});
         return;
       }
-      var onclick=el.getAttribute('onclick')||'';
+      
+      if(el.classList.contains('test-opt')){
+        enviarEvento('test_opcion_click',{event_category:'test',event_label:el.textContent.trim().substring(0,40)});
+        return;
+      }
+      
       for(var fn in trackMap){
         if(onclick.includes(fn)){
-          gtag('event',trackMap[fn],{event_category:'engagement',event_label:fn});
-          if(typeof window.clarity==='function') window.clarity('event',trackMap[fn]);
+          var params={event_category:'engagement',event_label:fn,contexto:contexto};
+          if(fn==='downloadPDF'||fn==='downloadAstro'){
+            var vozMatch=onclick.match(/\('(\w+)'\)/);
+            if(vozMatch) params.voz=vozMatch[1];
+          }
+          if(fn==='showTab'){
+            var tabMatch=onclick.match(/showTab\(['"](\w+)['"]\)/);
+            if(tabMatch) params.tab_id=tabMatch[1];
+          }
+          enviarEvento(trackMap[fn],params);
           return;
         }
       }
-      if(onclick.includes('downloadAstro')){
-        var vozMatch=onclick.match(/downloadAstro\(['"](\w+)['"]\)/);
-        var voz=vozMatch?vozMatch[1]:'unknown';
-        gtag('event','download_carta_natal',{event_category:'descarga',event_label:voz});
-        if(typeof window.clarity==='function') window.clarity('event','download_astro_'+voz);
+      
+      if(el.textContent.match(/🩺|🌿 Terapeuta|💚 Como/)){
+        enviarEvento('voz_seleccionada',{event_category:'descarga',event_label:el.textContent.trim().substring(0,40),contexto:contexto});
         return;
       }
-      if(el.textContent.includes('Tal vez')){
-        gtag('event','modal_suscripcion_cerrado',{event_category:'conversion',event_label:'tal_vez_despues'});
-        if(typeof window.clarity==='function') window.clarity('event','modal_cerrado');
-        return;
-      }
+      
       if(el.classList.contains('back-btn')){
-        gtag('event','nav_volver',{event_category:'navegacion',event_label:'back'});
+        enviarEvento('nav_volver',{event_category:'navegacion',event_label:'back',contexto:contexto});
         return;
       }
+      
+      for(var palabra in textMap){
+        if(texto.includes(palabra)){
+          enviarEvento(textMap[palabra],{event_category:'interaccion',event_label:texto.substring(0,40),contexto:contexto});
+          return;
+        }
+      }
+      
+      // Fallback: captura todo lo demás
+      var tagInfo=el.tagName.toLowerCase();
+      var idInfo=el.id||'sin_id';
+      var claseInfo=(el.className||'').toString().split(' ')[0]||'sin_clase';
+      enviarEvento('click_generico',{
+        event_category:'interaccion_generica',
+        event_label:texto||idInfo||claseInfo,
+        tag:tagInfo,
+        contexto:contexto
+      });
+      
     }catch(err){}
   },true);
-  console.log('VedaBite tracking global activo');
+  
+  // Scroll depth
+  var scrollHitos={25:false,50:false,75:false,100:false};
+  window.addEventListener('scroll',function(){
+    try{
+      var h=document.documentElement;
+      var scrolled=(h.scrollTop+window.innerHeight)/h.scrollHeight*100;
+      [25,50,75,100].forEach(function(hito){
+        if(!scrollHitos[hito] && scrolled>=hito){
+          scrollHitos[hito]=true;
+          enviarEvento('scroll_profundidad',{event_category:'engagement',event_label:hito+'%',profundidad:hito});
+        }
+      });
+    }catch(e){}
+  },{passive:true});
+  
+  // Cambio de pantalla
+  var ultimaPantalla='';
+  function detectarPantalla(){
+    try{
+      var activa=document.querySelector('.screen.active');
+      if(activa && activa.id!==ultimaPantalla){
+        ultimaPantalla=activa.id;
+        enviarEvento('pantalla_vista',{event_category:'navegacion',event_label:activa.id,pantalla:activa.id});
+      }
+    }catch(e){}
+  }
+  setInterval(detectarPantalla,1500);
+  
+  // Tiempo activo
+  var tiempoActivo=0;
+  var ultimaActividad=Date.now();
+  ['click','scroll','keydown','mousemove','touchstart'].forEach(function(evt){
+    document.addEventListener(evt,function(){ultimaActividad=Date.now();},{passive:true});
+  });
+  setInterval(function(){
+    if(Date.now()-ultimaActividad<60000){
+      tiempoActivo+=30;
+      if(tiempoActivo%60===0){
+        enviarEvento('tiempo_activo',{event_category:'engagement',event_label:tiempoActivo+'s',segundos:tiempoActivo});
+      }
+    }
+  },30000);
+  
+  console.log('VedaBite tracking global v2 activo');
 })();
 </script>
 
@@ -1540,19 +1650,19 @@ window._vbFetchEstadoEscaner=function(){
     }
   }catch(e){}
 
-  // REGALO — CUPÓN DESCARGABLE
-  var origShowResults=window.showResults;
-  if(origShowResults){
+  // 2 BOTONES BIFURCACIÓN POST-INFORME (reemplazan REGALÁ BIENESTAR)
+  var origShowResultsBifurca=window.showResults;
+  if(origShowResultsBifurca){
     window.showResults=function(){
-      origShowResults();
+      origShowResultsBifurca();
       setTimeout(function(){
         var header=document.getElementById('resHeader');
-        if(header && !document.getElementById('vbCuponBtn')){
+        if(header && !document.getElementById('vbBotonesBifurca')){
           var div=document.createElement('div');
-          div.id='vbCuponBtn';
-          div.innerHTML='<div style="margin:16px 20px;text-align:center">'
-            +'<button onclick="generarCupon()" style="display:inline-block;padding:14px 28px;background:linear-gradient(135deg,#E67E22,#D35400);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(230,126,34,.3)">🎁 REGALÁ BIENESTAR</button>'
-            +'<p style="font-size:11px;color:#8B7355;margin-top:8px">Descargá un cupón y mandalo a quien quieras</p>'
+          div.id='vbBotonesBifurca';
+          div.innerHTML='<div style="margin:20px 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+            +'<button onclick="_vbEntenderResultado()" style="display:block;width:100%;padding:16px 12px;background:#fff;color:#3D5A36;border:2px solid #5A7A53;border-radius:14px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1.3;min-height:88px">Quiero entender mejor mi resultado<div style="font-size:11px;font-weight:400;color:#777;margin-top:6px;line-height:1.3">Te muestro tu desequilibrio · Gratis</div></button>'
+            +'<button onclick="_vbPlanPersonalizado()" style="display:block;width:100%;padding:16px 12px;background:#3D5A36;color:#fff;border:none;border-radius:14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;line-height:1.3;min-height:88px;box-shadow:0 4px 12px rgba(61,90,54,.25)">Quiero mi plan personalizado<div style="font-size:11px;font-weight:400;color:#D1FAE5;margin-top:6px;line-height:1.3">10 días gratis · USD 20/mes</div></button>'
             +'</div>';
           header.after(div);
         }
@@ -1561,8 +1671,171 @@ window._vbFetchEstadoEscaner=function(){
   }
 })();
 
-// Generar cupón como imagen descargable
-function generarCupon(){
+// ════════════════════════════════════════════════════════════════
+// PANTALLA "QUIERO ENTENDER MEJOR MI RESULTADO"
+// El terapeuta muestra Prakriti vs Vikriti = el desequilibrio real
+// ════════════════════════════════════════════════════════════════
+
+var _VB_TERAPEUTA={
+  vata:{
+    nombre:'Aire',emoji:'🌬️',color:'#3B82F6',bgColor:'linear-gradient(180deg,#DBEAFE,#93C5FD)',
+    saludoBase:'Soy tu terapeuta ayurvédico. Dejame explicarte, sin apuro, qué significa todo lo que el test reveló sobre vos. No te voy a llenar de palabras raras. Hablemos en castellano.',
+    secciones:[
+      {titulo:'Primero: qué significa el resultado que viste',texto:'El test mostró que tu dosha dominante es Vata. Vata es la energía del movimiento, del aire en vos. Todos tenemos los tres doshas (Vata, Pitta, Kapha) pero uno predomina. Vos, predominantemente, sos aire.'},
+      {titulo:'Pero hay dos cosas distintas: cómo SOS vs cómo ESTÁS',texto:'Y esto es lo más importante que te quiero explicar. Una cosa es tu constitución de nacimiento (cómo viniste al mundo), otra cosa es cómo estás hoy. La constitución no cambia nunca. El estado actual cambia todo el tiempo, según lo que hacés, lo que comés, el clima, las emociones.'},
+      {titulo:'Cómo sos de nacimiento (tu naturaleza)',texto:'Sos creativa, rápida, con muchas ideas al mismo tiempo. Hablás rápido, te entusiasmás con facilidad, tenés una cabeza que no para. Físicamente tendés a ser delgada, de huesos marcados, piel que se reseca, manos y pies fríos. Dormís liviano, comés irregular, te olvidás cosas pero aprendés rápido. Esa sos vos, y está bien.'},
+      {titulo:'Lo que te da fuerza y lo que te traiciona',texto:'Esa misma energía que te hace creativa, ligera y comunicativa, cuando se exagera te lleva al insomnio, la ansiedad, la distracción, la fatiga. El aire es lo que hace volar las cosas — y también lo que las tira al piso si sopla fuerte. La clave no es cambiar quién sos. La clave es que el aire no se vuelva tormenta.'},
+      {titulo:'Qué es el Ayurveda (sin palabras raras)',texto:'Es una ciencia de la vida que viene de la India, de hace más de 5000 años. No es religión, no es misticismo, no es una moda. Se basa en una sola idea muy simple: tu cuerpo y la naturaleza están hechos de lo mismo. Espacio, aire, fuego, agua, tierra. Esos cinco elementos están afuera y adentro de vos. Por eso el clima te afecta, la estación te afecta, la hora del día te afecta. No es espiritualidad: es observación.'},
+      {titulo:'Cómo sabés que tu aire se está desbalanceando',texto:'Hay señales claras que aparecen antes de que te enfermes. En el cuerpo: piel seca, labios agrietados, uñas quebradizas, constipación, pies fríos, palpitaciones sin razón, rigidez en la espalda o el cuello. En la mente: pensar demasiadas cosas al mismo tiempo, no poder concentrarte, ansiedad, preocupación sin motivo, miedo al futuro. En el sueño: dormirte tarde, despertarte entre las 2 y las 6 de la mañana, sueños raros, sensación de no haber descansado.'},
+      {titulo:'Qué lo empeora (la lista honesta)',texto:'El frío, el viento, los viajes, los cambios constantes. El café, las bebidas frías, las ensaladas crudas como comida principal. Comer apurada o a deshoras. Las pantallas hasta tarde. Hablar todo el día sin pausa. El exceso de información, de estímulos, de reuniones. La falta de rutina es lo que más te daña: sin rutina, el aire no se queda quieto.'},
+      {titulo:'Por qué lo contrario te cura',texto:'El Ayurveda tiene una ley muy simple: los opuestos se equilibran. Si tu naturaleza es fría, seca, ligera y móvil, lo que te sana es lo contrario: calor, humedad, pesadez, quietud. Por eso te cae bien una sopa caliente con aceite, un masaje con aceite tibio, una rutina fija, acostarte temprano. No es un capricho, es física básica aplicada al cuerpo.'},
+      {titulo:'Los 4 pilares para equilibrar tu aire',texto:'Uno: la comida. Caliente, cocida, con un poquito de grasa buena (aceite de oliva, ghee, palta). Evitá lo frío y lo crudo. Dos: la rutina. Despertarte, comer y acostarte todos los días a la misma hora. El aire necesita estructura. Tres: el descanso. Dormir antes de las 22:30, porque entre 22 y 2 es cuando tu sistema nervioso se regenera. Cuatro: la mente. Meditación, yoga suave, caminar sin celular. Tu mente necesita pausas.'},
+      {titulo:'Por dónde empezar (una sola cosa, no diez)',texto:'Siempre se empieza por la comida. Porque es lo que hacés todos los días, varias veces al día. Si cambiás la comida, cambiás el 60% del desequilibrio en pocas semanas. Después, cuando la comida ya está resuelta, viene la rutina. Después el descanso. Después la mente. En ese orden. Nunca todo junto, porque no funciona y te frustra.'},
+      {titulo:'Lo que Vedabite NO es',texto:'No es una dieta. No te va a decir que cuentes calorías ni que dejes de comer lo que te gusta. No reemplaza a tu médico — si tenés una enfermedad diagnosticada, seguí con tu médico. No es religión, no te pide que creas en nada. No es misticismo, no te va a hablar de auras ni chakras como verdad absoluta. Es un sistema práctico de ajustes diarios. Nada más, nada menos.'},
+      {titulo:'Ciencia antigua que la ciencia nueva está confirmando',texto:'Lo que el Ayurveda dijo hace 5000 años — que la comida impacta en la mente, que los horarios importan, que el estrés enferma, que la respiración modifica el sistema nervioso — hoy lo confirma la neurociencia, la cronobiología, la microbiota intestinal, la medicina del estrés. No es magia. Es una observación muy vieja de cómo funciona el ser humano.'},
+      {titulo:'Un mensaje antes de seguir',texto:'No tenés que hacer todo ya. No tenés que ser perfecta. El camino es progresivo: un ajuste a la vez, probado, incorporado, y después el siguiente. Lo importante es empezar. Y lo que sigue, si querés, es tu GPS personal para recorrer ese camino con un orden claro y sin perderte.'}
+    ]
+  },
+  pitta:{
+    nombre:'Fuego',emoji:'🔥',color:'#F97316',bgColor:'linear-gradient(180deg,#FED7AA,#FDBA74)',
+    saludoBase:'Soy tu terapeuta ayurvédico. Dejame explicarte, sin apuro, qué significa todo lo que el test reveló sobre vos. No te voy a llenar de palabras raras. Hablemos en castellano.',
+    secciones:[
+      {titulo:'Primero: qué significa el resultado que viste',texto:'El test mostró que tu dosha dominante es Pitta. Pitta es la energía de la transformación, del fuego en vos. Todos tenemos los tres doshas (Vata, Pitta, Kapha) pero uno predomina. Vos, predominantemente, sos fuego.'},
+      {titulo:'Pero hay dos cosas distintas: cómo SOS vs cómo ESTÁS',texto:'Y esto es lo más importante que te quiero explicar. Una cosa es tu constitución de nacimiento (cómo viniste al mundo), otra cosa es cómo estás hoy. La constitución no cambia nunca. El estado actual cambia todo el tiempo, según lo que hacés, lo que comés, el clima, las emociones.'},
+      {titulo:'Cómo sos de nacimiento (tu naturaleza)',texto:'Sos intensa, decidida, clara, líder sin proponértelo. Tenés buena digestión, te dan hambre fuerte y a horarios marcados. Físicamente sos de estructura mediana, piel con tendencia al rojo o a pecas, transpirás fácil, tenés calor. Tu mente es analítica, resolvés problemas, te exigís. Esa sos vos, y está bien.'},
+      {titulo:'Lo que te da fuerza y lo que te traiciona',texto:'Ese mismo fuego que te hace enfocada, productiva y brillante, cuando se exagera te lleva a la irritabilidad, la crítica, el perfeccionismo, la inflamación. El fuego es lo que cocina los alimentos — y también lo que quema la casa. La clave no es apagarte. La clave es que el fuego no se vuelva incendio.'},
+      {titulo:'Qué es el Ayurveda (sin palabras raras)',texto:'Es una ciencia de la vida que viene de la India, de hace más de 5000 años. No es religión, no es misticismo, no es una moda. Se basa en una sola idea muy simple: tu cuerpo y la naturaleza están hechos de lo mismo. Espacio, aire, fuego, agua, tierra. Esos cinco elementos están afuera y adentro de vos. Por eso el clima te afecta, la estación te afecta, la hora del día te afecta. No es espiritualidad: es observación.'},
+      {titulo:'Cómo sabés que tu fuego se está desbalanceando',texto:'Hay señales claras que aparecen antes de que te enfermes. En el cuerpo: acidez, reflujo, úlceras, rosácea, brotes en la piel, calor en las palmas, sudoración excesiva, dolor de cabeza al atardecer, inflamación (gingivitis, artritis leve). En la mente: irritabilidad, impaciencia, crítica fácil, celos, competitividad obsesiva, perfeccionismo. En el sueño: despertarte entre 1 y 3 de la mañana con la cabeza llena, sueños intensos o violentos.'},
+      {titulo:'Qué lo empeora (la lista honesta)',texto:'El calor, el sol directo del mediodía, el verano. El picante, el frito, el alcohol, el café. Comer apurada, saltearte el almuerzo o comer demasiado tarde. Trabajar más horas de las que tu cuerpo aguanta. Criticarte a vos misma. Discutir mucho. Las pantallas a la noche. Competir todo el tiempo. La exigencia sin pausa es lo que más te incendia.'},
+      {titulo:'Por qué lo contrario te cura',texto:'El Ayurveda tiene una ley muy simple: los opuestos se equilibran. Si tu naturaleza es caliente, aguda, penetrante, lo que te sana es lo contrario: fresco, suave, dulce, calmo. Por eso te cae bien el coco, la menta, el pepino, caminar al atardecer cuando el sol ya no quema, respirar lento, comer sentada. No es un capricho, es física básica aplicada al cuerpo.'},
+      {titulo:'Los 4 pilares para equilibrar tu fuego',texto:'Uno: la comida. Fresca, no picante, con sabores dulces (fruta madura, vegetales dulces) y amargos (hojas verdes). Evitá el frito, el alcohol y el picante excesivo. Dos: los horarios. No saltes el almuerzo — tu fuego digestivo pide comida entre las 12 y las 14. Tres: el descanso. Pantalla off 30 minutos antes de dormir. Cuatro: la mente. Aflojar la exigencia, practicar la paciencia con vos misma antes que con los demás.'},
+      {titulo:'Por dónde empezar (una sola cosa, no diez)',texto:'Siempre se empieza por la comida. Porque es lo que hacés todos los días, varias veces al día. Si cambiás la comida, cambiás el 60% del desequilibrio en pocas semanas. Después, cuando la comida ya está resuelta, viene la rutina. Después el descanso. Después la mente. En ese orden. Nunca todo junto, porque no funciona y te frustra.'},
+      {titulo:'Lo que Vedabite NO es',texto:'No es una dieta. No te va a decir que cuentes calorías ni que dejes de comer lo que te gusta. No reemplaza a tu médico — si tenés una enfermedad diagnosticada, seguí con tu médico. No es religión, no te pide que creas en nada. No es misticismo, no te va a hablar de auras ni chakras como verdad absoluta. Es un sistema práctico de ajustes diarios. Nada más, nada menos.'},
+      {titulo:'Ciencia antigua que la ciencia nueva está confirmando',texto:'Lo que el Ayurveda dijo hace 5000 años — que la comida impacta en la mente, que los horarios importan, que el estrés enferma, que la respiración modifica el sistema nervioso — hoy lo confirma la neurociencia, la cronobiología, la microbiota intestinal, la medicina del estrés. No es magia. Es una observación muy vieja de cómo funciona el ser humano.'},
+      {titulo:'Un mensaje antes de seguir',texto:'No tenés que hacer todo ya. No tenés que ser perfecta — justamente el perfeccionismo es parte de lo que te desbalancea. El camino es progresivo: un ajuste a la vez, probado, incorporado, y después el siguiente. Lo importante es empezar. Y lo que sigue, si querés, es tu GPS personal para recorrer ese camino con un orden claro y sin perderte.'}
+    ]
+  },
+  kapha:{
+    nombre:'Tierra',emoji:'🌍',color:'#22C55E',bgColor:'linear-gradient(180deg,#D1FAE5,#6EE7B7)',
+    saludoBase:'Soy tu terapeuta ayurvédico. Dejame explicarte, sin apuro, qué significa todo lo que el test reveló sobre vos. No te voy a llenar de palabras raras. Hablemos en castellano.',
+    secciones:[
+      {titulo:'Primero: qué significa el resultado que viste',texto:'El test mostró que tu dosha dominante es Kapha. Kapha es la energía de la estructura, de la tierra y el agua en vos. Todos tenemos los tres doshas (Vata, Pitta, Kapha) pero uno predomina. Vos, predominantemente, sos tierra.'},
+      {titulo:'Pero hay dos cosas distintas: cómo SOS vs cómo ESTÁS',texto:'Y esto es lo más importante que te quiero explicar. Una cosa es tu constitución de nacimiento (cómo viniste al mundo), otra cosa es cómo estás hoy. La constitución no cambia nunca. El estado actual cambia todo el tiempo, según lo que hacés, lo que comés, el clima, las emociones.'},
+      {titulo:'Cómo sos de nacimiento (tu naturaleza)',texto:'Sos estable, paciente, cariñosa, con buena memoria, fuerte resistencia física. La gente confía en vos, no te alterás fácil, sostenés a otros. Físicamente sos de estructura más grande, piel suave, pelo abundante, digestión lenta pero estable. Dormís profundo, comés con placer, caminás tranquila. Esa sos vos, y está bien.'},
+      {titulo:'Lo que te da fuerza y lo que te traiciona',texto:'Esa misma estabilidad que te hace confiable, paciente y amorosa, cuando se exagera te lleva al estancamiento, al sobrepeso, a la tristeza, al apego, a la pereza. La tierra es lo que sostiene la casa — y también lo que se vuelve pantano si se llena de agua sin salida. La clave no es volverte otra cosa. La clave es que la tierra no se vuelva piedra.'},
+      {titulo:'Qué es el Ayurveda (sin palabras raras)',texto:'Es una ciencia de la vida que viene de la India, de hace más de 5000 años. No es religión, no es misticismo, no es una moda. Se basa en una sola idea muy simple: tu cuerpo y la naturaleza están hechos de lo mismo. Espacio, aire, fuego, agua, tierra. Esos cinco elementos están afuera y adentro de vos. Por eso el clima te afecta, la estación te afecta, la hora del día te afecta. No es espiritualidad: es observación.'},
+      {titulo:'Cómo sabés que tu tierra se está desbalanceando',texto:'Hay señales claras que aparecen antes de que te enfermes. En el cuerpo: sensación de pesadez al levantarte, retención de líquidos en piernas o cara, congestión nasal crónica, mucosidad, letargo después de comer, subir de peso sin comer tanto, resistencia a la insulina. En la mente: desmotivación, tristeza sin motivo, apego a personas o situaciones que te hacen mal, no querer hacer cambios, nostalgia constante. En el sueño: dormir más de 9 horas y despertarse igual cansada.'},
+      {titulo:'Qué lo empeora (la lista honesta)',texto:'El frío húmedo, el invierno. Los lácteos, los dulces, el trigo, los fritos, comer de noche. Las siestas largas, levantarse tarde. No hacer ejercicio. Quedarte en lo conocido. No decir que no. Repetir la misma rutina por años sin estímulo nuevo. Acumular objetos, comida, relaciones que ya no sirven. Lo que más te estanca es no moverte — del lugar, de la cabeza, de las costumbres.'},
+      {titulo:'Por qué lo contrario te cura',texto:'El Ayurveda tiene una ley muy simple: los opuestos se equilibran. Si tu naturaleza es fría, pesada, lenta, húmeda, lo que te sana es lo contrario: caliente, liviano, seco, en movimiento. Por eso te cae bien el jengibre, el picante suave, el ejercicio intenso, levantarte temprano, saltar comidas. No es un capricho, es física básica aplicada al cuerpo.'},
+      {titulo:'Los 4 pilares para equilibrar tu tierra',texto:'Uno: la comida. Liviana, picante suave, cocida, poca cantidad. Evitá lácteos, dulces y comidas pesadas — especialmente de noche. Dos: los horarios. Levantarte antes de las 6:30. Después de las 7, tu cuerpo entra en modo pesado y te cuesta el día entero. Tres: el movimiento. Ejercicio intenso diario, aunque sean 20 minutos. La tierra necesita que la agiten. Cuatro: la mente. Probar cosas nuevas, variar las rutinas, desapegar.'},
+      {titulo:'Por dónde empezar (una sola cosa, no diez)',texto:'Siempre se empieza por la comida. Porque es lo que hacés todos los días, varias veces al día. Si cambiás la comida, cambiás el 60% del desequilibrio en pocas semanas. Después viene el movimiento — tu dosha lo necesita más que cualquier otro. Después los horarios. Después la mente. En ese orden. Nunca todo junto, porque no funciona y te frustra.'},
+      {titulo:'Lo que Vedabite NO es',texto:'No es una dieta. No te va a decir que cuentes calorías ni que dejes de comer lo que te gusta. No reemplaza a tu médico — si tenés una enfermedad diagnosticada, seguí con tu médico. No es religión, no te pide que creas en nada. No es misticismo, no te va a hablar de auras ni chakras como verdad absoluta. Es un sistema práctico de ajustes diarios. Nada más, nada menos.'},
+      {titulo:'Ciencia antigua que la ciencia nueva está confirmando',texto:'Lo que el Ayurveda dijo hace 5000 años — que la comida impacta en la mente, que los horarios importan, que el estrés enferma, que la respiración modifica el sistema nervioso — hoy lo confirma la neurociencia, la cronobiología, la microbiota intestinal, la medicina del estrés. No es magia. Es una observación muy vieja de cómo funciona el ser humano.'},
+      {titulo:'Un mensaje antes de seguir',texto:'No tenés que hacer todo ya. No tenés que ser perfecta. Sé que tu naturaleza prefiere quedarse donde está — por eso el primer paso es el más difícil para vos. El camino es progresivo: un ajuste a la vez, probado, incorporado, y después el siguiente. Lo importante es empezar. Y lo que sigue, si querés, es tu GPS personal para recorrer ese camino con un orden claro y sin perderte.'}
+    ]
+  }
+};
+
+function _vbCalcularDesequilibrio(){
+  // Calcula el % de desbalance entre el dosha dominante y el resto
+  // Es una aproximación: si el dominante > 50% el desequilibrio es alto
+  try{
+    if(window.res && window.res.scores){
+      var s=window.res.scores;
+      var total=s.vata+s.pitta+s.kapha;
+      if(total===0) return 50;
+      var max=Math.max(s.vata,s.pitta,s.kapha);
+      var pct=(max/total)*100;
+      // Si está balanceado (33%) no hay desequilibrio. Si hay 60%+ hay desequilibrio.
+      var desequilibrio=Math.round(Math.max(0,(pct-33)*1.5));
+      return Math.min(85,desequilibrio);
+    }
+  }catch(e){}
+  return 50;
+}
+
+function _vbEntenderResultado(){
+  try{
+    if(typeof gtag==='function')gtag('event','cta_post_informe',{event_category:'engagement',event_label:'entender_resultado',variant:'pantalla_terapeuta_desequilibrio'});
+    if(typeof window.clarity==='function'){window.clarity('set','cta_variant','entender_resultado');window.clarity('event','cta_entender_resultado');}
+    // Marcar que ya vio la pantalla del terapeuta — desbloquea el botón "Tu camino"
+    localStorage.setItem('vb_vio_terapeuta','true');
+  }catch(e){}
+  
+  var dosha=(window.res&&window.res.p)?window.res.p:'vata';
+  var t=_VB_TERAPEUTA[dosha]||_VB_TERAPEUTA.vata;
+  var desequilibrio=_vbCalcularDesequilibrio();
+  var equilibrio=100-desequilibrio;
+  
+  var html='<div id="vbOverlayTerapeuta" style="position:fixed;inset:0;background:#fff;z-index:5000;overflow-y:auto;-webkit-overflow-scrolling:touch">'
+    +'<div style="max-width:480px;margin:0 auto;min-height:100vh">'
+    
+    // HEADER
+    +'<div style="background:'+t.bgColor+';padding:36px 24px 28px;text-align:center;position:relative">'
+    +'<button onclick="_vbCerrarTerapeuta()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,.9);border:none;width:38px;height:38px;border-radius:50%;font-size:20px;cursor:pointer;color:#333;line-height:1;font-weight:700">✕</button>'
+    +'<div style="font-size:64px;margin-bottom:8px">'+t.emoji+'</div>'
+    +'<p style="font-size:11px;color:rgba(0,0,0,.55);margin:0 0 4px;letter-spacing:2.5px;text-transform:uppercase;font-weight:600">Tu naturaleza es</p>'
+    +'<h2 style="font-family:\'Lora\',serif;font-size:34px;color:#1a1a1a;margin:0;font-weight:600">'+t.nombre+'</h2>'
+    +'</div>'
+    
+    // SALUDO
+    +'<div style="padding:28px 24px 16px;background:#FAF7F0;border-bottom:1px solid #E8DFC8">'
+    +'<p style="font-size:15px;line-height:1.7;color:#3D5A36;font-style:italic;margin:0">"'+t.saludoBase+'"</p>'
+    +'</div>'
+    
+    // EL DESEQUILIBRIO — gauge visual
+    +'<div style="padding:32px 24px;text-align:center;background:linear-gradient(180deg,#fff 0%,#FAF7F0 100%)">'
+    +'<p style="font-size:11px;color:#8B7355;letter-spacing:2.5px;text-transform:uppercase;margin:0 0 14px;font-weight:600">Tu equilibrio actual</p>'
+    +'<div style="display:inline-block;position:relative;width:160px;height:160px">'
+    +'<svg width="160" height="160" viewBox="0 0 160 160">'
+    +'<circle cx="80" cy="80" r="68" fill="none" stroke="#E8DFC8" stroke-width="14"/>'
+    +'<circle cx="80" cy="80" r="68" fill="none" stroke="'+t.color+'" stroke-width="14" stroke-linecap="round" stroke-dasharray="'+(equilibrio*4.27)+' 427" transform="rotate(-90 80 80)"/>'
+    +'</svg>'
+    +'<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">'
+    +'<div style="font-size:42px;font-weight:700;color:#1a1a1a;line-height:1">'+equilibrio+'%</div>'
+    +'<div style="font-size:11px;color:#8B7355;letter-spacing:1.5px;text-transform:uppercase;margin-top:4px">equilibrio</div>'
+    +'</div>'
+    +'</div>'
+    +'<p style="font-size:13px;color:#8B7355;margin:18px 0 0;line-height:1.5">El desequilibrio es de <strong style="color:'+t.color+'">'+desequilibrio+'%</strong>.<br>Eso es lo que vamos a trabajar.</p>'
+    +'</div>'
+    
+    // SECCIONES NARRATIVAS (13 bloques numerados)
+    +t.secciones.map(function(s,i){
+      return '<div style="padding:'+(i===0?'28px':'8px')+' 24px 20px">'
+        +'<div style="display:flex;align-items:center;margin-bottom:12px">'
+        +'<div style="width:30px;height:30px;border-radius:50%;background:'+(i<3?'#3D5A36':i<7?t.color:'#5A7A53')+';color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;margin-right:10px;flex-shrink:0">'+(i+1)+'</div>'
+        +'<h3 style="font-family:\'Lora\',serif;font-size:18px;color:#1a1a1a;margin:0;font-weight:600;line-height:1.3">'+s.titulo+'</h3>'
+        +'</div>'
+        +'<p style="font-size:15px;line-height:1.75;color:#3a3a3a;margin:0 0 0 40px">'+s.texto+'</p>'
+        +'</div>';
+    }).join('')
+    
+    // CTA
+    +'<div style="padding:24px;background:#FAF7F0;border-top:1px solid #E8DFC8">'
+    +'<p style="font-size:14px;color:#5A7A53;font-style:italic;text-align:center;margin:0 0 18px;line-height:1.6">¿Querés ver tu camino completo<br>con todos los ajustes paso a paso?</p>'
+    +'<button onclick="_vbCerrarTerapeuta();_vbAbrirTuCamino()" style="display:block;width:100%;padding:18px 20px;background:#3D5A36;color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;line-height:1.3;box-shadow:0 4px 12px rgba(61,90,54,.25)">Ver mi camino del bienestar<div style="font-size:12px;font-weight:400;color:#D1FAE5;margin-top:4px">El GPS personalizado para vos</div></button>'
+    +'<button onclick="_vbCerrarTerapeuta()" style="display:block;width:100%;padding:14px 20px;background:transparent;color:#5A7A53;border:none;font-size:14px;cursor:pointer;font-family:inherit;margin-top:8px">Sigo mirando, todavía no</button>'
+    +'</div>'
+    +'</div></div>';
+  document.body.insertAdjacentHTML('beforeend',html);
+  document.body.style.overflow='hidden';
+}
+
+function _vbCerrarTerapeuta(){
+  var o=document.getElementById('vbOverlayTerapeuta');
+  if(o)o.remove();
+  document.body.style.overflow='';
+  // Marcar que ya vio la pantalla del terapeuta — desbloquea el botón "Tu camino"
+  try{localStorage.setItem('vb_vio_terapeuta','true');}catch(e){}
+}
+
+function _vbPlanPersonalizado(){
+  _vbAccionPracticaPostInforme('plan_personalizado');
+}
+
+
+// Función original de cupón queda desactivada
+function generarCupon_LEGACY(){
   try{if(typeof gtag==='function')gtag('event','cupon_generado',{event_category:'referido'})}catch(e){}
   
   var dosha=res&&res.p?res.p:'vata';
@@ -1969,6 +2242,310 @@ function enviarRegalo(){
     }).catch(function(){});
   }catch(e){}
 })();
+</script>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- BLOQUE 1: BOTÓN FLOTANTE "TU CAMINO" — GPS del Bienestar          -->
+<!-- Aparece solo cuando la persona está en la pantalla post-informe   -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<div id="vbTuCaminoBtn" style="display:none;position:fixed;bottom:20px;right:20px;z-index:9998;cursor:pointer;transition:transform .2s">
+  <div onclick="_vbAbrirTuCamino()" style="background:linear-gradient(135deg,#3D5A36,#2D4226);color:#F5F1E8;padding:12px 16px;border-radius:16px;box-shadow:0 6px 20px rgba(61,90,54,.35);min-width:150px;border:1px solid rgba(255,255,255,.1)">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <span style="font-size:20px">🧭</span>
+      <span style="font-size:13px;font-weight:700;letter-spacing:0.5px">Tu camino</span>
+    </div>
+    <div style="font-size:11px;color:#D4B896;font-weight:400;line-height:1.4">
+      <span id="vbTcEquilibrio">Equilibrio —%</span>
+    </div>
+    <div style="font-size:10px;color:#A9C4A5;margin-top:2px;line-height:1.3" id="vbTcProximo">
+      Tocá para empezar
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════════
+   LÓGICA DEL BOTÓN FLOTANTE "TU CAMINO"
+   - Solo aparece en la pantalla post-informe (#s4)
+   - Muestra el % de equilibrio y el próximo ajuste
+   - Al tocar abre la pantalla del GPS (Bloque 2, próximo)
+   ════════════════════════════════════════════════════════════════ */
+(function(){
+  var btn=document.getElementById('vbTuCaminoBtn');
+  if(!btn) return;
+
+  // Mostrar solo a gratis post-test, ocultar a los que pagaron
+  function actualizarVisibilidad(){
+    try{
+      var activa=document.querySelector('.screen.active');
+      var yaVioTerapeuta=localStorage.getItem('vb_vio_terapeuta')==='true';
+      var yaPago=localStorage.getItem('vb_paid')==='true';
+      // Ocultar si pagó (ya tiene el GPS adentro del producto)
+      if(yaPago){btn.style.display='none';return;}
+      // Mostrar solo en pantalla post-informe, con test hecho, y tras ver terapeuta
+      if(activa && activa.id==='s4' && window.res && window.res.p && yaVioTerapeuta){
+        btn.style.display='block';
+        actualizarDatos();
+      }else{
+        btn.style.display='none';
+      }
+    }catch(e){}
+  }
+
+  // Mostrar el desequilibrio específico de la persona
+  function actualizarDatos(){
+    try{
+      var dosha=window.res?window.res.p:null;
+      if(!dosha) return;
+      var pct=window.res.pct?window.res.pct[dosha]:50;
+      
+      // Nombre del dosha + % de desequilibrio
+      var nombreDosha={vata:'Vata',pitta:'Pitta',kapha:'Kapha'};
+      var n=nombreDosha[dosha]||'Dosha';
+      document.getElementById('vbTcEquilibrio').textContent=n+' al '+Math.round(pct)+'%';
+      
+      // Qué pide el cuerpo según el desequilibrio (gancho a la acción)
+      var mensajePorDosha={
+        vata:'🌿 Tu cuerpo pide tierra',
+        pitta:'💧 Tu cuerpo pide frescura',
+        kapha:'🔥 Tu cuerpo pide movimiento'
+      };
+      document.getElementById('vbTcProximo').textContent=mensajePorDosha[dosha]||'🌿 Vamos a equilibrarte';
+    }catch(e){}
+  }
+
+  // Revisar cada 1 segundo (simple, eficiente)
+  setInterval(actualizarVisibilidad,1000);
+  // Hover/touch feedback
+  btn.addEventListener('touchstart',function(){this.style.transform='scale(0.96)';},{passive:true});
+  btn.addEventListener('touchend',function(){this.style.transform='scale(1)';},{passive:true});
+})();
+
+// Tocar Tu camino:
+// - Si NO pagó → checkout directo (gancho de conversión)
+// - Si YA pagó → abre la pantalla completa del GPS
+function _vbAbrirTuCamino(){
+  var yaPago=false;
+  try{yaPago=localStorage.getItem('vb_paid')==='true';}catch(e){}
+  
+  try{
+    if(typeof gtag==='function'){
+      if(yaPago){
+        gtag('event','gps_abierto',{event_category:'engagement',event_label:'usuario_pago'});
+      }else{
+        gtag('event','cta_post_informe',{event_category:'conversion',event_label:'tu_camino_flotante',variant:'tu_camino_gancho'});
+      }
+    }
+    if(typeof window.clarity==='function'){
+      window.clarity('event',yaPago?'gps_abierto':'tu_camino_click_checkout');
+    }
+  }catch(e){}
+  
+  if(yaPago){
+    _vbAbrirPantallaGPS();
+  }else{
+    if(typeof _vbAccionPracticaPostInforme==='function'){
+      _vbAccionPracticaPostInforme('tu_camino_flotante');
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// BLOQUE 2: PANTALLA DEL GPS COMPLETA
+// Solo accesible para usuarios que pagaron
+// ════════════════════════════════════════════════════════════════
+
+// Datos de los 9 ajustes iniciales (3 por dosha)
+// NOTA: el contenido real completo viene en el Bloque 3
+var _VB_AJUSTES={
+  vata:[
+    {id:'v1',cat:'alimentos',emoji:'🍵',titulo:'Agua tibia al despertar',desc:'Un vaso de agua tibia con 3 gotas de limón antes de cualquier otra cosa. Enciende el fuego digestivo suavemente.',tiempo:'2 min'},
+    {id:'v2',cat:'alimentos',emoji:'🥘',titulo:'Una comida caliente al mediodía',desc:'Tu cuerpo digiere mejor lo cocido y tibio. Evitá ensaladas frías como plato principal esta semana.',tiempo:'siempre'},
+    {id:'v3',cat:'horarios',emoji:'🛏️',titulo:'Dormirse antes de las 22:30',desc:'Tu sistema nervioso se resetea en la primera mitad de la noche. Si te acostás tarde, no repone.',tiempo:'todos los días'}
+  ],
+  pitta:[
+    {id:'p1',cat:'alimentos',emoji:'🥒',titulo:'Algo fresco en cada comida',desc:'Pepino, menta, cilantro, yogur. Tu fuego digestivo es fuerte, lo que necesita es baja la temperatura.',tiempo:'cada comida'},
+    {id:'p2',cat:'horarios',emoji:'🌅',titulo:'No saltearte el almuerzo',desc:'De 12 a 14 tu digestión está en pico. Si no comés, tu cuerpo quema reservas y te ponés irritable.',tiempo:'todos los días'},
+    {id:'p3',cat:'descanso',emoji:'🌙',titulo:'Pantalla off 30 min antes de dormir',desc:'Tu mente analítica necesita bajar revoluciones. Leer en papel o respirar reemplaza la pantalla.',tiempo:'30 min antes de dormir'}
+  ],
+  kapha:[
+    {id:'k1',cat:'alimentos',emoji:'🫚',titulo:'Jengibre antes de comer',desc:'Una rodajita de jengibre fresco con limón 10 min antes del almuerzo despierta tu digestión lenta.',tiempo:'10 min antes de almorzar'},
+    {id:'k2',cat:'horarios',emoji:'⏰',titulo:'Levantarte antes de las 6:30',desc:'Después de las 7 tu cuerpo entra en modo pesado y te cuesta el día entero. Madrugar te libera.',tiempo:'todos los días'},
+    {id:'k3',cat:'movimiento',emoji:'🚶',titulo:'Caminar 20 min después de comer',desc:'Tu metabolismo necesita moverse para procesar. Caminar rápido después de comer evita la pesadez.',tiempo:'20 min post-almuerzo'}
+  ]
+};
+
+function _vbAbrirPantallaGPS(){
+  var dosha=(window.res&&window.res.p)?window.res.p:'vata';
+  var pct=window.res&&window.res.pct?Math.round(window.res.pct[dosha]):50;
+  var ajustesHechos=[];
+  try{ajustesHechos=JSON.parse(localStorage.getItem('vb_ajustes_hechos')||'[]');}catch(e){}
+  
+  var bonusPorAjustes=Math.min(ajustesHechos.length*3,40);
+  var equilibrio=Math.min(100-pct+bonusPorAjustes,100);
+  equilibrio=Math.max(equilibrio,5);
+  equilibrio=Math.round(equilibrio);
+  
+  var ajustes=_VB_AJUSTES[dosha]||_VB_AJUSTES.vata;
+  var proximoAjuste=ajustes.find(function(a){return ajustesHechos.indexOf(a.id)===-1;})||ajustes[0];
+  var hechosObjs=ajustes.filter(function(a){return ajustesHechos.indexOf(a.id)>-1;});
+  var bloqueadosObjs=ajustes.filter(function(a){return ajustesHechos.indexOf(a.id)===-1 && a.id!==proximoAjuste.id;});
+  
+  var nombreDosha={vata:'Aire',pitta:'Fuego',kapha:'Tierra'}[dosha]||'';
+  var colorDosha={vata:'#3B82F6',pitta:'#F97316',kapha:'#22C55E'}[dosha]||'#5A7A53';
+  
+  // Calcular grados del círculo para el score
+  var grados=Math.round(equilibrio*3.6);
+  
+  var hechosHTML=hechosObjs.length===0 ? 
+    '<p style="text-align:center;color:#8B7355;font-style:italic;margin:0;font-size:13px;padding:24px 16px">Todavía no completaste ningún paso.<br>Empezá por el de arriba 👆</p>' :
+    hechosObjs.map(function(a){
+      return '<div style="display:flex;align-items:center;padding:14px 16px;background:#F0FDF4;border-radius:12px;margin-bottom:8px;border-left:4px solid #22C55E">'
+        +'<div style="font-size:24px;margin-right:12px">'+a.emoji+'</div>'
+        +'<div style="flex:1"><div style="font-size:14px;font-weight:600;color:#1a1a1a">'+a.titulo+'</div>'
+        +'<div style="font-size:11px;color:#5A7A53;margin-top:2px;text-transform:uppercase;letter-spacing:0.5px">✓ '+a.cat+'</div></div>'
+        +'</div>';
+    }).join('');
+  
+  var bloqueadosHTML=bloqueadosObjs.map(function(a){
+    return '<div style="display:flex;align-items:center;padding:14px 16px;background:#F5F5F5;border-radius:12px;margin-bottom:8px;opacity:0.55">'
+      +'<div style="font-size:20px;margin-right:12px;filter:grayscale(1)">🔒</div>'
+      +'<div style="flex:1"><div style="font-size:14px;font-weight:500;color:#666">'+a.titulo+'</div>'
+      +'<div style="font-size:11px;color:#999;margin-top:2px;text-transform:uppercase;letter-spacing:0.5px">'+a.cat+'</div></div>'
+      +'</div>';
+  }).join('');
+  
+  var html='<div id="vbOverlayGPS" style="position:fixed;inset:0;background:#FAF7F0;z-index:5000;overflow-y:auto;-webkit-overflow-scrolling:touch">'
+    +'<div style="max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:60px">'
+    
+    // HEADER
+    +'<div style="background:linear-gradient(135deg,#3D5A36,#2D4226);color:#F5F1E8;padding:24px 20px 20px;position:relative">'
+    +'<button onclick="_vbCerrarGPS()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);border:none;width:38px;height:38px;border-radius:50%;font-size:20px;cursor:pointer;color:#fff;line-height:1;font-weight:700">✕</button>'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">'
+    +'<span style="font-size:24px">🧭</span>'
+    +'<h2 style="font-family:\'Lora\',serif;font-size:22px;margin:0;font-weight:600">Tu camino</h2>'
+    +'</div>'
+    +'<p style="font-size:13px;color:#D4B896;margin:0;letter-spacing:0.3px">El GPS del Bienestar</p>'
+    +'</div>'
+    
+    // SECCIÓN 1: SCORE CIRCULAR
+    +'<div style="padding:32px 20px 20px;text-align:center;background:#FAF7F0">'
+    +'<div style="position:relative;width:180px;height:180px;margin:0 auto 16px">'
+    +'<svg width="180" height="180" viewBox="0 0 180 180" style="transform:rotate(-90deg)">'
+    +'<circle cx="90" cy="90" r="78" fill="none" stroke="#E8DFC8" stroke-width="12"/>'
+    +'<circle cx="90" cy="90" r="78" fill="none" stroke="'+colorDosha+'" stroke-width="12" stroke-linecap="round" stroke-dasharray="'+(equilibrio*4.9)+' 490" stroke-dashoffset="0"/>'
+    +'</svg>'
+    +'<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">'
+    +'<div style="font-family:\'Lora\',serif;font-size:44px;font-weight:600;color:#1a1a1a;line-height:1">'+equilibrio+'<span style="font-size:20px;color:#8B7355">%</span></div>'
+    +'<div style="font-size:11px;color:#8B7355;text-transform:uppercase;letter-spacing:1.5px;margin-top:4px">Equilibrio</div>'
+    +'</div>'
+    +'</div>'
+    +'<p style="font-size:14px;color:#3D5A36;margin:0 0 24px;font-style:italic;line-height:1.5">'
+    +(equilibrio>=70 ? 'Estás bien. Vamos a afinar.' : equilibrio>=40 ? 'Estás en camino. Cada paso cuenta.' : 'Venís con mucho que equilibrar. Paciencia.')+'</p>'
+    
+    // DE DÓNDE VENÍS → A DÓNDE VAS
+    +'<div style="background:#fff;border-radius:14px;padding:18px;margin-bottom:24px;border:1px solid #E8DFC8">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;gap:12px">'
+    +'<div style="flex:1;text-align:center">'
+    +'<div style="font-size:10px;color:#8B7355;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px">De acá</div>'
+    +'<div style="font-size:16px;font-weight:600;color:'+colorDosha+'">'+nombreDosha+' '+pct+'%</div>'
+    +'<div style="font-size:11px;color:#999;margin-top:2px">Tu desequilibrio hoy</div>'
+    +'</div>'
+    +'<div style="font-size:20px;color:#D4B896">→</div>'
+    +'<div style="flex:1;text-align:center">'
+    +'<div style="font-size:10px;color:#8B7355;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px">A acá</div>'
+    +'<div style="font-size:16px;font-weight:600;color:#3D5A36">Equilibrio</div>'
+    +'<div style="font-size:11px;color:#999;margin-top:2px">Tu objetivo</div>'
+    +'</div>'
+    +'</div>'
+    +'</div>'
+    +'</div>'
+    
+    // SECCIÓN 2: PRÓXIMO PASO
+    +'<div style="padding:0 20px 24px">'
+    +'<p style="font-size:11px;color:#8B7355;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;font-weight:600">Tu próximo paso</p>'
+    +'<div style="background:linear-gradient(135deg,#FFF4E6,#FFE0B2);border:2px solid #F57C00;border-radius:18px;padding:20px;box-shadow:0 4px 14px rgba(245,124,0,0.12)">'
+    +'<div style="display:flex;align-items:start;gap:14px;margin-bottom:14px">'
+    +'<div style="font-size:42px">'+proximoAjuste.emoji+'</div>'
+    +'<div style="flex:1">'
+    +'<div style="font-size:10px;color:#F57C00;text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:4px">'+proximoAjuste.cat+'</div>'
+    +'<h3 style="font-family:\'Lora\',serif;font-size:19px;color:#1a1a1a;margin:0 0 6px;font-weight:600;line-height:1.25">'+proximoAjuste.titulo+'</h3>'
+    +'<p style="font-size:11px;color:#8B7355;margin:0">⏱️ '+proximoAjuste.tiempo+'</p>'
+    +'</div>'
+    +'</div>'
+    +'<p style="font-size:14px;color:#3a3a3a;line-height:1.6;margin:0 0 18px">'+proximoAjuste.desc+'</p>'
+    
+    // 4 BOTONES DE ESTADO (checklist)
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+    +'<button onclick="_vbMarcarAjuste(\''+proximoAjuste.id+'\',\'hecho\')" style="padding:12px 8px;background:#22C55E;color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;line-height:1.3">✅<br>Lo hice</button>'
+    +'<button onclick="_vbMarcarAjuste(\''+proximoAjuste.id+'\',\'rutina\')" style="padding:12px 8px;background:#3D5A36;color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;line-height:1.3">🔁<br>Es rutina</button>'
+    +'<button onclick="_vbMarcarAjuste(\''+proximoAjuste.id+'\',\'pausa\')" style="padding:12px 8px;background:#fff;color:#8B7355;border:2px solid #D4B896;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1.3">⏸️<br>Dame tiempo</button>'
+    +'<button onclick="_vbMarcarAjuste(\''+proximoAjuste.id+'\',\'descartar\')" style="padding:12px 8px;background:#fff;color:#999;border:2px solid #E5E5E5;border-radius:10px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;line-height:1.3">❌<br>No es para mí</button>'
+    +'</div>'
+    +'</div>'
+    +'</div>'
+    
+    // SECCIÓN 3: CAMINO RECORRIDO
+    +'<div style="padding:0 20px 24px">'
+    +'<p style="font-size:11px;color:#8B7355;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;font-weight:600">Tu camino recorrido</p>'
+    +hechosHTML
+    +'</div>'
+    
+    // SECCIÓN 4: LO QUE VIENE
+    +(bloqueadosObjs.length>0 ? ('<div style="padding:0 20px 24px">'
+    +'<p style="font-size:11px;color:#8B7355;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;font-weight:600">Lo que viene</p>'
+    +bloqueadosHTML
+    +'</div>') : '')
+    
+    // FOOTER
+    +'<div style="padding:20px;text-align:center;border-top:1px solid #E8DFC8;margin-top:8px">'
+    +'<p style="font-size:12px;color:#8B7355;font-style:italic;margin:0;line-height:1.6">Cada pequeño ajuste te acerca al equilibrio.<br>No hay apuro. Tu cuerpo es sabio.</p>'
+    +'</div>'
+    
+    +'</div></div>';
+  
+  document.body.insertAdjacentHTML('beforeend',html);
+  document.body.style.overflow='hidden';
+}
+
+function _vbCerrarGPS(){
+  var o=document.getElementById('vbOverlayGPS');
+  if(o)o.remove();
+  document.body.style.overflow='';
+}
+
+// Marcar un ajuste con uno de los 4 estados
+function _vbMarcarAjuste(id,estado){
+  try{
+    var hechos=JSON.parse(localStorage.getItem('vb_ajustes_hechos')||'[]');
+    var estados=JSON.parse(localStorage.getItem('vb_ajustes_estados')||'{}');
+    
+    if(estado==='hecho' || estado==='rutina'){
+      if(hechos.indexOf(id)===-1) hechos.push(id);
+      estados[id]=estado;
+    } else if(estado==='descartar'){
+      // Sacar de hechos, marcar como descartado
+      hechos=hechos.filter(function(x){return x!==id;});
+      estados[id]='descartado';
+    } else if(estado==='pausa'){
+      estados[id]='pausa';
+    }
+    
+    localStorage.setItem('vb_ajustes_hechos',JSON.stringify(hechos));
+    localStorage.setItem('vb_ajustes_estados',JSON.stringify(estados));
+    
+    if(typeof gtag==='function'){
+      gtag('event','ajuste_marcado',{event_category:'gps',event_label:id+'_'+estado,ajuste_id:id,estado:estado});
+    }
+    if(typeof window.clarity==='function'){
+      window.clarity('event','ajuste_'+estado+'_'+id);
+    }
+    
+    // Re-renderizar el GPS
+    _vbCerrarGPS();
+    setTimeout(_vbAbrirPantallaGPS,100);
+  }catch(e){}
+}
 </script>
 
 </body>
