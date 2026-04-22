@@ -35,6 +35,9 @@ h1,h2,h3,h4{font-family:'Lora',serif}.container{max-width:480px;margin:0 auto;pa
 .btn-gold{background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff}
 .btn-outline{background:transparent;border:2px solid #e5e5e5;color:#666}
 .screen{display:none;min-height:100vh}.screen.active{display:block}
+/* savedSession banner solo visible dentro del Hero activo */
+.screen:not(.active) #savedSession{display:none!important}
+#s2 #savedSession,#s3 #savedSession,#s4 #savedSession{display:none!important}
 .card{background:#fff;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
 .tip-card{background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border-left:4px solid var(--sage);padding:12px 16px;margin-bottom:10px;border-radius:0 12px 12px 0}
 .tip-num{background:var(--sage);color:#fff;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-right:8px}
@@ -134,7 +137,7 @@ window.clarity('event',eventName+(label?'_'+label:''));
 <div onclick="startTest()" style="text-align:center;max-width:70px;cursor:pointer;transition:transform .2s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"><span style="font-size:28px;display:block">🪐</span><span style="font-size:10px;color:#7a7a7a;line-height:1.3;display:block">Carta Astral<br>Védica</span></div>
 <div onclick="startTest()" style="text-align:center;max-width:70px;cursor:pointer;transition:transform .2s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"><span style="font-size:28px;display:block">🧘</span><span style="font-size:10px;color:#7a7a7a;line-height:1.3;display:block">17 Áreas<br>a Ajustar</span></div>
 </div>
-<div id="savedSession" style="display:none;margin-top:24px"><div class="card"><p style="margin-bottom:12px">🎉 ¡Tenés una sesión guardada!</p><button class="btn btn-sage" onclick="loadSession()">CONTINUAR MI PERFIL →</button><button class="btn btn-outline" style="margin-top:8px" onclick="clearSession()">Empezar de nuevo</button></div></div>
+<div id="savedSession" style="display:none;margin-top:24px"><div class="card" style="background:#F0FDF4;border:2px solid #5A7A53;padding:18px"><p style="margin-bottom:14px;font-size:15px;color:#3D5A36;font-weight:600">🎉 ¡Tenés una sesión guardada!</p><p style="margin-bottom:16px;font-size:13px;color:#5A7A53">Podés continuar donde la dejaste o empezar de cero.</p><button type="button" class="btn btn-sage" style="padding:18px;font-size:15px;touch-action:manipulation;min-height:54px" onclick="loadSession()">CONTINUAR MI PERFIL →</button><button type="button" class="btn btn-outline" style="margin-top:10px;padding:14px;touch-action:manipulation;min-height:46px" onclick="clearSession()">Empezar de nuevo</button></div></div>
 </div>
 </div>
 </div>
@@ -373,7 +376,43 @@ salud:function(a){return"Por último, algunas cositas para tener en cuenta. No e
 }
 };
 function saveSession(){try{localStorage.setItem("vb_res",JSON.stringify(res)),localStorage.setItem("vb_email",userEmail),localStorage.setItem("vb_dosha",res.p)}catch(a){}}
-function loadSession(){try{var a=localStorage.getItem("vb_res");if(a)return res=JSON.parse(a),userEmail=localStorage.getItem("vb_email")||"",showResults(),!0}catch(a){}return!1}
+function loadSession(){
+  try{
+    var a=localStorage.getItem("vb_res");
+    if(!a){
+      // No hay sesión guardada, limpiar banner y volver al inicio
+      document.getElementById("savedSession").style.display="none";
+      return false;
+    }
+    var parsed=JSON.parse(a);
+    // Validar que tenga los campos mínimos requeridos
+    if(!parsed || !parsed.p || !parsed.pct){
+      // Datos corruptos — limpiar y avisar
+      localStorage.removeItem("vb_res");
+      localStorage.removeItem("vb_email");
+      document.getElementById("savedSession").style.display="none";
+      alert("Tu sesión anterior no se pudo recuperar. Empezá el test de nuevo.");
+      try{if(typeof gtag==='function')gtag('event','sesion_corrupta',{event_category:'error'});}catch(e){}
+      return false;
+    }
+    res=parsed;
+    userEmail=localStorage.getItem("vb_email")||"";
+    // Ocultar el banner de sesión guardada al cargar el informe
+    document.getElementById("savedSession").style.display="none";
+    showResults();
+    try{if(typeof gtag==='function')gtag('event','sesion_retomada',{event_category:'navegacion',event_label:'continuar_perfil'});}catch(e){}
+    return true;
+  }catch(err){
+    // Error en parsing — limpiar todo
+    try{
+      localStorage.removeItem("vb_res");
+      localStorage.removeItem("vb_email");
+      document.getElementById("savedSession").style.display="none";
+      alert("Hubo un problema al recuperar tu sesión. Empezá de nuevo.");
+    }catch(e){}
+    return false;
+  }
+}
 function checkSaved(){try{localStorage.getItem("vb_res")&&(document.getElementById("savedSession").style.display="block")}catch(a){}}
 function clearSession(){try{localStorage.removeItem("vb_res"),localStorage.removeItem("vb_email"),localStorage.removeItem("vb_dosha"),document.getElementById("savedSession").style.display="none"}catch(a){}}
 function vbHacerPDF(htmlContent,nombre){var doc='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+nombre+'</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Helvetica,Arial,sans-serif;color:#1a1a1a;background:#fff;padding:20px;max-width:600px;margin:0 auto;line-height:1.5}h1{font-size:22px;margin:8px 0}h3{font-size:16px;margin:0 0 8px}h4{font-size:14px;margin:8px 0 4px}p{margin:4px 0;font-size:13px}@media print{body{padding:10px}}</style></head><body>'+htmlContent+'</body></html>';try{var blob=new Blob([doc],{type:'text/html;charset=utf-8'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=nombre.replace('.pdf','.html');a.style.display='none';document.body.appendChild(a);a.click();setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);}catch(e){var w=window.open('','_blank');if(w){w.document.open();w.document.write(doc);w.document.close();w.focus();setTimeout(function(){try{w.print()}catch(e2){}},500);}else{alert('No se pudo descargar el informe. Intentá desde otro navegador.');}}}
@@ -407,7 +446,7 @@ html+='<div style="text-align:center;color:#999;font-size:11px;margin-top:20px;p
 vbHacerPDF(html,'VedaBite-Informe-'+voz+'.pdf')}
 function confirmRestart(){confirm("¿Querés rehacer el test? Tus resultados actuales se perderán.")&&(clearSession(),startTest())}
 function show(a){document.querySelectorAll(".screen").forEach(function(a){a.classList.remove("active")}),document.getElementById(a).classList.add("active"),window.scrollTo(0,0),document.getElementById("navBar").classList.toggle("active","s4"===a)}
-function startTest(){ans={vata:qi=0,pitta:0,kapha:0},show("s2"),renderQ()}
+function startTest(){try{var ss=document.getElementById("savedSession");if(ss)ss.style.display="none";}catch(e){}ans={vata:qi=0,pitta:0,kapha:0},show("s2"),renderQ()}
 function renderQ(){var e=Q[qi];document.getElementById("qnum").textContent=qi+1,document.getElementById("pbar").style.width=(qi+1)/60*100+"%",document.getElementById("qcat").textContent=e.c,document.getElementById("qtxt").textContent=e.q,document.getElementById("qopts").innerHTML=[{v:0,l:"No me identifica"},{v:1,l:"A veces"},{v:2,l:"Frecuentemente"},{v:3,l:"Totalmente"}].map(function(a){return'<div class="test-opt" onclick="answer(\''+e.d+"',"+a.v+')"><span>'+a.l+"</span></div>"}).join("")}
 function answer(a,e){ans[a]+=e,(60<=++qi?showEmail:renderQ)()}
 function prevQ(){0<qi?(qi--,renderQ()):show("s1")}
