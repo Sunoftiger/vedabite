@@ -413,7 +413,7 @@ function answer(a,e){ans[a]+=e,(60<=++qi?showEmail:renderQ)()}
 function prevQ(){0<qi?(qi--,renderQ()):show("s1")}
 function getRes(){var a=ans.vata+ans.pitta+ans.kapha||1,e="vata";return ans.pitta>ans[e]&&(e="pitta"),{p:e=ans.kapha>ans[e]?"kapha":e,pct:{vata:Math.round(ans.vata/a*100),pitta:Math.round(ans.pitta/a*100),kapha:Math.round(ans.kapha/a*100)}}}
 function showEmail(){res=getRes();var a=D[res.p];document.getElementById("eDosha").textContent=a.e,document.getElementById("eName").textContent=a.n,show("s3")}
-function submitEmail(){var a=document.getElementById("emailIn").value;if(!a||!a.includes("@"))return alert("Email inválido");(async function(){try{var emailClean=a.trim().toLowerCase();var msgBuffer=new TextEncoder().encode(emailClean);var hashBuffer=await crypto.subtle.digest('SHA-256',msgBuffer);var hashed=Array.from(new Uint8Array(hashBuffer)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');if(typeof gtag==='function'){gtag('set','user_data',{'sha256_email_address':hashed});}}catch(e){}})();userEmail=a;var e=D[res.p];emailjs.send("service_xf7v0x7","template_vzggqyx",{to_email:a,dosha_name:e.n,dosha_emoji:e.e,dosha_desc:e.desc,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha}).then(function(){}).catch(function(a){});try{if(window._vbSaveLead)window._vbSaveLead({email:a,dosha:res.p,dosha_name:e.n,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha,trialStart:new Date().toISOString(),trialEnd:new Date(Date.now()+10*24*60*60*1000).toISOString(),paid:false,source:document.referrer||"direct",utm:location.search||""}).catch(function(){});}catch(e){}try{localStorage.setItem("vb_trialStart",new Date().toISOString());gtag("event","generate_lead");if(window._vbTrack)window._vbTrack()}catch(a){}saveSession(),showResults()}
+function submitEmail(){var a=document.getElementById("emailIn").value;if(!a||!a.includes("@"))return alert("Email inválido");(async function(){try{var emailClean=a.trim().toLowerCase();var msgBuffer=new TextEncoder().encode(emailClean);var hashBuffer=await crypto.subtle.digest('SHA-256',msgBuffer);var hashed=Array.from(new Uint8Array(hashBuffer)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');if(typeof gtag==='function'){gtag('set','user_data',{'sha256_email_address':hashed});}}catch(e){}})();userEmail=a;try{localStorage.setItem("vb_email",a);}catch(e){}var e=D[res.p];emailjs.send("service_xf7v0x7","template_vzggqyx",{to_email:a,dosha_name:e.n,dosha_emoji:e.e,dosha_desc:e.desc,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha}).then(function(){}).catch(function(a){});try{if(window._vbSaveLead)window._vbSaveLead({email:a,dosha:res.p,dosha_name:e.n,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha,trialStart:new Date().toISOString(),trialEnd:new Date(Date.now()+10*24*60*60*1000).toISOString(),paid:false,source:document.referrer||"direct",utm:location.search||""}).catch(function(){});}catch(e){}try{localStorage.setItem("vb_trialStart",new Date().toISOString());gtag("event","generate_lead");if(window._vbTrack)window._vbTrack()}catch(a){}saveSession(),showResults()}
 function showResults(){var a=D[res.p];document.getElementById("resHeader").style.background=a.bg,document.getElementById("resEmoji").textContent=a.e,document.getElementById("resName").textContent=a.n,document.getElementById("resDesc").textContent=a.desc,document.getElementById("resPct").innerHTML=Object.entries(res.pct).sort(function(a,e){return e[1]-a[1]}).map(function(a){return'<div style="background:#fff;padding:8px 16px;border-radius:8px"><div style="font-weight:700;color:'+D[a[0]].c+'">'+a[1]+'%</div><div style="font-size:12px">'+D[a[0]].e+"</div></div>"}).join(""),document.getElementById("tabsGrid").innerHTML=T.map(function(a){var emojiHTML=a.id==="escanerEquilibrio"?'<span style="font-size:1.3rem;letter-spacing:3px;display:block;margin-bottom:8px">'+a.e+'</span>':'<span>'+a.e+'</span>';return'<div class="tab-card'+(a.p?" premium":"")+'" style="position:relative" onclick="showTab(\''+a.id+"')\">"+emojiHTML+"<strong>"+a.t+"</strong>"+(a.p?'<span class="premium-tag">PREMIUM</span>':"")+"</div>"}).join(""),renderTabs(a),show("s4")}
 function tips(a){return a&&a.length?'<div style="margin-top:20px"><h4 style="margin-bottom:12px">💡 7 Tips Personalizados</h4>'+a.map(function(a,e){return'<div class="tip-card"><span class="tip-num">'+(e+1)+"</span>"+a+"</div>"}).join("")+"</div>":""}
 function showTab(a){document.querySelectorAll(".tab-content").forEach(function(a){a.classList.remove("active")});var el=document.getElementById("t-"+a);if(el){el.classList.add("active");document.getElementById("tabsGrid").style.display="none";window.scrollTo(0,0);if(a==="escanerEquilibrio"){try{var dd=res&&res.p?res.p:"desconocido";if(window._vbTrack)window._vbTrack("tab_abierto",{tab:"escaner_equilibrio",dosha:dd});if(typeof window._vbFetchEstadoEscaner==='function')window._vbFetchEstadoEscaner();if(!el._vbBound){el._vbBound=true;el.addEventListener("click",function(ev){var card=ev.target.closest("[data-sec]");if(card){try{if(window._vbTrack)window._vbTrack("escaner_seccion",{seccion:card.getAttribute("data-sec"),dosha:card.getAttribute("data-dosha")});}catch(e){}}});}}catch(e){}}}}
@@ -2359,23 +2359,155 @@ function _vbAbrirTuCamino(){
 // NOTA: el contenido real completo viene en el Bloque 3
 var _VB_AJUSTES={
   vata:[
-    {id:'v1',cat:'alimentos',emoji:'🍵',titulo:'Agua tibia al despertar',desc:'Un vaso de agua tibia con 3 gotas de limón antes de cualquier otra cosa. Enciende el fuego digestivo suavemente.',tiempo:'2 min'},
-    {id:'v2',cat:'alimentos',emoji:'🥘',titulo:'Una comida caliente al mediodía',desc:'Tu cuerpo digiere mejor lo cocido y tibio. Evitá ensaladas frías como plato principal esta semana.',tiempo:'siempre'},
-    {id:'v3',cat:'horarios',emoji:'🛏️',titulo:'Dormirse antes de las 22:30',desc:'Tu sistema nervioso se resetea en la primera mitad de la noche. Si te acostás tarde, no repone.',tiempo:'todos los días'}
+    {
+      id:'v1',cat:'alimentos',emoji:'🍵',
+      titulo:'Agua tibia al despertar',
+      desc:'Un vaso de agua tibia con 3 gotas de limón antes de cualquier otra cosa. Enciende el fuego digestivo suavemente.',
+      tiempo:'2 minutos · todos los días',
+      pasos:[
+        'Ponés agua a calentar apenas te levantás (no hirviendo, tibia — como el té que tomás en invierno).',
+        'Le tirás 3 gotas de limón exprimido (no más, porque acidifica demasiado).',
+        'La tomás despacio, sentada, antes de cualquier otra cosa (antes del café, del mate, del celular).',
+        'Esperás 15 minutos antes de desayunar para que el estómago se prepare.'
+      ],
+      porque:'Cuando dormís tu fuego digestivo baja al mínimo. Si lo primero que le tirás al cuerpo es café o jugo frío, es como tirarle un balde de agua a una brasa. El agua tibia con un toque de limón despierta el sistema sin agredirlo, activa las mucosas del estómago y ayuda a limpiar lo que se acumuló durante la noche. En tu caso que sos Vata, el frío es especialmente peligroso porque tu cuerpo ya tiende a la sequedad y al frío.',
+      tip:'Si te da pereza poner agua a calentar, dejá una jarra térmica llena a la noche. A la mañana ya está lista. Convertilo en ritual, no en obligación.',
+      video:''
+    },
+    {
+      id:'v2',cat:'alimentos',emoji:'🥘',
+      titulo:'Una comida caliente al mediodía',
+      desc:'Tu cuerpo digiere mejor lo cocido y tibio. Evitá ensaladas frías como plato principal esta semana.',
+      tiempo:'siempre · la comida principal del día',
+      pasos:[
+        'Al mediodía, armá un plato con algo cocido caliente: guiso, sopa, arroz con verduras salteadas, lentejas.',
+        'Agregale una cucharada de aceite de oliva crudo o ghee al final (tu cuerpo necesita grasas buenas).',
+        'Sentate a comer. Sin celular. Mastica bien — el aire se tranquiliza cuando el cuerpo hace las cosas despacio.',
+        'Si tenés que llevar vianda, que sea en termo: un guiso siempre es mejor que una ensalada fría.'
+      ],
+      porque:'Tu naturaleza es seca y fría. Si le metés ensalada cruda fría al mediodía, tu cuerpo tiene que gastar energía extra para calentar y digerir eso. Resultado: hinchazón, gases, cansancio después de comer. En cambio lo cocido y tibio ya viene "predigerido" por la cocción — tu estómago hace menos esfuerzo y absorbés más nutrientes. La grasa buena (oliva, ghee, palta) lubrica lo seco de adentro, que es tu tendencia natural.',
+      tip:'La regla simple: si lo que vas a comer te da frío de solo mirarlo, no es para vos al mediodía. Dejá las ensaladas para cenas de verano o como acompañamiento, nunca como plato principal.',
+      video:''
+    },
+    {
+      id:'v3',cat:'horarios',emoji:'🛏️',
+      titulo:'Dormirse antes de las 22:30',
+      desc:'Tu sistema nervioso se resetea en la primera mitad de la noche. Si te acostás tarde, no repone.',
+      tiempo:'todos los días · no es negociable',
+      pasos:[
+        'A las 21:00 ya cerrás la cocina: no se come más.',
+        'A las 21:30 apagás pantallas grandes (TV, compu) y dejás el celular en otro cuarto.',
+        'A las 22:00 ya estás en la cama con un libro en papel o solo respirando.',
+        'A las 22:30 luz apagada. Aunque no tengas sueño, quedate ahí. El cuerpo aprende.'
+      ],
+      porque:'Entre las 22 y las 2 de la mañana tu cuerpo hace el trabajo más importante: repara el sistema nervioso, consolida la memoria, regula hormonas. Si te dormís a la 1, te salteás esas horas críticas — y por más que duermas 8 horas totales, vas a despertarte cansada. Los Vata son especialmente sensibles a esto porque su sistema nervioso ya está naturalmente acelerado. Dormir tarde es como dejar la computadora sin hacer copia de seguridad: la info se pierde.',
+      tip:'La primera semana te va a costar. Es normal. Tu cuerpo pide que le des una rutina nueva. A los 10 días vas a empezar a tener sueño naturalmente a las 22. No pelees con el reloj, acompañalo.',
+      video:''
+    }
   ],
   pitta:[
-    {id:'p1',cat:'alimentos',emoji:'🥒',titulo:'Algo fresco en cada comida',desc:'Pepino, menta, cilantro, yogur. Tu fuego digestivo es fuerte, lo que necesita es baja la temperatura.',tiempo:'cada comida'},
-    {id:'p2',cat:'horarios',emoji:'🌅',titulo:'No saltearte el almuerzo',desc:'De 12 a 14 tu digestión está en pico. Si no comés, tu cuerpo quema reservas y te ponés irritable.',tiempo:'todos los días'},
-    {id:'p3',cat:'descanso',emoji:'🌙',titulo:'Pantalla off 30 min antes de dormir',desc:'Tu mente analítica necesita bajar revoluciones. Leer en papel o respirar reemplaza la pantalla.',tiempo:'30 min antes de dormir'}
+    {
+      id:'p1',cat:'alimentos',emoji:'🥒',
+      titulo:'Algo fresco en cada comida',
+      desc:'Pepino, menta, cilantro, yogur. Tu fuego digestivo es fuerte, lo que necesita es baja la temperatura.',
+      tiempo:'cada comida · simple de incorporar',
+      pasos:[
+        'En el almuerzo sumá pepino en rodajas finas o hojas de menta fresca a lo que vayas a comer.',
+        'En la cena probá un yogur natural con pepino rallado (raita) o una ensalada con cilantro.',
+        'En vez de agua con limón, probá agua con unas rodajas de pepino y menta.',
+        'Reemplazá al menos una taza de café por una infusión de menta fría al mediodía.'
+      ],
+      porque:'Tu Pitta está alto, y el fuego necesita lo opuesto: frescura. El pepino es 95% agua, tiene efecto refrescante real (no es metáfora). La menta baja el calor interno, calma la acidez. El yogur natural lubrica el estómago inflamado. El cilantro es un antioxidante potente que saca toxinas generadas por el calor excesivo. Si seguís agregándole "más fuego" a tu comida (picante, frito, alcohol), tu sistema digestivo responde con acidez, reflujo, irritación.',
+      tip:'No se trata de "ponerse a dieta". Se trata de agregar cosas frescas. Seguí comiendo lo que te gusta, pero sumale algo verde y fresco al lado. El Ayurveda no quita, suma inteligentemente.',
+      video:''
+    },
+    {
+      id:'p2',cat:'horarios',emoji:'🌅',
+      titulo:'No saltearte el almuerzo',
+      desc:'De 12 a 14 tu digestión está en pico. Si no comés, tu cuerpo quema reservas y te ponés irritable.',
+      tiempo:'todos los días · entre 12 y 14 horas',
+      pasos:[
+        'Bloqueate 30 minutos reales en el calendario entre las 12 y las 14 para almorzar.',
+        'Comé sentada, sin reunión, sin pantalla, sin parado en la cocina.',
+        'Hacé tu comida más abundante del día al mediodía (no a la noche).',
+        'Si el trabajo no te deja parar, armá algo simple pero real: no sirven galletitas ni una fruta sola.'
+      ],
+      porque:'Tu fuego digestivo sigue el ritmo del sol. Cuando el sol está en el pico (12-14), tu Agni también. Es el mejor momento para digerir bien lo que comés, incluso lo más complejo. Si en ese horario no le das nada, tu cuerpo empieza a quemar sus propias reservas, liberás ácido, el fuego busca qué digerir y te digiere a vos: irritación, dolor de cabeza, mal humor a las 16 horas. Los Pitta saltan el almuerzo por exigencia o por trabajo, y pagan ese salto a la tarde con síntomas físicos y emocionales.',
+      tip:'Si decís "no tengo tiempo de almorzar", estás diciendo "no tengo tiempo de funcionar bien". Es una prioridad, no un lujo. Tu rendimiento de la tarde depende de esa pausa del mediodía.',
+      video:''
+    },
+    {
+      id:'p3',cat:'descanso',emoji:'🌙',
+      titulo:'Pantalla off 30 min antes de dormir',
+      desc:'Tu mente analítica necesita bajar revoluciones. Leer en papel o respirar reemplaza la pantalla.',
+      tiempo:'30 minutos cada noche',
+      pasos:[
+        'Ponele alarma al celular a las 22:00 que diga "modo noche".',
+        'Cuando suena, celular en modo avión y lejos de la cama (no en la mesa de luz).',
+        'Hacé una de estas tres cosas: leer algo en papel, respirar lento 5 minutos, o estirar despacio.',
+        'Luz del cuarto tenue o apagada. Sin lámpara blanca fría.'
+      ],
+      porque:'La pantalla emite luz azul que tu cerebro interpreta como "todavía es de día". Eso bloquea la melatonina (la hormona que te hace dormir). Además, el contenido que consumís a la noche (noticias, redes, mails de trabajo) activa tu mente analítica — que en Pitta ya está hiperactiva. Resultado: te dormís tarde, te despertás entre 1 y 3 de la mañana con la cabeza llena de cosas por resolver. Ese despertar del medio de la noche es pura Pitta en desequilibrio.',
+      tip:'Si te cuesta soltar el celular porque "me relajo viendo videos", probá una semana sin. Vas a descubrir que no te relajaba — te anestesiaba. La diferencia es grande.',
+      video:''
+    }
   ],
   kapha:[
-    {id:'k1',cat:'alimentos',emoji:'🫚',titulo:'Jengibre antes de comer',desc:'Una rodajita de jengibre fresco con limón 10 min antes del almuerzo despierta tu digestión lenta.',tiempo:'10 min antes de almorzar'},
-    {id:'k2',cat:'horarios',emoji:'⏰',titulo:'Levantarte antes de las 6:30',desc:'Después de las 7 tu cuerpo entra en modo pesado y te cuesta el día entero. Madrugar te libera.',tiempo:'todos los días'},
-    {id:'k3',cat:'movimiento',emoji:'🚶',titulo:'Caminar 20 min después de comer',desc:'Tu metabolismo necesita moverse para procesar. Caminar rápido después de comer evita la pesadez.',tiempo:'20 min post-almuerzo'}
+    {
+      id:'k1',cat:'alimentos',emoji:'🫚',
+      titulo:'Jengibre antes de comer',
+      desc:'Una rodajita de jengibre fresco con limón 10 min antes del almuerzo despierta tu digestión lenta.',
+      tiempo:'10 minutos antes de almorzar',
+      pasos:[
+        'Cortá una rodajita fina de jengibre fresco (del tamaño de una moneda).',
+        'Le ponés unas gotas de limón y una pizca de sal (muy poca).',
+        'Lo masticás despacio 10 minutos antes de sentarte a comer.',
+        'Tomás medio vaso de agua a temperatura natural (ni fría ni tibia).'
+      ],
+      porque:'Tu digestión es lenta por naturaleza. Si le tirás comida a un sistema dormido, la comida se queda ahí pesando, fermentando, generando mucosidad y toxinas. El jengibre despierta las enzimas digestivas antes de que llegue la comida, es como encender el horno antes de meter la bandeja. El limón suma jugos ácidos, la sal dispara la saliva. Después de eso, tu cuerpo está listo para recibir y procesar en vez de almacenar.',
+      tip:'Si no te gusta masticar jengibre crudo, rallalo en un vaso chiquito con agua tibia y limón y tomalo 10 min antes. El efecto es parecido.',
+      video:''
+    },
+    {
+      id:'k2',cat:'horarios',emoji:'⏰',
+      titulo:'Levantarte antes de las 6:30',
+      desc:'Después de las 7 tu cuerpo entra en modo pesado y te cuesta el día entero. Madrugar te libera.',
+      tiempo:'todos los días · cambio grande',
+      pasos:[
+        'Primera semana: poné alarma a las 7:00 (no a las 6:30 todavía).',
+        'Al sonar no toques "posponer". Sentate en la cama aunque sea un minuto.',
+        'Abrí las ventanas, dejá entrar luz natural apenas posible.',
+        'Segunda semana movés la alarma a las 6:45. Tercera semana, a las 6:30.'
+      ],
+      porque:'Las horas entre las 6 y las 10 de la mañana son horas Kapha — pesadas, lentas, densas por naturaleza. Si te despertás dentro de ese rango (7, 8, 9), absorbés esa energía pesada y la cargás todo el día. Si te levantás antes (6 o 6:30), aprovechás las últimas horas Vata de la noche, que son ligeras, claras, llenas de energía. Los Kapha que se levantan tarde arrastran cansancio, apatía y ganas de no hacer nada. Los que madrugan tienen el día entero resuelto antes que los demás empiecen.',
+      tip:'No lo hagas de un día para el otro. Tu cuerpo necesita semanas para reajustar el reloj. Pero una vez que se acomoda, no vas a querer volver atrás — vas a descubrir que las primeras horas del día son las más lúcidas.',
+      video:''
+    },
+    {
+      id:'k3',cat:'movimiento',emoji:'🚶',
+      titulo:'Caminar 20 min después de comer',
+      desc:'Tu metabolismo necesita moverse para procesar. Caminar rápido después de comer evita la pesadez.',
+      tiempo:'20 minutos después del almuerzo',
+      pasos:[
+        'Al terminar de almorzar, esperá 10 minutos (no arranques al toque).',
+        'Salí a caminar 20 minutos a ritmo rápido — no paseo, caminata decidida.',
+        'Si no podés salir, caminá por la casa o por el pasillo de la oficina. Lo que importa es no quedarte sentada.',
+        'Al final, tomás medio vaso de agua tibia, no fría.'
+      ],
+      porque:'Tu metabolismo es lento por naturaleza. Si comés y te sentás (o peor, te acostás), la comida se queda ahí procesando a media máquina. Resultado: pesadez, sueño, acumulación. Caminar activa el fuego digestivo, acelera el tránsito, transforma la comida en energía en vez de depósito. Para Kapha esto no es "cuestión estética", es cuestión de no acumular. Veinte minutos de caminata después de la comida principal cambian todo tu metabolismo del día.',
+      tip:'Hacé la caminata una costumbre no negociable. Si llueve, caminás en casa. Si tenés una reunión, la hacés caminando (llamada en altavoz). Si sos de las que dicen "no tengo tiempo", pensalo así: no caminar hoy te cuesta 2 horas de energía menos mañana.',
+      video:''
+    }
   ]
 };
 
 function _vbAbrirPantallaGPS(){
+  // Si no aceptó disclaimer, mostrarlo primero y después abrir el GPS
+  if(!_vbPlanActivado()){
+    _vbMostrarDisclaimerSiHaceFalta(_vbAbrirPantallaGPS);
+    return;
+  }
+  
   var dosha=(window.res&&window.res.p)?window.res.p:'vata';
   var pct=window.res&&window.res.pct?Math.round(window.res.pct[dosha]):50;
   var ajustesHechos=[];
@@ -2461,26 +2593,66 @@ function _vbAbrirPantallaGPS(){
     +'</div>'
     +'</div>'
     
-    // SECCIÓN 2: PRÓXIMO PASO
+    // SECCIÓN 2: PRÓXIMO PASO — EXPANDIDO con pasos, porqué, tip y slot de video
     +'<div style="padding:0 20px 24px">'
     +'<p style="font-size:11px;color:#8B7355;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;font-weight:600">Tu próximo paso</p>'
-    +'<div style="background:linear-gradient(135deg,#FFF4E6,#FFE0B2);border:2px solid #F57C00;border-radius:18px;padding:20px;box-shadow:0 4px 14px rgba(245,124,0,0.12)">'
+    +'<div style="background:linear-gradient(135deg,#FFF4E6,#FFE0B2);border:2px solid #F57C00;border-radius:18px;padding:22px 20px;box-shadow:0 4px 14px rgba(245,124,0,0.12)">'
+    
+    // Header del ajuste
     +'<div style="display:flex;align-items:start;gap:14px;margin-bottom:14px">'
     +'<div style="font-size:42px">'+proximoAjuste.emoji+'</div>'
     +'<div style="flex:1">'
     +'<div style="font-size:10px;color:#F57C00;text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:4px">'+proximoAjuste.cat+'</div>'
-    +'<h3 style="font-family:\'Lora\',serif;font-size:19px;color:#1a1a1a;margin:0 0 6px;font-weight:600;line-height:1.25">'+proximoAjuste.titulo+'</h3>'
+    +'<h3 style="font-family:\'Lora\',serif;font-size:20px;color:#1a1a1a;margin:0 0 6px;font-weight:600;line-height:1.25">'+proximoAjuste.titulo+'</h3>'
     +'<p style="font-size:11px;color:#8B7355;margin:0">⏱️ '+proximoAjuste.tiempo+'</p>'
     +'</div>'
     +'</div>'
-    +'<p style="font-size:14px;color:#3a3a3a;line-height:1.6;margin:0 0 18px">'+proximoAjuste.desc+'</p>'
+    
+    // Descripción corta
+    +'<p style="font-size:14px;color:#3a3a3a;line-height:1.6;margin:0 0 18px;font-style:italic">'+proximoAjuste.desc+'</p>'
+    
+    // Pasos concretos
+    +(proximoAjuste.pasos && proximoAjuste.pasos.length>0 ? (
+      '<div style="background:rgba(255,255,255,0.7);border-radius:12px;padding:16px;margin-bottom:14px">'
+      +'<p style="font-size:10px;color:#F57C00;text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin:0 0 10px">Paso a paso</p>'
+      +proximoAjuste.pasos.map(function(p,i){
+        return '<div style="display:flex;gap:10px;margin-bottom:10px"><div style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:#F57C00;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">'+(i+1)+'</div><div style="flex:1;font-size:14px;line-height:1.5;color:#3a3a3a;padding-top:1px">'+p+'</div></div>';
+      }).join('')
+      +'</div>'
+    ):'')
+    
+    // Por qué funciona
+    +(proximoAjuste.porque ? (
+      '<div style="background:rgba(61,90,54,0.08);border-left:3px solid #3D5A36;border-radius:8px;padding:14px 16px;margin-bottom:14px">'
+      +'<p style="font-size:10px;color:#3D5A36;text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin:0 0 6px">Por qué funciona</p>'
+      +'<p style="font-size:13px;color:#3a3a3a;line-height:1.6;margin:0">'+proximoAjuste.porque+'</p>'
+      +'</div>'
+    ):'')
+    
+    // Tip extra
+    +(proximoAjuste.tip ? (
+      '<div style="background:rgba(139,115,85,0.08);border-radius:8px;padding:12px 14px;margin-bottom:16px">'
+      +'<p style="font-size:13px;color:#5A4A35;line-height:1.5;margin:0"><strong style="color:#8B7355">💡 Tip:</strong> '+proximoAjuste.tip+'</p>'
+      +'</div>'
+    ):'')
+    
+    // Slot video YouTube (aparece solo si hay link cargado)
+    +(proximoAjuste.video && proximoAjuste.video.length>0 ? (
+      '<div style="margin-bottom:16px;border-radius:12px;overflow:hidden;background:#000;position:relative;padding-bottom:56.25%;height:0">'
+      +'<iframe src="https://www.youtube.com/embed/'+proximoAjuste.video+'" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>'
+      +'</div>'
+    ):(
+      '<div style="background:rgba(139,115,85,0.05);border:1px dashed rgba(139,115,85,0.3);border-radius:10px;padding:14px;margin-bottom:16px;text-align:center">'
+      +'<p style="font-size:12px;color:#8B7355;margin:0;font-style:italic">🎥 Video explicativo próximamente</p>'
+      +'</div>'
+    ))
     
     // 4 BOTONES DE ESTADO (checklist)
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
-    +'<button onclick="_vbMarcarAjuste(\''+proximoAjuste.id+'\',\'hecho\')" style="padding:12px 8px;background:#22C55E;color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;line-height:1.3">✅<br>Lo hice</button>'
-    +'<button onclick="_vbMarcarAjuste(\''+proximoAjuste.id+'\',\'rutina\')" style="padding:12px 8px;background:#3D5A36;color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;line-height:1.3">🔁<br>Es rutina</button>'
-    +'<button onclick="_vbMarcarAjuste(\''+proximoAjuste.id+'\',\'pausa\')" style="padding:12px 8px;background:#fff;color:#8B7355;border:2px solid #D4B896;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1.3">⏸️<br>Dame tiempo</button>'
-    +'<button onclick="_vbMarcarAjuste(\''+proximoAjuste.id+'\',\'descartar\')" style="padding:12px 8px;background:#fff;color:#999;border:2px solid #E5E5E5;border-radius:10px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;line-height:1.3">❌<br>No es para mí</button>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">'
+    +'<button onclick="_vbMarcarAjuste(\''+proximoAjuste.id+'\',\'hecho\')" style="padding:14px 8px;background:#22C55E;color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;line-height:1.3">✅<br>Lo hice hoy</button>'
+    +'<button onclick="_vbMarcarAjuste(\''+proximoAjuste.id+'\',\'rutina\')" style="padding:14px 8px;background:#3D5A36;color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;line-height:1.3">🔁<br>Ya es rutina</button>'
+    +'<button onclick="_vbMarcarAjuste(\''+proximoAjuste.id+'\',\'pausa\')" style="padding:14px 8px;background:#fff;color:#8B7355;border:2px solid #D4B896;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1.3">⏸️<br>Dame tiempo</button>'
+    +'<button onclick="_vbMarcarAjuste(\''+proximoAjuste.id+'\',\'descartar\')" style="padding:14px 8px;background:#fff;color:#999;border:2px solid #E5E5E5;border-radius:10px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;line-height:1.3">❌<br>No es para mí</button>'
     +'</div>'
     +'</div>'
     +'</div>'
@@ -2524,7 +2696,6 @@ function _vbMarcarAjuste(id,estado){
       if(hechos.indexOf(id)===-1) hechos.push(id);
       estados[id]=estado;
     } else if(estado==='descartar'){
-      // Sacar de hechos, marcar como descartado
       hechos=hechos.filter(function(x){return x!==id;});
       estados[id]='descartado';
     } else if(estado==='pausa'){
@@ -2534,6 +2705,9 @@ function _vbMarcarAjuste(id,estado){
     localStorage.setItem('vb_ajustes_hechos',JSON.stringify(hechos));
     localStorage.setItem('vb_ajustes_estados',JSON.stringify(estados));
     
+    // Firebase sync — guardar progreso en la nube (Bloque 4)
+    _vbSincronizarProgreso(hechos,estados);
+    
     if(typeof gtag==='function'){
       gtag('event','ajuste_marcado',{event_category:'gps',event_label:id+'_'+estado,ajuste_id:id,estado:estado});
     }
@@ -2541,10 +2715,155 @@ function _vbMarcarAjuste(id,estado){
       window.clarity('event','ajuste_'+estado+'_'+id);
     }
     
-    // Re-renderizar el GPS
     _vbCerrarGPS();
     setTimeout(_vbAbrirPantallaGPS,100);
   }catch(e){}
+}
+
+// ════════════════════════════════════════════════════════════════
+// BLOQUE 4: FIREBASE SYNC — progreso del GPS en la nube
+// Se guarda usando el email del test como clave
+// Funciona offline: localStorage primero, Firebase cuando hay red
+// ════════════════════════════════════════════════════════════════
+
+function _vbSincronizarProgreso(hechos,estados){
+  try{
+    if(!window._vbDB) return; // Firebase no disponible, solo localStorage
+    var email=localStorage.getItem('vb_email')||(window.res && window.res.email);
+    if(!email) return; // sin email no podemos sincronizar
+    var dosha=(window.res&&window.res.p)?window.res.p:null;
+    var data={
+      email:email,
+      dosha:dosha,
+      ajustes_hechos:hechos,
+      ajustes_estados:estados,
+      ultima_actualizacion:new Date().toISOString(),
+      plan_activado:localStorage.getItem('vb_plan_activado')==='true',
+      is_paid:localStorage.getItem('vb_paid')==='true'
+    };
+    window._vbDB.collection('progreso').doc(email).set(data,{merge:true}).catch(function(e){});
+  }catch(e){}
+}
+
+function _vbCargarProgresoDesdeFirebase(){
+  try{
+    if(!window._vbDB) return;
+    var email=localStorage.getItem('vb_email')||(window.res && window.res.email);
+    if(!email) return;
+    window._vbDB.collection('progreso').doc(email).get().then(function(doc){
+      if(doc.exists){
+        var data=doc.data();
+        // Merge: Firebase gana solo si tiene datos más nuevos o si localStorage está vacío
+        var hechosLocal=JSON.parse(localStorage.getItem('vb_ajustes_hechos')||'[]');
+        var hechosCloud=data.ajustes_hechos||[];
+        if(hechosCloud.length>=hechosLocal.length){
+          localStorage.setItem('vb_ajustes_hechos',JSON.stringify(hechosCloud));
+          localStorage.setItem('vb_ajustes_estados',JSON.stringify(data.ajustes_estados||{}));
+        }
+        if(data.plan_activado) localStorage.setItem('vb_plan_activado','true');
+      }
+    }).catch(function(e){});
+  }catch(e){}
+}
+
+// Al cargar la página, si hay email, intenta recuperar el progreso
+(function(){
+  setTimeout(_vbCargarProgresoDesdeFirebase,3000);
+})();
+
+// ════════════════════════════════════════════════════════════════
+// BLOQUE 5: DISCLAIMER LEGAL — al activar el plan por primera vez
+// Cumple con ANMAT: informa que no reemplaza diagnóstico médico
+// 1 párrafo + checkbox + botón. No es contrato bloqueante.
+// ════════════════════════════════════════════════════════════════
+
+function _vbPlanActivado(){
+  try{return localStorage.getItem('vb_plan_activado')==='true';}catch(e){return false;}
+}
+
+function _vbMostrarDisclaimerSiHaceFalta(callback){
+  // Si ya aceptó, ejecuta el callback directo
+  if(_vbPlanActivado()){
+    if(typeof callback==='function') callback();
+    return;
+  }
+  
+  var html='<div id="vbDisclaimerModal" style="position:fixed;inset:0;background:rgba(45,66,38,0.9);z-index:6000;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto">'
+    +'<div style="background:#FAF7F0;padding:28px 24px;border-radius:20px;max-width:440px;width:100%;border:1px solid #E8DFC8;max-height:90vh;overflow-y:auto">'
+    
+    +'<div style="text-align:center;margin-bottom:20px">'
+    +'<div style="font-size:48px;margin-bottom:8px">🌿</div>'
+    +'<h2 style="font-family:\'Lora\',serif;font-size:22px;color:#3D5A36;margin:0;font-weight:600">Antes de empezar tu camino</h2>'
+    +'</div>'
+    
+    +'<div style="background:#fff;border-radius:14px;padding:18px;margin-bottom:18px;border:1px solid #E8DFC8">'
+    +'<p style="font-size:14px;line-height:1.7;color:#3a3a3a;margin:0">Vedabite es una guía de bienestar basada en Ayurveda. <strong>No reemplaza el diagnóstico ni el tratamiento médico.</strong> Si tenés una condición de salud, estás embarazada, en lactancia, o tomás medicación, consultá a tu médico antes de aplicar cualquier recomendación que veas acá. Los ajustes que te sugerimos son pequeños cambios de hábito, no medicamentos ni dietas restrictivas.</p>'
+    +'</div>'
+    
+    +'<label style="display:flex;align-items:start;gap:10px;margin-bottom:18px;cursor:pointer;user-select:none" for="vbDiscCheck">'
+    +'<input type="checkbox" id="vbDiscCheck" style="width:20px;height:20px;accent-color:#3D5A36;margin-top:2px;flex-shrink:0;cursor:pointer">'
+    +'<span style="font-size:13px;color:#3a3a3a;line-height:1.5">Entendí y acepto que esto es una guía de bienestar, no un tratamiento médico.</span>'
+    +'</label>'
+    
+    +'<button id="vbDiscBtn" onclick="_vbAceptarDisclaimer()" disabled style="display:block;width:100%;padding:16px;background:#ccc;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:not-allowed;font-family:inherit;transition:all 0.2s">Activar mi plan</button>'
+    
+    +'<button onclick="_vbCerrarDisclaimer()" style="display:block;width:100%;padding:12px;background:transparent;color:#8B7355;border:none;font-size:13px;cursor:pointer;font-family:inherit;margin-top:8px">Volver atrás</button>'
+    
+    +'</div></div>';
+  
+  document.body.insertAdjacentHTML('beforeend',html);
+  document.body.style.overflow='hidden';
+  
+  // Activar botón solo cuando se tilda el checkbox
+  var check=document.getElementById('vbDiscCheck');
+  var btn=document.getElementById('vbDiscBtn');
+  if(check && btn){
+    check.addEventListener('change',function(){
+      if(this.checked){
+        btn.disabled=false;
+        btn.style.background='#3D5A36';
+        btn.style.cursor='pointer';
+      } else {
+        btn.disabled=true;
+        btn.style.background='#ccc';
+        btn.style.cursor='not-allowed';
+      }
+    });
+  }
+  
+  // Guardar callback para ejecutar tras aceptar
+  window._vbDisclaimerCallback=callback;
+}
+
+function _vbAceptarDisclaimer(){
+  try{
+    localStorage.setItem('vb_plan_activado','true');
+    localStorage.setItem('vb_plan_activado_fecha',new Date().toISOString());
+    if(typeof gtag==='function')gtag('event','disclaimer_aceptado',{event_category:'legal',event_label:'plan_activado'});
+    if(typeof window.clarity==='function')window.clarity('event','disclaimer_aceptado');
+    // Sync a Firebase
+    try{
+      var hechos=JSON.parse(localStorage.getItem('vb_ajustes_hechos')||'[]');
+      var estados=JSON.parse(localStorage.getItem('vb_ajustes_estados')||'{}');
+      _vbSincronizarProgreso(hechos,estados);
+    }catch(e){}
+  }catch(e){}
+  
+  _vbCerrarDisclaimer();
+  
+  // Ejecutar el callback original (abrir GPS, marcar ajuste, etc.)
+  if(typeof window._vbDisclaimerCallback==='function'){
+    setTimeout(function(){
+      window._vbDisclaimerCallback();
+      window._vbDisclaimerCallback=null;
+    },200);
+  }
+}
+
+function _vbCerrarDisclaimer(){
+  var m=document.getElementById('vbDisclaimerModal');
+  if(m)m.remove();
+  document.body.style.overflow='';
 }
 </script>
 
