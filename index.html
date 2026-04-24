@@ -236,7 +236,7 @@ window.clarity('event',eventName+(label?'_'+label:''));
 <div class="screen active" id="s1">
 <div style="padding:40px 20px;text-align:center">
 <div class="container">
-<p style="background:rgba(124,154,115,.15);color:#5A7A53;padding:8px 16px;border-radius:50px;display:inline-block;font-size:14px;font-weight:600;margin-bottom:24px">Ya realizaron el test <span id="vbContador">370</span> personas</p>
+<p style="background:rgba(124,154,115,.15);color:#5A7A53;padding:8px 16px;border-radius:50px;display:inline-block;font-size:14px;font-weight:600;margin-bottom:24px">Ya realizaron el test <span id="vbContador">470</span> personas</p>
 <h1 style="font-size:28px;margin-bottom:24px">Tu cuerpo <span style="color:var(--terracotta)">habla.</span></h1>
 <div style="position:relative;display:inline-block;width:100%">
 <button class="btn btn-cta-hero" onclick="startTest()">VEDABITE LO TRADUCE · DESCUBRILO<div style="font-size:11px;font-weight:500;color:#FFF;opacity:0.9;margin-top:4px;letter-spacing:0.5px">👇 Hacé el test ahora · 5 minutos</div></button>
@@ -1512,37 +1512,105 @@ window._vbFetchEstadoEscaner=function(){
 <a id="vbWhatsAppBtn" href="https://wa.me/5491153149117?text=Hola%2C%20quiero%20saber%20m%C3%A1s%20sobre%20Vedabite" target="_blank" style="display:none;position:fixed;bottom:20px;right:20px;width:56px;height:56px;background:#25D366;border-radius:50%;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.25);z-index:9999;text-decoration:none;transition:transform .15s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"><svg width="28" height="28" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
 <script>(function(){try{if(localStorage.getItem('vb_paid')==='true'){var w=document.getElementById('vbWhatsAppBtn');if(w)w.style.display='flex';}}catch(e){}})();</script>
 
-<!-- CONTADOR DINÁMICO DESDE FIREBASE — v2 -->
+<!-- CONTADOR DINÁMICO DESDE FIREBASE — v3 con count() nativo -->
 <script>
 (function(){
   if(!window._vbDB) return;
-  function actualizarContador(){
-    window._vbDB.collection('leads').get().then(function(snap){
+  var el=document.getElementById('vbContador');
+  if(!el) return;
+  
+  var ACTUALIZANDO=false;
+  
+  function setNumero(n){
+    if(!el) return;
+    // Animación opcional: sube de a poco si el nuevo es mayor que el actual
+    var actual=parseInt(el.textContent)||0;
+    if(n>actual && n-actual<50){
+      var step=Math.ceil((n-actual)/10);
+      var timer=setInterval(function(){
+        actual=Math.min(actual+step,n);
+        el.textContent=actual;
+        if(actual>=n)clearInterval(timer);
+      },60);
+    }else{
+      el.textContent=n;
+    }
+    // Guardar en localStorage como cache
+    try{localStorage.setItem('vb_contador_cache',JSON.stringify({n:n,t:Date.now()}));}catch(e){}
+  }
+  
+  // Paso 1: mostrar caché inmediatamente (para UX rápida)
+  try{
+    var cache=JSON.parse(localStorage.getItem('vb_contador_cache')||'null');
+    if(cache && cache.n && (Date.now()-cache.t)<3600000){
+      el.textContent=cache.n;
+    }
+  }catch(e){}
+  
+  // Paso 2: intentar contador rápido con count() nativo de Firestore
+  function actualizarRapido(){
+    if(ACTUALIZANDO)return;
+    ACTUALIZANDO=true;
+    try{
+      // Count aggregation query (Firestore v9+) - mucho más rápido que get() completo
+      if(typeof window._vbDB.collection('leads').count==='function'){
+        window._vbDB.collection('leads').count().get().then(function(snap){
+          var c=snap.data().count;
+          if(c>0){
+            setNumero(c);
+            window._vbDB.collection('config').doc('contador').set({total:c,updated:new Date().toISOString()},{merge:true}).catch(function(){});
+          }
+          ACTUALIZANDO=false;
+        }).catch(function(err){
+          console.warn('Contador count() falló, uso fallback:',err.code);
+          actualizarFallback();
+        });
+      }else{
+        actualizarFallback();
+      }
+    }catch(e){
+      actualizarFallback();
+    }
+  }
+  
+  // Paso 3: fallback al método viejo si count() no está disponible
+  function actualizarFallback(){
+    window._vbDB.collection('leads').get({source:'server'}).then(function(snap){
       var c=snap.size;
       if(c>0){
-        var el=document.getElementById('vbContador');
-        if(el) el.textContent=c;
+        setNumero(c);
         window._vbDB.collection('config').doc('contador').set({total:c,updated:new Date().toISOString()},{merge:true}).catch(function(){});
       }
-    }).catch(function(){
+      ACTUALIZANDO=false;
+    }).catch(function(err){
+      console.warn('Contador fallback falló:',err.code);
+      // Último recurso: leer del doc config
       window._vbDB.collection('config').doc('contador').get().then(function(doc){
         if(doc.exists && doc.data().total){
-          var el=document.getElementById('vbContador');
-          if(el) el.textContent=doc.data().total;
+          setNumero(doc.data().total);
         }
-      }).catch(function(){});
+        ACTUALIZANDO=false;
+      }).catch(function(){ACTUALIZANDO=false;});
     });
   }
-  actualizarContador();
+  
+  // Arrancar apenas Firebase esté listo
+  setTimeout(actualizarRapido,300);
+  
+  // Cada vez que alguien deja un lead, recontar después de 2 segundos
   var origSave=window._vbSaveLead;
   if(origSave){
     window._vbSaveLead=function(d){
       var result=origSave(d);
-      setTimeout(actualizarContador,1500);
+      setTimeout(actualizarRapido,2000);
       return result;
     };
   }
+  
+  // Recontar cada 60 segundos para usuarios activos viendo la página
+  setInterval(actualizarRapido,60000);
 })();
+</script>
 </script>
 
 <script>
