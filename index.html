@@ -1307,7 +1307,7 @@ window._vbFotoSeleccionada=function(input){
 // Enviar foto a Cloud Function para analisis con Claude Opus
 window._vbEnviarAnalisisIA=function(base64, mediaType, seccion, dosha, preview){
   // URL de la Cloud Function - se actualiza despues del deploy
-  var FUNCTION_URL=window._vbFunctionURL||'https://southamerica-east1-vedabite-1b49a.cloudfunctions.net/analizarFotoAyurveda';
+  var FUNCTION_URL=window._vbFunctionURL||'https://analizarfotoayurveda-j3yesrdcba-rj.a.run.app';
   
   if(!window.userEmail){
     _vbMostrarErrorFoto(preview, 'Necesitas completar el test primero para que guardemos tu perfil.', seccion);
