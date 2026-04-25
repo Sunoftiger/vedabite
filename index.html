@@ -2,6 +2,38 @@
 <html lang="es-AR">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="vb-version" content="v40q-20260425">
+<script>
+(function(){
+  var VERSION='v40q-20260425';
+  try{
+    var stored=localStorage.getItem('vb_version');
+    if(stored && stored!==VERSION){
+      // Versión cambió: limpiar cachés conocidos sin tocar email/sesión
+      console.log('[Cache] Nueva versión detectada:',VERSION,'(antes:',stored,'). Limpiando...');
+      localStorage.removeItem('vb_contador_cache');
+      localStorage.removeItem('vb_contador_real');
+      // Forzar reload sin caché si la URL no tiene ?v=
+      if(!location.search.includes('v=')){
+        var sep=location.search?'&':'?';
+        location.replace(location.pathname+location.search+sep+'v='+Date.now());
+        return;
+      }
+    }
+    localStorage.setItem('vb_version',VERSION);
+  }catch(e){}
+  
+  // Service Worker cleanup (algunos navegadores cachean agresivamente)
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.getRegistrations().then(function(regs){
+      regs.forEach(function(r){r.unregister();});
+    }).catch(function(){});
+  }
+})();
+</script>
 <title>Vedabite - Test Ayurvédico Gratis</title>
 <link href="https://fonts.googleapis.com/css2?family=Lora:wght@600&family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-HM7G4LZM70"></script>
