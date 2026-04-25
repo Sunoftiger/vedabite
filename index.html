@@ -189,8 +189,215 @@ window._vbDetectarPais();
 </script>
 <script>
 firebase.initializeApp({apiKey:"AIzaSyCxTOtGmdzdaYQghf270VenmVzMaeZnlOM",authDomain:"vedabite-1b49a.firebaseapp.com",projectId:"vedabite-1b49a",storageBucket:"vedabite-1b49a.firebasestorage.app",messagingSenderId:"435704386348",appId:"1:435704386348:web:e6a7842f7fe9a10ed8d289",measurementId:"G-Y0KHXLM0PJ"});
+
+/* =========================================================
+   VEDABITE — SISTEMA DE SALUD Y ALERTAS
+   Monitor que avisa visualmente si algo está roto.
+   Activá modo admin con ?debug=1 en la URL.
+   ========================================================= */
+(function(){
+  window._vbHealth={
+    firestore_write:'pendiente',
+    firestore_read:'pendiente',
+    cloud_function:'pendiente',
+    payment_country:'pendiente',
+    contador:'pendiente',
+    errores:[],
+    warnings:[],
+    timestamps:{}
+  };
+  
+  // Detectar modo admin (debug visible) por URL ?debug=1 o localStorage
+  var isAdmin=false;
+  try{
+    var url=new URL(window.location.href);
+    if(url.searchParams.get('debug')==='1'){
+      localStorage.setItem('vb_admin','1');
+    }
+    if(url.searchParams.get('debug')==='0'){
+      localStorage.removeItem('vb_admin');
+    }
+    isAdmin=localStorage.getItem('vb_admin')==='1';
+  }catch(e){}
+  window._vbAdmin=isAdmin;
+  
+  // Banner de alerta visible (solo admin)
+  function mostrarAlerta(tipo,mensaje,detalle){
+    if(!isAdmin)return;
+    var colores={
+      error:{bg:'#FEF2F2',border:'#DC2626',color:'#7F1D1D',emoji:'🚨'},
+      warning:{bg:'#FEFCE8',border:'#CA8A04',color:'#78350F',emoji:'⚠️'},
+      ok:{bg:'#F0FDF4',border:'#16A34A',color:'#14532D',emoji:'✅'}
+    };
+    var c=colores[tipo]||colores.warning;
+    var contenedor=document.getElementById('vb_health_banner');
+    if(!contenedor){
+      contenedor=document.createElement('div');
+      contenedor.id='vb_health_banner';
+      contenedor.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;max-height:200px;overflow-y:auto;font-family:system-ui,-apple-system,sans-serif;font-size:12px;line-height:1.4';
+      document.body&&document.body.appendChild(contenedor);
+    }
+    var item=document.createElement('div');
+    item.style.cssText='background:'+c.bg+';border-left:4px solid '+c.border+';color:'+c.color+';padding:8px 12px;margin:0;display:flex;align-items:center;gap:10px';
+    item.innerHTML=c.emoji+' <strong>'+mensaje+'</strong>'+(detalle?' — <span style="opacity:0.85">'+detalle+'</span>':'')+' <button onclick="this.parentElement.remove()" style="margin-left:auto;background:none;border:1px solid '+c.border+';color:'+c.color+';padding:2px 8px;border-radius:4px;cursor:pointer;font-size:10px">cerrar</button>';
+    contenedor.appendChild(item);
+  }
+  window._vbAlerta=mostrarAlerta;
+  
+  // Wrapper para errores fatales no capturados
+  window.addEventListener('error',function(e){
+    window._vbHealth.errores.push({tipo:'js_error',msg:e.message,file:e.filename,line:e.lineno,t:Date.now()});
+    if(isAdmin)mostrarAlerta('error','Error JS',e.message+' ('+e.filename+':'+e.lineno+')');
+  });
+  
+  window.addEventListener('unhandledrejection',function(e){
+    var msg=(e.reason&&e.reason.message)||String(e.reason);
+    window._vbHealth.errores.push({tipo:'promise_rejection',msg:msg,t:Date.now()});
+    if(isAdmin)mostrarAlerta('warning','Promesa fallida',msg);
+  });
+  
+  // Auto-test: SOLO en modo admin para no impactar usuarios reales
+  if(isAdmin)setTimeout(function(){
+    if(!window._vbDB){
+      window._vbHealth.firestore_write='falla';
+      mostrarAlerta('error','Firestore no inicializado','window._vbDB no existe');
+      return;
+    }
+    
+    // Test 1: ¿Podemos escribir en Firestore?
+    var testEmail='__healthcheck_'+Date.now()+'@vedabite.test';
+    window._vbDB.collection('leads').doc(testEmail).set({
+      email:testEmail,
+      dosha:'__test__',
+      _healthcheck:true,
+      createdAt:new Date().toISOString()
+    }).then(function(){
+      window._vbHealth.firestore_write='ok';
+      window._vbHealth.timestamps.firestore_write=Date.now();
+      console.log('[Health] ✅ Firestore WRITE: OK');
+      // Limpiar el doc de test
+      window._vbDB.collection('leads').doc(testEmail).delete().catch(function(){});
+    }).catch(function(e){
+      window._vbHealth.firestore_write='falla';
+      window._vbHealth.errores.push({tipo:'firestore_write',code:e.code,msg:e.message,t:Date.now()});
+      console.error('[Health] 🚨 Firestore WRITE FALLA:',e.code,'-',e.message);
+      mostrarAlerta('error','Firestore no permite escribir leads',e.code+': '+e.message);
+    });
+    
+    // Test 2: ¿Detección de país funciona?
+    if(window._vbPaymentConfig&&window._vbPaymentConfig.detected){
+      window._vbHealth.payment_country='ok';
+      console.log('[Health] ✅ Detección país: OK ('+window._vbPaymentConfig.country+')');
+    }else{
+      setTimeout(function(){
+        if(window._vbPaymentConfig&&window._vbPaymentConfig.detected){
+          window._vbHealth.payment_country='ok';
+        }else{
+          window._vbHealth.payment_country='falla';
+          mostrarAlerta('warning','Detección país lenta','ipapi.co no respondió en 5 segundos');
+        }
+      },2000);
+    }
+    
+    // Test 3: ¿El contador se actualizó?
+    setTimeout(function(){
+      var el=document.getElementById('vbContador');
+      if(el){
+        var v=parseInt(el.textContent);
+        if(v===470){
+          window._vbHealth.contador='falla';
+          mostrarAlerta('warning','Contador no actualizó','Sigue mostrando 470 (valor hardcoded)');
+        }else if(v>0){
+          window._vbHealth.contador='ok';
+        }
+      }
+    },5000);
+  },3000);
+  
+  // Comando para inspeccionar salud desde consola
+  window._vbStatus=function(){
+    console.log('═══════════════════════════════════');
+    console.log('   VEDABITE HEALTH STATUS');
+    console.log('═══════════════════════════════════');
+    console.log('Firestore write:',window._vbHealth.firestore_write);
+    console.log('Detección país:',window._vbHealth.payment_country);
+    console.log('Contador:',window._vbHealth.contador);
+    console.log('Errores:',window._vbHealth.errores.length);
+    console.log('Warnings:',window._vbHealth.warnings.length);
+    if(window._vbHealth.errores.length){
+      console.log('');
+      console.log('ÚLTIMOS ERRORES:');
+      window._vbHealth.errores.slice(-5).forEach(function(e,i){
+        console.log('  '+(i+1)+'. ['+e.tipo+'] '+(e.msg||e.code||'(sin mensaje)'));
+      });
+    }
+    console.log('═══════════════════════════════════');
+    return window._vbHealth;
+  };
+  
+  if(isAdmin){
+    setTimeout(function(){
+      mostrarAlerta('ok','Modo Admin activo','Escribí _vbStatus() en consola para ver salud completa');
+    },500);
+  }
+})();
 window._vbDB=firebase.firestore();
-window._vbSaveLead=function(d){try{return window._vbDB.collection("leads").add(Object.assign({},d,{timestamp:firebase.firestore.FieldValue.serverTimestamp(),createdAt:new Date().toISOString()})).catch(function(e){console.warn('Firestore lead no guardado:',e.code);try{var leads=JSON.parse(localStorage.getItem('vb_leads_pendientes')||'[]');leads.push(Object.assign({},d,{createdAt:new Date().toISOString()}));localStorage.setItem('vb_leads_pendientes',JSON.stringify(leads));}catch(err){}return null;});}catch(e){return Promise.resolve(null);}};
+window._vbSaveLead=function(d){
+  try{
+    var emailID=(d.email||'').trim().toLowerCase();
+    
+    // SANITIZACIÓN: las Firestore Rules prohíben paid/plan/trialStart/trialEnd al crear
+    // Esos campos solo los puede setear la Cloud Function (Admin SDK)
+    var clean={};
+    var prohibidos=['paid','plan','trialStart','trialEnd'];
+    for(var k in d){
+      if(d.hasOwnProperty(k) && prohibidos.indexOf(k)===-1){
+        clean[k]=d[k];
+      }
+    }
+    
+    // Asegurar campos obligatorios (regla exige email + dosha)
+    if(!clean.email)clean.email=emailID;
+    if(!clean.dosha){
+      console.error('[Lead] dosha faltante - documento no se puede crear');
+      return Promise.resolve(null);
+    }
+    
+    // Agregar timestamps
+    clean.timestamp=firebase.firestore.FieldValue.serverTimestamp();
+    clean.createdAt=new Date().toISOString();
+    
+    if(!emailID){
+      // Sin email: cae a ID random
+      return window._vbDB.collection("leads").add(clean).then(function(ref){
+        console.log('[Lead] Guardado OK con ID random:',ref.id);
+        return ref;
+      }).catch(function(e){
+        console.error('[Lead] ERROR Firestore:',e.code,'-',e.message);
+        return null;
+      });
+    }
+    
+    // Email como ID del documento
+    return window._vbDB.collection("leads").doc(emailID).set(clean,{merge:true}).then(function(){
+      console.log('[Lead] Guardado OK:',emailID);
+      return true;
+    }).catch(function(e){
+      console.error('[Lead] ERROR Firestore para',emailID,':',e.code,'-',e.message);
+      // Backup en localStorage para no perder el dato
+      try{
+        var leads=JSON.parse(localStorage.getItem('vb_leads_pendientes')||'[]');
+        leads.push(Object.assign({},clean,{createdAt:new Date().toISOString(),firestoreError:e.code}));
+        localStorage.setItem('vb_leads_pendientes',JSON.stringify(leads));
+        console.log('[Lead] Guardado en localStorage como pendiente');
+      }catch(err){}
+      return null;
+    });
+  }catch(e){
+    console.error('[Lead] Excepción:',e.message);
+    return Promise.resolve(null);
+  }
+};
 function _vbMostrarSuscripcion(){
   var cfg=window._vbPaymentConfig||{country:'AR',price:'$28.300',currency:'ARS'};
   var precio=cfg.price||'USD 20';
@@ -236,7 +443,14 @@ window.clarity('event',eventName+(label?'_'+label:''));
 <div class="screen active" id="s1">
 <div style="padding:40px 20px;text-align:center">
 <div class="container">
-<p style="background:rgba(124,154,115,.15);color:#5A7A53;padding:8px 16px;border-radius:50px;display:inline-block;font-size:14px;font-weight:600;margin-bottom:24px">Ya realizaron el test <span id="vbContador">470</span> personas</p>
+<p style="color:#5A7A53;font-size:13px;font-weight:500;margin-bottom:24px;cursor:default;user-select:none;display:inline-flex;align-items:center;gap:8px"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#5A7A53;animation:vbPulse 2s ease-in-out infinite"></span>Ya se realizaron <span id="vbContador">470</span> test</p>
+<style>
+@keyframes vbPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.8)}}
+/* Emojis decorativos grandes no clickeables - evita dead clicks */
+[style*="font-size:48px"],[style*="font-size:64px"],[style*="font-size:72px"],[style*="font-size:80px"],[style*="font-size:96px"],#eDosha,#resEmoji{cursor:default!important;user-select:none!important;pointer-events:none!important}
+/* Pero los botones siempre clickeables aunque tengan emojis */
+button [style*="font-size"],a [style*="font-size"]{pointer-events:auto!important;cursor:inherit!important}
+</style>
 <h1 style="font-size:28px;margin-bottom:24px">Tu cuerpo <span style="color:var(--terracotta)">habla.</span></h1>
 <div style="position:relative;display:inline-block;width:100%">
 <button class="btn btn-cta-hero" onclick="startTest()">VEDABITE LO TRADUCE · DESCUBRILO<div style="font-size:11px;font-weight:500;color:#FFF;opacity:0.9;margin-top:4px;letter-spacing:0.5px">👇 Hacé el test ahora · 5 minutos</div></button>
@@ -257,7 +471,7 @@ window.clarity('event',eventName+(label?'_'+label:''));
 <div onclick="startTest()" style="text-align:center;max-width:70px;cursor:pointer;transition:transform .2s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"><span style="font-size:28px;display:block">🪐</span><span style="font-size:10px;color:#7a7a7a;line-height:1.3;display:block">Carta Astral<br>Védica</span></div>
 <div onclick="startTest()" style="text-align:center;max-width:70px;cursor:pointer;transition:transform .2s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"><span style="font-size:28px;display:block">🧘</span><span style="font-size:10px;color:#7a7a7a;line-height:1.3;display:block">17 Áreas<br>a Ajustar</span></div>
 </div>
-<div id="savedSession" style="display:none;margin-top:24px"><div class="card" style="background:#F0FDF4;border:2px solid #5A7A53;padding:18px"><p style="margin-bottom:14px;font-size:15px;color:#3D5A36;font-weight:600">🎉 ¡Tenés una sesión guardada!</p><p style="margin-bottom:16px;font-size:13px;color:#5A7A53">Podés continuar donde la dejaste o empezar de cero.</p><button type="button" class="btn btn-sage" style="padding:18px;font-size:15px;touch-action:manipulation;min-height:54px" onclick="loadSession()">CONTINUAR MI PERFIL →</button><button type="button" class="btn btn-outline" style="margin-top:10px;padding:14px;touch-action:manipulation;min-height:46px" onclick="clearSession()">Empezar de nuevo</button></div></div>
+<div id="savedSession" style="display:none;margin-top:24px"><div class="card" style="background:#F0FDF4;border:2px solid #5A7A53;padding:18px"><p style="margin-bottom:14px;font-size:15px;color:#3D5A36;font-weight:600">🎉 ¡Tenés una sesión guardada!</p><p style="margin-bottom:16px;font-size:13px;color:#5A7A53">Podés continuar donde la dejaste o empezar de cero.</p><button type="button" class="btn btn-sage" style="padding:18px;font-size:15px;touch-action:manipulation;min-height:54px" onclick="loadSession()">CONTINUAR MI PERFIL →</button><button type="button" style="margin-top:14px;padding:8px;background:none;border:none;color:#8B7355;font-size:12px;text-decoration:underline;cursor:pointer;display:block;margin-left:auto;margin-right:auto" onclick="confirmClearSession()">empezar de nuevo</button></div></div>
 </div>
 </div>
 </div>
@@ -268,8 +482,8 @@ window.clarity('event',eventName+(label?'_'+label:''));
 <span style="font-size:14px;color:#7a7a7a"><span id="qnum">1</span>/60</span>
 </div>
 <div class="card" style="text-align:center">
-<p style="font-size:12px;color:var(--sage);text-transform:uppercase;margin-bottom:12px" id="qcat">Constitución</p>
-<h2 style="font-size:18px" id="qtxt">Cargando...</h2>
+<p style="font-size:12px;color:var(--sage);text-transform:uppercase;margin-bottom:12px;cursor:default;user-select:none;pointer-events:none" id="qcat">Constitución</p>
+<h2 style="font-size:18px;cursor:default;user-select:none;pointer-events:none" id="qtxt">Cargando...</h2>
 </div>
 <div id="qopts"></div>
 <button class="back-btn" style="width:100%;text-align:center" onclick="prevQ()">← Volver</button>
@@ -517,6 +731,8 @@ function loadSession(){
     }
     res=parsed;
     userEmail=localStorage.getItem("vb_email")||"";
+    window.userEmail=userEmail;
+    window.res=res;
     // Ocultar el banner de sesión guardada al cargar el informe
     document.getElementById("savedSession").style.display="none";
     showResults();
@@ -535,6 +751,7 @@ function loadSession(){
 }
 function checkSaved(){try{localStorage.getItem("vb_res")&&(document.getElementById("savedSession").style.display="block")}catch(a){}}
 function clearSession(){try{localStorage.removeItem("vb_res"),localStorage.removeItem("vb_email"),localStorage.removeItem("vb_dosha"),document.getElementById("savedSession").style.display="none"}catch(a){}}
+function confirmClearSession(){if(confirm("¿Seguro que querés empezar de nuevo? Vas a perder tu progreso anterior.")){clearSession();try{if(window._vbTrack)window._vbTrack('sesion_borrada_confirmada');}catch(e){}}else{try{if(window._vbTrack)window._vbTrack('sesion_borrada_cancelada');}catch(e){}}}
 function vbHacerPDF(htmlContent,nombre){var doc='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+nombre+'</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Helvetica,Arial,sans-serif;color:#1a1a1a;background:#fff;padding:20px;max-width:600px;margin:0 auto;line-height:1.5}h1{font-size:22px;margin:8px 0}h3{font-size:16px;margin:0 0 8px}h4{font-size:14px;margin:8px 0 4px}p{margin:4px 0;font-size:13px}@media print{body{padding:10px}}</style></head><body>'+htmlContent+'</body></html>';try{var blob=new Blob([doc],{type:'text/html;charset=utf-8'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=nombre.replace('.pdf','.html');a.style.display='none';document.body.appendChild(a);a.click();setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);}catch(e){var w=window.open('','_blank');if(w){w.document.open();w.document.write(doc);w.document.close();w.focus();setTimeout(function(){try{w.print()}catch(e2){}},500);}else{alert('No se pudo descargar el informe. Intentá desde otro navegador.');}}}
 function downloadPDF(voz){
 voz=voz||'ayurveda';
@@ -572,7 +789,7 @@ function answer(a,e){ans[a]+=e,(60<=++qi?showEmail:renderQ)()}
 function prevQ(){0<qi?(qi--,renderQ()):show("s1")}
 function getRes(){var a=ans.vata+ans.pitta+ans.kapha||1,e="vata";return ans.pitta>ans[e]&&(e="pitta"),{p:e=ans.kapha>ans[e]?"kapha":e,pct:{vata:Math.round(ans.vata/a*100),pitta:Math.round(ans.pitta/a*100),kapha:Math.round(ans.kapha/a*100)}}}
 function showEmail(){res=getRes();var a=D[res.p];document.getElementById("eDosha").textContent=a.e,document.getElementById("eName").textContent=a.n,show("s3")}
-function submitEmail(){var a=document.getElementById("emailIn").value;if(!a||!a.includes("@"))return alert("Email inválido");(async function(){try{var emailClean=a.trim().toLowerCase();var msgBuffer=new TextEncoder().encode(emailClean);var hashBuffer=await crypto.subtle.digest('SHA-256',msgBuffer);var hashed=Array.from(new Uint8Array(hashBuffer)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');if(typeof gtag==='function'){gtag('set','user_data',{'sha256_email_address':hashed});}}catch(e){}})();userEmail=a;try{localStorage.setItem("vb_email",a);}catch(e){}var e=D[res.p];emailjs.send("service_xf7v0x7","template_vzggqyx",{to_email:a,dosha_name:e.n,dosha_emoji:e.e,dosha_desc:e.desc,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha}).then(function(){}).catch(function(a){});try{if(window._vbSaveLead)window._vbSaveLead({email:a,dosha:res.p,dosha_name:e.n,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha,trialStart:new Date().toISOString(),trialEnd:new Date(Date.now()+10*24*60*60*1000).toISOString(),paid:false,source:document.referrer||"direct",utm:location.search||""}).catch(function(){});}catch(e){}try{localStorage.setItem("vb_trialStart",new Date().toISOString());gtag("event","generate_lead");if(window._vbTrack)window._vbTrack()}catch(a){}saveSession(),showResults()}
+function submitEmail(){var a=document.getElementById("emailIn").value;if(!a||!a.includes("@"))return alert("Email inválido");(async function(){try{var emailClean=a.trim().toLowerCase();var msgBuffer=new TextEncoder().encode(emailClean);var hashBuffer=await crypto.subtle.digest('SHA-256',msgBuffer);var hashed=Array.from(new Uint8Array(hashBuffer)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');if(typeof gtag==='function'){gtag('set','user_data',{'sha256_email_address':hashed});}}catch(e){}})();userEmail=a;window.userEmail=a;window.res=res;try{localStorage.setItem("vb_email",a);}catch(e){}var e=D[res.p];emailjs.send("service_xf7v0x7","template_vzggqyx",{to_email:a,dosha_name:e.n,dosha_emoji:e.e,dosha_desc:e.desc,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha}).then(function(){}).catch(function(a){});try{if(window._vbSaveLead)window._vbSaveLead({email:a,dosha:res.p,dosha_name:e.n,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha,source:document.referrer||"direct",utm:location.search||""}).catch(function(){});}catch(e){}try{localStorage.setItem("vb_trialStart",new Date().toISOString());gtag("event","generate_lead");if(window._vbTrack)window._vbTrack()}catch(a){}saveSession(),showResults()}
 function showResults(){var a=D[res.p];document.getElementById("resHeader").style.background=a.bg,document.getElementById("resEmoji").textContent=a.e,document.getElementById("resName").textContent=a.n,document.getElementById("resDesc").textContent=a.desc,document.getElementById("resPct").innerHTML=Object.entries(res.pct).sort(function(a,e){return e[1]-a[1]}).map(function(a){return'<div style="background:#fff;padding:8px 16px;border-radius:8px"><div style="font-weight:700;color:'+D[a[0]].c+'">'+a[1]+'%</div><div style="font-size:12px">'+D[a[0]].e+"</div></div>"}).join(""),document.getElementById("tabsGrid").innerHTML=T.map(function(a){var emojiHTML=a.id==="escanerEquilibrio"?'<span style="font-size:1.3rem;letter-spacing:3px;display:block;margin-bottom:8px">'+a.e+'</span>':'<span>'+a.e+'</span>';return'<div class="tab-card'+(a.p?" premium":"")+'" style="position:relative" onclick="showTab(\''+a.id+"')\">"+emojiHTML+"<strong>"+a.t+"</strong>"+(a.p?'<span class="premium-tag">PREMIUM</span>':"")+"</div>"}).join(""),renderTabs(a),show("s4")}
 function tips(a){return a&&a.length?'<div style="margin-top:20px"><h4 style="margin-bottom:12px">💡 7 Tips Personalizados</h4>'+a.map(function(a,e){return'<div class="tip-card"><span class="tip-num">'+(e+1)+"</span>"+a+"</div>"}).join("")+"</div>":""}
 function showTab(a){document.querySelectorAll(".tab-content").forEach(function(a){a.classList.remove("active")});var el=document.getElementById("t-"+a);if(el){el.classList.add("active");document.getElementById("tabsGrid").style.display="none";window.scrollTo(0,0);if(a==="escanerEquilibrio"){try{var dd=res&&res.p?res.p:"desconocido";if(window._vbTrack)window._vbTrack("tab_abierto",{tab:"escaner_equilibrio",dosha:dd});if(typeof window._vbFetchEstadoEscaner==='function')window._vbFetchEstadoEscaner();if(!el._vbBound){el._vbBound=true;el.addEventListener("click",function(ev){var card=ev.target.closest("[data-sec]");if(card){try{if(window._vbTrack)window._vbTrack("escaner_seccion",{seccion:card.getAttribute("data-sec"),dosha:card.getAttribute("data-dosha")});}catch(e){}}});}}catch(e){}}}}
@@ -929,7 +1146,68 @@ window.INFO.vata.escanerEquilibrio=`<div class="card"><h4>🔬 Tu cuerpo habla �
 
 <div class="card" data-sec="detox" data-dosha="vata" style="cursor:pointer"><h4>🧪 Evaluación de Desintoxicación (Mutra Pariksha)</h4><p><strong>Qué se observa:</strong> los líquidos que elimina tu cuerpo dan información sobre hidratación, calor interno y filtrado renal. Se mira color (desde transparente hasta oscuro), turbidez o claridad, presencia de espuma, frecuencia durante el día.</p><p><strong>Para qué sirve:</strong> detecta nivel de hidratación, si hay calor interno excesivo (señal Pitta), si hay retención o estancamiento (señal Kapha), y cómo está funcionando el filtrado del cuerpo.</p><p><strong>Cómo lo ves cuando estás en equilibrio:</strong> color amarillo claro paja, transparente sin turbidez, sin espuma persistente, frecuencia regular durante el día (5 a 7 veces), sin olor fuerte.</p><p><strong>Señales de desequilibrio Vata (tu tipo):</strong> color muy claro casi transparente por exceso de líquidos, o muy oscuro por deshidratación repentina. Frecuencia irregular, a veces mucha a veces poca. Puede haber ligera turbidez por estrés nervioso. Esto refleja que tu sistema de filtrado está reaccionando al estrés y la irregularidad.</p><p><strong>Qué hacer si ves estas señales:</strong> hidratación CONSTANTE y regular, no por atracones. Tomá agua tibia con limón en ayunas. Evitá diuréticos fuertes como café negro en exceso. Mantené horarios fijos de comida.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
 
-<div class="card" data-sec="digestion" data-dosha="vata" style="cursor:pointer"><h4>🌿 Evaluación de Digestión (Mala Pariksha)</h4><p><strong>Qué se observa:</strong> usando la escala Bristol (7 tipos) traducida a lenguaje simple, evaluamos cómo procesa tu cuerpo lo que comés. Forma, consistencia, color, frecuencia, facilidad de eliminación.</p><p><strong>Para qué sirve:</strong> detecta la velocidad de tu digestión, si estás absorbiendo nutrientes, el estado de tu fuego digestivo (Agni) y si hay acumulación de toxinas (Ama).</p><p><strong>La escala Bristol en palabras simples:</strong></p><ul style="line-height:1.9;padding-left:20px"><li><strong>Tipo 1:</strong> bolitas duras separadas — constipación severa</li><li><strong>Tipo 2:</strong> forma de salchicha con grumos — constipación</li><li><strong>Tipo 3:</strong> salchicha con grietas en la superficie — aceptable pero seca</li><li><strong>Tipo 4:</strong> salchicha lisa y suave — ideal</li><li><strong>Tipo 5:</strong> trozos blandos con bordes definidos — falta fibra</li><li><strong>Tipo 6:</strong> trozos esponjosos con bordes irregulares — tendencia a diarrea</li><li><strong>Tipo 7:</strong> líquido sin forma — diarrea</li></ul><p><strong>Señales de desequilibrio Vata (tu tipo):</strong> tendencia a tipos 1, 2 y 3. Digestión rápida pero incompleta, gases frecuentes, sensación de no vaciar completamente, frecuencia irregular (puede pasar 1 día sin evacuar y después varias veces junto). Esto indica fuego digestivo (Agni) variable y sequedad intestinal.</p><p><strong>Qué hacer si ves estas señales:</strong> ghee diario (1 cucharada con comida caliente), agua tibia durante el día, Triphala por la noche si hay constipación, evitá ensaladas grandes y comida fría, masticá lento 20 veces cada bocado.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>`;
+<div class="card" data-sec="digestion" data-dosha="vata" style="cursor:pointer"><h4>🌿 Evaluación de Digestión (Mala Pariksha)</h4><p><strong>Qué se observa:</strong> usando la escala Bristol (7 tipos) traducida a lenguaje simple, evaluamos cómo procesa tu cuerpo lo que comés. Forma, consistencia, color, frecuencia, facilidad de eliminación.</p><p><strong>Para qué sirve:</strong> detecta la velocidad de tu digestión, si estás absorbiendo nutrientes, el estado de tu fuego digestivo (Agni) y si hay acumulación de toxinas (Ama).</p><p><strong>La escala Bristol en palabras simples:</strong></p><ul style="line-height:1.9;padding-left:20px"><li><strong>Tipo 1:</strong> bolitas duras separadas — constipación severa</li><li><strong>Tipo 2:</strong> forma de salchicha con grumos — constipación</li><li><strong>Tipo 3:</strong> salchicha con grietas en la superficie — aceptable pero seca</li><li><strong>Tipo 4:</strong> salchicha lisa y suave — ideal</li><li><strong>Tipo 5:</strong> trozos blandos con bordes definidos — falta fibra</li><li><strong>Tipo 6:</strong> trozos esponjosos con bordes irregulares — tendencia a diarrea</li><li><strong>Tipo 7:</strong> líquido sin forma — diarrea</li></ul><p><strong>Señales de desequilibrio Vata (tu tipo):</strong> tendencia a tipos 1, 2 y 3. Digestión rápida pero incompleta, gases frecuentes, sensación de no vaciar completamente, frecuencia irregular (puede pasar 1 día sin evacuar y después varias veces junto). Esto indica fuego digestivo (Agni) variable y sequedad intestinal.</p><p><strong>Qué hacer si ves estas señales:</strong> ghee diario (1 cucharada con comida caliente), agua tibia durante el día, Triphala por la noche si hay constipación, evitá ensaladas grandes y comida fría, masticá lento 20 veces cada bocado.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div><!-- GRUPO: BOCA -->
+<h3 style="margin:28px 0 12px;color:#3D5A36;font-size:18px;letter-spacing:1px;border-bottom:2px solid #E8DFC8;padding-bottom:6px">Zona Boca</h3>
+
+<div class="card" data-sec="labios" data-dosha="vata" style="cursor:pointer"><h4>💋 Evaluación de Labios (Oshtha Pariksha)</h4><p><strong>Qué se observa:</strong> color, hidratación, grietas, descamación, comisuras con fisuras, temblor sutil, volumen y simetría.</p><p><strong>Para qué sirve:</strong> los labios reflejan el estado del estómago, la hidratación general, y la circulación periférica. Cambios rápidos en los labios indican desequilibrios recientes.</p><p><strong>Cómo los ves en equilibrio:</strong> color rosa uniforme, bordes definidos, sin grietas, humedad natural, volumen proporcional, sin descamación ni temblor.</p><p><strong>Qué hacer si hay señales:</strong> hidratación oral, aceite de coco o ghee en labios antes de dormir, mejorar digestión, evitar lamerse los labios.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="dientes" data-dosha="vata" style="cursor:pointer"><h4>🦷 Evaluación de Dientes (Danta Pariksha)</h4><p><strong>Qué se observa:</strong> color del esmalte, sarro visible, encías inflamadas o retraídas, dientes apretados o espaciados, desgaste por bruxismo, caries visibles, sensibilidad.</p><p><strong>Para qué sirve:</strong> los dientes y encías reflejan el estado óseo general, nutrición de calcio, equilibrio de Vata en huesos, y toxinas acumuladas.</p><p><strong>Cómo los ves en equilibrio:</strong> blanco marfil uniforme, encías rosa firme sin inflamación, sin sarro, sin sensibilidad, dientes alineados.</p><p><strong>Qué hacer si hay señales:</strong> enjuague con aceite de sésamo 5 min por día (oil pulling), cepillado con polvo de triphala, masticar semillas de hinojo después de comer, consulta odontológica anual.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="mucosas" data-dosha="vata" style="cursor:pointer"><h4>🌸 Evaluación de Mucosas (Shleshma Darshana)</h4><p><strong>Qué se observa:</strong> color del párpado inferior por dentro, interior del labio inferior, encías — todas las mucosas visibles. Palidez, enrojecimiento, tinte amarillento o violáceo.</p><p><strong>Para qué sirve:</strong> las mucosas son ventanas directas a la circulación y nivel de hemoglobina. Detectan anemia, inflamación sistémica, problemas hepáticos incipientes.</p><p><strong>Cómo las ves en equilibrio:</strong> rosa coral vivo, húmedas sin exceso, sin manchas, color uniforme en todas las mucosas visibles.</p><p><strong>Qué hacer si hay señales:</strong> análisis de sangre si hay palidez persistente, alimentación rica en hierro biodisponible, vitamina C con comidas, consulta médica si el tinte es amarillento.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<!-- GRUPO: CARA -->
+<h3 style="margin:28px 0 12px;color:#3D5A36;font-size:18px;letter-spacing:1px;border-bottom:2px solid #E8DFC8;padding-bottom:6px">Zona Cara</h3>
+
+<div class="card" data-sec="forma_facial" data-dosha="vata" style="cursor:pointer"><h4>🗿 Forma de la Cara (Mukha Akriti)</h4><p><strong>Qué se observa:</strong> contorno general del rostro (alargado, ovalado, redondo), pómulos marcados o suaves, mandíbula definida o difusa, frente estrecha o ancha, proporciones.</p><p><strong>Para qué sirve:</strong> la forma facial revela constitución genética y dosha dominante. Cambios recientes (hinchazón, adelgazamiento) indican desequilibrios metabólicos.</p><p><strong>Cómo la ves en equilibrio:</strong> proporciones armónicas, sin hinchazón, contornos definidos acorde a tu genética, sin asimetría pronunciada.</p><p><strong>Qué hacer si hay señales:</strong> si hay hinchazón súbita: reducir sal, lácteos, trigo. Drenaje linfático facial. Si hay adelgazamiento marcado, revisar tiroides y digestión.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="mapa_facial" data-dosha="vata" style="cursor:pointer"><h4>🧭 Mapa Facial por Zonas (Mukha Mandala)</h4><p><strong>Qué se observa:</strong> cada zona del rostro conecta con un órgano. Frente (intestino delgado), entrecejo (hígado), mejillas (pulmones), nariz (corazón), mentón (sistema reproductor), contorno mandíbula (riñones).</p><p><strong>Para qué sirve:</strong> mapear qué órganos están reaccionando. Manchas, granos, rojeces o sequedad en cada zona dan pistas muy precisas del origen interno.</p><p><strong>Cómo lo ves en equilibrio:</strong> piel uniforme sin zonas marcadas, sin granos recurrentes en lugares específicos, sin manchas focalizadas.</p><p><strong>Qué hacer si hay señales:</strong> según zona afectada: frente = más fibra y agua; entrecejo = desintoxicar hígado; mejillas = respiración y cardio; mentón = equilibrio hormonal; mandíbula = hidratación renal.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="brillo_facial" data-dosha="vata" style="cursor:pointer"><h4>✨ Brillo Natural (Chaya-Prabha)</h4><p><strong>Qué se observa:</strong> luminosidad natural de la piel, energía que transmite el rostro, tono opaco o vivo. Lo que el ayurveda llama el "ojas" visible, la esencia vital reflejada.</p><p><strong>Para qué sirve:</strong> el brillo facial es el indicador más sensible del estado general. Cae antes que cualquier síntoma físico específico. Mide vitalidad profunda.</p><p><strong>Cómo lo ves en equilibrio:</strong> piel con luz propia aunque no haya maquillaje, transparencia saludable, tono vivo, mirada despierta y natural.</p><p><strong>Qué hacer si hay señales:</strong> dormir antes de las 23hs, agua con limón en ayunas, masaje con aceite (abhyanga) 3 veces por semana, alimentos frescos no procesados, pranayama diario.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="simetria_facial" data-dosha="vata" style="cursor:pointer"><h4>⚖️ Simetría Facial (Samyak Lakshana)</h4><p><strong>Qué se observa:</strong> equilibrio entre lado izquierdo y derecho del rostro. Comisura de labios pareja, ojos al mismo nivel, cejas alineadas, párpados sin caída marcada.</p><p><strong>Para qué sirve:</strong> la asimetría facial revela tensión muscular crónica, bruxismo, desequilibrios hemisféricos cerebrales, estrés acumulado en un lado del cuerpo.</p><p><strong>Cómo la ves en equilibrio:</strong> rostro simétrico de frente, proporciones iguales entre ambos lados, sin tensión visible marcada.</p><p><strong>Qué hacer si hay señales:</strong> masaje facial bilateral 5 min/día, postura consciente, tratamiento bruxismo si aprieta la mandíbula, yoga facial 3 veces por semana.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<!-- GRUPO: PIEL -->
+<h3 style="margin:28px 0 12px;color:#3D5A36;font-size:18px;letter-spacing:1px;border-bottom:2px solid #E8DFC8;padding-bottom:6px">Zona Piel</h3>
+
+<div class="card" data-sec="piel" data-dosha="vata" style="cursor:pointer"><h4>🌱 Calidad de la Piel (Tvak Pariksha)</h4><p><strong>Qué se observa:</strong> textura (seca, grasa, mixta), hidratación, arrugas finas vs profundas, poros marcados o cerrados, elasticidad al pellizcar, brillo o opacidad.</p><p><strong>Para qué sirve:</strong> la piel es el órgano más grande y refleja hidratación celular, equilibrio hormonal, digestión, y tiempo biológico real vs cronológico.</p><p><strong>Cómo la ves en equilibrio:</strong> tacto suave, hidratación natural, poros regulares, elasticidad (vuelve rápido tras pellizco), sin zonas ásperas ni brillos excesivos.</p><p><strong>Qué hacer si hay señales:</strong> aceite apropiado para tu dosha (sésamo/coco/mostaza), exfoliación suave semanal con harina de garbanzo, hidratación interna con agua tibia, sueño 7-8 horas.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="lunares" data-dosha="vata" style="cursor:pointer"><h4>🔸 Lunares y Manchas (Tila Kalaka)</h4><p><strong>Qué se observa:</strong> cantidad, tamaño, distribución, color, bordes regulares o irregulares, cambios recientes en forma o color. Pecas, queratosis, manchas seniles.</p><p><strong>Para qué sirve:</strong> en ayurveda cada zona refleja un órgano específico. Además, el monitoreo periódico detecta cambios dermatológicos tempranos.</p><p><strong>Cómo los ves en equilibrio:</strong> lunares estables en forma y color, bordes definidos, tamaño constante, sin asimetrías ni sangrado.</p><p><strong>Qué hacer si hay señales:</strong> si cambia un lunar (ABCDE: asimetría, bordes irregulares, color variable, diámetro >6mm, evolución reciente), consulta dermatológica urgente.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="color_piel" data-dosha="vata" style="cursor:pointer"><h4>🎨 Color General de la Piel (Varna)</h4><p><strong>Qué se observa:</strong> tono general (cálido, neutro, frío), uniformidad, zonas con hiperpigmentación, tinte amarillento, grisáceo o azulado en zonas visibles.</p><p><strong>Para qué sirve:</strong> cambios de color general reflejan función hepática, oxigenación, circulación, nivel de ojas (vitalidad). Es un indicador sistémico potente.</p><p><strong>Cómo lo ves en equilibrio:</strong> tono uniforme consistente con tu genética, sin tintes anormales, sin zonas pálidas o amarillentas, buena oxigenación visible.</p><p><strong>Qué hacer si hay señales:</strong> tinte amarillento → hepatograma. Palidez → hemograma. Grisáceo → revisar oxigenación y circulación. Uniformizar con protección solar y antioxidantes.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="cicatrices" data-dosha="vata" style="cursor:pointer"><h4>🩹 Cicatrices y Marcas (Vrana Lakshana)</h4><p><strong>Qué se observa:</strong> cicatrices antiguas (cómo cicatrizaron), queloides, estrías, marcas de acné, capacidad de reparación del tejido, coloración residual.</p><p><strong>Para qué sirve:</strong> la calidad de cicatrización revela tu Ranjaka Pitta (función hepática y sanguínea), tu capacidad reparativa, tu nivel de colágeno y minerales.</p><p><strong>Cómo las ves en equilibrio:</strong> cicatrices planas, color similar a la piel circundante, sin queloides desproporcionados, estrías discretas si las hay.</p><p><strong>Qué hacer si hay señales:</strong> aceite de rosa mosqueta o ghee en cicatrices recientes, silicio orgánico (bamboo tabashir), vitamina C + zinc para colágeno, masaje circular.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="vello" data-dosha="vata" style="cursor:pointer"><h4>🌾 Vello Corporal (Roma)</h4><p><strong>Qué se observa:</strong> densidad, grosor, distribución, color del vello en antebrazo, pantorrilla o torso. Zonas con vello ausente o en exceso inusual.</p><p><strong>Para qué sirve:</strong> el patrón de vello refleja equilibrio hormonal (andrógenos, estrógenos), dosha dominante, circulación periférica, salud folicular general.</p><p><strong>Cómo lo ves en equilibrio:</strong> distribución acorde a tu genética, densidad estable en el tiempo, sin caída súbita, sin crecimiento hormonal anormal.</p><p><strong>Qué hacer si hay señales:</strong> crecimiento desproporcionado → chequeo hormonal. Caída súbita → revisar tiroides, ferritina, estrés. Aceite de ricino tópico para densidad.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<!-- GRUPO: MANOS -->
+<h3 style="margin:28px 0 12px;color:#3D5A36;font-size:18px;letter-spacing:1px;border-bottom:2px solid #E8DFC8;padding-bottom:6px">Zona Manos</h3>
+
+<div class="card" data-sec="unas" data-dosha="vata" style="cursor:pointer"><h4>💅 Uñas (Nakha Pariksha)</h4><p><strong>Qué se observa:</strong> color del lecho ungueal, líneas longitudinales o transversales, manchas blancas, media luna visible, forma (plana, curvada, quebradiza), grosor, brillo.</p><p><strong>Para qué sirve:</strong> las uñas son indicadores de minerales (hierro, zinc, calcio), función hepática, circulación, e historial de estrés (líneas de Beau).</p><p><strong>Cómo las ves en equilibrio:</strong> lecho rosado, media luna visible en pulgares, superficie lisa sin estrías, sin manchas, grosor uniforme, brillo natural.</p><p><strong>Qué hacer si hay señales:</strong> estrías transversales → estrés reciente; manchas blancas → zinc; palidez → hierro; quebradizas → biotina y omega 3. Aceite de almendras en cutículas.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="manos" data-dosha="vata" style="cursor:pointer"><h4>✋ Manos (Hasta Pariksha)</h4><p><strong>Qué se observa:</strong> temperatura (frías, tibias, calientes), sudoración, color de palmas, líneas marcadas, temblor sutil, dedos largos o cortos, flexibilidad articular.</p><p><strong>Para qué sirve:</strong> las manos son uno de los diagnósticos más precisos del ayurveda. Revelan dosha dominante, circulación, sistema nervioso, y estrés crónico.</p><p><strong>Cómo las ves en equilibrio:</strong> temperatura tibia uniforme, humedad natural sin sudor excesivo, palmas rosadas, sin temblor, articulaciones flexibles sin crujidos.</p><p><strong>Qué hacer si hay señales:</strong> frías → mejorar circulación con jengibre y movimiento; sudorosas → calmar Pitta; temblor → reducir cafeína y estrés, pranayama diario.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<!-- GRUPO: PIES -->
+<h3 style="margin:28px 0 12px;color:#3D5A36;font-size:18px;letter-spacing:1px;border-bottom:2px solid #E8DFC8;padding-bottom:6px">Zona Pies</h3>
+
+<div class="card" data-sec="pies" data-dosha="vata" style="cursor:pointer"><h4>🦶 Pies (Pada Pariksha)</h4><p><strong>Qué se observa:</strong> temperatura, arco (plano, alto, normal), grietas en talones, hinchazón de tobillos, uñas de los pies, hongos visibles, color general, callos.</p><p><strong>Para qué sirve:</strong> los pies son el mapa reflejo del cuerpo entero (reflexología). Además muestran circulación periférica, retención de líquidos, y equilibrio postural.</p><p><strong>Cómo los ves en equilibrio:</strong> piel sin grietas profundas, temperatura tibia, sin hinchazón, uñas sanas, arco acorde a tu pie, sin callosidades marcadas.</p><p><strong>Qué hacer si hay señales:</strong> masaje con aceite de sésamo cada noche, agua tibia con sal 10 min semanal, chequeo circulatorio si hay hinchazón, podología si hay hongos.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<!-- GRUPO: CABEZA -->
+<h3 style="margin:28px 0 12px;color:#3D5A36;font-size:18px;letter-spacing:1px;border-bottom:2px solid #E8DFC8;padding-bottom:6px">Zona Cabeza</h3>
+
+<div class="card" data-sec="cabello" data-dosha="vata" style="cursor:pointer"><h4>💇 Cabello y Cuero Cabelludo (Kesha Pariksha)</h4><p><strong>Qué se observa:</strong> densidad, brillo, grosor, caspa o descamación, caída, canas prematuras, cuero cabelludo graso o seco, línea frontal del cabello.</p><p><strong>Para qué sirve:</strong> el cabello refleja Asthi Dhatu (tejido óseo), calcio, proteínas, hormonas, y vitalidad Kapha. Los cambios revelan desequilibrios nutricionales y hormonales.</p><p><strong>Cómo lo ves en equilibrio:</strong> densidad estable, brillo natural, grosor apropiado a tu tipo, sin caída anormal, cuero cabelludo sin picazón ni caspa, pigmento consistente.</p><p><strong>Qué hacer si hay señales:</strong> masaje con aceite tibio (bhringraj, amla, coco según dosha) 2 veces por semana, proteínas de calidad, silicio orgánico, control de estrés.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<!-- GRUPO: CORPORAL -->
+<h3 style="margin:28px 0 12px;color:#3D5A36;font-size:18px;letter-spacing:1px;border-bottom:2px solid #E8DFC8;padding-bottom:6px">Zona Corporal</h3>
+
+<div class="card" data-sec="constitucion" data-dosha="vata" style="cursor:pointer"><h4>🧍 Constitución General (Akriti)</h4><p><strong>Qué se observa:</strong> proporciones corporales, simetría general, distribución del peso, desarrollo muscular, postura natural de pie, anchura de hombros vs caderas.</p><p><strong>Para qué sirve:</strong> la constitución revela Prakriti (dosha genético), metabolismo basal, distribución de grasa y músculo, y tendencias de salud futura.</p><p><strong>Cómo la ves en equilibrio:</strong> proporciones armónicas, postura erguida sin tensión, desarrollo muscular funcional, distribución de peso equilibrada según tu dosha.</p><p><strong>Qué hacer si hay señales:</strong> cambios súbitos de peso → revisar tiroides y digestión. Postura caída → fortalecer core y espalda. Atrofia muscular → proteínas y entrenamiento de fuerza.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="venas" data-dosha="vata" style="cursor:pointer"><h4>🩸 Venas Visibles (Sira Darshana)</h4><p><strong>Qué se observa:</strong> venas en dorso de manos, cuello, piernas. Dilatación, varices, arañas vasculares, prominencia, color azulado intenso, zonas con dolor.</p><p><strong>Para qué sirve:</strong> la red venosa visible indica circulación periférica, presión venosa, retorno al corazón, y en ayurveda refleja estado de Rakta Dhatu (sangre).</p><p><strong>Cómo las ves en equilibrio:</strong> venas sutilmente visibles, sin dilatación pronunciada, sin varices, sin dolor al tacto, color azul suave no violáceo intenso.</p><p><strong>Qué hacer si hay señales:</strong> elevar piernas 15 min/día, caminatas regulares, medias de compresión si varices, vitamina C y rutina con movimiento. Consulta vascular si hay varices marcadas.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<!-- GRUPO: TRANSPIRACIÓN -->
+<h3 style="margin:28px 0 12px;color:#3D5A36;font-size:18px;letter-spacing:1px;border-bottom:2px solid #E8DFC8;padding-bottom:6px">Zona Transpiración</h3>
+
+<div class="card" data-sec="transpiracion" data-dosha="vata" style="cursor:pointer"><h4>💧 Transpiración (Sveda)</h4><p><strong>Qué se observa:</strong> cantidad, zonas donde aparece (frente, axilas, manos, pies), olor, color (amarillenta, transparente), si aparece con esfuerzo normal o excesivo.</p><p><strong>Para qué sirve:</strong> el sudor es canal de eliminación de Pitta y metabolismo básico. Detecta hiperactividad simpática, desequilibrio hormonal, sobrepeso metabólico, o ansiedad.</p><p><strong>Cómo la ves en equilibrio:</strong> sudoración moderada con esfuerzo apropiado, olor suave no desagradable, transparente, distribución uniforme, no aparece en reposo.</p><p><strong>Qué hacer si hay señales:</strong> excesiva → reducir picante, alcohol, estrés; regular respiración. Ausente → movimiento para activar detox. Olor fuerte → probióticos y clorofila.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+`;
 
 window.INFO.pitta.escanerEquilibrio=`<div class="card"><h4>🔬 Tu cuerpo habla — aprendé a escucharlo</h4><p>El Ayurveda lee señales del cuerpo que la medicina convencional pasa por alto. Lengua, ojos, líquidos y digestión cuentan lo que está pasando adentro antes de que aparezca un síntoma serio. Para tu constitución Pitta estas señales son especialmente importantes: tu fuego interno se descontrola fácil y deja huellas visibles antes de volverse inflamación o acidez crónica.</p></div>
 
@@ -939,7 +1217,68 @@ window.INFO.pitta.escanerEquilibrio=`<div class="card"><h4>🔬 Tu cuerpo habla 
 
 <div class="card" data-sec="detox" data-dosha="pitta" style="cursor:pointer"><h4>🧪 Evaluación de Desintoxicación (Mutra Pariksha)</h4><p><strong>Qué se observa:</strong> los líquidos que elimina tu cuerpo dan información sobre hidratación, calor interno y filtrado renal. Se mira color (desde transparente hasta oscuro), turbidez o claridad, presencia de espuma, frecuencia durante el día.</p><p><strong>Para qué sirve:</strong> detecta nivel de hidratación, si hay calor interno excesivo, si hay retención, y cómo está funcionando el filtrado del cuerpo.</p><p><strong>Cómo lo ves cuando estás en equilibrio:</strong> color amarillo claro paja, transparente sin turbidez, sin espuma persistente, frecuencia regular (5 a 7 veces al día), sin olor fuerte.</p><p><strong>Señales de desequilibrio Pitta (tu tipo):</strong> color amarillo intenso o anaranjado, puede haber olor más fuerte, sensación de ardor al eliminar, mayor concentración a pesar de tomar agua. Esto refleja calor interno alto, hígado trabajando al máximo, posible deshidratación por exceso de transpiración o alcohol.</p><p><strong>Qué hacer si ves estas señales:</strong> agua fresca (no helada) todo el día, agua de coco diaria, reducir drásticamente alcohol y café, comer pepino, sandía, melón. Si persiste el ardor o hay dolor, consulta médica.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
 
-<div class="card" data-sec="digestion" data-dosha="pitta" style="cursor:pointer"><h4>🌿 Evaluación de Digestión (Mala Pariksha)</h4><p><strong>Qué se observa:</strong> usando la escala Bristol (7 tipos) traducida a lenguaje simple, evaluamos cómo procesa tu cuerpo lo que comés. Forma, consistencia, color, frecuencia, facilidad de eliminación.</p><p><strong>Para qué sirve:</strong> detecta la velocidad de tu digestión, si estás absorbiendo nutrientes, el estado de tu fuego digestivo (Agni) y si hay calor excesivo.</p><p><strong>La escala Bristol en palabras simples:</strong></p><ul style="line-height:1.9;padding-left:20px"><li><strong>Tipo 1:</strong> bolitas duras separadas — constipación severa</li><li><strong>Tipo 2:</strong> forma de salchicha con grumos — constipación</li><li><strong>Tipo 3:</strong> salchicha con grietas en la superficie — aceptable pero seca</li><li><strong>Tipo 4:</strong> salchicha lisa y suave — ideal</li><li><strong>Tipo 5:</strong> trozos blandos con bordes definidos — falta fibra</li><li><strong>Tipo 6:</strong> trozos esponjosos con bordes irregulares — tendencia a diarrea</li><li><strong>Tipo 7:</strong> líquido sin forma — diarrea</li></ul><p><strong>Señales de desequilibrio Pitta (tu tipo):</strong> tendencia a tipos 5, 6 y 7. Digestión muy rápida, 2 a 4 evacuaciones por día, sensación de urgencia, puede haber color más claro (marrón amarillento) por tránsito rápido, ardor o irritación. Esto indica fuego digestivo (Agni) demasiado activo, posible inflamación intestinal.</p><p><strong>Qué hacer si ves estas señales:</strong> evitá picantes, alcohol y café en ayunas. Incorporá avena cocida, arroz basmati, legumbres suaves (mung dal), yogur natural con hinojo después de comer. Si hay sangre, dolor fuerte o persiste más de 3 días, consulta médica sin demora.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>`;
+<div class="card" data-sec="digestion" data-dosha="pitta" style="cursor:pointer"><h4>🌿 Evaluación de Digestión (Mala Pariksha)</h4><p><strong>Qué se observa:</strong> usando la escala Bristol (7 tipos) traducida a lenguaje simple, evaluamos cómo procesa tu cuerpo lo que comés. Forma, consistencia, color, frecuencia, facilidad de eliminación.</p><p><strong>Para qué sirve:</strong> detecta la velocidad de tu digestión, si estás absorbiendo nutrientes, el estado de tu fuego digestivo (Agni) y si hay calor excesivo.</p><p><strong>La escala Bristol en palabras simples:</strong></p><ul style="line-height:1.9;padding-left:20px"><li><strong>Tipo 1:</strong> bolitas duras separadas — constipación severa</li><li><strong>Tipo 2:</strong> forma de salchicha con grumos — constipación</li><li><strong>Tipo 3:</strong> salchicha con grietas en la superficie — aceptable pero seca</li><li><strong>Tipo 4:</strong> salchicha lisa y suave — ideal</li><li><strong>Tipo 5:</strong> trozos blandos con bordes definidos — falta fibra</li><li><strong>Tipo 6:</strong> trozos esponjosos con bordes irregulares — tendencia a diarrea</li><li><strong>Tipo 7:</strong> líquido sin forma — diarrea</li></ul><p><strong>Señales de desequilibrio Pitta (tu tipo):</strong> tendencia a tipos 5, 6 y 7. Digestión muy rápida, 2 a 4 evacuaciones por día, sensación de urgencia, puede haber color más claro (marrón amarillento) por tránsito rápido, ardor o irritación. Esto indica fuego digestivo (Agni) demasiado activo, posible inflamación intestinal.</p><p><strong>Qué hacer si ves estas señales:</strong> evitá picantes, alcohol y café en ayunas. Incorporá avena cocida, arroz basmati, legumbres suaves (mung dal), yogur natural con hinojo después de comer. Si hay sangre, dolor fuerte o persiste más de 3 días, consulta médica sin demora.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div><!-- GRUPO: BOCA -->
+<h3 style="margin:28px 0 12px;color:#3D5A36;font-size:18px;letter-spacing:1px;border-bottom:2px solid #E8DFC8;padding-bottom:6px">Zona Boca</h3>
+
+<div class="card" data-sec="labios" data-dosha="pitta" style="cursor:pointer"><h4>💋 Evaluación de Labios (Oshtha Pariksha)</h4><p><strong>Qué se observa:</strong> color, hidratación, grietas, descamación, comisuras con fisuras, temblor sutil, volumen y simetría.</p><p><strong>Para qué sirve:</strong> los labios reflejan el estado del estómago, la hidratación general, y la circulación periférica. Cambios rápidos en los labios indican desequilibrios recientes.</p><p><strong>Cómo los ves en equilibrio:</strong> color rosa uniforme, bordes definidos, sin grietas, humedad natural, volumen proporcional, sin descamación ni temblor.</p><p><strong>Qué hacer si hay señales:</strong> hidratación oral, aceite de coco o ghee en labios antes de dormir, mejorar digestión, evitar lamerse los labios.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="dientes" data-dosha="pitta" style="cursor:pointer"><h4>🦷 Evaluación de Dientes (Danta Pariksha)</h4><p><strong>Qué se observa:</strong> color del esmalte, sarro visible, encías inflamadas o retraídas, dientes apretados o espaciados, desgaste por bruxismo, caries visibles, sensibilidad.</p><p><strong>Para qué sirve:</strong> los dientes y encías reflejan el estado óseo general, nutrición de calcio, equilibrio de Vata en huesos, y toxinas acumuladas.</p><p><strong>Cómo los ves en equilibrio:</strong> blanco marfil uniforme, encías rosa firme sin inflamación, sin sarro, sin sensibilidad, dientes alineados.</p><p><strong>Qué hacer si hay señales:</strong> enjuague con aceite de sésamo 5 min por día (oil pulling), cepillado con polvo de triphala, masticar semillas de hinojo después de comer, consulta odontológica anual.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="mucosas" data-dosha="pitta" style="cursor:pointer"><h4>🌸 Evaluación de Mucosas (Shleshma Darshana)</h4><p><strong>Qué se observa:</strong> color del párpado inferior por dentro, interior del labio inferior, encías — todas las mucosas visibles. Palidez, enrojecimiento, tinte amarillento o violáceo.</p><p><strong>Para qué sirve:</strong> las mucosas son ventanas directas a la circulación y nivel de hemoglobina. Detectan anemia, inflamación sistémica, problemas hepáticos incipientes.</p><p><strong>Cómo las ves en equilibrio:</strong> rosa coral vivo, húmedas sin exceso, sin manchas, color uniforme en todas las mucosas visibles.</p><p><strong>Qué hacer si hay señales:</strong> análisis de sangre si hay palidez persistente, alimentación rica en hierro biodisponible, vitamina C con comidas, consulta médica si el tinte es amarillento.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<!-- GRUPO: CARA -->
+<h3 style="margin:28px 0 12px;color:#3D5A36;font-size:18px;letter-spacing:1px;border-bottom:2px solid #E8DFC8;padding-bottom:6px">Zona Cara</h3>
+
+<div class="card" data-sec="forma_facial" data-dosha="pitta" style="cursor:pointer"><h4>🗿 Forma de la Cara (Mukha Akriti)</h4><p><strong>Qué se observa:</strong> contorno general del rostro (alargado, ovalado, redondo), pómulos marcados o suaves, mandíbula definida o difusa, frente estrecha o ancha, proporciones.</p><p><strong>Para qué sirve:</strong> la forma facial revela constitución genética y dosha dominante. Cambios recientes (hinchazón, adelgazamiento) indican desequilibrios metabólicos.</p><p><strong>Cómo la ves en equilibrio:</strong> proporciones armónicas, sin hinchazón, contornos definidos acorde a tu genética, sin asimetría pronunciada.</p><p><strong>Qué hacer si hay señales:</strong> si hay hinchazón súbita: reducir sal, lácteos, trigo. Drenaje linfático facial. Si hay adelgazamiento marcado, revisar tiroides y digestión.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="mapa_facial" data-dosha="pitta" style="cursor:pointer"><h4>🧭 Mapa Facial por Zonas (Mukha Mandala)</h4><p><strong>Qué se observa:</strong> cada zona del rostro conecta con un órgano. Frente (intestino delgado), entrecejo (hígado), mejillas (pulmones), nariz (corazón), mentón (sistema reproductor), contorno mandíbula (riñones).</p><p><strong>Para qué sirve:</strong> mapear qué órganos están reaccionando. Manchas, granos, rojeces o sequedad en cada zona dan pistas muy precisas del origen interno.</p><p><strong>Cómo lo ves en equilibrio:</strong> piel uniforme sin zonas marcadas, sin granos recurrentes en lugares específicos, sin manchas focalizadas.</p><p><strong>Qué hacer si hay señales:</strong> según zona afectada: frente = más fibra y agua; entrecejo = desintoxicar hígado; mejillas = respiración y cardio; mentón = equilibrio hormonal; mandíbula = hidratación renal.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="brillo_facial" data-dosha="pitta" style="cursor:pointer"><h4>✨ Brillo Natural (Chaya-Prabha)</h4><p><strong>Qué se observa:</strong> luminosidad natural de la piel, energía que transmite el rostro, tono opaco o vivo. Lo que el ayurveda llama el "ojas" visible, la esencia vital reflejada.</p><p><strong>Para qué sirve:</strong> el brillo facial es el indicador más sensible del estado general. Cae antes que cualquier síntoma físico específico. Mide vitalidad profunda.</p><p><strong>Cómo lo ves en equilibrio:</strong> piel con luz propia aunque no haya maquillaje, transparencia saludable, tono vivo, mirada despierta y natural.</p><p><strong>Qué hacer si hay señales:</strong> dormir antes de las 23hs, agua con limón en ayunas, masaje con aceite (abhyanga) 3 veces por semana, alimentos frescos no procesados, pranayama diario.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="simetria_facial" data-dosha="pitta" style="cursor:pointer"><h4>⚖️ Simetría Facial (Samyak Lakshana)</h4><p><strong>Qué se observa:</strong> equilibrio entre lado izquierdo y derecho del rostro. Comisura de labios pareja, ojos al mismo nivel, cejas alineadas, párpados sin caída marcada.</p><p><strong>Para qué sirve:</strong> la asimetría facial revela tensión muscular crónica, bruxismo, desequilibrios hemisféricos cerebrales, estrés acumulado en un lado del cuerpo.</p><p><strong>Cómo la ves en equilibrio:</strong> rostro simétrico de frente, proporciones iguales entre ambos lados, sin tensión visible marcada.</p><p><strong>Qué hacer si hay señales:</strong> masaje facial bilateral 5 min/día, postura consciente, tratamiento bruxismo si aprieta la mandíbula, yoga facial 3 veces por semana.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<!-- GRUPO: PIEL -->
+<h3 style="margin:28px 0 12px;color:#3D5A36;font-size:18px;letter-spacing:1px;border-bottom:2px solid #E8DFC8;padding-bottom:6px">Zona Piel</h3>
+
+<div class="card" data-sec="piel" data-dosha="pitta" style="cursor:pointer"><h4>🌱 Calidad de la Piel (Tvak Pariksha)</h4><p><strong>Qué se observa:</strong> textura (seca, grasa, mixta), hidratación, arrugas finas vs profundas, poros marcados o cerrados, elasticidad al pellizcar, brillo o opacidad.</p><p><strong>Para qué sirve:</strong> la piel es el órgano más grande y refleja hidratación celular, equilibrio hormonal, digestión, y tiempo biológico real vs cronológico.</p><p><strong>Cómo la ves en equilibrio:</strong> tacto suave, hidratación natural, poros regulares, elasticidad (vuelve rápido tras pellizco), sin zonas ásperas ni brillos excesivos.</p><p><strong>Qué hacer si hay señales:</strong> aceite apropiado para tu dosha (sésamo/coco/mostaza), exfoliación suave semanal con harina de garbanzo, hidratación interna con agua tibia, sueño 7-8 horas.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="lunares" data-dosha="pitta" style="cursor:pointer"><h4>🔸 Lunares y Manchas (Tila Kalaka)</h4><p><strong>Qué se observa:</strong> cantidad, tamaño, distribución, color, bordes regulares o irregulares, cambios recientes en forma o color. Pecas, queratosis, manchas seniles.</p><p><strong>Para qué sirve:</strong> en ayurveda cada zona refleja un órgano específico. Además, el monitoreo periódico detecta cambios dermatológicos tempranos.</p><p><strong>Cómo los ves en equilibrio:</strong> lunares estables en forma y color, bordes definidos, tamaño constante, sin asimetrías ni sangrado.</p><p><strong>Qué hacer si hay señales:</strong> si cambia un lunar (ABCDE: asimetría, bordes irregulares, color variable, diámetro >6mm, evolución reciente), consulta dermatológica urgente.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="color_piel" data-dosha="pitta" style="cursor:pointer"><h4>🎨 Color General de la Piel (Varna)</h4><p><strong>Qué se observa:</strong> tono general (cálido, neutro, frío), uniformidad, zonas con hiperpigmentación, tinte amarillento, grisáceo o azulado en zonas visibles.</p><p><strong>Para qué sirve:</strong> cambios de color general reflejan función hepática, oxigenación, circulación, nivel de ojas (vitalidad). Es un indicador sistémico potente.</p><p><strong>Cómo lo ves en equilibrio:</strong> tono uniforme consistente con tu genética, sin tintes anormales, sin zonas pálidas o amarillentas, buena oxigenación visible.</p><p><strong>Qué hacer si hay señales:</strong> tinte amarillento → hepatograma. Palidez → hemograma. Grisáceo → revisar oxigenación y circulación. Uniformizar con protección solar y antioxidantes.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="cicatrices" data-dosha="pitta" style="cursor:pointer"><h4>🩹 Cicatrices y Marcas (Vrana Lakshana)</h4><p><strong>Qué se observa:</strong> cicatrices antiguas (cómo cicatrizaron), queloides, estrías, marcas de acné, capacidad de reparación del tejido, coloración residual.</p><p><strong>Para qué sirve:</strong> la calidad de cicatrización revela tu Ranjaka Pitta (función hepática y sanguínea), tu capacidad reparativa, tu nivel de colágeno y minerales.</p><p><strong>Cómo las ves en equilibrio:</strong> cicatrices planas, color similar a la piel circundante, sin queloides desproporcionados, estrías discretas si las hay.</p><p><strong>Qué hacer si hay señales:</strong> aceite de rosa mosqueta o ghee en cicatrices recientes, silicio orgánico (bamboo tabashir), vitamina C + zinc para colágeno, masaje circular.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="vello" data-dosha="pitta" style="cursor:pointer"><h4>🌾 Vello Corporal (Roma)</h4><p><strong>Qué se observa:</strong> densidad, grosor, distribución, color del vello en antebrazo, pantorrilla o torso. Zonas con vello ausente o en exceso inusual.</p><p><strong>Para qué sirve:</strong> el patrón de vello refleja equilibrio hormonal (andrógenos, estrógenos), dosha dominante, circulación periférica, salud folicular general.</p><p><strong>Cómo lo ves en equilibrio:</strong> distribución acorde a tu genética, densidad estable en el tiempo, sin caída súbita, sin crecimiento hormonal anormal.</p><p><strong>Qué hacer si hay señales:</strong> crecimiento desproporcionado → chequeo hormonal. Caída súbita → revisar tiroides, ferritina, estrés. Aceite de ricino tópico para densidad.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<!-- GRUPO: MANOS -->
+<h3 style="margin:28px 0 12px;color:#3D5A36;font-size:18px;letter-spacing:1px;border-bottom:2px solid #E8DFC8;padding-bottom:6px">Zona Manos</h3>
+
+<div class="card" data-sec="unas" data-dosha="pitta" style="cursor:pointer"><h4>💅 Uñas (Nakha Pariksha)</h4><p><strong>Qué se observa:</strong> color del lecho ungueal, líneas longitudinales o transversales, manchas blancas, media luna visible, forma (plana, curvada, quebradiza), grosor, brillo.</p><p><strong>Para qué sirve:</strong> las uñas son indicadores de minerales (hierro, zinc, calcio), función hepática, circulación, e historial de estrés (líneas de Beau).</p><p><strong>Cómo las ves en equilibrio:</strong> lecho rosado, media luna visible en pulgares, superficie lisa sin estrías, sin manchas, grosor uniforme, brillo natural.</p><p><strong>Qué hacer si hay señales:</strong> estrías transversales → estrés reciente; manchas blancas → zinc; palidez → hierro; quebradizas → biotina y omega 3. Aceite de almendras en cutículas.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="manos" data-dosha="pitta" style="cursor:pointer"><h4>✋ Manos (Hasta Pariksha)</h4><p><strong>Qué se observa:</strong> temperatura (frías, tibias, calientes), sudoración, color de palmas, líneas marcadas, temblor sutil, dedos largos o cortos, flexibilidad articular.</p><p><strong>Para qué sirve:</strong> las manos son uno de los diagnósticos más precisos del ayurveda. Revelan dosha dominante, circulación, sistema nervioso, y estrés crónico.</p><p><strong>Cómo las ves en equilibrio:</strong> temperatura tibia uniforme, humedad natural sin sudor excesivo, palmas rosadas, sin temblor, articulaciones flexibles sin crujidos.</p><p><strong>Qué hacer si hay señales:</strong> frías → mejorar circulación con jengibre y movimiento; sudorosas → calmar Pitta; temblor → reducir cafeína y estrés, pranayama diario.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<!-- GRUPO: PIES -->
+<h3 style="margin:28px 0 12px;color:#3D5A36;font-size:18px;letter-spacing:1px;border-bottom:2px solid #E8DFC8;padding-bottom:6px">Zona Pies</h3>
+
+<div class="card" data-sec="pies" data-dosha="pitta" style="cursor:pointer"><h4>🦶 Pies (Pada Pariksha)</h4><p><strong>Qué se observa:</strong> temperatura, arco (plano, alto, normal), grietas en talones, hinchazón de tobillos, uñas de los pies, hongos visibles, color general, callos.</p><p><strong>Para qué sirve:</strong> los pies son el mapa reflejo del cuerpo entero (reflexología). Además muestran circulación periférica, retención de líquidos, y equilibrio postural.</p><p><strong>Cómo los ves en equilibrio:</strong> piel sin grietas profundas, temperatura tibia, sin hinchazón, uñas sanas, arco acorde a tu pie, sin callosidades marcadas.</p><p><strong>Qué hacer si hay señales:</strong> masaje con aceite de sésamo cada noche, agua tibia con sal 10 min semanal, chequeo circulatorio si hay hinchazón, podología si hay hongos.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<!-- GRUPO: CABEZA -->
+<h3 style="margin:28px 0 12px;color:#3D5A36;font-size:18px;letter-spacing:1px;border-bottom:2px solid #E8DFC8;padding-bottom:6px">Zona Cabeza</h3>
+
+<div class="card" data-sec="cabello" data-dosha="pitta" style="cursor:pointer"><h4>💇 Cabello y Cuero Cabelludo (Kesha Pariksha)</h4><p><strong>Qué se observa:</strong> densidad, brillo, grosor, caspa o descamación, caída, canas prematuras, cuero cabelludo graso o seco, línea frontal del cabello.</p><p><strong>Para qué sirve:</strong> el cabello refleja Asthi Dhatu (tejido óseo), calcio, proteínas, hormonas, y vitalidad Kapha. Los cambios revelan desequilibrios nutricionales y hormonales.</p><p><strong>Cómo lo ves en equilibrio:</strong> densidad estable, brillo natural, grosor apropiado a tu tipo, sin caída anormal, cuero cabelludo sin picazón ni caspa, pigmento consistente.</p><p><strong>Qué hacer si hay señales:</strong> masaje con aceite tibio (bhringraj, amla, coco según dosha) 2 veces por semana, proteínas de calidad, silicio orgánico, control de estrés.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<!-- GRUPO: CORPORAL -->
+<h3 style="margin:28px 0 12px;color:#3D5A36;font-size:18px;letter-spacing:1px;border-bottom:2px solid #E8DFC8;padding-bottom:6px">Zona Corporal</h3>
+
+<div class="card" data-sec="constitucion" data-dosha="pitta" style="cursor:pointer"><h4>🧍 Constitución General (Akriti)</h4><p><strong>Qué se observa:</strong> proporciones corporales, simetría general, distribución del peso, desarrollo muscular, postura natural de pie, anchura de hombros vs caderas.</p><p><strong>Para qué sirve:</strong> la constitución revela Prakriti (dosha genético), metabolismo basal, distribución de grasa y músculo, y tendencias de salud futura.</p><p><strong>Cómo la ves en equilibrio:</strong> proporciones armónicas, postura erguida sin tensión, desarrollo muscular funcional, distribución de peso equilibrada según tu dosha.</p><p><strong>Qué hacer si hay señales:</strong> cambios súbitos de peso → revisar tiroides y digestión. Postura caída → fortalecer core y espalda. Atrofia muscular → proteínas y entrenamiento de fuerza.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="venas" data-dosha="pitta" style="cursor:pointer"><h4>🩸 Venas Visibles (Sira Darshana)</h4><p><strong>Qué se observa:</strong> venas en dorso de manos, cuello, piernas. Dilatación, varices, arañas vasculares, prominencia, color azulado intenso, zonas con dolor.</p><p><strong>Para qué sirve:</strong> la red venosa visible indica circulación periférica, presión venosa, retorno al corazón, y en ayurveda refleja estado de Rakta Dhatu (sangre).</p><p><strong>Cómo las ves en equilibrio:</strong> venas sutilmente visibles, sin dilatación pronunciada, sin varices, sin dolor al tacto, color azul suave no violáceo intenso.</p><p><strong>Qué hacer si hay señales:</strong> elevar piernas 15 min/día, caminatas regulares, medias de compresión si varices, vitamina C y rutina con movimiento. Consulta vascular si hay varices marcadas.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<!-- GRUPO: TRANSPIRACIÓN -->
+<h3 style="margin:28px 0 12px;color:#3D5A36;font-size:18px;letter-spacing:1px;border-bottom:2px solid #E8DFC8;padding-bottom:6px">Zona Transpiración</h3>
+
+<div class="card" data-sec="transpiracion" data-dosha="pitta" style="cursor:pointer"><h4>💧 Transpiración (Sveda)</h4><p><strong>Qué se observa:</strong> cantidad, zonas donde aparece (frente, axilas, manos, pies), olor, color (amarillenta, transparente), si aparece con esfuerzo normal o excesivo.</p><p><strong>Para qué sirve:</strong> el sudor es canal de eliminación de Pitta y metabolismo básico. Detecta hiperactividad simpática, desequilibrio hormonal, sobrepeso metabólico, o ansiedad.</p><p><strong>Cómo la ves en equilibrio:</strong> sudoración moderada con esfuerzo apropiado, olor suave no desagradable, transparente, distribución uniforme, no aparece en reposo.</p><p><strong>Qué hacer si hay señales:</strong> excesiva → reducir picante, alcohol, estrés; regular respiración. Ausente → movimiento para activar detox. Olor fuerte → probióticos y clorofila.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+`;
 
 window.INFO.kapha.escanerEquilibrio=`<div class="card"><h4>🔬 Tu cuerpo habla — aprendé a escucharlo</h4><p>El Ayurveda lee señales del cuerpo que la medicina convencional pasa por alto. Lengua, ojos, líquidos y digestión cuentan lo que está pasando adentro antes de que aparezca un síntoma serio. Para tu constitución Kapha estas señales son especialmente importantes: tu cuerpo acumula despacio y los desequilibrios se instalan sin avisar. Leer temprano estas señales te permite moverte antes de que el estancamiento se vuelva enfermedad.</p></div>
 
@@ -949,7 +1288,68 @@ window.INFO.kapha.escanerEquilibrio=`<div class="card"><h4>🔬 Tu cuerpo habla 
 
 <div class="card" data-sec="detox" data-dosha="kapha" style="cursor:pointer"><h4>🧪 Evaluación de Desintoxicación (Mutra Pariksha)</h4><p><strong>Qué se observa:</strong> los líquidos que elimina tu cuerpo dan información sobre hidratación, calor interno y filtrado renal. Se mira color (desde transparente hasta oscuro), turbidez o claridad, presencia de espuma, frecuencia durante el día.</p><p><strong>Para qué sirve:</strong> detecta nivel de hidratación, si hay retención, si hay calor interno excesivo, y cómo está funcionando el filtrado del cuerpo.</p><p><strong>Cómo lo ves cuando estás en equilibrio:</strong> color amarillo claro paja, transparente, sin espuma persistente, frecuencia regular (5 a 7 veces al día), sin olor fuerte.</p><p><strong>Señales de desequilibrio Kapha (tu tipo):</strong> color muy claro casi transparente pero con turbidez, puede haber espuma que tarda en desaparecer, frecuencia baja (3-4 veces por día), sensación de no eliminar todo lo que tomaste durante el día, retención visible en piernas o cara. Esto refleja que tu cuerpo está reteniendo líquidos, metabolismo lento, posible pre-diabetes o resistencia a la insulina.</p><p><strong>Qué hacer si ves estas señales:</strong> tomá líquidos tibios (nunca fríos) durante el día, té de jengibre con pimienta, reducir sal drásticamente, ejercicio intenso diario para drenar, evitá lácteos y azúcar. Si hay espuma persistente o retención marcada, análisis de orina con tu médico para descartar proteínas o glucosa.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
 
-<div class="card" data-sec="digestion" data-dosha="kapha" style="cursor:pointer"><h4>🌿 Evaluación de Digestión (Mala Pariksha)</h4><p><strong>Qué se observa:</strong> usando la escala Bristol (7 tipos) traducida a lenguaje simple, evaluamos cómo procesa tu cuerpo lo que comés. Forma, consistencia, color, frecuencia, facilidad de eliminación.</p><p><strong>Para qué sirve:</strong> detecta la velocidad de tu digestión, si estás absorbiendo nutrientes, el estado de tu fuego digestivo (Agni) y si hay acumulación o estancamiento.</p><p><strong>La escala Bristol en palabras simples:</strong></p><ul style="line-height:1.9;padding-left:20px"><li><strong>Tipo 1:</strong> bolitas duras separadas — constipación severa</li><li><strong>Tipo 2:</strong> forma de salchicha con grumos — constipación</li><li><strong>Tipo 3:</strong> salchicha con grietas en la superficie — aceptable pero seca</li><li><strong>Tipo 4:</strong> salchicha lisa y suave — ideal</li><li><strong>Tipo 5:</strong> trozos blandos con bordes definidos — falta fibra</li><li><strong>Tipo 6:</strong> trozos esponjosos con bordes irregulares — tendencia a diarrea</li><li><strong>Tipo 7:</strong> líquido sin forma — diarrea</li></ul><p><strong>Señales de desequilibrio Kapha (tu tipo):</strong> tendencia a tipos 3 y 4 pero con gran volumen y pesadez, evacuaciones lentas, una sola vez al día o cada 2 días, sensación pesada después, posible mucosidad visible, olor dulce. Esto indica fuego digestivo (Agni) lento, Ama acumulado, metabolismo enlentecido.</p><p><strong>Qué hacer si ves estas señales:</strong> té de jengibre antes de cada comida, especias picantes (pimienta, mostaza, chile) en todas las comidas, evitá lácteos, trigo refinado y azúcar, caminata de 20 minutos después del almuerzo, más fibra (avena, chía, semillas), ayuno intermitente.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>`;
+<div class="card" data-sec="digestion" data-dosha="kapha" style="cursor:pointer"><h4>🌿 Evaluación de Digestión (Mala Pariksha)</h4><p><strong>Qué se observa:</strong> usando la escala Bristol (7 tipos) traducida a lenguaje simple, evaluamos cómo procesa tu cuerpo lo que comés. Forma, consistencia, color, frecuencia, facilidad de eliminación.</p><p><strong>Para qué sirve:</strong> detecta la velocidad de tu digestión, si estás absorbiendo nutrientes, el estado de tu fuego digestivo (Agni) y si hay acumulación o estancamiento.</p><p><strong>La escala Bristol en palabras simples:</strong></p><ul style="line-height:1.9;padding-left:20px"><li><strong>Tipo 1:</strong> bolitas duras separadas — constipación severa</li><li><strong>Tipo 2:</strong> forma de salchicha con grumos — constipación</li><li><strong>Tipo 3:</strong> salchicha con grietas en la superficie — aceptable pero seca</li><li><strong>Tipo 4:</strong> salchicha lisa y suave — ideal</li><li><strong>Tipo 5:</strong> trozos blandos con bordes definidos — falta fibra</li><li><strong>Tipo 6:</strong> trozos esponjosos con bordes irregulares — tendencia a diarrea</li><li><strong>Tipo 7:</strong> líquido sin forma — diarrea</li></ul><p><strong>Señales de desequilibrio Kapha (tu tipo):</strong> tendencia a tipos 3 y 4 pero con gran volumen y pesadez, evacuaciones lentas, una sola vez al día o cada 2 días, sensación pesada después, posible mucosidad visible, olor dulce. Esto indica fuego digestivo (Agni) lento, Ama acumulado, metabolismo enlentecido.</p><p><strong>Qué hacer si ves estas señales:</strong> té de jengibre antes de cada comida, especias picantes (pimienta, mostaza, chile) en todas las comidas, evitá lácteos, trigo refinado y azúcar, caminata de 20 minutos después del almuerzo, más fibra (avena, chía, semillas), ayuno intermitente.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div><!-- GRUPO: BOCA -->
+<h3 style="margin:28px 0 12px;color:#3D5A36;font-size:18px;letter-spacing:1px;border-bottom:2px solid #E8DFC8;padding-bottom:6px">Zona Boca</h3>
+
+<div class="card" data-sec="labios" data-dosha="kapha" style="cursor:pointer"><h4>💋 Evaluación de Labios (Oshtha Pariksha)</h4><p><strong>Qué se observa:</strong> color, hidratación, grietas, descamación, comisuras con fisuras, temblor sutil, volumen y simetría.</p><p><strong>Para qué sirve:</strong> los labios reflejan el estado del estómago, la hidratación general, y la circulación periférica. Cambios rápidos en los labios indican desequilibrios recientes.</p><p><strong>Cómo los ves en equilibrio:</strong> color rosa uniforme, bordes definidos, sin grietas, humedad natural, volumen proporcional, sin descamación ni temblor.</p><p><strong>Qué hacer si hay señales:</strong> hidratación oral, aceite de coco o ghee en labios antes de dormir, mejorar digestión, evitar lamerse los labios.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="dientes" data-dosha="kapha" style="cursor:pointer"><h4>🦷 Evaluación de Dientes (Danta Pariksha)</h4><p><strong>Qué se observa:</strong> color del esmalte, sarro visible, encías inflamadas o retraídas, dientes apretados o espaciados, desgaste por bruxismo, caries visibles, sensibilidad.</p><p><strong>Para qué sirve:</strong> los dientes y encías reflejan el estado óseo general, nutrición de calcio, equilibrio de Vata en huesos, y toxinas acumuladas.</p><p><strong>Cómo los ves en equilibrio:</strong> blanco marfil uniforme, encías rosa firme sin inflamación, sin sarro, sin sensibilidad, dientes alineados.</p><p><strong>Qué hacer si hay señales:</strong> enjuague con aceite de sésamo 5 min por día (oil pulling), cepillado con polvo de triphala, masticar semillas de hinojo después de comer, consulta odontológica anual.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="mucosas" data-dosha="kapha" style="cursor:pointer"><h4>🌸 Evaluación de Mucosas (Shleshma Darshana)</h4><p><strong>Qué se observa:</strong> color del párpado inferior por dentro, interior del labio inferior, encías — todas las mucosas visibles. Palidez, enrojecimiento, tinte amarillento o violáceo.</p><p><strong>Para qué sirve:</strong> las mucosas son ventanas directas a la circulación y nivel de hemoglobina. Detectan anemia, inflamación sistémica, problemas hepáticos incipientes.</p><p><strong>Cómo las ves en equilibrio:</strong> rosa coral vivo, húmedas sin exceso, sin manchas, color uniforme en todas las mucosas visibles.</p><p><strong>Qué hacer si hay señales:</strong> análisis de sangre si hay palidez persistente, alimentación rica en hierro biodisponible, vitamina C con comidas, consulta médica si el tinte es amarillento.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<!-- GRUPO: CARA -->
+<h3 style="margin:28px 0 12px;color:#3D5A36;font-size:18px;letter-spacing:1px;border-bottom:2px solid #E8DFC8;padding-bottom:6px">Zona Cara</h3>
+
+<div class="card" data-sec="forma_facial" data-dosha="kapha" style="cursor:pointer"><h4>🗿 Forma de la Cara (Mukha Akriti)</h4><p><strong>Qué se observa:</strong> contorno general del rostro (alargado, ovalado, redondo), pómulos marcados o suaves, mandíbula definida o difusa, frente estrecha o ancha, proporciones.</p><p><strong>Para qué sirve:</strong> la forma facial revela constitución genética y dosha dominante. Cambios recientes (hinchazón, adelgazamiento) indican desequilibrios metabólicos.</p><p><strong>Cómo la ves en equilibrio:</strong> proporciones armónicas, sin hinchazón, contornos definidos acorde a tu genética, sin asimetría pronunciada.</p><p><strong>Qué hacer si hay señales:</strong> si hay hinchazón súbita: reducir sal, lácteos, trigo. Drenaje linfático facial. Si hay adelgazamiento marcado, revisar tiroides y digestión.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="mapa_facial" data-dosha="kapha" style="cursor:pointer"><h4>🧭 Mapa Facial por Zonas (Mukha Mandala)</h4><p><strong>Qué se observa:</strong> cada zona del rostro conecta con un órgano. Frente (intestino delgado), entrecejo (hígado), mejillas (pulmones), nariz (corazón), mentón (sistema reproductor), contorno mandíbula (riñones).</p><p><strong>Para qué sirve:</strong> mapear qué órganos están reaccionando. Manchas, granos, rojeces o sequedad en cada zona dan pistas muy precisas del origen interno.</p><p><strong>Cómo lo ves en equilibrio:</strong> piel uniforme sin zonas marcadas, sin granos recurrentes en lugares específicos, sin manchas focalizadas.</p><p><strong>Qué hacer si hay señales:</strong> según zona afectada: frente = más fibra y agua; entrecejo = desintoxicar hígado; mejillas = respiración y cardio; mentón = equilibrio hormonal; mandíbula = hidratación renal.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="brillo_facial" data-dosha="kapha" style="cursor:pointer"><h4>✨ Brillo Natural (Chaya-Prabha)</h4><p><strong>Qué se observa:</strong> luminosidad natural de la piel, energía que transmite el rostro, tono opaco o vivo. Lo que el ayurveda llama el "ojas" visible, la esencia vital reflejada.</p><p><strong>Para qué sirve:</strong> el brillo facial es el indicador más sensible del estado general. Cae antes que cualquier síntoma físico específico. Mide vitalidad profunda.</p><p><strong>Cómo lo ves en equilibrio:</strong> piel con luz propia aunque no haya maquillaje, transparencia saludable, tono vivo, mirada despierta y natural.</p><p><strong>Qué hacer si hay señales:</strong> dormir antes de las 23hs, agua con limón en ayunas, masaje con aceite (abhyanga) 3 veces por semana, alimentos frescos no procesados, pranayama diario.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="simetria_facial" data-dosha="kapha" style="cursor:pointer"><h4>⚖️ Simetría Facial (Samyak Lakshana)</h4><p><strong>Qué se observa:</strong> equilibrio entre lado izquierdo y derecho del rostro. Comisura de labios pareja, ojos al mismo nivel, cejas alineadas, párpados sin caída marcada.</p><p><strong>Para qué sirve:</strong> la asimetría facial revela tensión muscular crónica, bruxismo, desequilibrios hemisféricos cerebrales, estrés acumulado en un lado del cuerpo.</p><p><strong>Cómo la ves en equilibrio:</strong> rostro simétrico de frente, proporciones iguales entre ambos lados, sin tensión visible marcada.</p><p><strong>Qué hacer si hay señales:</strong> masaje facial bilateral 5 min/día, postura consciente, tratamiento bruxismo si aprieta la mandíbula, yoga facial 3 veces por semana.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<!-- GRUPO: PIEL -->
+<h3 style="margin:28px 0 12px;color:#3D5A36;font-size:18px;letter-spacing:1px;border-bottom:2px solid #E8DFC8;padding-bottom:6px">Zona Piel</h3>
+
+<div class="card" data-sec="piel" data-dosha="kapha" style="cursor:pointer"><h4>🌱 Calidad de la Piel (Tvak Pariksha)</h4><p><strong>Qué se observa:</strong> textura (seca, grasa, mixta), hidratación, arrugas finas vs profundas, poros marcados o cerrados, elasticidad al pellizcar, brillo o opacidad.</p><p><strong>Para qué sirve:</strong> la piel es el órgano más grande y refleja hidratación celular, equilibrio hormonal, digestión, y tiempo biológico real vs cronológico.</p><p><strong>Cómo la ves en equilibrio:</strong> tacto suave, hidratación natural, poros regulares, elasticidad (vuelve rápido tras pellizco), sin zonas ásperas ni brillos excesivos.</p><p><strong>Qué hacer si hay señales:</strong> aceite apropiado para tu dosha (sésamo/coco/mostaza), exfoliación suave semanal con harina de garbanzo, hidratación interna con agua tibia, sueño 7-8 horas.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="lunares" data-dosha="kapha" style="cursor:pointer"><h4>🔸 Lunares y Manchas (Tila Kalaka)</h4><p><strong>Qué se observa:</strong> cantidad, tamaño, distribución, color, bordes regulares o irregulares, cambios recientes en forma o color. Pecas, queratosis, manchas seniles.</p><p><strong>Para qué sirve:</strong> en ayurveda cada zona refleja un órgano específico. Además, el monitoreo periódico detecta cambios dermatológicos tempranos.</p><p><strong>Cómo los ves en equilibrio:</strong> lunares estables en forma y color, bordes definidos, tamaño constante, sin asimetrías ni sangrado.</p><p><strong>Qué hacer si hay señales:</strong> si cambia un lunar (ABCDE: asimetría, bordes irregulares, color variable, diámetro >6mm, evolución reciente), consulta dermatológica urgente.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="color_piel" data-dosha="kapha" style="cursor:pointer"><h4>🎨 Color General de la Piel (Varna)</h4><p><strong>Qué se observa:</strong> tono general (cálido, neutro, frío), uniformidad, zonas con hiperpigmentación, tinte amarillento, grisáceo o azulado en zonas visibles.</p><p><strong>Para qué sirve:</strong> cambios de color general reflejan función hepática, oxigenación, circulación, nivel de ojas (vitalidad). Es un indicador sistémico potente.</p><p><strong>Cómo lo ves en equilibrio:</strong> tono uniforme consistente con tu genética, sin tintes anormales, sin zonas pálidas o amarillentas, buena oxigenación visible.</p><p><strong>Qué hacer si hay señales:</strong> tinte amarillento → hepatograma. Palidez → hemograma. Grisáceo → revisar oxigenación y circulación. Uniformizar con protección solar y antioxidantes.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="cicatrices" data-dosha="kapha" style="cursor:pointer"><h4>🩹 Cicatrices y Marcas (Vrana Lakshana)</h4><p><strong>Qué se observa:</strong> cicatrices antiguas (cómo cicatrizaron), queloides, estrías, marcas de acné, capacidad de reparación del tejido, coloración residual.</p><p><strong>Para qué sirve:</strong> la calidad de cicatrización revela tu Ranjaka Pitta (función hepática y sanguínea), tu capacidad reparativa, tu nivel de colágeno y minerales.</p><p><strong>Cómo las ves en equilibrio:</strong> cicatrices planas, color similar a la piel circundante, sin queloides desproporcionados, estrías discretas si las hay.</p><p><strong>Qué hacer si hay señales:</strong> aceite de rosa mosqueta o ghee en cicatrices recientes, silicio orgánico (bamboo tabashir), vitamina C + zinc para colágeno, masaje circular.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="vello" data-dosha="kapha" style="cursor:pointer"><h4>🌾 Vello Corporal (Roma)</h4><p><strong>Qué se observa:</strong> densidad, grosor, distribución, color del vello en antebrazo, pantorrilla o torso. Zonas con vello ausente o en exceso inusual.</p><p><strong>Para qué sirve:</strong> el patrón de vello refleja equilibrio hormonal (andrógenos, estrógenos), dosha dominante, circulación periférica, salud folicular general.</p><p><strong>Cómo lo ves en equilibrio:</strong> distribución acorde a tu genética, densidad estable en el tiempo, sin caída súbita, sin crecimiento hormonal anormal.</p><p><strong>Qué hacer si hay señales:</strong> crecimiento desproporcionado → chequeo hormonal. Caída súbita → revisar tiroides, ferritina, estrés. Aceite de ricino tópico para densidad.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<!-- GRUPO: MANOS -->
+<h3 style="margin:28px 0 12px;color:#3D5A36;font-size:18px;letter-spacing:1px;border-bottom:2px solid #E8DFC8;padding-bottom:6px">Zona Manos</h3>
+
+<div class="card" data-sec="unas" data-dosha="kapha" style="cursor:pointer"><h4>💅 Uñas (Nakha Pariksha)</h4><p><strong>Qué se observa:</strong> color del lecho ungueal, líneas longitudinales o transversales, manchas blancas, media luna visible, forma (plana, curvada, quebradiza), grosor, brillo.</p><p><strong>Para qué sirve:</strong> las uñas son indicadores de minerales (hierro, zinc, calcio), función hepática, circulación, e historial de estrés (líneas de Beau).</p><p><strong>Cómo las ves en equilibrio:</strong> lecho rosado, media luna visible en pulgares, superficie lisa sin estrías, sin manchas, grosor uniforme, brillo natural.</p><p><strong>Qué hacer si hay señales:</strong> estrías transversales → estrés reciente; manchas blancas → zinc; palidez → hierro; quebradizas → biotina y omega 3. Aceite de almendras en cutículas.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="manos" data-dosha="kapha" style="cursor:pointer"><h4>✋ Manos (Hasta Pariksha)</h4><p><strong>Qué se observa:</strong> temperatura (frías, tibias, calientes), sudoración, color de palmas, líneas marcadas, temblor sutil, dedos largos o cortos, flexibilidad articular.</p><p><strong>Para qué sirve:</strong> las manos son uno de los diagnósticos más precisos del ayurveda. Revelan dosha dominante, circulación, sistema nervioso, y estrés crónico.</p><p><strong>Cómo las ves en equilibrio:</strong> temperatura tibia uniforme, humedad natural sin sudor excesivo, palmas rosadas, sin temblor, articulaciones flexibles sin crujidos.</p><p><strong>Qué hacer si hay señales:</strong> frías → mejorar circulación con jengibre y movimiento; sudorosas → calmar Pitta; temblor → reducir cafeína y estrés, pranayama diario.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<!-- GRUPO: PIES -->
+<h3 style="margin:28px 0 12px;color:#3D5A36;font-size:18px;letter-spacing:1px;border-bottom:2px solid #E8DFC8;padding-bottom:6px">Zona Pies</h3>
+
+<div class="card" data-sec="pies" data-dosha="kapha" style="cursor:pointer"><h4>🦶 Pies (Pada Pariksha)</h4><p><strong>Qué se observa:</strong> temperatura, arco (plano, alto, normal), grietas en talones, hinchazón de tobillos, uñas de los pies, hongos visibles, color general, callos.</p><p><strong>Para qué sirve:</strong> los pies son el mapa reflejo del cuerpo entero (reflexología). Además muestran circulación periférica, retención de líquidos, y equilibrio postural.</p><p><strong>Cómo los ves en equilibrio:</strong> piel sin grietas profundas, temperatura tibia, sin hinchazón, uñas sanas, arco acorde a tu pie, sin callosidades marcadas.</p><p><strong>Qué hacer si hay señales:</strong> masaje con aceite de sésamo cada noche, agua tibia con sal 10 min semanal, chequeo circulatorio si hay hinchazón, podología si hay hongos.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<!-- GRUPO: CABEZA -->
+<h3 style="margin:28px 0 12px;color:#3D5A36;font-size:18px;letter-spacing:1px;border-bottom:2px solid #E8DFC8;padding-bottom:6px">Zona Cabeza</h3>
+
+<div class="card" data-sec="cabello" data-dosha="kapha" style="cursor:pointer"><h4>💇 Cabello y Cuero Cabelludo (Kesha Pariksha)</h4><p><strong>Qué se observa:</strong> densidad, brillo, grosor, caspa o descamación, caída, canas prematuras, cuero cabelludo graso o seco, línea frontal del cabello.</p><p><strong>Para qué sirve:</strong> el cabello refleja Asthi Dhatu (tejido óseo), calcio, proteínas, hormonas, y vitalidad Kapha. Los cambios revelan desequilibrios nutricionales y hormonales.</p><p><strong>Cómo lo ves en equilibrio:</strong> densidad estable, brillo natural, grosor apropiado a tu tipo, sin caída anormal, cuero cabelludo sin picazón ni caspa, pigmento consistente.</p><p><strong>Qué hacer si hay señales:</strong> masaje con aceite tibio (bhringraj, amla, coco según dosha) 2 veces por semana, proteínas de calidad, silicio orgánico, control de estrés.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<!-- GRUPO: CORPORAL -->
+<h3 style="margin:28px 0 12px;color:#3D5A36;font-size:18px;letter-spacing:1px;border-bottom:2px solid #E8DFC8;padding-bottom:6px">Zona Corporal</h3>
+
+<div class="card" data-sec="constitucion" data-dosha="kapha" style="cursor:pointer"><h4>🧍 Constitución General (Akriti)</h4><p><strong>Qué se observa:</strong> proporciones corporales, simetría general, distribución del peso, desarrollo muscular, postura natural de pie, anchura de hombros vs caderas.</p><p><strong>Para qué sirve:</strong> la constitución revela Prakriti (dosha genético), metabolismo basal, distribución de grasa y músculo, y tendencias de salud futura.</p><p><strong>Cómo la ves en equilibrio:</strong> proporciones armónicas, postura erguida sin tensión, desarrollo muscular funcional, distribución de peso equilibrada según tu dosha.</p><p><strong>Qué hacer si hay señales:</strong> cambios súbitos de peso → revisar tiroides y digestión. Postura caída → fortalecer core y espalda. Atrofia muscular → proteínas y entrenamiento de fuerza.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<div class="card" data-sec="venas" data-dosha="kapha" style="cursor:pointer"><h4>🩸 Venas Visibles (Sira Darshana)</h4><p><strong>Qué se observa:</strong> venas en dorso de manos, cuello, piernas. Dilatación, varices, arañas vasculares, prominencia, color azulado intenso, zonas con dolor.</p><p><strong>Para qué sirve:</strong> la red venosa visible indica circulación periférica, presión venosa, retorno al corazón, y en ayurveda refleja estado de Rakta Dhatu (sangre).</p><p><strong>Cómo las ves en equilibrio:</strong> venas sutilmente visibles, sin dilatación pronunciada, sin varices, sin dolor al tacto, color azul suave no violáceo intenso.</p><p><strong>Qué hacer si hay señales:</strong> elevar piernas 15 min/día, caminatas regulares, medias de compresión si varices, vitamina C y rutina con movimiento. Consulta vascular si hay varices marcadas.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+
+<!-- GRUPO: TRANSPIRACIÓN -->
+<h3 style="margin:28px 0 12px;color:#3D5A36;font-size:18px;letter-spacing:1px;border-bottom:2px solid #E8DFC8;padding-bottom:6px">Zona Transpiración</h3>
+
+<div class="card" data-sec="transpiracion" data-dosha="kapha" style="cursor:pointer"><h4>💧 Transpiración (Sveda)</h4><p><strong>Qué se observa:</strong> cantidad, zonas donde aparece (frente, axilas, manos, pies), olor, color (amarillenta, transparente), si aparece con esfuerzo normal o excesivo.</p><p><strong>Para qué sirve:</strong> el sudor es canal de eliminación de Pitta y metabolismo básico. Detecta hiperactividad simpática, desequilibrio hormonal, sobrepeso metabólico, o ansiedad.</p><p><strong>Cómo la ves en equilibrio:</strong> sudoración moderada con esfuerzo apropiado, olor suave no desagradable, transparente, distribución uniforme, no aparece en reposo.</p><p><strong>Qué hacer si hay señales:</strong> excesiva → reducir picante, alcohol, estrés; regular respiración. Ausente → movimiento para activar detox. Olor fuerte → probióticos y clorofila.</p><div style="margin-top:12px"><button class="vb-foto-btn" onclick="_vbCapturarFoto(this)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button><input type="file" accept="image/*" capture="environment" style="display:none" onchange="_vbFotoSeleccionada(this)"><div class="vb-foto-preview" style="display:none;margin-top:10px"></div></div></div>
+`;
 
 window.INFO3={vata:{},pitta:{},kapha:{}};
 
@@ -1280,26 +1680,109 @@ window._vbFotoSeleccionada=function(input){
   
   // Validar tipo y tamaño (max 10 MB)
   if(!file.type.match(/^image\//)){alert('Por favor subí una imagen (JPG, PNG, HEIC)');return;}
-  if(file.size>10*1024*1024){alert('La imagen es muy grande. Máximo 10 MB.');return;}
+  if(file.size>15*1024*1024){alert('La imagen es muy grande. Máximo 15 MB.');return;}
   
-  // Leer como base64
+  // Mostrar loader inmediatamente
+  if(preview){
+    preview.style.display='block';
+    preview.innerHTML='<div style="background:linear-gradient(135deg,#3D5A36,#2D4226);color:#fff;padding:20px;border-radius:10px;text-align:center"><div style="display:inline-block;width:24px;height:24px;border:3px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:vbSpin 1s linear infinite;vertical-align:middle;margin-right:10px"></div><span style="vertical-align:middle">Procesando tu foto...</span></div>';
+  }
+  
+  // Procesar imagen con Canvas (resuelve HEIC, fotos negras, recompresión)
   var reader=new FileReader();
   reader.onload=function(e){
-    var base64=e.target.result;
-    
-    // Mostrar preview con loader
+    var img=new Image();
+    img.crossOrigin='anonymous';
+    img.onload=function(){
+      try{
+        // Detectar si la imagen cargó OK
+        if(img.width===0||img.height===0){
+          throw new Error('Imagen sin dimensiones');
+        }
+        
+        // Crear canvas con tamaño optimizado (máx 1600px lado largo)
+        var canvas=document.createElement('canvas');
+        var maxSize=1600;
+        var w=img.width,h=img.height;
+        if(w>maxSize||h>maxSize){
+          if(w>h){h=Math.round(h*maxSize/w);w=maxSize;}
+          else{w=Math.round(w*maxSize/h);h=maxSize;}
+        }
+        canvas.width=w;
+        canvas.height=h;
+        var ctx=canvas.getContext('2d');
+        
+        // Fondo blanco por las dudas (evita negro en algunos formatos)
+        ctx.fillStyle='#ffffff';
+        ctx.fillRect(0,0,w,h);
+        
+        // Dibujar imagen
+        ctx.drawImage(img,0,0,w,h);
+        
+        // Convertir a JPG (estándar universal)
+        var base64=canvas.toDataURL('image/jpeg',0.85);
+        
+        // VALIDAR que la imagen no sea negra
+        // Tomar 9 puntos de muestra y ver si hay variación de color
+        var sampleCtx=ctx;
+        var samples=[
+          [0,0],[w/2,0],[w-1,0],
+          [0,h/2],[w/2,h/2],[w-1,h/2],
+          [0,h-1],[w/2,h-1],[w-1,h-1]
+        ];
+        var totalBrightness=0;
+        var validSamples=0;
+        for(var i=0;i<samples.length;i++){
+          try{
+            var pixel=sampleCtx.getImageData(Math.floor(samples[i][0]),Math.floor(samples[i][1]),1,1).data;
+            var brightness=(pixel[0]+pixel[1]+pixel[2])/3;
+            totalBrightness+=brightness;
+            validSamples++;
+          }catch(e){}
+        }
+        var avgBrightness=validSamples>0?totalBrightness/validSamples:128;
+        
+        if(avgBrightness<10){
+          // La imagen es prácticamente negra
+          if(preview){
+            preview.innerHTML='<div style="background:#FEF2F2;color:#B91C1C;padding:20px;border-radius:10px;text-align:center;border:2px solid #FCA5A5"><strong>⚠️ La foto salió oscura</strong><br><br><span style="font-size:13px">Esto puede pasar en iPhone con formato HEIC o si la cámara no recibió luz suficiente.</span><br><br><strong>Probá esto:</strong><br><span style="font-size:13px;line-height:1.8">1. Buscá un lugar con buena luz natural<br>2. Sacá la foto de nuevo<br>3. Si usás iPhone, andá a Configuración → Cámara → Formatos → "Más compatible" (JPG)</span><br><br><button onclick="this.closest(\'.vb-foto-preview\').previousElementSibling.click()" style="background:#5A7A53;color:#fff;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;margin-top:8px">📸 Sacar foto otra vez</button></div>';
+          }
+          try{if(window._vbTrack)window._vbTrack('foto_negra',{seccion:seccion,dosha:dosha,brightness:avgBrightness});}catch(e){}
+          return;
+        }
+        
+        // Mostrar preview con la foto procesada
+        if(preview){
+          preview.innerHTML='<img src="'+base64+'" style="max-width:100%;border-radius:10px;border:2px solid #E8DFC8" alt="Foto capturada"><div id="vb-loader-'+seccion+'" style="background:linear-gradient(135deg,#3D5A36,#2D4226);color:#fff;padding:20px;border-radius:10px;margin-top:10px;text-align:center"><div style="display:inline-block;width:24px;height:24px;border:3px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:vbSpin 1s linear infinite;vertical-align:middle;margin-right:10px"></div><span style="vertical-align:middle">Analizando tu foto con IA ayurvédica...</span></div>';
+        }
+        
+        // Guardar en window
+        window._vbFotosCapturadas=window._vbFotosCapturadas||{};
+        window._vbFotosCapturadas[seccion+'_'+dosha]={base64:base64,timestamp:new Date().toISOString(),size:base64.length,type:'image/jpeg'};
+        try{if(window._vbTrack)window._vbTrack('foto_capturada',{seccion:seccion,dosha:dosha,size_kb:Math.round(base64.length/1024),original_kb:Math.round(file.size/1024)});}catch(e){}
+        
+        // Enviar a Cloud Function
+        _vbEnviarAnalisisIA(base64,'image/jpeg',seccion,dosha,preview);
+        
+      }catch(err){
+        console.error('Error procesando imagen:',err);
+        if(preview){
+          preview.innerHTML='<div style="background:#FEF2F2;color:#B91C1C;padding:16px;border-radius:10px;text-align:center;border:2px solid #FCA5A5"><strong>⚠️ No pudimos procesar la foto</strong><br><span style="font-size:13px">'+err.message+'</span><br><br><button onclick="this.closest(\'.vb-foto-preview\').previousElementSibling.click()" style="background:#5A7A53;color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer">📸 Intentar de nuevo</button></div>';
+        }
+      }
+    };
+    img.onerror=function(){
+      if(preview){
+        preview.innerHTML='<div style="background:#FEF2F2;color:#B91C1C;padding:16px;border-radius:10px;text-align:center;border:2px solid #FCA5A5"><strong>⚠️ Formato de imagen no compatible</strong><br><span style="font-size:13px">Probá con JPG o PNG. En iPhone: Configuración → Cámara → Formatos → "Más compatible"</span><br><br><button onclick="this.closest(\'.vb-foto-preview\').previousElementSibling.click()" style="background:#5A7A53;color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer">📸 Intentar de nuevo</button></div>';
+      }
+      try{if(window._vbTrack)window._vbTrack('foto_formato_no_soportado',{seccion:seccion,dosha:dosha,type:file.type});}catch(e){}
+    };
+    img.src=e.target.result;
+  };
+  reader.onerror=function(){
     if(preview){
-      preview.style.display='block';
-      preview.innerHTML='<img src="'+base64+'" style="max-width:100%;border-radius:10px;border:2px solid #E8DFC8" alt="Foto capturada"><div id="vb-loader-'+seccion+'" style="background:linear-gradient(135deg,#3D5A36,#2D4226);color:#fff;padding:20px;border-radius:10px;margin-top:10px;text-align:center"><div style="display:inline-block;width:24px;height:24px;border:3px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:vbSpin 1s linear infinite;vertical-align:middle;margin-right:10px"></div><span style="vertical-align:middle">Analizando tu foto con IA ayurvédica...</span></div>';
+      preview.innerHTML='<div style="background:#FEF2F2;color:#B91C1C;padding:16px;border-radius:10px;text-align:center;border:2px solid #FCA5A5"><strong>⚠️ No pudimos leer el archivo</strong><br><button onclick="this.closest(\'.vb-foto-preview\').previousElementSibling.click()" style="background:#5A7A53;color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;margin-top:10px">📸 Intentar de nuevo</button></div>';
     }
-    
-    // Guardar en window por las dudas
-    window._vbFotosCapturadas=window._vbFotosCapturadas||{};
-    window._vbFotosCapturadas[seccion+'_'+dosha]={base64:base64,timestamp:new Date().toISOString(),size:file.size,type:file.type};
-    try{if(window._vbTrack)window._vbTrack('foto_capturada',{seccion:seccion,dosha:dosha,size_kb:Math.round(file.size/1024)});}catch(e){}
-    
-    // Llamar a Cloud Function
-    _vbEnviarAnalisisIA(base64, file.type, seccion, dosha, preview);
   };
   reader.readAsDataURL(file);
 };
@@ -1309,24 +1792,37 @@ window._vbEnviarAnalisisIA=function(base64, mediaType, seccion, dosha, preview){
   // URL de la Cloud Function - se actualiza despues del deploy
   var FUNCTION_URL=window._vbFunctionURL||'https://analizarfotoayurveda-j3yesrdcba-rj.a.run.app';
   
-  if(!window.userEmail){
-    _vbMostrarErrorFoto(preview, 'Necesitas completar el test primero para que guardemos tu perfil.', seccion);
+  // Buscar email en TODAS las fuentes posibles (variable global, window, localStorage)
+  var emailFinal=window.userEmail||(typeof userEmail!=='undefined'?userEmail:'')||localStorage.getItem('vb_email')||'';
+  
+  // Buscar resultados del test en TODAS las fuentes posibles
+  var resFinal=window.res||(typeof res!=='undefined'?res:null);
+  if(!resFinal){
+    try{var stored=localStorage.getItem('vb_res');if(stored)resFinal=JSON.parse(stored);}catch(e){}
+  }
+  
+  if(!emailFinal){
+    _vbMostrarErrorFoto(preview, 'Necesitás completar el test primero. Si ya lo hiciste, recargá la página.', seccion);
     return;
   }
   
-  if(!window.res||!window.res.p||!window.res.pct){
+  if(!resFinal||!resFinal.p||!resFinal.pct){
     _vbMostrarErrorFoto(preview, 'Completá el test de dosha antes de usar el escáner.', seccion);
     return;
   }
+  
+  // Sincronizar window.userEmail y window.res por si otras funciones los necesitan
+  window.userEmail=emailFinal;
+  window.res=resFinal;
   
   fetch(FUNCTION_URL, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
-      email: window.userEmail,
+      email: emailFinal,
       seccion: seccion,
       dosha: dosha,
-      porcentajes: window.res.pct,
+      porcentajes: resFinal.pct,
       imageBase64: base64,
       mediaType: mediaType
     })
@@ -1477,12 +1973,15 @@ window._vbActualizarContadorFotos=function(){
 
 // Consultar estado inicial de fotos gratis al abrir el tab
 window._vbFetchEstadoEscaner=function(){
-  if(!window.userEmail)return;
+  // Buscar email en TODAS las fuentes posibles
+  var emailFinal=window.userEmail||(typeof userEmail!=='undefined'?userEmail:'')||localStorage.getItem('vb_email')||'';
+  if(!emailFinal)return;
+  window.userEmail=emailFinal;
   var ESTADO_URL='https://southamerica-east1-vedabite-1b49a.cloudfunctions.net/estadoEscaner';
   fetch(ESTADO_URL, {
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({email:window.userEmail})
+    body:JSON.stringify({email:emailFinal})
   })
   .then(function(r){return r.json();})
   .then(function(data){
@@ -1512,105 +2011,72 @@ window._vbFetchEstadoEscaner=function(){
 <a id="vbWhatsAppBtn" href="https://wa.me/5491153149117?text=Hola%2C%20quiero%20saber%20m%C3%A1s%20sobre%20Vedabite" target="_blank" style="display:none;position:fixed;bottom:20px;right:20px;width:56px;height:56px;background:#25D366;border-radius:50%;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.25);z-index:9999;text-decoration:none;transition:transform .15s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"><svg width="28" height="28" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
 <script>(function(){try{if(localStorage.getItem('vb_paid')==='true'){var w=document.getElementById('vbWhatsAppBtn');if(w)w.style.display='flex';}}catch(e){}})();</script>
 
-<!-- CONTADOR DINÁMICO DESDE FIREBASE — v3 con count() nativo -->
+<!-- CONTADOR DINÁMICO DESDE FIREBASE — v4 simple y directo -->
 <script>
 (function(){
-  if(!window._vbDB) return;
-  var el=document.getElementById('vbContador');
-  if(!el) return;
-  
-  var ACTUALIZANDO=false;
-  
-  function setNumero(n){
-    if(!el) return;
-    // Animación opcional: sube de a poco si el nuevo es mayor que el actual
-    var actual=parseInt(el.textContent)||0;
-    if(n>actual && n-actual<50){
-      var step=Math.ceil((n-actual)/10);
-      var timer=setInterval(function(){
-        actual=Math.min(actual+step,n);
-        el.textContent=actual;
-        if(actual>=n)clearInterval(timer);
-      },60);
-    }else{
-      el.textContent=n;
-    }
-    // Guardar en localStorage como cache
-    try{localStorage.setItem('vb_contador_cache',JSON.stringify({n:n,t:Date.now()}));}catch(e){}
-  }
-  
-  // Paso 1: mostrar caché inmediatamente (para UX rápida)
-  try{
-    var cache=JSON.parse(localStorage.getItem('vb_contador_cache')||'null');
-    if(cache && cache.n && (Date.now()-cache.t)<3600000){
-      el.textContent=cache.n;
-    }
-  }catch(e){}
-  
-  // Paso 2: intentar contador rápido con count() nativo de Firestore
-  function actualizarRapido(){
-    if(ACTUALIZANDO)return;
-    ACTUALIZANDO=true;
-    try{
-      // Count aggregation query (Firestore v9+) - mucho más rápido que get() completo
-      if(typeof window._vbDB.collection('leads').count==='function'){
-        window._vbDB.collection('leads').count().get().then(function(snap){
-          var c=snap.data().count;
-          if(c>0){
-            setNumero(c);
-            window._vbDB.collection('config').doc('contador').set({total:c,updated:new Date().toISOString()},{merge:true}).catch(function(){});
-          }
-          ACTUALIZANDO=false;
-        }).catch(function(err){
-          console.warn('Contador count() falló, uso fallback:',err.code);
-          actualizarFallback();
-        });
-      }else{
-        actualizarFallback();
-      }
-    }catch(e){
-      actualizarFallback();
-    }
-  }
-  
-  // Paso 3: fallback al método viejo si count() no está disponible
-  function actualizarFallback(){
+  function actualizar(){
+    var el=document.getElementById('vbContador');
+    if(!el){console.log('[Contador] elemento no encontrado, reintentando...');setTimeout(actualizar,500);return;}
+    if(!window._vbDB||!firebase||!firebase.firestore){console.log('[Contador] Firebase no listo, reintentando...');setTimeout(actualizar,500);return;}
+    
+    console.log('[Contador] Consultando Firestore...');
+    
+    // Método principal: get() server-only (siempre funciona en SDK v8 compat)
     window._vbDB.collection('leads').get({source:'server'}).then(function(snap){
       var c=snap.size;
+      console.log('[Contador] Resultado Firestore:',c);
       if(c>0){
-        setNumero(c);
-        window._vbDB.collection('config').doc('contador').set({total:c,updated:new Date().toISOString()},{merge:true}).catch(function(){});
+        el.textContent=c;
+        try{localStorage.setItem('vb_contador_real',c);}catch(e){}
+        // Guardar en config doc para fallback futuro
+        try{window._vbDB.collection('config').doc('contador').set({total:c,updated:new Date().toISOString()},{merge:true});}catch(e){}
+      }else{
+        console.warn('[Contador] Firestore devolvió 0 leads — chequear permisos');
       }
-      ACTUALIZANDO=false;
     }).catch(function(err){
-      console.warn('Contador fallback falló:',err.code);
-      // Último recurso: leer del doc config
+      console.error('[Contador] ERROR Firestore:',err.code,err.message);
+      // Fallback al doc config
       window._vbDB.collection('config').doc('contador').get().then(function(doc){
-        if(doc.exists && doc.data().total){
-          setNumero(doc.data().total);
+        if(doc.exists&&doc.data().total){
+          console.log('[Contador] Usando valor del doc config:',doc.data().total);
+          el.textContent=doc.data().total;
         }
-        ACTUALIZANDO=false;
-      }).catch(function(){ACTUALIZANDO=false;});
+      }).catch(function(){});
     });
   }
   
-  // Arrancar apenas Firebase esté listo
-  setTimeout(actualizarRapido,300);
+  // Cargar valor de localStorage primero (UX rápida)
+  setTimeout(function(){
+    var el=document.getElementById('vbContador');
+    if(el){
+      try{
+        var v=localStorage.getItem('vb_contador_real');
+        if(v&&parseInt(v)>0)el.textContent=v;
+      }catch(e){}
+    }
+  },100);
   
-  // Cada vez que alguien deja un lead, recontar después de 2 segundos
-  var origSave=window._vbSaveLead;
-  if(origSave){
-    window._vbSaveLead=function(d){
-      var result=origSave(d);
-      setTimeout(actualizarRapido,2000);
-      return result;
-    };
-  }
+  // Primer fetch al cargar
+  setTimeout(actualizar,800);
   
-  // Recontar cada 60 segundos para usuarios activos viendo la página
-  setInterval(actualizarRapido,60000);
+  // Re-fetch cada 30 segundos
+  setInterval(actualizar,30000);
+  
+  // Re-fetch cuando se guarda un lead nuevo
+  var checkSaveLead=setInterval(function(){
+    if(window._vbSaveLead&&!window._vbSaveLead._wrapped){
+      var orig=window._vbSaveLead;
+      window._vbSaveLead=function(d){
+        var r=orig(d);
+        setTimeout(actualizar,2500);
+        return r;
+      };
+      window._vbSaveLead._wrapped=true;
+      clearInterval(checkSaveLead);
+      console.log('[Contador] Hook a _vbSaveLead instalado');
+    }
+  },500);
 })();
-</script>
 </script>
 
 <script>
