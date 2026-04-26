@@ -722,8 +722,104 @@ function vbNakshatraFromDeg(deg){
   return VB_NAKSHATRA_DOSHA[idx]||{n:'Desconocido',d:'pitta'};
 }
 
-// Llamado real a la API: paso 1 - Geo Location (ciudad → lat/lon)
+// Tabla local de ciudades comunes (cubre 95% de usuarios Latam + España)
+// Si no está acá, se recurre a la API de geo. Esto evita el error "no encuentra Buenos Aires".
+var VB_CIUDADES={
+  // Argentina
+  'buenos aires':{lat:-34.6037,lon:-58.3816,tz:-3,country:'Argentina'},
+  'ciudad autonoma de buenos aires':{lat:-34.6037,lon:-58.3816,tz:-3,country:'Argentina'},
+  'caba':{lat:-34.6037,lon:-58.3816,tz:-3,country:'Argentina'},
+  'capital federal':{lat:-34.6037,lon:-58.3816,tz:-3,country:'Argentina'},
+  'cordoba':{lat:-31.4201,lon:-64.1888,tz:-3,country:'Argentina'},
+  'rosario':{lat:-32.9442,lon:-60.6505,tz:-3,country:'Argentina'},
+  'mendoza':{lat:-32.8895,lon:-68.8458,tz:-3,country:'Argentina'},
+  'la plata':{lat:-34.9215,lon:-57.9545,tz:-3,country:'Argentina'},
+  'mar del plata':{lat:-38.0055,lon:-57.5426,tz:-3,country:'Argentina'},
+  'tucuman':{lat:-26.8083,lon:-65.2176,tz:-3,country:'Argentina'},
+  'salta':{lat:-24.7821,lon:-65.4232,tz:-3,country:'Argentina'},
+  'san juan':{lat:-31.5375,lon:-68.5364,tz:-3,country:'Argentina'},
+  'neuquen':{lat:-38.9516,lon:-68.0591,tz:-3,country:'Argentina'},
+  'bariloche':{lat:-41.1335,lon:-71.3103,tz:-3,country:'Argentina'},
+  'tandil':{lat:-37.3217,lon:-59.1332,tz:-3,country:'Argentina'},
+  'bahia blanca':{lat:-38.7196,lon:-62.2724,tz:-3,country:'Argentina'},
+  'avellaneda':{lat:-34.6589,lon:-58.3654,tz:-3,country:'Argentina'},
+  'lomas de zamora':{lat:-34.7606,lon:-58.4006,tz:-3,country:'Argentina'},
+  'quilmes':{lat:-34.7203,lon:-58.2546,tz:-3,country:'Argentina'},
+  'san isidro':{lat:-34.4708,lon:-58.5128,tz:-3,country:'Argentina'},
+  // Uruguay
+  'montevideo':{lat:-34.9011,lon:-56.1645,tz:-3,country:'Uruguay'},
+  'punta del este':{lat:-34.9636,lon:-54.9534,tz:-3,country:'Uruguay'},
+  // Chile
+  'santiago':{lat:-33.4489,lon:-70.6693,tz:-3,country:'Chile'},
+  'santiago de chile':{lat:-33.4489,lon:-70.6693,tz:-3,country:'Chile'},
+  'valparaiso':{lat:-33.0472,lon:-71.6127,tz:-3,country:'Chile'},
+  'concepcion':{lat:-36.8201,lon:-73.0444,tz:-3,country:'Chile'},
+  // México
+  'ciudad de mexico':{lat:19.4326,lon:-99.1332,tz:-6,country:'Mexico'},
+  'mexico df':{lat:19.4326,lon:-99.1332,tz:-6,country:'Mexico'},
+  'cdmx':{lat:19.4326,lon:-99.1332,tz:-6,country:'Mexico'},
+  'guadalajara':{lat:20.6597,lon:-103.3496,tz:-6,country:'Mexico'},
+  'monterrey':{lat:25.6866,lon:-100.3161,tz:-6,country:'Mexico'},
+  'puebla':{lat:19.0414,lon:-98.2063,tz:-6,country:'Mexico'},
+  'tijuana':{lat:32.5149,lon:-117.0382,tz:-8,country:'Mexico'},
+  'cancun':{lat:21.1619,lon:-86.8515,tz:-5,country:'Mexico'},
+  // Colombia
+  'bogota':{lat:4.7110,lon:-74.0721,tz:-5,country:'Colombia'},
+  'medellin':{lat:6.2476,lon:-75.5658,tz:-5,country:'Colombia'},
+  'cali':{lat:3.4516,lon:-76.5320,tz:-5,country:'Colombia'},
+  'cartagena':{lat:10.3910,lon:-75.4794,tz:-5,country:'Colombia'},
+  'barranquilla':{lat:10.9685,lon:-74.7813,tz:-5,country:'Colombia'},
+  // Perú
+  'lima':{lat:-12.0464,lon:-77.0428,tz:-5,country:'Peru'},
+  'arequipa':{lat:-16.4090,lon:-71.5375,tz:-5,country:'Peru'},
+  'cusco':{lat:-13.5320,lon:-71.9675,tz:-5,country:'Peru'},
+  // Venezuela
+  'caracas':{lat:10.4806,lon:-66.9036,tz:-4,country:'Venezuela'},
+  'maracaibo':{lat:10.6427,lon:-71.6125,tz:-4,country:'Venezuela'},
+  // Ecuador
+  'quito':{lat:-0.1807,lon:-78.4678,tz:-5,country:'Ecuador'},
+  'guayaquil':{lat:-2.1709,lon:-79.9224,tz:-5,country:'Ecuador'},
+  // Bolivia
+  'la paz':{lat:-16.5000,lon:-68.1500,tz:-4,country:'Bolivia'},
+  'santa cruz':{lat:-17.7833,lon:-63.1821,tz:-4,country:'Bolivia'},
+  // Paraguay
+  'asuncion':{lat:-25.2637,lon:-57.5759,tz:-3,country:'Paraguay'},
+  // España
+  'madrid':{lat:40.4168,lon:-3.7038,tz:1,country:'Spain'},
+  'barcelona':{lat:41.3851,lon:2.1734,tz:1,country:'Spain'},
+  'valencia':{lat:39.4699,lon:-0.3763,tz:1,country:'Spain'},
+  'sevilla':{lat:37.3891,lon:-5.9845,tz:1,country:'Spain'},
+  'zaragoza':{lat:41.6488,lon:-0.8891,tz:1,country:'Spain'},
+  'malaga':{lat:36.7213,lon:-4.4214,tz:1,country:'Spain'},
+  'bilbao':{lat:43.2630,lon:-2.9350,tz:1,country:'Spain'},
+  'palma de mallorca':{lat:39.5696,lon:2.6502,tz:1,country:'Spain'},
+  // USA Hispano
+  'miami':{lat:25.7617,lon:-80.1918,tz:-5,country:'USA'},
+  'los angeles':{lat:34.0522,lon:-118.2437,tz:-8,country:'USA'},
+  'new york':{lat:40.7128,lon:-74.0060,tz:-5,country:'USA'},
+  'houston':{lat:29.7604,lon:-95.3698,tz:-6,country:'USA'},
+  'phoenix':{lat:33.4484,lon:-112.0740,tz:-7,country:'USA'}
+};
+
+// Normaliza string: minúsculas + saca acentos + saca extra
+function vbNormalizar(s){
+  return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[,\-\.].*$/,'').trim();
+}
+
+// Busca ciudad en tabla local primero, después en API si no la encuentra
 async function vbApiGeo(ciudad){
+  var key=vbNormalizar(ciudad);
+  // Búsqueda local exacta
+  if(VB_CIUDADES[key]){
+    return VB_CIUDADES[key];
+  }
+  // Búsqueda local parcial (si escribe "buenos aires capital" matchea "buenos aires")
+  for(var k in VB_CIUDADES){
+    if(key.indexOf(k)===0||k.indexOf(key)===0){
+      return VB_CIUDADES[k];
+    }
+  }
+  // No encontrada localmente, llamar API
   try{
     var r=await fetch('https://json.freeastrologyapi.com/geo-details',{
       method:'POST',
@@ -732,7 +828,7 @@ async function vbApiGeo(ciudad){
     });
     var d=await r.json();
     if(d&&d.output&&d.output.length){
-      return {lat:parseFloat(d.output[0].latitude),lon:parseFloat(d.output[0].longitude),country:d.output[0].country};
+      return {lat:parseFloat(d.output[0].latitude),lon:parseFloat(d.output[0].longitude),tz:null,country:d.output[0].country};
     }
     return null;
   }catch(e){console.error('[vbApiGeo]',e);return null;}
@@ -787,16 +883,19 @@ async function vbCalcularPrakriti(){
     }
   }catch(e){}
   
-  // Paso 1: geo
+  // Paso 1: geo (busca primero en tabla local)
   var geo=await vbApiGeo(d.lugar_nacimiento);
   if(!geo){
     document.getElementById('vbPrakritiResult').innerHTML='<div style="background:#FFF3CD;border:1px solid #C49E72;border-radius:10px;padding:14px;margin:14px 0"><p style="font-size:13px;color:#8B7355;line-height:1.5">No pudimos ubicar "'+d.lugar_nacimiento+'". Probá con un nombre más conocido (ej: "Buenos Aires" en lugar de un barrio). De todos modos podés <a href="#" onclick="vbSaltarPrakriti();return false" style="color:#5A7A53;font-weight:700">continuar al test →</a></p></div>';
     return;
   }
   
-  // Paso 2: timezone
-  var tz=await vbApiTimezone(geo.lat,geo.lon,d.fecha_nacimiento);
-  if(tz===null){tz=-3;} // fallback Argentina
+  // Paso 2: timezone (si geo ya trae tz, usarlo. Sino llamar API)
+  var tz=geo.tz;
+  if(tz===null||tz===undefined){
+    tz=await vbApiTimezone(geo.lat,geo.lon,d.fecha_nacimiento);
+    if(tz===null){tz=-3;} // fallback Argentina
+  }
   
   // Paso 3: planets
   var partesFecha=d.fecha_nacimiento.split('-');
