@@ -1137,14 +1137,31 @@ async function vbCalcularPrakriti(){
   }
   
   // Extraer Lagna, Sol, Luna del response
-  var lagna=null,sol=null,luna=null;
-  for(var key in planetsRes){
-    var planeta=planetsRes[key];
-    if(!planeta||!planeta.name)continue;
-    if(planeta.name==='Ascendant')lagna=planeta;
-    if(planeta.name==='Sun')sol=planeta;
-    if(planeta.name==='Moon')luna=planeta;
+  // La API devuelve output como array: output[0] = indexado por número, output[1] = indexado por nombre
+  var planetas=null;
+  if(Array.isArray(planetsRes)&&planetsRes.length>=2&&planetsRes[1]){
+    planetas=planetsRes[1]; // formato indexado por nombre directo
+  }else if(Array.isArray(planetsRes)&&planetsRes.length>=1&&planetsRes[0]){
+    // Fallback: usar el formato numérico y extraer por iteración
+    planetas={};
+    var primero=planetsRes[0];
+    for(var k in primero){
+      var p=primero[k];
+      if(p&&p.name)planetas[p.name]=p;
+    }
+  }else if(planetsRes&&typeof planetsRes==='object'){
+    // Por si la API devuelve objeto plano
+    planetas=planetsRes;
   }
+  
+  if(!planetas){
+    document.getElementById('vbPrakritiResult').innerHTML='<p style="color:#C44E4E;text-align:center">No pudimos leer la respuesta. <a href="#" onclick="vbSaltarPrakriti();return false" style="color:#5A7A53">Continuar al test →</a></p>';
+    return;
+  }
+  
+  var lagna=planetas['Ascendant']||null;
+  var sol=planetas['Sun']||null;
+  var luna=planetas['Moon']||null;
   
   if(!lagna||!luna){
     document.getElementById('vbPrakritiResult').innerHTML='<p style="color:#C44E4E;text-align:center">Datos incompletos. <a href="#" onclick="vbSaltarPrakriti();return false" style="color:#5A7A53">Continuar al test →</a></p>';
@@ -1152,9 +1169,10 @@ async function vbCalcularPrakriti(){
   }
   
   // Calcular doshas según rashis y nakshatra de la luna
-  var lagnaSign=lagna.current_sign!==undefined?(lagna.current_sign-1+12)%12:Math.floor((lagna.fullDegree||0)/30)%12;
-  var solSign=sol&&sol.current_sign!==undefined?(sol.current_sign-1+12)%12:0;
-  var lunaSign=luna.current_sign!==undefined?(luna.current_sign-1+12)%12:0;
+  // API devuelve current_sign 1-12, mi tabla VB_RASHI_DOSHA usa índice 0-11
+  var lagnaSign=lagna.current_sign?(lagna.current_sign-1):0;
+  var solSign=sol&&sol.current_sign?(sol.current_sign-1):0;
+  var lunaSign=luna.current_sign?(luna.current_sign-1):0;
   var lunaNak=vbNakshatraFromDeg(luna.fullDegree||0);
   
   var lagnaInfo=VB_RASHI_DOSHA[lagnaSign]||VB_RASHI_DOSHA[0];
