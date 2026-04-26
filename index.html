@@ -509,6 +509,7 @@ Pequeños ajustes que cambian todo.
 <div style="background:linear-gradient(180deg,#FEF3C7,#FDE68A);min-height:100vh;padding:24px">
 <div class="container" style="max-width:560px;margin:0 auto">
 <div style="text-align:center;margin-bottom:24px;padding-top:8px">
+<p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700;margin-bottom:8px">📋 Datos básicos · Paso 1 de 8</p>
 <p style="font-size:12px;letter-spacing:2px;color:var(--sage);text-transform:uppercase;font-weight:700">Antes de empezar</p>
 <h2 style="font-family:Georgia,serif;font-size:22px;color:#3D5A36;margin-top:8px;line-height:1.3">Para que tu equilibrio sea<br><em style="color:#C49E72">tuyo</em>, contame quién sos</h2>
 <p style="font-size:13px;color:#7a7a7a;margin-top:10px;line-height:1.5">Tu cuerpo no es genérico. Tu plan tampoco.<br>30 segundos · 100% privado</p>
@@ -1273,6 +1274,10 @@ function vbContinuarTest(){
 <div class="screen" id="s1c">
 <div style="background:linear-gradient(180deg,#FEF3C7,#FDE68A);min-height:100vh;padding:24px">
 <div class="container" style="max-width:560px;margin:0 auto">
+<div style="text-align:center;margin-bottom:18px;padding-top:8px">
+<p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700">📋 Tu carta natal védica · Paso 2 de 8</p>
+<p style="font-size:13px;color:#7a7a7a;margin-top:6px">Jyotish — la lectura del cielo en tu nacimiento</p>
+</div>
 <div class="card" id="vbPrakritiResult" style="text-align:center;padding:24px;min-height:300px">
 <div class="vb-spinner"></div>
 <p style="margin-top:14px;color:#5A7A53;font-size:13px">Calculando tu carta natal védica...</p>
@@ -1289,6 +1294,10 @@ function vbContinuarTest(){
 
 <div class="screen" id="s2">
 <div style="background:linear-gradient(180deg,#FEF3C7,#FDE68A);min-height:100vh;padding:24px">
+<div style="text-align:center;margin-bottom:14px;padding-top:8px">
+<p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700">📋 Test Vikriti · Paso 3 de 8</p>
+<p style="font-size:12px;color:#7a7a7a;margin-top:4px">50 preguntas que el Vaidya te haría hoy</p>
+</div>
 <div style="text-align:center;margin-bottom:24px">
 <div class="progress"><div class="progress-bar" id="pbar"></div></div>
 <span style="font-size:14px;color:#7a7a7a"><span id="qnum">1</span>/<span id="qtotal">50</span></span>
@@ -1834,36 +1843,159 @@ function vbRenderDevolucionIntegral(){
     html+='</div>';
   }
   
-  // ========== SECCIÓN 6: ZONA PAGO (5 capas más profundas con velo) ==========
-  html+='<div style="background:linear-gradient(180deg,#3D5A36,#2D3A26);color:#fff;border-radius:14px;padding:22px;margin-bottom:14px;text-align:center;position:relative;overflow:hidden">';
-  html+='<div style="position:absolute;top:14px;right:14px;background:#C49E72;color:#fff;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px">PAGO · USD 20</div>';
-  html+='<p style="font-size:11px;letter-spacing:3px;color:#FDE68A;text-transform:uppercase;font-weight:700;margin-bottom:8px">🔒 Diagnóstico integral</p>';
-  html+='<h3 style="font-family:Georgia,serif;font-size:22px;color:#FFF;font-weight:400;margin-bottom:14px;line-height:1.4">El Vaidya (terapeuta ayurvédico con experiencia) necesita 5 lecturas más para darte el diagnóstico completo</h3>';
+  // ========== SECCIÓN 6: ZONA DIAGNÓSTICO INTEGRAL ==========
+  var trialOk5=(typeof vbTrialActivo==='function')?vbTrialActivo():true;
   
-  html+='<div style="text-align:left;background:rgba(255,255,255,0.05);border-radius:12px;padding:16px;margin-bottom:16px">';
-  
-  // Las 5 capas pago con velo
-  var capasPago=[
-    {n:'Las 14 áreas detalladas',s:'Asta Sthana Pariksha (los 8 exámenes del Vaidya)',d:'desglose de tus puntos en Agni (fuego digestivo), Mala (heces), Mutra (orina), Sveda (sudor), Nidra (sueño), Manas (mente), Bala (energía vital) y las 8 áreas restantes — con interpretación clásica de cada una'},
-    {n:'Canales bloqueados',s:'Sthana Samshraya (zona donde se aloja) · Srotas (canales energéticos)',d:'cuáles de los 13 canales del cuerpo están obstruidos (digestivo, respiratorio, mental, etc.) y por qué'},
-    {n:'Toxinas no digeridas',s:'Ama (residuo de mala digestión)',d:'si hay acumulación de toxinas por digestión incompleta — el factor que más cambia el plan'},
-    {n:'Tu fuerza vital actual',s:'Bala (energía vital): Pravara (fuerte), Madhyama (media), Avara (baja)',d:'fuerte, media o baja — define qué tan agresiva o suave puede ser la corrección'},
-    {n:'Etapa exacta del ciclo',s:'Kriyakala (las 6 etapas del desequilibrio)',d:'en cuál de las 6 etapas estás: Sanchaya (acumulación), Prakopa (agravamiento), Prasara (extensión), Sthana Samshraya (alojamiento), Vyakti (manifestación), Bheda (cronificación) — define la urgencia'}
-  ];
-  capasPago.forEach(function(c,idx){
-    html+='<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;'+(idx<capasPago.length-1?'border-bottom:1px solid rgba(255,255,255,0.1)':'')+'">';
-    html+='<div style="font-size:18px;flex-shrink:0">🔒</div>';
-    html+='<div style="flex:1">';
-    html+='<div style="font-size:14px;color:#FDE68A;font-weight:700;margin-bottom:2px">'+c.n+'</div>';
-    html+='<div style="font-size:11px;color:#C49E72;margin-bottom:4px;font-style:italic">'+c.s+'</div>';
-    html+='<div style="font-size:12px;color:#E8DFC8;line-height:1.5;filter:blur(3px);user-select:none">'+c.d+'</div>';
-    html+='</div></div>';
-  });
-  html+='</div>';
-  
-  html+='<button onclick="vbDesbloquearDiagnostico()" style="width:100%;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;padding:16px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:0.5px;box-shadow:0 4px 14px rgba(224,122,31,0.3)">Desbloquear mi diagnóstico integral · USD 20 →</button>';
-  html+='<p style="font-size:11px;color:#FDE68A;margin-top:10px;opacity:0.8">10 días de prueba · Cancelás cuando quieras</p>';
-  html+='</div>';
+  if(trialOk5){
+    // TRIAL ACTIVO → 5 capas DETALLADAS Y EJECUTABLES
+    html+='<div style="background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border-radius:14px;padding:22px;margin-bottom:14px;position:relative;overflow:hidden">';
+    html+='<div style="position:absolute;top:14px;right:14px;background:#FDE68A;color:#3D5A36;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px">🎁 GRATIS</div>';
+    html+='<p style="font-size:11px;letter-spacing:3px;color:#FDE68A;text-transform:uppercase;font-weight:700;margin-bottom:8px;text-align:center">📋 Diagnóstico integral · Paso 6</p>';
+    html+='<h3 style="font-family:Georgia,serif;font-size:22px;color:#FFF;font-weight:400;margin-bottom:8px;line-height:1.4;text-align:center">Las 5 lecturas profundas del Vaidya (terapeuta ayurvédico)</h3>';
+    html+='<p style="font-size:13px;color:#E8DFC8;line-height:1.6;margin-bottom:18px;text-align:center">Cada capa te dice qué pasa, cómo verlo vos misma y qué hacer hoy.</p>';
+    
+    var capas5=[
+      {
+        n:'1 · Las 14 áreas detalladas',
+        s:'Asta Sthana Pariksha (los 8 exámenes clásicos del Vaidya)',
+        que:'El Vaidya examina 14 zonas de tu cuerpo para leer cómo está cada función vital. Cada zona da información distinta.',
+        areas:[
+          'Nadi (pulso) — ritmo cardíaco y energía',
+          'Mutra (orina) — hidratación y filtrado renal',
+          'Mala (heces) — digestión y eliminación',
+          'Jihva (lengua) — mapa del intestino',
+          'Shabda (voz) — fuerza pulmonar y emocional',
+          'Sparsha (piel) — tu dosha en superficie',
+          'Drik (ojos) — hígado y sistema nervioso',
+          'Akriti (forma del cuerpo) — constitución',
+          'Agni (fuego digestivo) — cómo procesás',
+          'Sveda (sudor) — calor interno',
+          'Nidra (sueño) — reparación nocturna',
+          'Manas (mente) — claridad mental',
+          'Bala (energía vital) — fuerza diaria',
+          'Ojas (esencia vital) — vitalidad profunda'
+        ],
+        hacer:'Hoy, antes de comer, prestá atención a tu lengua (Jihva) y a cómo te sentís de energía (Bala). Anotá en una nota del celular qué notás. Esa es la observación base del Vaidya.'
+      },
+      {
+        n:'2 · Canales bloqueados',
+        s:'Sthana Samshraya (zona donde se aloja) · Srotas (canales energéticos del cuerpo)',
+        que:'Tu cuerpo tiene 13 canales (Srotas) por donde circula la nutrición, los desechos, los líquidos y la mente. Cuando un canal se bloquea, aparece el síntoma.',
+        areas:[
+          'Pranavaha Srotas — canal del aire y la respiración',
+          'Annavaha Srotas — canal del alimento y digestión',
+          'Udakavaha Srotas — canal del agua y la hidratación',
+          'Rasavaha Srotas — canal del plasma y la nutrición',
+          'Raktavaha Srotas — canal de la sangre',
+          'Mamsavaha Srotas — canal de los músculos',
+          'Medovaha Srotas — canal de las grasas',
+          'Asthivaha Srotas — canal de los huesos',
+          'Majjavaha Srotas — canal del tejido nervioso y médula',
+          'Shukravaha Srotas — canal reproductor',
+          'Mutravaha Srotas — canal urinario',
+          'Purishavaha Srotas — canal de eliminación de heces',
+          'Svedavaha Srotas — canal del sudor'
+        ],
+        hacer:'Identificá tu canal más bloqueado por el síntoma más fuerte (constipación = Purishavaha; insomnio = Manovaha; congestión = Pranavaha; retención = Udakavaha). El plan de paso 7 ataca específicamente ese canal.'
+      },
+      {
+        n:'3 · Toxinas no digeridas (Ama)',
+        s:'Ama (residuo pegajoso de digestión incompleta)',
+        que:'Cuando tu Agni (fuego digestivo) está débil, lo que comés no se digiere bien. Lo no digerido se vuelve Ama: una sustancia espesa, pegajosa, que se acumula en tejidos y bloquea canales. Es la raíz del 80% de las enfermedades crónicas.',
+        test:[
+          'Mirate la lengua al despertar antes de cepillarte. Si tiene capa blanca/amarilla/marrón → tenés Ama.',
+          'Mal aliento al levantarte → Ama.',
+          'Sensación de pesadez después de comer → Ama.',
+          'Cansancio al despertar a pesar de dormir → Ama.',
+          'Olor corporal fuerte sin esfuerzo físico → Ama.'
+        ],
+        hacer:'Si reconocés 2 o más señales: tomá agua tibia con jengibre fresco rallado (1 cm) en ayunas durante 14 días. Cená antes de las 19hs. Salteá una cena por semana. Si seguís con capa en la lengua, sumá Triphala 1g antes de dormir con agua tibia (consultá con tu médico antes).'
+      },
+      {
+        n:'4 · Tu fuerza vital actual (Bala)',
+        s:'Bala (energía vital): Pravara (fuerte), Madhyama (media), Avara (baja)',
+        que:'Tu fuerza vital define qué tan agresivo o suave puede ser tu plan. Si forzás corrección con Bala baja, te enfermás más. Si vas suave con Bala alta, no avanzás.',
+        test:[
+          'Subí 3 pisos a paso normal. Tomá pulso al llegar arriba.',
+          'Si menos de 110 ppm y respirás normal en 1 min → Pravara (fuerte). Tu plan puede ser intenso.',
+          'Si 110-130 ppm y necesitás 2-3 min para respirar normal → Madhyama (media). Tu plan va gradual.',
+          'Si más de 130 ppm o tardás más de 3 min en recuperarte → Avara (baja). Tu plan empieza muy suave: solo descanso, alimentación tibia, caminatas cortas.'
+        ],
+        hacer:'Hacé el test arriba. Anotá tu nivel. El plan del paso 7 se calibra a esa fuerza. Nunca empieces un plan exigente con Bala Avara — primero subí Bala con descanso + Ojas (Ashwagandha + ghee).'
+      },
+      {
+        n:'5 · Etapa exacta del ciclo',
+        s:'Kriyakala (las 6 etapas del desequilibrio según Sushruta Samhita)',
+        que:'Toda enfermedad pasa por 6 etapas antes de instalarse. El Ayurveda permite intervenir en las primeras (1-3) y curar. En las últimas (4-6) ya hay daño orgánico y la corrección requiere medicina.',
+        areas:[
+          'Etapa 1 · Sanchaya (acumulación) — el dosha empieza a juntarse en su lugar de origen. Reversible en días.',
+          'Etapa 2 · Prakopa (agravamiento) — el dosha se irrita pero sigue contenido. Reversible en semanas.',
+          'Etapa 3 · Prasara (extensión) — el dosha se desborda y migra por los canales. Reversible en meses con disciplina.',
+          'Etapa 4 · Sthana Samshraya (alojamiento) — el dosha se aloja en un órgano débil. Aparece el primer síntoma claro.',
+          'Etapa 5 · Vyakti (manifestación) — la enfermedad ya tiene nombre médico. Requiere consulta clínica.',
+          'Etapa 6 · Bheda (cronificación) — daño estructural instalado. Requiere medicación + Ayurveda complementario.'
+        ],
+        hacer:'Según los puntos de tu test Vikriti, hoy estás en una etapa específica. El paso 6 te lo indica con tu nombre y tu cuadro. Si estás en etapa 1, 2 o 3 → todavía es tu decisión, hoy podés revertirlo. Si estás en 4 o más → consultá con un médico Y empezá Ayurveda complementario en paralelo.'
+      }
+    ];
+    
+    capas5.forEach(function(c,idx){
+      html+='<div style="background:rgba(255,255,255,0.08);border-radius:12px;padding:16px;margin-bottom:14px">';
+      html+='<div style="font-size:15px;color:#FDE68A;font-weight:700;margin-bottom:4px">'+c.n+'</div>';
+      html+='<div style="font-size:11px;color:#C49E72;margin-bottom:10px;font-style:italic;line-height:1.5">'+c.s+'</div>';
+      html+='<div style="font-size:13px;color:#fff;line-height:1.6;margin-bottom:10px"><strong>Qué es:</strong> '+c.que+'</div>';
+      
+      if(c.areas){
+        html+='<div style="background:rgba(0,0,0,0.15);border-radius:8px;padding:10px 12px;margin-bottom:10px"><div style="font-size:12px;color:#FDE68A;font-weight:700;margin-bottom:6px">'+(c.n.indexOf('etapa')>-1||c.n.indexOf('ciclo')>-1?'Las 6 etapas:':'Las áreas:')+'</div>';
+        html+='<ul style="margin:0;padding-left:18px;color:#E8DFC8;font-size:12px;line-height:1.7">';
+        c.areas.forEach(function(a){html+='<li style="margin-bottom:4px">'+a+'</li>';});
+        html+='</ul></div>';
+      }
+      
+      if(c.test){
+        html+='<div style="background:rgba(0,0,0,0.15);border-radius:8px;padding:10px 12px;margin-bottom:10px"><div style="font-size:12px;color:#FDE68A;font-weight:700;margin-bottom:6px">Cómo lo verificás vos:</div>';
+        html+='<ul style="margin:0;padding-left:18px;color:#E8DFC8;font-size:12px;line-height:1.7">';
+        c.test.forEach(function(t){html+='<li style="margin-bottom:4px">'+t+'</li>';});
+        html+='</ul></div>';
+      }
+      
+      html+='<div style="background:rgba(224,122,31,0.18);border-left:3px solid #FDE68A;border-radius:6px;padding:10px 12px"><div style="font-size:12px;color:#FDE68A;font-weight:700;margin-bottom:4px">✅ Qué hacer hoy:</div><div style="font-size:13px;color:#fff;line-height:1.6">'+c.hacer+'</div></div>';
+      html+='</div>';
+    });
+    
+    html+='<button onclick="vbDesbloquearDiagnostico()" style="width:100%;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;padding:16px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:0.5px;box-shadow:0 4px 14px rgba(224,122,31,0.3);margin-top:6px">Ver mi diagnóstico personalizado completo · GRATIS →</button>';
+    html+='<p style="font-size:11px;color:#FDE68A;margin-top:10px;opacity:0.85;text-align:center">Acceso completo · Sin tarjeta de crédito</p>';
+    html+='</div>';
+  }else{
+    // TRIAL VENCIDO → mantener velo + candado
+    html+='<div style="background:linear-gradient(180deg,#3D5A36,#2D3A26);color:#fff;border-radius:14px;padding:22px;margin-bottom:14px;text-align:center;position:relative;overflow:hidden">';
+    html+='<div style="position:absolute;top:14px;right:14px;background:#C49E72;color:#fff;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px">PAGO · USD 20</div>';
+    html+='<p style="font-size:11px;letter-spacing:3px;color:#FDE68A;text-transform:uppercase;font-weight:700;margin-bottom:8px">🔒 Diagnóstico integral</p>';
+    html+='<h3 style="font-family:Georgia,serif;font-size:22px;color:#FFF;font-weight:400;margin-bottom:14px;line-height:1.4">El Vaidya (terapeuta ayurvédico) necesita 5 lecturas más para darte el diagnóstico completo</h3>';
+    
+    html+='<div style="text-align:left;background:rgba(255,255,255,0.05);border-radius:12px;padding:16px;margin-bottom:16px">';
+    var capasPago=[
+      {n:'Las 14 áreas detalladas',s:'Asta Sthana Pariksha (los 8 exámenes del Vaidya)',d:'desglose de tus puntos en Agni (fuego digestivo), Mala (heces), Mutra (orina), Sveda (sudor), Nidra (sueño), Manas (mente), Bala (energía vital) y las 8 áreas restantes'},
+      {n:'Canales bloqueados',s:'Sthana Samshraya (zona donde se aloja) · Srotas (canales energéticos)',d:'cuáles de los 13 canales del cuerpo están obstruidos y por qué'},
+      {n:'Toxinas no digeridas',s:'Ama (residuo de mala digestión)',d:'si hay acumulación de toxinas por digestión incompleta'},
+      {n:'Tu fuerza vital actual',s:'Bala (energía vital): Pravara (fuerte), Madhyama (media), Avara (baja)',d:'define qué tan agresiva o suave puede ser la corrección'},
+      {n:'Etapa exacta del ciclo',s:'Kriyakala (las 6 etapas del desequilibrio)',d:'en cuál de las 6 etapas estás — define la urgencia'}
+    ];
+    capasPago.forEach(function(c,idx){
+      html+='<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;'+(idx<capasPago.length-1?'border-bottom:1px solid rgba(255,255,255,0.1)':'')+'">';
+      html+='<div style="font-size:18px;flex-shrink:0">🔒</div>';
+      html+='<div style="flex:1">';
+      html+='<div style="font-size:14px;color:#FDE68A;font-weight:700;margin-bottom:2px">'+c.n+'</div>';
+      html+='<div style="font-size:11px;color:#C49E72;margin-bottom:4px;font-style:italic">'+c.s+'</div>';
+      html+='<div style="font-size:12px;color:#E8DFC8;line-height:1.5;filter:blur(3px);user-select:none">'+c.d+'</div>';
+      html+='</div></div>';
+    });
+    html+='</div>';
+    
+    html+='<button onclick="vbDesbloquearDiagnostico()" style="width:100%;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;padding:16px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:0.5px;box-shadow:0 4px 14px rgba(224,122,31,0.3)">Desbloquear mi diagnóstico integral · USD 20 →</button>';
+    html+='<p style="font-size:11px;color:#FDE68A;margin-top:10px;opacity:0.8">Cancelás cuando quieras</p>';
+    html+='</div>';
+  }
   
   // ========== DISCLAIMER FINAL ==========
   html+='<p style="font-size:11px;color:#8B7355;margin-top:14px;text-align:center;font-style:italic;line-height:1.5">Vedabite acompaña, no diagnostica. Si algo te preocupa, consultá un profesional de la salud.</p>';
@@ -1889,17 +2021,489 @@ function vbRenderDevolucionIntegral(){
   }catch(e){}
 }
 
-// CTA del paso 5: desbloquear diagnóstico
+// CTA del paso 5: desbloquear diagnóstico → abre paso 6
 function vbDesbloquearDiagnostico(){
   try{
     if(typeof gtag==='function')gtag('event','cta_desbloquear_diagnostico',{event_category:'paso5',value:20});
     if(window.clarity)window.clarity('event','cta_desbloquear_diagnostico');
   }catch(e){}
-  // Por ahora redirigimos al checkout existente o mostramos mensaje
-  alert('Paso 6 (Diagnóstico integral PAGO) — próximamente. Te avisaremos cuando esté disponible.');
+  vbAbrirPaso6();
 }
+
+// ============================================================
+// PASO 6 — DIAGNÓSTICO INTEGRAL HIPER PERSONALIZADO (paso de venta)
+// Matriz fija basada en Charaka Samhita + Madhava Nidana + Ashtanga Hridayam
+// ============================================================
+var VB_CONSECUENCIAS={
+  vata:{
+    '25-34':{m:'Insomnio crónico, ansiedad, sequedad de piel y mucosas',a2:'Trastornos digestivos funcionales, gastritis nerviosa, dolor lumbar recurrente',a5:'Fibromialgia, fatiga crónica, ciclos hormonales irregulares, posible osteopenia temprana',a10:'Osteoporosis, hipertensión refractaria, deterioro cognitivo Vata, vulnerabilidad ósea'},
+    '35-49':{m:'Tensión muscular constante, ciclos del sueño rotos, irritabilidad subclínica',a2:'Lumbalgias crónicas, gastritis, ansiedad generalizada, caída de cabello',a5:'Osteopenia, problemas tiroideos, ciclos hormonales caóticos (peri-menopausia/andropausia)',a10:'Osteoporosis instalada, hipertensión Vata, deterioro cognitivo, fragilidad vertebral'},
+    '50-64':{m:'Sequedad articular, insomnio profundo, sensibilidad al frío',a2:'Artrosis Vata, hipertensión por rigidez vascular, pérdida ósea acelerada',a5:'Osteoporosis, problemas neurológicos sutiles, deterioro de memoria reciente',a10:'Demencia Vata, fracturas espontáneas, dependencia funcional progresiva'},
+    '65+':{m:'Sequedad sistémica, sueño fragmentado, frialdad de extremidades',a2:'Pérdida de masa ósea acelerada, deterioro cognitivo Vata',a5:'Fragilidad ósea grave, demencia, dependencia',a10:'Cuidados intensivos, pérdida de autonomía'}
+  },
+  pitta:{
+    '25-34':{m:'Acidez, brotes en piel, irritabilidad, perfeccionismo agotador',a2:'Gastritis crónica, dermatitis Pitta, hipertensión por estrés, infertilidad por inflamación',a5:'Úlcera, problemas hepáticos, hipertiroidismo, infertilidad inflamatoria',a10:'Cirrosis incipiente, cáncer hormono-dependiente Pitta, infarto temprano por estrés'},
+    '35-49':{m:'Acidez nocturna, dermatitis, migrañas Pitta, calor interno persistente',a2:'Esofagitis, dermatosis crónicas, hipertensión instalada, problemas hepáticos sutiles',a5:'Úlcera, hígado graso, hipertensión refractaria, cáncer hormono-dependiente potencial',a10:'Cirrosis, infarto, accidente cerebrovascular hemorrágico, cáncer instalado'},
+    '50-64':{m:'Acidez crónica, calor sofocante, brotes inflamatorios, ojos rojos',a2:'Hígado graso, hipertensión instalada, dermatitis crónica, problemas oculares',a5:'Cirrosis, infarto, cáncer Pitta, glaucoma',a10:'Insuficiencia hepática, eventos cardiovasculares mayores'},
+    '65+':{m:'Inflamación crónica subclínica, presión variable, sensibilidad al calor',a2:'Eventos cardiovasculares, deterioro hepático',a5:'Cardiopatía instalada, cáncer Pitta, deterioro orgánico múltiple',a10:'Insuficiencia multi-orgánica'}
+  },
+  kapha:{
+    '25-34':{m:'Pesadez matinal, sueño excesivo, antojo de dulces, congestión',a2:'Sobrepeso, prediabetes, sinusitis crónica, depresión Kapha sutil',a5:'Diabetes tipo 2, obesidad instalada, apnea del sueño, hipotiroidismo',a10:'Diabetes complicada, enfermedad cardiovascular Kapha, deterioro metabólico'},
+    '35-49':{m:'Aumento de peso, lentitud digestiva, mucosa abundante, melancolía',a2:'Síndrome metabólico, hígado graso, diabetes en horizonte, depresión instalada',a5:'Diabetes 2, hipertensión Kapha, apnea, problemas cardíacos por sedentarismo',a10:'Cardiopatía isquémica, ACV, complicaciones diabéticas, demencia vascular'},
+    '50-64':{m:'Sobrepeso instalado, retención, lentitud cognitiva, sueño pesado',a2:'Diabetes, hipertensión, hígado graso avanzado, apnea',a5:'Cardiopatía, ACV potencial, demencia vascular incipiente, complicaciones renales',a10:'Eventos cardiovasculares mayores, diálisis potencial, demencia instalada'},
+    '65+':{m:'Edemas, lentitud generalizada, congestión bronquial',a2:'Insuficiencia cardíaca Kapha, ACV, deterioro renal',a5:'Complicaciones múltiples, dependencia funcional',a10:'Cuidados paliativos, pérdida de autonomía total'}
+  }
+};
+
+var VB_CONDICIONES_IMPACTO={
+  hipertension:{vata:'agrava la rigidez vascular Vata, riesgo accidente cerebrovascular',pitta:'agrava el daño endotelial Pitta, riesgo infarto',kapha:'agrava el sedentarismo Kapha, riesgo cardiovascular global'},
+  diabetes:{vata:'descompensa el sistema nervioso autónomo, neuropatía Vata',pitta:'agrava daño hepático y renal, retinopatía Pitta',kapha:'es la diana de Kapha — empeora todo el cuadro metabólico'},
+  colesterol:{vata:'rigidez arterial acelerada',pitta:'hígado graso y daño hepático',kapha:'placa aterosclerótica clásica Kapha'},
+  sobrepeso:{vata:'rara combinación, suele indicar Vata-Kapha mixto',pitta:'inflamación visceral, hígado graso Pitta',kapha:'cuadro Kapha clásico — alta urgencia metabólica'},
+  tiroides:{vata:'amplifica la inestabilidad Vata',pitta:'amplifica la inflamación autoinmune',kapha:'amplifica la lentitud metabólica'},
+  embarazo:{vata:'requiere grasas calientes, descanso, contención',pitta:'requiere refrescar, evitar picantes y calor',kapha:'requiere movimiento moderado, alimentos ligeros'},
+  alergia_gluten:{vata:'inflamación intestinal Vata',pitta:'inflamación inmune Pitta',kapha:'mucosa intestinal cargada Kapha'},
+  alergia_lactosa:{vata:'mala absorción de calcio, riesgo óseo',pitta:'fermentación ácida intestinal',kapha:'mucosa abundante, congestión bronquial'}
+};
+
+function vbAbrirPaso6(){
+  var datos=window._vbDatos||{};
+  var prakriti=window._vbPrakriti||(datos.prakriti||null);
+  var vikriti=window.res||null;
+  if(!datos.sexo||!datos.edad||!vikriti||!vikriti.p){
+    alert('Faltan datos para generar tu diagnóstico integral. Completá primero los pasos anteriores.');
+    return;
+  }
+  var sexo=datos.sexo;
+  var edad=datos.edad;
+  var condiciones=Array.isArray(datos.condiciones)?datos.condiciones.filter(function(c){return c!=='ninguna';}):[];
+  var doshaVikriti=vikriti.p;
+  var doshaPrakriti=prakriti?prakriti.dosha_predominante:doshaVikriti;
+  var pctVikriti=vikriti.pct||{};
+  var pctActual=pctVikriti[doshaVikriti]||0;
+  
+  function nombreDosha(d){return ({vata:'Vata (aire+éter)',pitta:'Pitta (fuego+agua)',kapha:'Kapha (tierra+agua)'})[d]||d;}
+  function colorDosha(d){return ({vata:'#7B68EE',pitta:'#E67E22',kapha:'#5A7A53'})[d]||'#5A7A53';}
+  function rangoEdad(e){if(e<35)return '25-34';if(e<50)return '35-49';if(e<65)return '50-64';return '65+';}
+  function tituloSexo(s){return ({mujer:'Mujer',hombre:'Hombre',otro:'Persona'})[s]||'Persona';}
+  
+  var rango=rangoEdad(edad);
+  var conse=(VB_CONSECUENCIAS[doshaVikriti]&&VB_CONSECUENCIAS[doshaVikriti][rango])||VB_CONSECUENCIAS.vata['35-49'];
+  var fraseCondiciones=condiciones.length?condiciones.map(function(c){return ({hipertension:'hipertensión',diabetes:'diabetes',colesterol:'colesterol alto',sobrepeso:'sobrepeso',tiroides:'tiroides',embarazo:'embarazo',alergia_gluten:'intolerancia al gluten',alergia_lactosa:'intolerancia a la lactosa'})[c]||c;}).join(' + '):'sin condiciones declaradas';
+  
+  var html='<div style="background:linear-gradient(180deg,#FAF7F0,#FEF3C7);min-height:100vh;padding:20px 16px"><div style="max-width:600px;margin:0 auto">';
+  html+='<button onclick="vbCerrarPaso6()" style="background:none;border:none;color:#5A7A53;font-size:14px;cursor:pointer;margin-bottom:14px;padding:8px 0">← Volver al diagnóstico</button>';
+  
+  html+='<div style="text-align:center;margin-bottom:20px">';
+  html+='<p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700">📋 Diagnóstico integral · Paso 6 de 8</p>';
+  html+='<h2 style="font-family:Georgia,serif;font-size:24px;color:#3D5A36;font-weight:400;margin-top:8px;line-height:1.3">Lo que un Vaidya (terapeuta ayurvédico) con 80 años de experiencia vería en vos</h2>';
+  html+='</div>';
+  
+  // CAPA 1
+  html+='<div style="background:#fff;border:2px solid '+colorDosha(doshaVikriti)+';border-radius:14px;padding:20px;margin-bottom:14px">';
+  html+='<p style="font-size:11px;letter-spacing:2px;color:'+colorDosha(doshaVikriti)+';text-transform:uppercase;font-weight:700;margin-bottom:10px">Capa 1 · Tu cuerpo en 3 frases</p>';
+  html+='<p style="font-size:16px;color:#3D5A36;line-height:1.7;margin-bottom:10px"><strong>'+tituloSexo(sexo)+' · '+edad+' años · '+fraseCondiciones+'</strong></p>';
+  html+='<p style="font-size:14px;color:#5A7A53;line-height:1.7;margin-bottom:8px">Naciste <strong>'+nombreDosha(doshaPrakriti)+'</strong> y hoy estás siendo <strong>'+nombreDosha(doshaVikriti)+' al '+pctActual+'%</strong>.</p>';
+  if(doshaPrakriti!==doshaVikriti){
+    html+='<p style="font-size:14px;color:#5A7A53;line-height:1.7">Tu naturaleza '+doshaPrakriti+' (heredada según tu carta natal védica) está siendo empujada hacia '+doshaVikriti+' por tu rutina, alimentación, emociones o estación actual.</p>';
+  }else{
+    html+='<p style="font-size:14px;color:#5A7A53;line-height:1.7">Tu naturaleza '+doshaPrakriti+' está expresándose con intensidad. La clave es no exagerar lo que ya sos.</p>';
+  }
+  if(condiciones.length){
+    html+='<div style="margin-top:14px;padding-top:14px;border-top:1px solid #E8DFC8"><p style="font-size:13px;color:#3D5A36;font-weight:700;margin-bottom:6px">Cómo se cruza tu cuadro con tus condiciones:</p>';
+    condiciones.forEach(function(c){
+      var impacto=VB_CONDICIONES_IMPACTO[c];
+      if(impacto&&impacto[doshaVikriti]){
+        html+='<p style="font-size:13px;color:#5A7A53;line-height:1.6;margin-bottom:6px">• <strong>'+(({hipertension:'Hipertensión',diabetes:'Diabetes',colesterol:'Colesterol alto',sobrepeso:'Sobrepeso',tiroides:'Tiroides',embarazo:'Embarazo',alergia_gluten:'Intolerancia gluten',alergia_lactosa:'Intolerancia lactosa'})[c]||c)+':</strong> '+impacto[doshaVikriti]+'</p>';
+      }
+    });
+    html+='</div>';
+  }
+  html+='</div>';
+  
+  // CAPA 2
+  html+='<div style="background:#fff;border:1px solid #C44E4E;border-radius:14px;padding:20px;margin-bottom:14px">';
+  html+='<p style="font-size:11px;letter-spacing:2px;color:#C44E4E;text-transform:uppercase;font-weight:700;margin-bottom:10px">Capa 2 · Tu línea de tiempo (si seguís así)</p>';
+  html+='<div style="display:flex;flex-direction:column;gap:10px">';
+  html+='<div style="background:#FEF3C7;border-left:4px solid #F59E0B;padding:12px 14px;border-radius:8px"><p style="font-size:12px;color:#92400E;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">En 6 meses</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">'+conse.m+'</p></div>';
+  html+='<div style="background:#FED7AA;border-left:4px solid #EA580C;padding:12px 14px;border-radius:8px"><p style="font-size:12px;color:#7C2D12;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">En 2 años</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">'+conse.a2+'</p></div>';
+  html+='<div style="background:#FECACA;border-left:4px solid #DC2626;padding:12px 14px;border-radius:8px"><p style="font-size:12px;color:#7F1D1D;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">En 5 años</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">'+conse.a5+'</p></div>';
+  html+='<div style="background:#FCA5A5;border-left:4px solid #991B1B;padding:12px 14px;border-radius:8px"><p style="font-size:12px;color:#7F1D1D;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">En 10 años</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">'+conse.a10+'</p></div>';
+  html+='</div>';
+  html+='<div style="margin-top:14px;padding:12px 14px;background:#D1FAE5;border-left:4px solid #059669;border-radius:8px"><p style="font-size:13px;color:#065F46;line-height:1.6"><strong>Pero todavía estás en etapa Prakopa (agravamiento). Todavía es reversible.</strong></p></div>';
+  html+='</div>';
+  
+  // CAPA 3
+  if(prakriti&&prakriti.lagna){
+    html+='<div style="background:linear-gradient(180deg,#F5F3FF,#EDE9FE);border:1px solid #7B68EE;border-radius:14px;padding:20px;margin-bottom:14px">';
+    html+='<p style="font-size:11px;letter-spacing:2px;color:#5B21B6;text-transform:uppercase;font-weight:700;margin-bottom:10px">Capa 3 · Tu cruce único (lo que nadie te dijo antes)</p>';
+    html+='<p style="font-size:14px;color:#3D5A36;line-height:1.7;margin-bottom:10px">Según tu carta natal védica (Janma Kundali), tu cuerpo no es una constitución simple. Tiene 3 voces:</p>';
+    html+='<div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:10px">';
+    html+='<p style="font-size:13px;color:#5A7A53;margin-bottom:8px;line-height:1.6"><strong>Lagna (ascendente, marca tu cuerpo físico):</strong> '+prakriti.lagna.sign+' → '+nombreDosha(prakriti.lagna.dosha)+'</p>';
+    if(prakriti.surya)html+='<p style="font-size:13px;color:#5A7A53;margin-bottom:8px;line-height:1.6"><strong>Surya Rashi (sol, marca tu energía vital):</strong> '+prakriti.surya.sign+' → '+nombreDosha(prakriti.surya.dosha)+'</p>';
+    if(prakriti.chandra)html+='<p style="font-size:13px;color:#5A7A53;margin-bottom:8px;line-height:1.6"><strong>Chandra Rashi (luna, marca tus emociones):</strong> '+prakriti.chandra.sign+' → '+nombreDosha(prakriti.chandra.dosha)+'</p>';
+    if(prakriti.nakshatra)html+='<p style="font-size:13px;color:#5A7A53;line-height:1.6"><strong>Nakshatra (mansión lunar, marca tu mente profunda):</strong> '+prakriti.nakshatra.nombre+' → '+nombreDosha(prakriti.nakshatra.dosha)+'</p>';
+    html+='</div>';
+    html+='<p style="font-size:13px;color:#5A7A53;line-height:1.7"><strong>Esto significa:</strong> tu '+(condiciones.length?'cuadro de '+fraseCondiciones:'desbalance actual')+' NO es genérico. Es la combinación de estos elementos cruzándose contigo a los '+edad+' años. Por eso el plan común no te funciona — y por eso necesitás uno propio.</p>';
+    html+='</div>';
+  }
+  
+  // CAPA 4
+  var topByDosha={
+    vata:[
+      {n:'Manas (mente) · pensamientos rápidos, dificultad para concentrarse',d:'Tu mente está acelerada. Saltás de un tema a otro. La calma se siente como esfuerzo.'},
+      {n:'Nidra (sueño) · sueño liviano, despertares',d:'Tu cuerpo no está pudiendo entrar al descanso profundo. La reparación nocturna no está sucediendo.'},
+      {n:'Bala (energía vital) · agotamiento variable',d:'Tu energía sube y baja sin lógica. Lo que ayer pudiste, hoy te agota.'}
+    ],
+    pitta:[
+      {n:'Agni (fuego digestivo) · acidez, hambre voraz',d:'Tu digestión está en alarma. El cuerpo quema lo que no debe.'},
+      {n:'Sveda (sudor) · sudoración con olor fuerte',d:'Tu cuerpo está liberando calor sin filtro. La temperatura interna está alta.'},
+      {n:'Manas (mente) · irritabilidad, perfeccionismo',d:'Tu mente quema. Cosas mínimas te incendian.'}
+    ],
+    kapha:[
+      {n:'Agni (fuego digestivo) · digestión lenta, pesadez',d:'Tu fuego digestivo está apagado. Lo que comés se acumula.'},
+      {n:'Nidra (sueño) · sueño excesivo, despertar pesado',d:'Dormís pero no descansás. El cuerpo no termina de procesar la noche.'},
+      {n:'Bala (energía vital) · falta de impulso',d:'Tu energía está baja desde la mañana. Arrancar es el desafío.'}
+    ]
+  };
+  var areasTop=topByDosha[doshaVikriti]||topByDosha.vata;
+  html+='<div style="background:#fff;border:1px solid #5A7A53;border-radius:14px;padding:20px;margin-bottom:14px">';
+  html+='<p style="font-size:11px;letter-spacing:2px;color:#5A7A53;text-transform:uppercase;font-weight:700;margin-bottom:10px">Capa 4 · Lo que tu cuerpo te dice hoy</p>';
+  html+='<p style="font-size:14px;color:#5A7A53;line-height:1.7;margin-bottom:14px">De las 14 áreas que examiné en tu test (los 8 exámenes clásicos del Vaidya · Asta Sthana Pariksha), las que están más cargadas en tu '+doshaVikriti+' son:</p>';
+  html+='<div style="display:flex;flex-direction:column;gap:8px">';
+  areasTop.forEach(function(a,idx){
+    html+='<div style="background:#FAF7F0;border-radius:10px;padding:12px 14px"><p style="font-size:13px;color:#3D5A36;font-weight:700;margin-bottom:4px">'+(idx+1)+'. '+a.n+'</p><p style="font-size:12px;color:#5A7A53;line-height:1.5">'+a.d+'</p></div>';
+  });
+  html+='</div>';
+  html+='<p style="font-size:13px;color:#5A7A53;line-height:1.7;margin-top:14px;font-style:italic">Tu cuerpo lleva meses avisando. Hoy, recién hoy, lo viste claro.</p>';
+  html+='</div>';
+  
+  // CAPA 5 + CTA
+  html+='<div style="background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border-radius:18px;padding:28px 22px;text-align:center;margin-bottom:14px">';
+  html+='<p style="font-size:11px;letter-spacing:3px;color:#FDE68A;text-transform:uppercase;font-weight:700;margin-bottom:10px">Capa 5 · La esperanza concreta</p>';
+  html+='<h3 style="font-family:Georgia,serif;font-size:26px;color:#fff;font-weight:400;margin-bottom:14px;line-height:1.3">Tu equilibrio es alcanzable en 90 días</h3>';
+  html+='<p style="font-size:15px;color:#E8DFC8;line-height:1.7;margin-bottom:8px">Por la naturaleza de tu Prakriti (constitución natural) cruzada con tus '+(condiciones.length?'condiciones declaradas':'síntomas actuales')+', ese plan es <strong style="color:#FDE68A">único</strong>.</p>';
+  html+='<p style="font-size:15px;color:#E8DFC8;line-height:1.7;margin-bottom:22px">No es el mismo plan que para cualquier otra '+tituloSexo(sexo).toLowerCase()+' de '+edad+' años. Es el <strong style="color:#FDE68A">tuyo</strong>.</p>';
+  var ctaTrialOk=vbTrialActivo();
+  var ctaDiasRest=vbDiasRestantes();
+  if(ctaTrialOk){
+    html+='<button onclick="vbAbrirPaso7()" style="width:100%;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;padding:18px;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:0.3px;box-shadow:0 4px 14px rgba(224,122,31,0.4);margin-bottom:10px">Ver mi plan de equilibrio personalizado · GRATIS →</button>';
+    html+='<p style="font-size:12px;color:#FDE68A;opacity:0.9">'+ctaDiasRest+' día'+(ctaDiasRest!==1?'s':'')+' de prueba · Después USD 20/mes</p>';
+  }else{
+    html+='<button onclick="vbCheckoutPaso7()" style="width:100%;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;padding:18px;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:0.3px;box-shadow:0 4px 14px rgba(224,122,31,0.4);margin-bottom:10px">Suscribirme · USD 20/mes →</button>';
+    html+='<p style="font-size:12px;color:#FDE68A;opacity:0.9">Tu prueba de 7 días terminó · Cancelás cuando quieras</p>';
+  }
+  html+='</div>';
+  
+  html+='<p style="font-size:11px;color:#8B7355;text-align:center;font-style:italic;line-height:1.6;margin-bottom:30px">Vedabite acompaña, no diagnostica enfermedad ni reemplaza atención médica. Si algo te preocupa, consultá con tu médico de confianza. Las consecuencias mostradas son orientativas según la tradición ayurvédica clásica (Charaka Samhita, Madhava Nidana, Ashtanga Hridayam).</p>';
+  html+='</div></div>';
+  
+  var s6=document.getElementById('s6');
+  if(!s6){
+    s6=document.createElement('div');
+    s6.className='screen';
+    s6.id='s6';
+    document.body.appendChild(s6);
+  }
+  s6.innerHTML=html;
+  show('s6');
+  
+  try{
+    if(typeof gtag==='function')gtag('event','paso6_visto',{sexo:sexo,edad:edad,rango_edad:rango,condiciones_count:condiciones.length,condiciones:condiciones.join(',')||'ninguna',prakriti:doshaPrakriti,vikriti:doshaVikriti,pct_vikriti:pctActual});
+    if(window.clarity){window.clarity('set','paso6_visto','si');window.clarity('event','paso6_diagnostico_integral_visto');}
+  }catch(e){}
+}
+
+function vbCerrarPaso6(){
+  show('s4');
+  try{if(typeof gtag==='function')gtag('event','paso6_cerrado_sin_pagar');}catch(e){}
+}
+
+function vbCheckoutPaso7(){
+  try{
+    if(typeof gtag==='function'){
+      gtag('event','cta_checkout_paso6',{event_category:'paso6',value:20,currency:'USD'});
+      gtag('event','begin_checkout',{value:20,currency:'USD',items:[{item_name:'Vedabite Práctica',price:20}]});
+    }
+    if(window.clarity){window.clarity('event','cta_checkout_paso6');window.clarity('set','intencion_compra','si');}
+  }catch(e){}
+  window.open((window._vbURLCheckout&&window._vbURLCheckout())||'https://vedabite.lemonsqueezy.com/checkout/buy/ec74072d-7b30-4273-b369-1950cc7820d0','_blank');
+}
+
+// ============================================================
+// HELPERS TRIAL — 7 días gratis con todo desbloqueado
+// ============================================================
+function vbDiasTrial(){
+  try{
+    var trialStart=localStorage.getItem('vb_trialStart');
+    if(!trialStart)return 0;
+    var dias=Math.floor((Date.now()-new Date(trialStart).getTime())/(1000*60*60*24));
+    return Math.max(0,dias);
+  }catch(e){return 0;}
+}
+function vbTrialActivo(){
+  // FLAG GLOBAL: durante el lanzamiento todo está GRATIS
+  // Cuando queramos activar paywall, cambiar VB_PAYWALL_ACTIVO a true
+  if(window.VB_PAYWALL_ACTIVO===false||typeof window.VB_PAYWALL_ACTIVO==='undefined')return true;
+  // Pago activo (Lemon Squeezy webhook futuro) o trial vigente (≤7 días)
+  try{
+    if(localStorage.getItem('vb_pago_activo')==='si')return true;
+    return vbDiasTrial()<=7;
+  }catch(e){return true;}
+}
+function vbDiasRestantes(){
+  return Math.max(0,7-vbDiasTrial());
+}
+
+// ============================================================
+// PASO 7 — TRATAMIENTO PERSONALIZADO
+// Visible siempre, contenido bloqueado al día 8
+// ============================================================
+var VB_PLAN_ALIMENTACION={
+  vata:{
+    si:'Cereales calientes (avena, arroz basmati), legumbres bien cocidas con especias, vegetales cocidos con ghee, frutas dulces y maduras, lácteos tibios, frutos secos remojados, sopas calientes',
+    no:'Ensaladas frías, smoothies fríos, gaseosas, alimentos crudos en exceso, frijoles negros, comidas rápidas, café en ayunas, frutos secos secos',
+    cuando:'5 comidas chicas. Desayuno tibio 7-8hs · Almuerzo principal 12-13hs · Merienda 16hs · Cena temprana 19hs · Infusión nocturna 21hs'
+  },
+  pitta:{
+    si:'Vegetales de hoja verde, frutas dulces (mango, pera, melón), arroz, avena, leche fresca, ghee, coco, hinojo, cilantro, menta',
+    no:'Picantes, alcohol, fritos, café, tomate en exceso, vinagre, alimentos fermentados, carnes rojas, lácteos ácidos',
+    cuando:'3 comidas regulares. Desayuno fresco 8hs · Almuerzo principal 12-13hs (es cuando tu Agni está más fuerte) · Cena suave 19hs'
+  },
+  kapha:{
+    si:'Vegetales picantes y amargos (rúcula, achicoria, brócoli), legumbres ligeras, especias calientes (jengibre, pimienta, cúrcuma), frutas astringentes (manzana, granada), miel cruda',
+    no:'Lácteos pesados, dulces refinados, frituras, banana, palta, exceso de pan, queso, helado, agua fría',
+    cuando:'2 comidas grandes + ayuno intermitente. Desayuno tarde 10hs (o saltearlo) · Almuerzo principal 13hs · Cena muy temprana 18hs o saltearla'
+  }
+};
+
+var VB_PLAN_RUTINA={
+  vata:{m:'Despertar 6:30hs · Aceite tibio en pies y oídos · Yoga suave 15 min · Desayuno tibio',t:'Caminata 30 min al sol · Almuerzo sentada sin pantallas · Siesta corta de 15 min permitida',n:'Cena temprano · Baño tibio · Aceite de sésamo en cuerpo · Acostarse 22hs · Sin pantallas última hora'},
+  pitta:{m:'Despertar 6hs · Agua fresca con limón · Pranayama refrescante (Sheetali) 10 min · Desayuno fresco',t:'Trabajo principal 10-14hs · Almuerzo a la sombra · Caminata suave después · Evitar sol del mediodía',n:'Cena suave 19hs · Caminata corta · Lectura tranquila · Acostarse 22-23hs · Habitación fresca'},
+  kapha:{m:'Despertar 5:30-6hs (clave) · Agua tibia con limón y miel · Ejercicio vigoroso 30-45 min · Desayuno ligero o saltearlo',t:'Trabajo activo · Almuerzo principal · NO siesta · Movimiento cada 2hs',n:'Cena muy temprana · Caminata después de cenar · Acostarse 22-23hs (no antes, no después)'}
+};
+
+var VB_PLAN_HIERBAS={
+  vata:'Ashwagandha (calma sistema nervioso) · Triphala (regula digestión) · Brahmi (claridad mental) · Jatamansi (insomnio) · Shatavari (mujeres, hidrata mucosas) · Bala (fortalece tejidos)',
+  pitta:'Brahmi (refresca mente) · Amalaki (rejuvenece) · Shatavari (refresca y nutre) · Guduchi (inmunidad) · Neem (en moderación) · Aloe vera (refresca hígado)',
+  kapha:'Trikatu (jengibre+pimienta larga+pimienta negra, activa Agni) · Triphala (limpia toxinas) · Punarnava (drena líquidos) · Guggul (metabolismo) · Tulsi (mucosa respiratoria)'
+};
+
+function vbAbrirPaso7(){
+  var datos=window._vbDatos||{};
+  var prakriti=window._vbPrakriti||(datos.prakriti||null);
+  var vikriti=window.res||null;
+  if(!datos.sexo||!datos.edad||!vikriti||!vikriti.p){
+    alert('Faltan datos para generar tu plan personalizado.');return;
+  }
+  
+  var sexo=datos.sexo,edad=datos.edad;
+  var condiciones=Array.isArray(datos.condiciones)?datos.condiciones.filter(function(c){return c!=='ninguna';}):[];
+  var doshaVikriti=vikriti.p;
+  var doshaPrakriti=prakriti?prakriti.dosha_predominante:doshaVikriti;
+  var trialOk=vbTrialActivo();
+  var diasRest=vbDiasRestantes();
+  var diaActual=vbDiasTrial();
+  
+  function nombreDosha(d){return ({vata:'Vata (aire+éter)',pitta:'Pitta (fuego+agua)',kapha:'Kapha (tierra+agua)'})[d]||d;}
+  function tituloSexo(s){return ({mujer:'Mujer',hombre:'Hombre',otro:'Persona'})[s]||'Persona';}
+  
+  var plan=VB_PLAN_ALIMENTACION[doshaVikriti]||VB_PLAN_ALIMENTACION.vata;
+  var rut=VB_PLAN_RUTINA[doshaVikriti]||VB_PLAN_RUTINA.vata;
+  var hierbas=VB_PLAN_HIERBAS[doshaVikriti]||VB_PLAN_HIERBAS.vata;
+  
+  var html='<div style="background:linear-gradient(180deg,#FAF7F0,#F0FDF4);min-height:100vh;padding:20px 16px"><div style="max-width:600px;margin:0 auto">';
+  html+='<button onclick="vbCerrarPaso7()" style="background:none;border:none;color:#5A7A53;font-size:14px;cursor:pointer;margin-bottom:14px;padding:8px 0">← Volver</button>';
+  
+  // Header
+  html+='<div style="text-align:center;margin-bottom:20px">';
+  html+='<p style="font-size:11px;letter-spacing:3px;color:#5A7A53;text-transform:uppercase;font-weight:700">🌿 Tu plan de equilibrio · Paso 7 de 8</p>';
+  html+='<h2 style="font-family:Georgia,serif;font-size:24px;color:#3D5A36;font-weight:400;margin-top:8px;line-height:1.3">Chikitsa (tratamiento) personalizado para tu '+nombreDosha(doshaVikriti)+'</h2>';
+  html+='<p style="font-size:13px;color:#7a7a7a;margin-top:6px">'+tituloSexo(sexo)+' · '+edad+' años · Plan basado en Charaka Samhita</p>';
+  html+='</div>';
+  
+  // Banner trial
+  if(trialOk){
+    html+='<div style="background:#D1FAE5;border:2px solid #059669;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#065F46;font-weight:700">🎁 Acceso gratis · Te quedan '+diasRest+' día'+(diasRest!==1?'s':'')+' de prueba</p><p style="font-size:11px;color:#047857;margin-top:4px">Después USD 20/mes · Cancelás cuando quieras</p></div>';
+  }else{
+    html+='<div style="background:#FEF3C7;border:2px solid #F59E0B;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#92400E;font-weight:700">🔒 Tu prueba terminó (día '+diaActual+')</p><p style="font-size:11px;color:#78350F;margin-top:4px">Suscribite por USD 20/mes para desbloquear tu plan completo</p></div>';
+  }
+  
+  // === SECCIÓN 1: AHARA (Alimentación) ===
+  html+='<div style="background:#fff;border:1px solid #5A7A53;border-radius:14px;padding:20px;margin-bottom:14px">';
+  html+='<p style="font-size:11px;letter-spacing:2px;color:#5A7A53;text-transform:uppercase;font-weight:700;margin-bottom:10px">1 · Ahara (alimentación)</p>';
+  html+='<h3 style="font-family:Georgia,serif;font-size:18px;color:#3D5A36;font-weight:400;margin-bottom:14px">Qué comer y cuándo</h3>';
+  
+  if(trialOk){
+    html+='<div style="background:#F0FDF4;border-left:4px solid #059669;padding:12px;border-radius:8px;margin-bottom:10px"><p style="font-size:12px;color:#065F46;font-weight:700;margin-bottom:4px">✅ Sí (sumá esto)</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">'+plan.si+'</p></div>';
+    html+='<div style="background:#FEE2E2;border-left:4px solid #DC2626;padding:12px;border-radius:8px;margin-bottom:10px"><p style="font-size:12px;color:#7F1D1D;font-weight:700;margin-bottom:4px">⚠️ No (sacá esto)</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">'+plan.no+'</p></div>';
+    html+='<div style="background:#FEF3C7;border-left:4px solid #F59E0B;padding:12px;border-radius:8px"><p style="font-size:12px;color:#92400E;font-weight:700;margin-bottom:4px">🕐 Horarios</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">'+plan.cuando+'</p></div>';
+  }else{
+    html+=vbVeloLock();
+  }
+  html+='</div>';
+  
+  // === SECCIÓN 2: DINACHARYA (Rutina diaria) ===
+  html+='<div style="background:#fff;border:1px solid #C49E72;border-radius:14px;padding:20px;margin-bottom:14px">';
+  html+='<p style="font-size:11px;letter-spacing:2px;color:#C49E72;text-transform:uppercase;font-weight:700;margin-bottom:10px">2 · Dinacharya (rutina diaria)</p>';
+  html+='<h3 style="font-family:Georgia,serif;font-size:18px;color:#3D5A36;font-weight:400;margin-bottom:14px">Tu día ideal hora por hora</h3>';
+  
+  if(trialOk){
+    html+='<div style="display:flex;flex-direction:column;gap:10px">';
+    html+='<div style="background:#FEF3C7;border-radius:8px;padding:12px"><p style="font-size:12px;color:#92400E;font-weight:700;margin-bottom:4px">🌅 Mañana (Brahma Muhurta)</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">'+rut.m+'</p></div>';
+    html+='<div style="background:#FED7AA;border-radius:8px;padding:12px"><p style="font-size:12px;color:#7C2D12;font-weight:700;margin-bottom:4px">☀️ Mediodía y tarde</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">'+rut.t+'</p></div>';
+    html+='<div style="background:#E0E7FF;border-radius:8px;padding:12px"><p style="font-size:12px;color:#3730A3;font-weight:700;margin-bottom:4px">🌙 Noche</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">'+rut.n+'</p></div>';
+    html+='</div>';
+  }else{
+    html+=vbVeloLock();
+  }
+  html+='</div>';
+  
+  // === SECCIÓN 3: AUSHADHI (Hierbas y Rasayanas) ===
+  html+='<div style="background:#fff;border:1px solid #7B68EE;border-radius:14px;padding:20px;margin-bottom:14px">';
+  html+='<p style="font-size:11px;letter-spacing:2px;color:#5B21B6;text-transform:uppercase;font-weight:700;margin-bottom:10px">3 · Aushadhi (hierbas y Rasayanas)</p>';
+  html+='<h3 style="font-family:Georgia,serif;font-size:18px;color:#3D5A36;font-weight:400;margin-bottom:14px">Hierbas que te equilibran</h3>';
+  
+  if(trialOk){
+    html+='<div style="background:#F5F3FF;border-radius:8px;padding:14px"><p style="font-size:13px;color:#3D5A36;line-height:1.7">'+hierbas+'</p></div>';
+    html+='<p style="font-size:11px;color:#8B7355;margin-top:10px;font-style:italic;line-height:1.5">⚠️ Consultá con tu médico antes de empezar cualquier hierba, especialmente si estás medicada, embarazada o tenés condiciones diagnosticadas.</p>';
+  }else{
+    html+=vbVeloLock();
+  }
+  html+='</div>';
+  
+  // === SECCIÓN 4: KALA (Cronograma 90 días) ===
+  html+='<div style="background:#fff;border:1px solid #DC2626;border-radius:14px;padding:20px;margin-bottom:14px">';
+  html+='<p style="font-size:11px;letter-spacing:2px;color:#DC2626;text-transform:uppercase;font-weight:700;margin-bottom:10px">4 · Kala (cronograma 90 días)</p>';
+  html+='<h3 style="font-family:Georgia,serif;font-size:18px;color:#3D5A36;font-weight:400;margin-bottom:14px">Tu plan paso a paso para reequilibrarte</h3>';
+  
+  if(trialOk){
+    html+='<div style="display:flex;flex-direction:column;gap:8px">';
+    html+='<div style="background:#FAF7F0;border-radius:8px;padding:12px"><p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:4px">Semana 1-2 · Limpieza inicial (Shodhana)</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">Sacá lo que NO va. Sumá agua tibia, infusiones, comidas calientes. Cero alcohol y procesados. Foco en regularizar horarios.</p></div>';
+    html+='<div style="background:#FAF7F0;border-radius:8px;padding:12px"><p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:4px">Semana 3-4 · Reconstrucción (Shamana)</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">Sumá lo que SÍ va. Empezá con Triphala suave. Establecé Dinacharya. Movimiento 30 min/día.</p></div>';
+    html+='<div style="background:#FAF7F0;border-radius:8px;padding:12px"><p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:4px">Mes 2 · Estabilización</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">Hierbas específicas según tu cuadro. Re-test al día 30 para ver progreso. Ajustes finos.</p></div>';
+    html+='<div style="background:#FAF7F0;border-radius:8px;padding:12px"><p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:4px">Mes 3 · Rasayana (rejuvenecimiento)</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">Sumá Rasayanas (Chyavanprash o Ashwagandha). Re-test final. Si seguís en plan, vas hacia Sama (equilibrio).</p></div>';
+    html+='</div>';
+  }else{
+    html+=vbVeloLock();
+  }
+  html+='</div>';
+  
+  // CTA si trial vencido
+  if(!trialOk){
+    html+='<div style="background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border-radius:18px;padding:28px 22px;text-align:center;margin-bottom:14px">';
+    html+='<h3 style="font-family:Georgia,serif;font-size:22px;color:#fff;font-weight:400;margin-bottom:14px;line-height:1.3">Desbloqueá tu plan completo + seguimiento mensual</h3>';
+    html+='<p style="font-size:15px;color:#E8DFC8;line-height:1.6;margin-bottom:22px">USD 20/mes · Plan personalizado + re-test cada 30 días + ajustes automáticos según tu progreso.</p>';
+    html+='<button onclick="vbCheckoutPaso7()" style="width:100%;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;padding:18px;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:0.3px;box-shadow:0 4px 14px rgba(224,122,31,0.4);margin-bottom:10px">Suscribirme · USD 20/mes →</button>';
+    html+='<p style="font-size:12px;color:#FDE68A;opacity:0.9">Cancelás cuando quieras</p>';
+    html+='</div>';
+  }else{
+    // CTA para ir al paso 8
+    html+='<div style="background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border-radius:18px;padding:24px 22px;text-align:center;margin-bottom:14px">';
+    html+='<p style="font-size:13px;color:#FDE68A;margin-bottom:10px">Próximo paso</p>';
+    html+='<h3 style="font-family:Georgia,serif;font-size:20px;color:#fff;font-weight:400;margin-bottom:18px;line-height:1.3">Seguimiento mensual con re-test automático</h3>';
+    html+='<button onclick="vbAbrirPaso8()" style="width:100%;background:#E07A1F;color:#fff;border:none;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer">Ver paso 8 · Seguimiento →</button>';
+    html+='</div>';
+  }
+  
+  html+='<p style="font-size:11px;color:#8B7355;text-align:center;font-style:italic;line-height:1.6;margin-bottom:30px">Vedabite acompaña, no diagnostica enfermedad ni reemplaza atención médica. Plan basado en Charaka Samhita, Ashtanga Hridayam y la tradición ayurvédica clásica.</p>';
+  html+='</div></div>';
+  
+  var s7=document.getElementById('s7');
+  if(!s7){s7=document.createElement('div');s7.className='screen';s7.id='s7';document.body.appendChild(s7);}
+  s7.innerHTML=html;
+  show('s7');
+  
+  try{
+    if(typeof gtag==='function')gtag('event','paso7_visto',{trial_activo:trialOk,dia_trial:diaActual,dosha:doshaVikriti});
+    if(window.clarity){window.clarity('set','paso7_visto','si');window.clarity('event','paso7_'+(trialOk?'trial':'bloqueado'));}
+  }catch(e){}
+}
+
+function vbCerrarPaso7(){
+  if(document.getElementById('s6')&&document.getElementById('s6').classList.contains('active')){show('s6');}
+  else show('s4');
+  try{if(typeof gtag==='function')gtag('event','paso7_cerrado');}catch(e){}
+}
+
+// Velo y candado para secciones bloqueadas
+function vbVeloLock(){
+  return '<div style="position:relative;background:#FAF7F0;border-radius:8px;padding:18px;text-align:center"><div style="filter:blur(4px);user-select:none;color:#5A7A53;font-size:13px;line-height:1.6">Contenido completo disponible solo con suscripción activa. Cereales calientes, legumbres bien cocidas con especias, vegetales con ghee, frutas dulces. Horarios específicos. Detalles personalizados según tu cuadro.</div><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;padding:10px 16px;border-radius:50px;border:2px solid #C49E72;font-size:13px;color:#3D5A36;font-weight:700;white-space:nowrap">🔒 Suscribite para ver</div></div>';
+}
+
+// ============================================================
+// PASO 8 — SEGUIMIENTO MENSUAL (bloqueado completo si trial vencido)
+// ============================================================
+function vbAbrirPaso8(){
+  var trialOk=vbTrialActivo();
+  var diasRest=vbDiasRestantes();
+  var diaActual=vbDiasTrial();
+  
+  var html='<div style="background:linear-gradient(180deg,#FAF7F0,#F5F3FF);min-height:100vh;padding:20px 16px"><div style="max-width:600px;margin:0 auto">';
+  html+='<button onclick="vbCerrarPaso8()" style="background:none;border:none;color:#5A7A53;font-size:14px;cursor:pointer;margin-bottom:14px;padding:8px 0">← Volver</button>';
+  
+  html+='<div style="text-align:center;margin-bottom:20px">';
+  html+='<p style="font-size:11px;letter-spacing:3px;color:#5B21B6;text-transform:uppercase;font-weight:700">📊 Seguimiento mensual · Paso 8 de 8</p>';
+  html+='<h2 style="font-family:Georgia,serif;font-size:24px;color:#3D5A36;font-weight:400;margin-top:8px;line-height:1.3">Tu evolución mes a mes</h2>';
+  html+='<p style="font-size:13px;color:#7a7a7a;margin-top:6px">Re-test cada 30 días · Ajuste automático del plan según progreso</p>';
+  html+='</div>';
+  
+  if(trialOk){
+    // Banner trial
+    html+='<div style="background:#D1FAE5;border:2px solid #059669;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#065F46;font-weight:700">🎁 Acceso gratis · Te quedan '+diasRest+' día'+(diasRest!==1?'s':'')+' de prueba</p></div>';
+    
+    // Contenido completo
+    html+='<div style="background:#fff;border:1px solid #C49E72;border-radius:14px;padding:20px;margin-bottom:14px">';
+    html+='<p style="font-size:11px;letter-spacing:2px;color:#C49E72;text-transform:uppercase;font-weight:700;margin-bottom:10px">Cómo funciona</p>';
+    html+='<div style="display:flex;flex-direction:column;gap:12px">';
+    html+='<div style="background:#FAF7F0;border-radius:8px;padding:14px"><p style="font-size:13px;color:#3D5A36;font-weight:700;margin-bottom:6px">📅 Día 30 — Primer re-test</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">Volvés a hacer el test Vikriti. Comparamos qué dosha bajó, cuál subió, en qué áreas mejoraste.</p></div>';
+    html+='<div style="background:#FAF7F0;border-radius:8px;padding:14px"><p style="font-size:13px;color:#3D5A36;font-weight:700;margin-bottom:6px">🔄 Ajuste automático del plan</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">Si tu Vata bajó 15%, el plan se ajusta. Si tu Pitta subió, el plan agrega cosas frescas. Todo según tu evolución real.</p></div>';
+    html+='<div style="background:#FAF7F0;border-radius:8px;padding:14px"><p style="font-size:13px;color:#3D5A36;font-weight:700;margin-bottom:6px">📊 Día 60 y 90 — Avance medible</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">Gráfico de tu evolución. Ves cómo tu desbalance se reduce mes a mes. Si llegaste a Sama (equilibrio), pasás al modo mantenimiento.</p></div>';
+    html+='<div style="background:#FAF7F0;border-radius:8px;padding:14px"><p style="font-size:13px;color:#3D5A36;font-weight:700;margin-bottom:6px">🌿 Rasayana después de los 90 días</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">Cuando llegás a equilibrio, pasás a fase Rasayana (rejuvenecimiento): protocolos para preservar el equilibrio y prevenir recaídas.</p></div>';
+    html+='</div></div>';
+    
+    // Botón hacer re-test (futuro)
+    html+='<div style="background:#fff;border:2px solid #5A7A53;border-radius:14px;padding:20px;margin-bottom:14px;text-align:center">';
+    html+='<p style="font-size:13px;color:#5A7A53;margin-bottom:10px">Tu próximo re-test estará disponible el día 30 desde tu primer test.</p>';
+    html+='<button onclick="alert(\'El re-test se habilita automáticamente a los 30 días. Te avisamos por email cuando esté listo.\')" style="background:#5A7A53;color:#fff;border:none;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">Saber más</button>';
+    html+='</div>';
+    
+  }else{
+    // BLOQUEADO COMPLETO
+    html+='<div style="background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border-radius:18px;padding:32px 22px;text-align:center;margin-bottom:14px">';
+    html+='<div style="font-size:48px;margin-bottom:14px">🔒</div>';
+    html+='<h3 style="font-family:Georgia,serif;font-size:24px;color:#fff;font-weight:400;margin-bottom:14px;line-height:1.3">Seguimiento mensual</h3>';
+    html+='<p style="font-size:15px;color:#E8DFC8;line-height:1.7;margin-bottom:22px">El seguimiento mensual con re-test automático, ajuste del plan y gráfico de evolución es exclusivo de la suscripción Vedabite Práctica.</p>';
+    html+='<button onclick="vbCheckoutPaso7()" style="width:100%;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;padding:18px;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:0.3px;box-shadow:0 4px 14px rgba(224,122,31,0.4);margin-bottom:10px">Suscribirme · USD 20/mes →</button>';
+    html+='<p style="font-size:12px;color:#FDE68A;opacity:0.9">Cancelás cuando quieras</p>';
+    html+='</div>';
+  }
+  
+  html+='<p style="font-size:11px;color:#8B7355;text-align:center;font-style:italic;line-height:1.6;margin-bottom:30px">Vedabite acompaña, no diagnostica enfermedad ni reemplaza atención médica.</p>';
+  html+='</div></div>';
+  
+  var s8=document.getElementById('s8');
+  if(!s8){s8=document.createElement('div');s8.className='screen';s8.id='s8';document.body.appendChild(s8);}
+  s8.innerHTML=html;
+  show('s8');
+  
+  try{
+    if(typeof gtag==='function')gtag('event','paso8_visto',{trial_activo:trialOk,dia_trial:diaActual});
+    if(window.clarity){window.clarity('set','paso8_visto','si');window.clarity('event','paso8_'+(trialOk?'trial':'bloqueado'));}
+  }catch(e){}
+}
+
+function vbCerrarPaso8(){
+  show('s7');
+  try{if(typeof gtag==='function')gtag('event','paso8_cerrado');}catch(e){}
+}
+
+// Conectar paso 6 → paso 7 directo (en lugar de checkout) cuando trial activo
+window.vbAbrirPaso7=vbAbrirPaso7;
+window.vbAbrirPaso8=vbAbrirPaso8;
 function tips(a){return a&&a.length?'<div style="margin-top:20px"><h4 style="margin-bottom:12px">💡 7 Tips Personalizados</h4>'+a.map(function(a,e){return'<div class="tip-card"><span class="tip-num">'+(e+1)+"</span>"+a+"</div>"}).join("")+"</div>":""}
-function showTab(a){document.querySelectorAll(".tab-content").forEach(function(a){a.classList.remove("active")});var el=document.getElementById("t-"+a);if(el){el.classList.add("active");document.getElementById("tabsGrid").style.display="none";window.scrollTo(0,0);if(a==="escanerEquilibrio"){try{var dd=res&&res.p?res.p:"desconocido";if(window._vbTrack)window._vbTrack("tab_abierto",{tab:"escaner_equilibrio",dosha:dd});if(typeof window._vbFetchEstadoEscaner==='function')window._vbFetchEstadoEscaner();if(!el._vbBound){el._vbBound=true;el.addEventListener("click",function(ev){var card=ev.target.closest("[data-sec]");if(card){try{if(window._vbTrack)window._vbTrack("escaner_seccion",{seccion:card.getAttribute("data-sec"),dosha:card.getAttribute("data-dosha")});}catch(e){}}});}}catch(e){}}}}
+function showTab(a){document.querySelectorAll(".tab-content").forEach(function(a){a.classList.remove("active")});var el=document.getElementById("t-"+a);if(el){el.classList.add("active");document.getElementById("tabsGrid").style.display="none";window.scrollTo(0,0);if(a==="escanerEquilibrio"){try{var dd=res&&res.p?res.p:"desconocido";if(window._vbTrack)window._vbTrack("tab_abierto",{tab:"escaner_equilibrio",dosha:dd});if(typeof window._vbFetchEstadoEscaner==='function')window._vbFetchEstadoEscaner();// IDs para anchor-scroll a las 3 evaluaciones principales
+try{var lengua=el.querySelector('[data-sec="lengua"]');if(lengua)lengua.id='evaluacion-lengua';var ojos=el.querySelector('[data-sec="ojos"]');if(ojos)ojos.id='evaluacion-ojos';var unas=el.querySelector('[data-sec="unas"]');if(unas)unas.id='evaluacion-unas';}catch(e){}if(!el._vbBound){el._vbBound=true;el.addEventListener("click",function(ev){var card=ev.target.closest("[data-sec]");if(card){try{if(window._vbTrack)window._vbTrack("escaner_seccion",{seccion:card.getAttribute("data-sec"),dosha:card.getAttribute("data-dosha")});}catch(e){}}});}}catch(e){}}}}
 function backIdx(){document.querySelectorAll(".tab-content").forEach(function(a){a.classList.remove("active")}),document.getElementById("tabsGrid").style.display="grid",window.scrollTo(0,0)}
 function scan(){var input=document.getElementById("prodIn").value.toLowerCase().trim();if(!input){document.getElementById("scanRes").innerHTML='<div class="result-neutral">⚠️ Escribí al menos un alimento o un menú entero separando con comas.</div>';return}var perfil=P[res.p];var items=input.split(/[,;]|\sy\s|\n/).map(function(s){return s.trim()}).filter(function(s){return s.length>0});var html='<div style="margin-top:16px"><h4 style="margin-bottom:12px;color:#5A7A53">📋 Análisis de '+items.length+' '+(items.length===1?'alimento':'alimentos')+':</h4>';var goodCount=0,badCount=0,neutralCount=0;items.forEach(function(item){var esBueno=perfil.g.some(function(a){return item.includes(a)||a.includes(item)});var esMalo=perfil.b.some(function(a){return item.includes(a)||a.includes(item)});if(esBueno&&!esMalo){goodCount++;html+='<div class="result-good" style="margin:6px 0;padding:10px 14px;background:#D1FAE5;border-left:4px solid #10B981;border-radius:6px"><strong>✅ '+item+'</strong> — Ideal para vos</div>'}else if(esMalo){badCount++;var sub=null;Object.keys(perfil.sub||{}).forEach(function(k){if(item.includes(k)||k.includes(item))sub=perfil.sub[k]});html+='<div class="result-bad" style="margin:6px 0;padding:10px 14px;background:#FEE2E2;border-left:4px solid #EF4444;border-radius:6px"><strong>⚠️ '+item+'</strong> — Mejor evitalo'+(sub?'<br><span style="font-size:13px;color:#666">💡 Cambialo por: <strong>'+sub+'</strong></span>':'')+'</div>'}else{neutralCount++;html+='<div class="result-neutral" style="margin:6px 0;padding:10px 14px;background:#FEF3C7;border-left:4px solid #F59E0B;border-radius:6px"><strong>🤔 '+item+'</strong> — Con moderación, no es ideal pero no te hace daño</div>'}});html+='<div style="margin-top:16px;padding:12px;background:#F0FDF4;border-radius:8px;text-align:center;font-size:14px"><strong>Resumen:</strong> '+goodCount+' ideales · '+badCount+' a evitar · '+neutralCount+' moderados</div>';if(badCount>0&&items.length>1){html+='<div style="margin-top:12px;padding:12px;background:#FFFBEB;border-radius:8px;font-size:13px"><strong>💡 Tip:</strong> Si estás en un restaurante, pedí los marcados con ✅ y reemplazá los ⚠️ con las alternativas sugeridas.</div>'}html+='</div>';document.getElementById("scanRes").innerHTML=html;try{if(typeof gtag==='function')gtag('event','scanner_uso',{event_category:'engagement',event_label:res.p,items_count:items.length,good_count:goodCount,bad_count:badCount});if(typeof window.clarity==='function')window.clarity('event','scanner_'+res.p)}catch(e){}}
 function qScan(a){document.getElementById("prodIn").value=a,scan()}
@@ -1918,7 +2522,9 @@ e+='<div class="tab-content" id="t-meditacion"><button class="back-btn" onclick=
 e+='<div class="tab-content" id="t-ubicacion"><button class="back-btn" onclick="backIdx()">← Volver</button><h3>📍 Cerca Tuyo</h3><div class="card"><a href="https://google.com/maps/search/yoga+cerca" target="_blank" class="btn btn-sage" style="margin-bottom:10px">🧘 Centros de Yoga</a><a href="https://google.com/maps/search/spa+cerca" target="_blank" class="btn btn-sage" style="margin-bottom:10px">💆 Spas</a><a href="https://google.com/maps/search/dietetica+cerca" target="_blank" class="btn btn-sage">🥗 Dietéticas</a></div></div>';
 e+='<div class="tab-content" id="t-salud"><button class="back-btn" onclick="backIdx()">← Volver</button><h3>🏥 Salud</h3><div class="card" style="background:#FEE2E2"><h4>⚠️ Riesgos</h4><ul>'+a.salud.r.map(function(a){return"<li>⚠️ "+a+"</li>"}).join("")+'</ul></div><div class="card" style="background:#D1FAE5"><h4>✅ Prevención</h4><ul>'+a.salud.p.map(function(a){return"<li>✓ "+a+"</li>"}).join("")+"</ul></div>"+tips(a.saludTips)+"</div>";
 e+='<div class="tab-content" id="t-escaner"><button class="back-btn" onclick="backIdx()">← Volver</button><h3>📷 Escáner de menú</h3><div class="card"><p style="margin-bottom:12px">Escribí los platos del menú separados por coma. Te decimos cuál sí y cuál no según tu constitución.</p><textarea class="escaner-input" id="prodIn" placeholder="Ejemplo: milanesa, papas fritas, ensalada cruda, helado" style="min-height:80px;resize:vertical;font-family:inherit"></textarea><button class="btn btn-sage" onclick="scan()" style="width:100%;margin-top:8px">🔍 Analizar menú completo</button><div id="scanRes"></div></div><div class="card" style="background:#F0F9FF"><h4>💡 Probá rápido:</h4><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px"><span class="quick-tag" onclick="qScan(\'café\')">☕ café</span><span class="quick-tag" onclick="qScan(\'helado\')">🍦 helado</span><span class="quick-tag" onclick="qScan(\'arroz\')">🍚 arroz</span><span class="quick-tag" onclick="qScan(\'banana\')">🍌 banana</span><span class="quick-tag" onclick="qScan(\'chocolate\')">🍫 chocolate</span><span class="quick-tag" onclick="qScan(\'milanesa, papas, ensalada\')">🍽️ menú típico</span></div></div></div>';
-e+='<div class="tab-content" id="t-escanerEquilibrio"><button class="back-btn" onclick="backIdx()">← Volver</button><h3>🔬 Escáner de Equilibrio</h3>'+(window.INFO&&window.INFO[res.p]&&window.INFO[res.p].escanerEquilibrio?window.INFO[res.p].escanerEquilibrio:"")+'<div class="card" style="background:#FEF3C7;border:2px solid #F59E0B;margin-top:16px"><p style="font-size:13px;color:#78350F;margin:0;line-height:1.6"><strong>🔬 Análisis experimental — versión Early Access</strong><br><br>Este análisis usa inteligencia artificial entrenada con textos clásicos del Ayurveda (Charaka Samhita, Sushruta Samhita). Está en fase de aprendizaje continuo y mejora con cada uso.<br><br><strong>⚠️ No reemplaza la consulta con un vaidya certificado ni con un médico.</strong><br><br>Si tenés dudas sobre lo que encontró, consultá con un profesional. Vedabite te acompaña, no te diagnostica.</p></div></div>';
+e+='<div class="tab-content" id="t-escanerEquilibrio"><button class="back-btn" onclick="backIdx()">← Volver</button><div style="text-align:center;margin:8px 0 18px"><p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700">📋 Escáner del Vaidya · Paso 4 de 8</p><p style="font-size:13px;color:#7a7a7a;margin-top:6px">Las 3 evaluaciones principales del terapeuta ayurvédico</p></div>'+
+'<div style="background:linear-gradient(180deg,#F0FDF4,#FAF7F0);border:2px solid #5A7A53;border-radius:14px;padding:18px;margin-bottom:18px"><p style="font-size:11px;letter-spacing:2px;color:#5A7A53;text-transform:uppercase;font-weight:700;margin-bottom:12px;text-align:center">⭐ Las 3 evaluaciones principales</p><div style="display:flex;flex-direction:column;gap:10px"><a href="#evaluacion-lengua" style="background:#fff;border:1px solid #C49E72;border-radius:10px;padding:14px;text-decoration:none;color:#3D5A36;display:flex;align-items:center;gap:12px"><span style="font-size:28px">👅</span><div><div style="font-size:14px;font-weight:700">Jihva Pariksha (lengua)</div><div style="font-size:12px;color:#7a7a7a">Mapa del intestino y digestión</div></div></a><a href="#evaluacion-ojos" style="background:#fff;border:1px solid #C49E72;border-radius:10px;padding:14px;text-decoration:none;color:#3D5A36;display:flex;align-items:center;gap:12px"><span style="font-size:28px">👁️</span><div><div style="font-size:14px;font-weight:700">Netra Pariksha (ojos)</div><div style="font-size:12px;color:#7a7a7a">Hígado, energía, sistema nervioso</div></div></a><a href="#evaluacion-unas" style="background:#fff;border:1px solid #C49E72;border-radius:10px;padding:14px;text-decoration:none;color:#3D5A36;display:flex;align-items:center;gap:12px"><span style="font-size:28px">💅</span><div><div style="font-size:14px;font-weight:700">Nakha Pariksha (uñas)</div><div style="font-size:12px;color:#7a7a7a">Minerales, calidad de tejidos, dosha óseo</div></div></a></div><p style="font-size:11px;color:#8B7355;margin-top:14px;text-align:center;font-style:italic">Las 17 evaluaciones complementarias están más abajo</p></div>'+
+'<h3>🔬 Escáner de Equilibrio</h3>'+(window.INFO&&window.INFO[res.p]&&window.INFO[res.p].escanerEquilibrio?window.INFO[res.p].escanerEquilibrio:"")+'<div class="card" style="background:#FEF3C7;border:2px solid #F59E0B;margin-top:16px"><p style="font-size:13px;color:#78350F;margin:0;line-height:1.6"><strong>🔬 Análisis experimental — versión Early Access</strong><br><br>Este análisis usa inteligencia artificial entrenada con textos clásicos del Ayurveda (Charaka Samhita, Sushruta Samhita). Está en fase de aprendizaje continuo y mejora con cada uso.<br><br><strong>⚠️ No reemplaza la consulta con un vaidya certificado ni con un médico.</strong><br><br>Si tenés dudas sobre lo que encontró, consultá con un profesional. Vedabite te acompaña, no te diagnostica.</p></div></div>';
 e+='<div class="tab-content" id="t-astrologia"><button class="back-btn" onclick="backIdx()">← Volver</button><h3>🪐 Carta Astral Védica</h3><div class="card" style="text-align:center"><p style="margin-bottom:16px">Descubrí tu carta astral védica. La astrología védica (Jyotish) revela tu dharma y propósito.</p><div style="font-size:48px;margin:20px 0">🪐✨🌙</div></div><div class="card"><h4>📝 Tus datos de nacimiento</h4><p style="color:#666;font-size:14px;margin-bottom:16px">Completá para ver tu carta astral védica</p><input type="date" class="astro-input" id="astroFecha"><input type="time" class="astro-input" id="astroHora"><input type="text" class="astro-input" id="astroLugar" placeholder="Ciudad (ej: Buenos Aires)"><button class="btn btn-gold" onclick="calcAstro()">🔮 VER MI CARTA ASTRAL →</button></div><div id="astroResult"></div></div>';
 document.getElementById("tabContents").innerHTML=e}
 
