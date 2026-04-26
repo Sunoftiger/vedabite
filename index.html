@@ -473,8 +473,8 @@ window.clarity('event',eventName+(label?'_'+label:''));
 };
 </script>
 <div class="screen active" id="s1">
-<div style="padding:40px 20px;text-align:center">
-<div class="container">
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 20px;text-align:center">
+<div class="container" style="width:100%">
 <p style="color:#5A7A53;font-size:13px;font-weight:500;margin-bottom:24px;cursor:default;user-select:none;display:inline-flex;align-items:center;gap:8px"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#5A7A53;animation:vbPulse 2s ease-in-out infinite"></span>Ya se realizaron <span id="vbContador">470</span> test</p>
 <style>
 @keyframes vbPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.8)}}
@@ -493,7 +493,7 @@ Recuperá tus hábitos naturales.
 Pequeños ajustes que cambian todo.
 </p>
 <div style="position:relative;display:inline-block;width:100%">
-<button class="btn btn-cta-hero" onclick="startTest()">Veamos tu equilibrio →<div style="font-size:11px;font-weight:500;color:#FFF;opacity:0.9;margin-top:4px;letter-spacing:0.5px">60 preguntas · 5 minutos</div></button>
+<button class="btn btn-cta-hero" onclick="startTest()">Veamos tu equilibrio →<div style="font-size:11px;font-weight:500;color:#FFF;opacity:0.9;margin-top:4px;letter-spacing:0.5px">50 preguntas · 4 minutos</div></button>
 </div>
 <style>
 .btn-cta-hero{background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;font-size:16px;padding:18px 14px;border-radius:14px;width:100%;border:none;cursor:pointer;font-weight:700;letter-spacing:0.3px;box-shadow:0 4px 15px rgba(224,122,31,.35);position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s;line-height:1.3}
