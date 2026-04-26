@@ -1604,7 +1604,300 @@ function prevQ(){0<qi?(qi--,renderQ()):show("s1")}
 function getRes(){var a=ans.vata+ans.pitta+ans.kapha||1,e="vata";return ans.pitta>ans[e]&&(e="pitta"),{p:e=ans.kapha>ans[e]?"kapha":e,pct:{vata:Math.round(ans.vata/a*100),pitta:Math.round(ans.pitta/a*100),kapha:Math.round(ans.kapha/a*100)}}}
 function showEmail(){res=getRes();var a=D[res.p];document.getElementById("eDosha").textContent=a.e,document.getElementById("eName").textContent=a.n,show("s3")}
 function submitEmail(){var a=document.getElementById("emailIn").value;if(!a||!a.includes("@"))return alert("Email inválido");(async function(){try{var emailClean=a.trim().toLowerCase();var msgBuffer=new TextEncoder().encode(emailClean);var hashBuffer=await crypto.subtle.digest('SHA-256',msgBuffer);var hashed=Array.from(new Uint8Array(hashBuffer)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');if(typeof gtag==='function'){gtag('set','user_data',{'sha256_email_address':hashed});}}catch(e){}})();userEmail=a;window.userEmail=a;window.res=res;try{localStorage.setItem("vb_email",a);}catch(e){}try{if(window.clarity){window.clarity('identify',a);window.clarity('set','userEmail',a);window.clarity('set','dosha',res.p);}}catch(e){}var e=D[res.p];emailjs.send("service_xf7v0x7","template_vzggqyx",{to_email:a,dosha_name:e.n,dosha_emoji:e.e,dosha_desc:e.desc,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha}).then(function(){}).catch(function(a){});try{if(window._vbSaveLead)window._vbSaveLead({email:a,dosha:res.p,dosha_name:e.n,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha,source:document.referrer||"direct",utm:location.search||""}).catch(function(){});}catch(e){}try{localStorage.setItem("vb_trialStart",new Date().toISOString());gtag("event","generate_lead");if(window._vbTrack)window._vbTrack()}catch(a){}saveSession(),showResults()}
-function showResults(){var a=D[res.p];document.getElementById("resHeader").style.background=a.bg,document.getElementById("resEmoji").textContent=a.e,document.getElementById("resName").textContent=a.n,document.getElementById("resDesc").textContent=a.desc,document.getElementById("resPct").innerHTML=Object.entries(res.pct).sort(function(a,e){return e[1]-a[1]}).map(function(a){return'<div style="background:#fff;padding:8px 16px;border-radius:8px"><div style="font-weight:700;color:'+D[a[0]].c+'">'+a[1]+'%</div><div style="font-size:12px">'+D[a[0]].e+"</div></div>"}).join(""),document.getElementById("tabsGrid").innerHTML=T.map(function(a){var emojiHTML=a.id==="escanerEquilibrio"?'<span style="font-size:1.3rem;letter-spacing:3px;display:block;margin-bottom:8px">'+a.e+'</span>':'<span>'+a.e+'</span>';return'<div class="tab-card'+(a.p?" premium":"")+'" style="position:relative" onclick="showTab(\''+a.id+"')\">"+emojiHTML+"<strong>"+a.t+"</strong>"+(a.p?'<span class="premium-tag">PREMIUM</span>':"")+"</div>"}).join(""),renderTabs(a),show("s4")}
+function showResults(){var a=D[res.p];document.getElementById("resHeader").style.background=a.bg,document.getElementById("resEmoji").textContent=a.e,document.getElementById("resName").textContent=a.n,document.getElementById("resDesc").textContent=a.desc,document.getElementById("resPct").innerHTML=Object.entries(res.pct).sort(function(a,e){return e[1]-a[1]}).map(function(a){return'<div style="background:#fff;padding:8px 16px;border-radius:8px"><div style="font-weight:700;color:'+D[a[0]].c+'">'+a[1]+'%</div><div style="font-size:12px">'+D[a[0]].e+"</div></div>"}).join("");try{vbRenderDevolucionIntegral();}catch(e){console.error('[devolucion]',e);}document.getElementById("tabsGrid").innerHTML=T.map(function(a){var emojiHTML=a.id==="escanerEquilibrio"?'<span style="font-size:1.3rem;letter-spacing:3px;display:block;margin-bottom:8px">'+a.e+'</span>':'<span>'+a.e+'</span>';return'<div class="tab-card'+(a.p?" premium":"")+'" style="position:relative" onclick="showTab(\''+a.id+"')\">"+emojiHTML+"<strong>"+a.t+"</strong>"+(a.p?'<span class="premium-tag">PREMIUM</span>':"")+"</div>"}).join(""),renderTabs(a),show("s4")}
+
+// === DEVOLUCIÓN INTEGRAL — sin pedir nada nuevo, evalúa lo acumulado ===
+function vbEvaluarCompletitud(){
+  var datos=window._vbDatos||{};
+  var prakriti=window._vbPrakriti||(datos.prakriti||null);
+  var vikriti=window.res||null;
+  
+  // Score de completitud — qué tenemos
+  var tiene={
+    datos_basicos: !!(datos.sexo && datos.edad),
+    fecha_nac: !!datos.fecha_nacimiento,
+    lugar_nac: !!datos.lugar_nacimiento,
+    condiciones: Array.isArray(datos.condiciones),
+    prakriti: !!(prakriti && prakriti.dosha_predominante),
+    vikriti: !!(vikriti && vikriti.p && vikriti.pct),
+    escaner_lengua: !!localStorage.getItem('vb_escaner_lengua'),
+    escaner_ojos: !!localStorage.getItem('vb_escaner_ojos'),
+    escaner_piel: !!localStorage.getItem('vb_escaner_piel')
+  };
+  
+  // Score absoluto
+  var sumaTiene=0;
+  Object.keys(tiene).forEach(function(k){if(tiene[k])sumaTiene++;});
+  var totalCampos=Object.keys(tiene).length;
+  var pctCompletitud=Math.round(sumaTiene/totalCampos*100);
+  
+  // Suficiencia para devolución
+  var minimoSuficiente=tiene.datos_basicos&&tiene.prakriti&&tiene.vikriti;
+  
+  return {tiene:tiene,pct:pctCompletitud,suficiente:minimoSuficiente,totalCampos:totalCampos,completos:sumaTiene};
+}
+
+function vbCalcularEtapaDesequilibrio(){
+  // Evalúa qué tan desbalanceado está según el cruce Prakriti vs Vikriti
+  var prakriti=window._vbPrakriti||(window._vbDatos&&window._vbDatos.prakriti)||null;
+  var vikriti=window.res||null;
+  
+  if(!vikriti||!vikriti.pct)return null;
+  
+  var pctVikriti=vikriti.pct;
+  var doshaVikriti=vikriti.p;
+  
+  // Sin Prakriti, solo evaluamos intensidad del dosha actual
+  if(!prakriti||!prakriti.dosha_predominante){
+    var pctActual=pctVikriti[doshaVikriti]||0;
+    if(pctActual>=60)return {etapa:2,nombre:'Prakopa',desc:'aumento moderado',color:'#E67E22'};
+    if(pctActual>=45)return {etapa:1,nombre:'Sanchaya',desc:'acumulación inicial',color:'#5A7A53'};
+    return {etapa:0,nombre:'Equilibrado',desc:'cerca del equilibrio',color:'#5A7A53'};
+  }
+  
+  var doshaPrakriti=prakriti.dosha_predominante;
+  
+  // Si Prakriti = Vikriti, es coherente (su naturaleza expresándose). Buscar segundo dosha.
+  if(doshaPrakriti===doshaVikriti){
+    // Buscar cuál de los OTROS doshas está más alto
+    var otros=Object.keys(pctVikriti).filter(function(d){return d!==doshaPrakriti;});
+    var mayorOtro=otros.sort(function(a,b){return pctVikriti[b]-pctVikriti[a];})[0];
+    var pctOtro=pctVikriti[mayorOtro]||0;
+    
+    if(pctOtro>=40)return {etapa:2,nombre:'Prakopa',desc:'tu '+doshaPrakriti+' natural está fuerte y '+mayorOtro+' empezó a subir',color:'#E67E22',doshaSecundario:mayorOtro};
+    if(pctOtro>=30)return {etapa:1,nombre:'Sanchaya',desc:'tu '+doshaPrakriti+' está expresándose pero hay leve acumulación de '+mayorOtro,color:'#5A7A53',doshaSecundario:mayorOtro};
+    return {etapa:0,nombre:'Coherente',desc:'tu Prakriti y Vikriti coinciden, estás expresando tu naturaleza',color:'#22C55E'};
+  }
+  
+  // Si Prakriti != Vikriti, hay desequilibrio claro — el dosha del Vikriti está alterado
+  var pctActual=pctVikriti[doshaVikriti]||0;
+  if(pctActual>=55)return {etapa:3,nombre:'Prasara',desc:'tu '+doshaVikriti+' está claramente desbalanceado, se está extendiendo',color:'#C44E4E'};
+  if(pctActual>=45)return {etapa:2,nombre:'Prakopa',desc:'tu '+doshaVikriti+' está aumentado por encima de tu naturaleza',color:'#E67E22'};
+  return {etapa:1,nombre:'Sanchaya',desc:'leve acumulación de '+doshaVikriti+' diferente a tu Prakriti',color:'#F59E0B'};
+}
+
+function vbRenderDevolucionIntegral(){
+  var contenedor=document.getElementById('resPct');
+  if(!contenedor)return;
+  var existente=document.getElementById('vbDevolucionIntegral');
+  if(existente)existente.remove();
+  
+  var prakriti=window._vbPrakriti||(window._vbDatos&&window._vbDatos.prakriti)||null;
+  var vikriti=window.res||null;
+  var datos=window._vbDatos||{};
+  var completitud=vbEvaluarCompletitud();
+  var etapa=vbCalcularEtapaDesequilibrio();
+  
+  if(!completitud.suficiente)return;
+  
+  // === DATA TABLES (las 5 cualidades de cada dosha) ===
+  var CUALIDADES_DOSHA={
+    vata:[
+      {s:'Laghu',e:'Liviano',d:'sentís el cuerpo y la mente livianos, casi sin peso'},
+      {s:'Ruksha',e:'Seco',d:'piel, pelo, mucosas e intestino tienden a la sequedad'},
+      {s:'Shita',e:'Frío',d:'manos y pies fríos, preferís el calor, sentís el frío fuerte'},
+      {s:'Chala',e:'Móvil / inestable',d:'pensamientos rápidos, mente que salta, sueño liviano'},
+      {s:'Vishada',e:'Claro / sin lubricación',d:'articulaciones que crujen, falta de "aceite" interno'}
+    ],
+    pitta:[
+      {s:'Ushna',e:'Caliente',d:'sentís calor interior, sudás, te molesta el calor de afuera'},
+      {s:'Tikshna',e:'Penetrante / agudo',d:'mente filosa, hambre voraz, digestión rápida que a veces quema'},
+      {s:'Drava',e:'Líquido',d:'sudoración, ojos llorosos, tendencia a inflamación con líquido'},
+      {s:'Snigdha',e:'Aceitoso',d:'piel grasa, brillo, tendencia a acné cuando se descontrola'},
+      {s:'Amla',e:'Ácido',d:'acidez estomacal, irritabilidad, mal aliento ácido'}
+    ],
+    kapha:[
+      {s:'Guru',e:'Pesado',d:'sentís el cuerpo y la mente pesados, lentos para arrancar'},
+      {s:'Snigdha',e:'Aceitoso / húmedo',d:'piel hidratada, mucosa abundante, lubricación natural'},
+      {s:'Shita',e:'Frío',d:'tendencia a sentir frío, mucosa fría, metabolismo lento'},
+      {s:'Sthira',e:'Estable / fijo',d:'persistente, te cuesta cambiar de hábito, mantenés rutinas largas'},
+      {s:'Madhura',e:'Dulce',d:'tendencia a antojo de dulces, naturaleza tierna y maternal'}
+    ]
+  };
+  
+  // === HELPERS ===
+  function pickDosha(d){return ({vata:'Vata · Aire+Éter',pitta:'Pitta · Fuego+Agua',kapha:'Kapha · Tierra+Agua'})[d]||d;}
+  function nombreDosha(d){return ({vata:'Vata (aire+éter)',pitta:'Pitta (fuego+agua)',kapha:'Kapha (tierra+agua)'})[d]||d;}
+  function colorDosha(d){return ({vata:'#7B68EE',pitta:'#E67E22',kapha:'#5A7A53'})[d]||'#5A7A53';}
+  function emojiDosha(d){return ({vata:'🌬️',pitta:'🔥',kapha:'🌍'})[d]||'';}
+  
+  var doshaPrakriti=prakriti?prakriti.dosha_predominante:null;
+  var doshaVikriti=vikriti.p;
+  var pctVikriti=vikriti.pct||{};
+  
+  // ========== EMPIEZA EL HTML ==========
+  var html='<div id="vbDevolucionIntegral" style="margin:24px 0">';
+  
+  // Encabezado del paso 5
+  html+='<div style="text-align:center;margin-bottom:18px">';
+  html+='<p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700">📋 Lectura del Vaidya (terapeuta ayurvédico) · Paso 5 de 8</p>';
+  html+='<h2 style="font-family:Georgia,serif;font-size:22px;color:#3D5A36;font-weight:400;margin-top:6px">Cómo naciste vs cómo estás hoy</h2>';
+  html+='<p style="font-size:13px;color:#7a7a7a;margin-top:6px">El cruce entre tu Prakriti (constitución natural) y tu Vikriti (estado actual) revela qué se desbalanceó</p>';
+  html+='</div>';
+  
+  // ========== SECCIÓN 1: TU PRAKRITI ==========
+  if(prakriti&&doshaPrakriti){
+    var cualPra=CUALIDADES_DOSHA[doshaPrakriti]||[];
+    html+='<div style="background:linear-gradient(180deg,#FAF7F0,#F5EFE0);border:1px solid '+colorDosha(doshaPrakriti)+';border-radius:14px;padding:18px;margin-bottom:14px">';
+    html+='<p style="font-size:11px;letter-spacing:2px;color:'+colorDosha(doshaPrakriti)+';text-transform:uppercase;font-weight:700;margin-bottom:6px">1 · Tu Prakriti (constitución natural)</p>';
+    html+='<h3 style="font-family:Georgia,serif;font-size:20px;color:'+colorDosha(doshaPrakriti)+';font-weight:400;margin-bottom:6px">'+emojiDosha(doshaPrakriti)+' Naciste '+(prakriti.prakriti_nombre||nombreDosha(doshaPrakriti))+'</h3>';
+    html+='<p style="font-size:13px;color:#5A7A53;margin-bottom:12px;line-height:1.5">Sánscrito (español): <strong>'+pickDosha(doshaPrakriti)+'</strong></p>';
+    html+='<p style="font-size:13px;color:#5A7A53;margin-bottom:10px;font-weight:600">Tus 5 cualidades naturales (los 5 Gunas):</p>';
+    html+='<div style="display:flex;flex-direction:column;gap:8px">';
+    cualPra.forEach(function(c){
+      html+='<div style="background:#fff;border-radius:8px;padding:10px 12px"><div style="font-size:13px;color:#3D5A36;font-weight:700">'+c.s+' <span style="font-weight:400;color:#8B7355">('+c.e+')</span></div><div style="font-size:12px;color:#7a7a7a;margin-top:4px;line-height:1.4">'+c.d+'</div></div>';
+    });
+    html+='</div>';
+    html+='</div>';
+  }
+  
+  // ========== SECCIÓN 2: TU VIKRITI HOY ==========
+  if(doshaVikriti){
+    var cualVik=CUALIDADES_DOSHA[doshaVikriti]||[];
+    var pctActual=pctVikriti[doshaVikriti]||0;
+    html+='<div style="background:linear-gradient(180deg,#FFFAF0,#FEF3C7);border:1px solid '+colorDosha(doshaVikriti)+';border-radius:14px;padding:18px;margin-bottom:14px">';
+    html+='<p style="font-size:11px;letter-spacing:2px;color:'+colorDosha(doshaVikriti)+';text-transform:uppercase;font-weight:700;margin-bottom:6px">2 · Tu Vikriti (estado actual)</p>';
+    html+='<h3 style="font-family:Georgia,serif;font-size:20px;color:'+colorDosha(doshaVikriti)+';font-weight:400;margin-bottom:6px">'+emojiDosha(doshaVikriti)+' Hoy estás siendo '+nombreDosha(doshaVikriti)+' al '+pctActual+'%</h3>';
+    html+='<p style="font-size:13px;color:#5A7A53;margin-bottom:12px;line-height:1.5">Sánscrito (español): <strong>'+pickDosha(doshaVikriti)+'</strong></p>';
+    html+='<p style="font-size:13px;color:#5A7A53;margin-bottom:10px;font-weight:600">Las 5 cualidades que están subiendo en vos hoy:</p>';
+    html+='<div style="display:flex;flex-direction:column;gap:8px">';
+    cualVik.forEach(function(c){
+      html+='<div style="background:#fff;border-radius:8px;padding:10px 12px"><div style="font-size:13px;color:#3D5A36;font-weight:700">↑ '+c.s+' <span style="font-weight:400;color:#8B7355">('+c.e+')</span></div><div style="font-size:12px;color:#7a7a7a;margin-top:4px;line-height:1.4">'+c.d+'</div></div>';
+    });
+    html+='</div>';
+    html+='</div>';
+  }
+  
+  // ========== SECCIÓN 3: EL GAP (la diferencia exacta) ==========
+  if(doshaPrakriti&&doshaVikriti){
+    var gapMismo=(doshaPrakriti===doshaVikriti);
+    var gapTitulo=gapMismo?'Tu Prakriti (constitución natural) y tu Vikriti (estado actual) coinciden':'Tu Prakriti (constitución natural) y tu Vikriti (estado actual) son diferentes';
+    var gapColor=gapMismo?'#22C55E':'#E67E22';
+    var gapEmoji=gapMismo?'✓':'⚠️';
+    
+    html+='<div style="background:#fff;border:2px solid '+gapColor+';border-radius:14px;padding:18px;margin-bottom:14px">';
+    html+='<p style="font-size:11px;letter-spacing:2px;color:'+gapColor+';text-transform:uppercase;font-weight:700;margin-bottom:6px">3 · El gap (diferencia entre lo que naciste y lo que sos hoy)</p>';
+    html+='<h3 style="font-family:Georgia,serif;font-size:18px;color:'+gapColor+';font-weight:400;margin-bottom:10px">'+gapEmoji+' '+gapTitulo+'</h3>';
+    
+    if(gapMismo){
+      html+='<p style="font-size:13px;color:#5A7A53;line-height:1.6;margin-bottom:8px">Naciste <strong>'+nombreDosha(doshaPrakriti)+'</strong> y hoy estás siendo <strong>'+nombreDosha(doshaVikriti)+'</strong>. Tu naturaleza se está expresando.</p>';
+      html+='<p style="font-size:12px;color:#8B7355;line-height:1.5">Esto es bueno: tu cuerpo está alineado con su programación original. El trabajo es mantener esa coherencia y evitar que se exagere.</p>';
+    }else{
+      html+='<p style="font-size:13px;color:#5A7A53;line-height:1.6;margin-bottom:8px">Naciste <strong>'+nombreDosha(doshaPrakriti)+'</strong> pero hoy estás siendo <strong>'+nombreDosha(doshaVikriti)+'</strong>.</p>';
+      html+='<p style="font-size:13px;color:#5A7A53;line-height:1.6;margin-bottom:8px">Tu cuerpo se está apartando de su naturaleza. No estás siendo lo que naciste para ser.</p>';
+      html+='<p style="font-size:12px;color:#8B7355;line-height:1.5">El <strong>Vaidya</strong> (terapeuta ayurvédico) lee esto como una señal: hay algo en tu rutina, alimentación, emociones o estación del año que está empujando a tu cuerpo en la dirección opuesta.</p>';
+    }
+    html+='</div>';
+  }
+  
+  // ========== SECCIÓN 4: VIKARA (Vriddhi o Kshaya) ==========
+  if(doshaVikriti&&pctVikriti){
+    var pctV=pctVikriti[doshaVikriti]||0;
+    var vikara,vikaraS,vikaraDesc,vikaraColor;
+    if(pctV>=50){
+      vikaraS='Vriddhi (aumento)'; vikara='aumento marcado';
+      vikaraDesc='Tu '+nombreDosha(doshaVikriti)+' está más alto de lo que debería. El cuerpo está produciendo o acumulando más de esta energía de la que necesita.';
+      vikaraColor='#E67E22';
+    }else if(pctV>=35){
+      vikaraS='Sama Vriddhi (aumento moderado)'; vikara='aumento moderado';
+      vikaraDesc='Tu '+nombreDosha(doshaVikriti)+' está empezando a subir, todavía sin desbordarse. Es el mejor momento para corregir.';
+      vikaraColor='#F59E0B';
+    }else{
+      vikaraS='Sama (equilibrio)'; vikara='en equilibrio relativo';
+      vikaraDesc='No hay un dosha (energía) claramente fuera de su lugar. Estás cerca de tu equilibrio natural.';
+      vikaraColor='#22C55E';
+    }
+    html+='<div style="background:#fff;border:1px solid '+vikaraColor+';border-radius:14px;padding:18px;margin-bottom:14px">';
+    html+='<p style="font-size:11px;letter-spacing:2px;color:'+vikaraColor+';text-transform:uppercase;font-weight:700;margin-bottom:6px">4 · Vikara (dirección del desequilibrio)</p>';
+    html+='<h3 style="font-family:Georgia,serif;font-size:18px;color:'+vikaraColor+';font-weight:400;margin-bottom:6px">'+vikaraS+'</h3>';
+    html+='<p style="font-size:13px;color:#5A7A53;line-height:1.6">'+vikaraDesc+'</p>';
+    html+='</div>';
+  }
+  
+  // ========== SECCIÓN 5: GATI (movimiento del desequilibrio) ==========
+  if(doshaVikriti){
+    var gati,gatiS,gatiDesc,gatiEmoji;
+    if(doshaVikriti==='vata'){
+      gatiS='Urdhva Gati (asciende)'; gatiEmoji='⬆️';
+      gatiDesc='Tu desequilibrio se está moviendo hacia arriba: cabeza, mente, sistema nervioso, pulmones. Sentís ansiedad, pensamientos rápidos, insomnio, sequedad en garganta o respiración corta.';
+    }else if(doshaVikriti==='pitta'){
+      gatiS='Tiryak Gati (se extiende lateralmente)'; gatiEmoji='↔️';
+      gatiDesc='Tu desequilibrio se está extendiendo lateralmente: piel, sangre, articulaciones, músculos. Aparecen rojeces, inflamación, irritabilidad, calor superficial.';
+    }else{
+      gatiS='Adho Gati (desciende)'; gatiEmoji='⬇️';
+      gatiDesc='Tu desequilibrio se está moviendo hacia abajo: estómago, intestino, piernas, sistema linfático. Sentís pesadez, lentitud digestiva, retención, congestión, cansancio matinal.';
+    }
+    html+='<div style="background:#fff;border:1px solid #C49E72;border-radius:14px;padding:18px;margin-bottom:18px">';
+    html+='<p style="font-size:11px;letter-spacing:2px;color:#C49E72;text-transform:uppercase;font-weight:700;margin-bottom:6px">5 · Gati (hacia dónde se mueve)</p>';
+    html+='<h3 style="font-family:Georgia,serif;font-size:18px;color:#3D5A36;font-weight:400;margin-bottom:6px">'+gatiEmoji+' '+gatiS+'</h3>';
+    html+='<p style="font-size:13px;color:#5A7A53;line-height:1.6">'+gatiDesc+'</p>';
+    html+='</div>';
+  }
+  
+  // ========== SECCIÓN 6: ZONA PAGO (5 capas más profundas con velo) ==========
+  html+='<div style="background:linear-gradient(180deg,#3D5A36,#2D3A26);color:#fff;border-radius:14px;padding:22px;margin-bottom:14px;text-align:center;position:relative;overflow:hidden">';
+  html+='<div style="position:absolute;top:14px;right:14px;background:#C49E72;color:#fff;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px">PAGO · USD 20</div>';
+  html+='<p style="font-size:11px;letter-spacing:3px;color:#FDE68A;text-transform:uppercase;font-weight:700;margin-bottom:8px">🔒 Diagnóstico integral</p>';
+  html+='<h3 style="font-family:Georgia,serif;font-size:22px;color:#FFF;font-weight:400;margin-bottom:14px;line-height:1.4">El Vaidya (terapeuta ayurvédico con experiencia) necesita 5 lecturas más para darte el diagnóstico completo</h3>';
+  
+  html+='<div style="text-align:left;background:rgba(255,255,255,0.05);border-radius:12px;padding:16px;margin-bottom:16px">';
+  
+  // Las 5 capas pago con velo
+  var capasPago=[
+    {n:'Las 14 áreas detalladas',s:'Asta Sthana Pariksha (los 8 exámenes del Vaidya)',d:'desglose de tus puntos en Agni (fuego digestivo), Mala (heces), Mutra (orina), Sveda (sudor), Nidra (sueño), Manas (mente), Bala (energía vital) y las 8 áreas restantes — con interpretación clásica de cada una'},
+    {n:'Canales bloqueados',s:'Sthana Samshraya (zona donde se aloja) · Srotas (canales energéticos)',d:'cuáles de los 13 canales del cuerpo están obstruidos (digestivo, respiratorio, mental, etc.) y por qué'},
+    {n:'Toxinas no digeridas',s:'Ama (residuo de mala digestión)',d:'si hay acumulación de toxinas por digestión incompleta — el factor que más cambia el plan'},
+    {n:'Tu fuerza vital actual',s:'Bala (energía vital): Pravara (fuerte), Madhyama (media), Avara (baja)',d:'fuerte, media o baja — define qué tan agresiva o suave puede ser la corrección'},
+    {n:'Etapa exacta del ciclo',s:'Kriyakala (las 6 etapas del desequilibrio)',d:'en cuál de las 6 etapas estás: Sanchaya (acumulación), Prakopa (agravamiento), Prasara (extensión), Sthana Samshraya (alojamiento), Vyakti (manifestación), Bheda (cronificación) — define la urgencia'}
+  ];
+  capasPago.forEach(function(c,idx){
+    html+='<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;'+(idx<capasPago.length-1?'border-bottom:1px solid rgba(255,255,255,0.1)':'')+'">';
+    html+='<div style="font-size:18px;flex-shrink:0">🔒</div>';
+    html+='<div style="flex:1">';
+    html+='<div style="font-size:14px;color:#FDE68A;font-weight:700;margin-bottom:2px">'+c.n+'</div>';
+    html+='<div style="font-size:11px;color:#C49E72;margin-bottom:4px;font-style:italic">'+c.s+'</div>';
+    html+='<div style="font-size:12px;color:#E8DFC8;line-height:1.5;filter:blur(3px);user-select:none">'+c.d+'</div>';
+    html+='</div></div>';
+  });
+  html+='</div>';
+  
+  html+='<button onclick="vbDesbloquearDiagnostico()" style="width:100%;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;padding:16px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:0.5px;box-shadow:0 4px 14px rgba(224,122,31,0.3)">Desbloquear mi diagnóstico integral · USD 20 →</button>';
+  html+='<p style="font-size:11px;color:#FDE68A;margin-top:10px;opacity:0.8">10 días de prueba · Cancelás cuando quieras</p>';
+  html+='</div>';
+  
+  // ========== DISCLAIMER FINAL ==========
+  html+='<p style="font-size:11px;color:#8B7355;margin-top:14px;text-align:center;font-style:italic;line-height:1.5">Vedabite acompaña, no diagnostica. Si algo te preocupa, consultá un profesional de la salud.</p>';
+  
+  html+='</div>';
+  
+  contenedor.insertAdjacentHTML('afterend',html);
+  
+  // GA4 event
+  try{
+    if(typeof gtag==='function'){
+      gtag('event','paso5_cruce_mostrado',{
+        prakriti:doshaPrakriti||'sin_prakriti',
+        vikriti:doshaVikriti||'sin_vikriti',
+        gap:doshaPrakriti===doshaVikriti?'mismo':'distinto',
+        pct_vikriti:pctVikriti[doshaVikriti]||0
+      });
+    }
+    if(window.clarity){
+      window.clarity('set','paso5_visto','si');
+      window.clarity('event','paso5_cruce_prakriti_vikriti');
+    }
+  }catch(e){}
+}
+
+// CTA del paso 5: desbloquear diagnóstico
+function vbDesbloquearDiagnostico(){
+  try{
+    if(typeof gtag==='function')gtag('event','cta_desbloquear_diagnostico',{event_category:'paso5',value:20});
+    if(window.clarity)window.clarity('event','cta_desbloquear_diagnostico');
+  }catch(e){}
+  // Por ahora redirigimos al checkout existente o mostramos mensaje
+  alert('Paso 6 (Diagnóstico integral PAGO) — próximamente. Te avisaremos cuando esté disponible.');
+}
 function tips(a){return a&&a.length?'<div style="margin-top:20px"><h4 style="margin-bottom:12px">💡 7 Tips Personalizados</h4>'+a.map(function(a,e){return'<div class="tip-card"><span class="tip-num">'+(e+1)+"</span>"+a+"</div>"}).join("")+"</div>":""}
 function showTab(a){document.querySelectorAll(".tab-content").forEach(function(a){a.classList.remove("active")});var el=document.getElementById("t-"+a);if(el){el.classList.add("active");document.getElementById("tabsGrid").style.display="none";window.scrollTo(0,0);if(a==="escanerEquilibrio"){try{var dd=res&&res.p?res.p:"desconocido";if(window._vbTrack)window._vbTrack("tab_abierto",{tab:"escaner_equilibrio",dosha:dd});if(typeof window._vbFetchEstadoEscaner==='function')window._vbFetchEstadoEscaner();if(!el._vbBound){el._vbBound=true;el.addEventListener("click",function(ev){var card=ev.target.closest("[data-sec]");if(card){try{if(window._vbTrack)window._vbTrack("escaner_seccion",{seccion:card.getAttribute("data-sec"),dosha:card.getAttribute("data-dosha")});}catch(e){}}});}}catch(e){}}}}
 function backIdx(){document.querySelectorAll(".tab-content").forEach(function(a){a.classList.remove("active")}),document.getElementById("tabsGrid").style.display="grid",window.scrollTo(0,0)}
@@ -2783,6 +3076,101 @@ window._vbActualizarContadorFotos=function(){
   
   var firstCard=tab.querySelector('.card');
   if(firstCard)firstCard.parentNode.insertBefore(badge, firstCard);
+};
+
+// === ESCÁNER FOTOS — captura + envío al backend + tracking ===
+window._vbCapturarFoto=function(btn){
+  // El botón está dentro de un .card data-sec / data-dosha
+  // Y tiene como siguiente sibling el input file oculto
+  try{
+    var card=btn.closest('[data-sec]');
+    if(!card){console.error('[escaner] sin card');return;}
+    var input=card.querySelector('input[type="file"]');
+    if(!input){console.error('[escaner] sin input');return;}
+    input.click();
+  }catch(e){console.error('[_vbCapturarFoto]',e);}
+};
+
+window._vbFotoSeleccionada=function(input){
+  try{
+    var file=input.files&&input.files[0];
+    if(!file){return;}
+    var card=input.closest('[data-sec]');
+    if(!card){console.error('[escaner] sin card');return;}
+    var seccion=card.getAttribute('data-sec')||'desconocida';
+    var dosha=card.getAttribute('data-dosha')||(window.res&&window.res.p)||'desconocido';
+    var preview=card.querySelector('.vb-foto-preview');
+    var emailFinal=window.userEmail||(typeof userEmail!=='undefined'?userEmail:'')||localStorage.getItem('vb_email')||'';
+    
+    if(!emailFinal){
+      if(preview){preview.style.display='block';preview.innerHTML='<div style="background:#FFF3CD;border:1px solid #C49E72;border-radius:8px;padding:10px;font-size:12px;color:#8B7355">⚠️ Necesitás registrar tu email primero para guardar el análisis.</div>';}
+      return;
+    }
+    
+    // Mostrar loader + preview de la foto
+    var reader=new FileReader();
+    reader.onload=function(e){
+      var imgB64=e.target.result;
+      if(preview){
+        preview.style.display='block';
+        preview.innerHTML='<img src="'+imgB64+'" style="width:100%;max-height:200px;object-fit:cover;border-radius:8px;margin-bottom:10px"><div style="background:#FAF7F0;border:1px solid #E8DFC8;border-radius:8px;padding:12px;text-align:center"><div style="display:inline-block;width:24px;height:24px;border:3px solid #E8DFC8;border-top-color:#5A7A53;border-radius:50%;animation:vbspin 1s linear infinite;vertical-align:middle"></div><span style="margin-left:10px;font-size:13px;color:#5A7A53">Analizando '+seccion+'...</span></div>';
+      }
+      
+      // Tracking inicio
+      try{
+        if(typeof gtag==='function')gtag('event','escaner_foto_enviada',{seccion:seccion,dosha:dosha});
+        if(window.clarity)window.clarity('event','escaner_foto_enviada');
+      }catch(e){}
+      
+      // Llamar Cloud Function
+      var ANALIZAR_URL='https://analizarfotoayurveda-j3yesrdcba-rj.a.run.app';
+      fetch(ANALIZAR_URL,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          email:emailFinal,
+          seccion:seccion,
+          dosha:dosha,
+          imagen:imgB64,
+          imagenBase64:imgB64
+        })
+      })
+      .then(function(r){return r.json().then(function(d){return {status:r.status,data:d};});})
+      .then(function(res){
+        if(res.status===200&&res.data&&(res.data.ok||res.data.analisis||res.data.resultado||res.data.texto)){
+          var analisis=res.data.analisis||res.data.resultado||res.data.texto||'';
+          // Guardar en localStorage para que la devolución integral lo detecte
+          try{localStorage.setItem('vb_escaner_'+seccion,JSON.stringify({seccion:seccion,dosha:dosha,fecha:new Date().toISOString(),resumen:analisis.substring(0,200)}));}catch(e){}
+          
+          if(preview){
+            preview.innerHTML='<img src="'+imgB64+'" style="width:100%;max-height:200px;object-fit:cover;border-radius:8px;margin-bottom:10px"><div style="background:#F0FDF4;border-left:4px solid #5A7A53;border-radius:8px;padding:14px"><p style="font-size:11px;letter-spacing:1.5px;color:#5A7A53;text-transform:uppercase;font-weight:700;margin-bottom:8px">📋 Análisis</p><div style="font-size:13px;color:#3D5A36;line-height:1.6;white-space:pre-wrap">'+analisis+'</div><p style="font-size:10px;color:#8B7355;margin-top:12px;font-style:italic;text-align:center">Vedabite acompaña, no diagnostica. Si algo te preocupa, consultá un profesional.</p></div>';
+          }
+          // Tracking éxito
+          try{
+            if(typeof gtag==='function')gtag('event','escaner_foto_analizada',{seccion:seccion,dosha:dosha});
+            if(window.clarity){window.clarity('event','escaner_completado_'+seccion);window.clarity('set','escaner_realizado',seccion);}
+          }catch(e){}
+          // Refrescar contador de fotos restantes
+          if(typeof window._vbFetchEstadoEscaner==='function')window._vbFetchEstadoEscaner();
+        }else{
+          // Error o usuario sin permisos
+          var msg=(res.data&&(res.data.error||res.data.message))||'No pudimos procesar la foto.';
+          if(preview){
+            preview.innerHTML='<div style="background:#FEE2E2;border-left:4px solid #C44E4E;border-radius:8px;padding:12px"><p style="font-size:13px;color:#7F1D1D;line-height:1.5">'+msg+'</p></div>';
+          }
+          try{if(typeof gtag==='function')gtag('event','escaner_foto_error',{seccion:seccion,error:msg.substring(0,80)});}catch(e){}
+        }
+      })
+      .catch(function(err){
+        console.error('[escaner]',err);
+        if(preview){
+          preview.innerHTML='<div style="background:#FEE2E2;border-left:4px solid #C44E4E;border-radius:8px;padding:12px"><p style="font-size:13px;color:#7F1D1D;line-height:1.5">⚠️ No pudimos conectar con el servidor. Probá de nuevo en unos minutos.</p></div>';
+        }
+      });
+    };
+    reader.readAsDataURL(file);
+    
+  }catch(e){console.error('[_vbFotoSeleccionada]',e);}
 };
 
 // Consultar estado inicial de fotos gratis al abrir el tab
