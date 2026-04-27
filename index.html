@@ -1564,7 +1564,51 @@ function getRes(){
 }
 function showEmail(){res=getRes();var a=D[res.p];document.getElementById("eDosha").textContent=a.e,document.getElementById("eName").textContent=a.n,show("s3")}
 function submitEmail(){var a=document.getElementById("emailIn").value;if(!a||!a.includes("@"))return alert("Email inválido");(async function(){try{var emailClean=a.trim().toLowerCase();var msgBuffer=new TextEncoder().encode(emailClean);var hashBuffer=await crypto.subtle.digest('SHA-256',msgBuffer);var hashed=Array.from(new Uint8Array(hashBuffer)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');if(typeof gtag==='function'){gtag('set','user_data',{'sha256_email_address':hashed});}}catch(e){}})();userEmail=a;window.userEmail=a;window.res=res;try{localStorage.setItem("vb_email",a);}catch(e){}try{if(window.clarity){window.clarity('identify',a);window.clarity('set','userEmail',a);window.clarity('set','dosha',res.p);}}catch(e){}var e=D[res.p];emailjs.send("service_xf7v0x7","template_vzggqyx",{to_email:a,dosha_name:e.n,dosha_emoji:e.e,dosha_desc:e.desc,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha}).then(function(){}).catch(function(a){});try{if(window._vbSaveLead)window._vbSaveLead({email:a,dosha:res.p,dosha_name:e.n,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha,source:document.referrer||"direct",utm:location.search||""}).catch(function(){});}catch(e){}try{localStorage.setItem("vb_trialStart",new Date().toISOString());gtag("event","generate_lead");if(window._vbTrack)window._vbTrack()}catch(a){}saveSession(),showResults()}
-function showResults(){var a=D[res.p];document.getElementById("resHeader").style.background=a.bg,document.getElementById("resEmoji").textContent=a.e,document.getElementById("resName").textContent=a.n,document.getElementById("resDesc").textContent=a.desc,document.getElementById("resPct").innerHTML=Object.entries(res.pct).sort(function(a,e){return e[1]-a[1]}).map(function(a){return'<div style="background:#fff;padding:8px 16px;border-radius:8px"><div style="font-weight:700;color:'+D[a[0]].c+'">'+a[1]+'%</div><div style="font-size:12px">'+D[a[0]].e+"</div></div>"}).join("");try{vbRenderDevolucionIntegral();}catch(e){console.error('[devolucion]',e);}var tabsGrid=document.getElementById("tabsGrid");tabsGrid.innerHTML="";renderTabs(a),show("s4");if(typeof vbMarcarPasoCompleto==='function')vbMarcarPasoCompleto(3);}
+function showResults(){
+  var a=D[res.p];
+  document.getElementById("resHeader").style.background=a.bg;
+  document.getElementById("resEmoji").textContent=a.e;
+  document.getElementById("resName").textContent=a.n;
+  document.getElementById("resDesc").textContent=a.desc;
+  
+  // Render de los 3 doshas — los que están en 0% se muestran en gris con etiqueta "no presente hoy"
+  var pctHTML='';
+  var doshasOrdenados=Object.entries(res.pct).sort(function(a,e){return e[1]-a[1]});
+  var hayCero=doshasOrdenados.some(function(d){return d[1]===0;});
+  
+  doshasOrdenados.forEach(function(d){
+    var dKey=d[0],dPct=d[1];
+    if(dPct===0){
+      // Dosha sin síntomas activos hoy
+      pctHTML+='<div style="background:#F5F5F4;padding:8px 14px;border-radius:8px;opacity:0.65"><div style="font-weight:700;color:#78716C">0%</div><div style="font-size:12px;color:#78716C">'+D[dKey].e+'</div><div style="font-size:9px;color:#A8A29E;margin-top:2px">no activo hoy</div></div>';
+    }else{
+      pctHTML+='<div style="background:#fff;padding:8px 16px;border-radius:8px"><div style="font-weight:700;color:'+D[dKey].c+'">'+dPct+'%</div><div style="font-size:12px">'+D[dKey].e+'</div></div>';
+    }
+  });
+  document.getElementById("resPct").innerHTML=pctHTML;
+  
+  // Si hay un dosha en 0%, agregar nota explicativa amigable debajo
+  if(hayCero){
+    var contenedor=document.getElementById("resPct");
+    if(contenedor&&!document.getElementById('vbNotaCero')){
+      var nota=document.createElement('div');
+      nota.id='vbNotaCero';
+      nota.style.cssText='margin-top:14px;padding:10px 14px;background:#FFF7ED;border-radius:10px;border-left:3px solid #C49E72;font-size:11px;color:#5A4A2A;line-height:1.5;text-align:left;max-width:520px;margin-left:auto;margin-right:auto';
+      nota.innerHTML='<strong>📍 Sobre el 0%:</strong> No significa que no tengas ese dosha en tu naturaleza. Significa que en estos últimos días <strong>no estás expresando síntomas activos</strong> de ese dosha. Tu Prakriti (constitución de nacimiento) sigue siendo única y completa.';
+      contenedor.parentNode.insertBefore(nota,contenedor.nextSibling);
+    }
+  }else{
+    var nota=document.getElementById('vbNotaCero');
+    if(nota)nota.remove();
+  }
+  
+  try{vbRenderDevolucionIntegral();}catch(e){console.error('[devolucion]',e);}
+  var tabsGrid=document.getElementById("tabsGrid");
+  tabsGrid.innerHTML="";
+  renderTabs(a);
+  show("s4");
+  if(typeof vbMarcarPasoCompleto==='function')vbMarcarPasoCompleto(3);
+}
 
 // === DEVOLUCIÓN INTEGRAL — sin pedir nada nuevo, evalúa lo acumulado ===
 function vbEvaluarCompletitud(){
@@ -3407,6 +3451,523 @@ function vbAbrirPaso7(){
   // ============================================================
   
   // Helper para crear card expandible
+  // === 10 TIPS CONCRETOS POR CADA ITEM Y DOSHA ===
+  var VB_TIPS_PASO7={
+    ahara:{
+      vata:[
+        'Comé sentada, sin pantallas, sin apuro. Tu Vata digiere mejor en calma.',
+        'Evitá ensaladas crudas y frutas frías al desayuno. Tu cuerpo pide caliente.',
+        'Sumá ghee a cada comida principal (1 cdita). Lubrica y nutre tu sequedad.',
+        'Tomá agua TIBIA con limón al despertar. Nada de hielo todo el día.',
+        'Cero alcohol y cafeína después de las 14hs. Te despierta el sistema nervioso.',
+        'Hacé 3 comidas + 1 colación. No saltees comidas, Vata se desestabiliza.',
+        'Cocción larga sí (estofados, sopas). Microondas y crudo no.',
+        'Especias diarias: jengibre, comino, hinojo, canela. Encienden tu Agni.',
+        'Frutos secos remojados toda la noche. Evitá secos crudos.',
+        'Cena liviana, tibia, antes de las 20hs. Sueño profundo depende de eso.'
+      ],
+      pitta:[
+        'Comé en lugares frescos, no al sol del mediodía. Tu Pitta sube con calor.',
+        'Cero comidas muy picantes, fritas, ácidas, agrias. Bajan tu fuego de a poco.',
+        'Sumá cilantro fresco crudo a tus platos. Refresca el hígado.',
+        'Tomá agua de coco entre comidas. Te enfría sin cargar el estómago.',
+        'Almuerzo abundante (12-13hs), tu Agni está más fuerte ahí.',
+        'Bajá café, té negro, alcohol fuerte. Inflama tu Pitta interno.',
+        'Sumá frutas dulces frescas: pera, sandía, uva, manzana, mango.',
+        'Lácteos sí pero a temperatura ambiente, nunca calientes con sal.',
+        'Hierbas amargas (rúcula, achicoria, alcaucil) ayudan a tu hígado.',
+        'No comas con rabia ni discutas en la mesa. Tu Pitta lo somatiza.'
+      ],
+      kapha:[
+        'Saltate el desayuno o que sea muy liviano (té con jengibre y miel).',
+        'Comé picante: pimienta, jengibre, mostaza, chile, ajo crudo.',
+        'Cero lácteos pesados, helados, dulces, frituras, panificados blancos.',
+        'Almuerzo principal entre 12-13hs, cena chiquita y temprana.',
+        'Sumá vegetales crudos amargos: rúcula, brócoli, espinaca, achicoria.',
+        'Té de jengibre con limón antes de cada comida (activa Agni dormido).',
+        'Cero comer entre comidas. Tu metabolismo necesita pausas largas.',
+        'Cereales sí pero integrales secos: quinoa, mijo, amaranto, cebada.',
+        'Frutas: manzana verde, pera, granada, frutos rojos. Nada de banana ni palta diaria.',
+        'Comé despacio pero NO te llenes. Salí de la mesa con un poco de hambre.'
+      ]
+    },
+    dinacharya:{
+      vata:[
+        'Despertate SIEMPRE a la misma hora (5:30-6:30). Tu Vata necesita ritmo fijo.',
+        'Apenas te levantes, agua tibia. Después al baño. La regularidad calma Vata.',
+        'Automasaje con sésamo tibio 5-10 min antes del baño. Vital para vos.',
+        'Comé a la misma hora todos los días. Vata se desordena con horarios variables.',
+        'Bajá pantallas a las 20hs. Tu sistema nervioso necesita oscuridad temprana.',
+        'A dormir antes de las 22hs. Si no, Vata se dispara al día siguiente.',
+        'Pies y cabeza siempre abrigados. Vata entra por ahí cuando hay frío.',
+        'Evitá ruido, multitarea, tráfico intenso. Sobrecarga tu sistema nervioso.',
+        'Caminá descalza en el pasto 5 min al día. Aterriza tu energía dispersa.',
+        'Una cosa por vez. No hagas 5 cosas al mismo tiempo. Vata no rinde así.'
+      ],
+      pitta:[
+        'Despertate temprano pero sin alarma agresiva. Tu Pitta despierta tenso.',
+        'Lavate la cara con agua FRESCA al despertar. Refresca el cerebro Pitta.',
+        'Almuerzo entre 12-13hs sí o sí. Tu Agni más fuerte está ahí.',
+        'Pausa de 10 min al mediodía. Tu Pitta se recalienta sin pausas.',
+        'Caminata o yoga al atardecer. Cuando Pitta baja naturalmente.',
+        'A dormir antes de las 22:30. Si pasás de las 23, te activás de nuevo.',
+        'Evitá discusiones intensas después de las 18hs. Tu Pitta se dispara.',
+        'Una pausa cada 90 min de trabajo. Tu Pitta necesita "techos".',
+        'Salí al verde una vez por semana. Naturaleza enfría a Pitta.',
+        'Bajá luces cálidas a la noche. Luz blanca activa tu fuego mental.'
+      ],
+      kapha:[
+        'Despertate antes de las 6hs. Si te quedás más, Kapha pesado todo el día.',
+        'Apenas despierto: 5 min de salto en el lugar o ejercicio cardio breve.',
+        'Cepillado seco (Garshana) 5 min antes del baño. Activa circulación.',
+        'Ducha tibia tendiendo a fresca. Agua muy caliente aumenta Kapha.',
+        'No vuelvas a la cama después de despertar. Kapha se instala.',
+        'Almuerzo más liviano que cena (al revés que otros doshas).',
+        'Movete cada 60 min si trabajás sentada. Kapha se estanca rápido.',
+        'Cero siestas. Si dormís de día, Kapha se duplica.',
+        'Sol matinal 15 min directos. Activa tu metabolismo dormido.',
+        'A dormir antes de las 23hs pero NO antes de las 22hs (Kapha temprano).'
+      ]
+    },
+    pranayama:{
+      vata:[
+        'Hacelo SIEMPRE sentada, columna recta, ojos cerrados.',
+        'Inhalación 4 segundos, exhalación 6 segundos. Más larga la exhalación.',
+        'Empezá con 5 minutos. Subí a 10 después de 1 semana.',
+        'Hacelo entre 19 y 21hs. Antes de dormir es ideal.',
+        'Si te mareás, parás 1 minuto y respirás normal. Vata se altera fácil.',
+        'No lo hagas después de comer. Esperá 2 horas mínimo.',
+        'Tapá fosa derecha con pulgar, izquierda con anular. Otros dedos relajados.',
+        'No fuerces el aire. Tu Vata necesita suavidad, no esfuerzo.',
+        'Día 7 ya vas a notar mejor sueño. Día 21 menos ansiedad sostenida.',
+        'Combiná con aceite de sésamo en las plantas de los pies justo antes.'
+      ],
+      pitta:[
+        'Hacelo en lugar fresco, ventilado, no al sol directo.',
+        'Inhalación por la lengua enrollada (forma de tubito), exhalación por la nariz.',
+        'Si no te sale enrollar la lengua, inhalá por dientes apretados (Sitkari).',
+        'Empezá con 12 respiraciones. Subí a 20 después de 1 semana.',
+        'Mejor al atardecer (17-19hs) cuando Pitta sube.',
+        'No lo hagas con hambre extrema ni después de comer picante.',
+        'Sentís frescor inmediato en el paladar. Eso es señal de que funciona.',
+        'Evitalo en invierno frío. En verano es ideal.',
+        'Día 3-5 ya notás menos calor mental e irritabilidad.',
+        'Combiná con visualización de luna llena o agua fresca.'
+      ],
+      kapha:[
+        'Sentate erguida, sin almohadón blando. Kapha necesita firmeza.',
+        'Exhala fuerte y rápida por la nariz, inhalación pasiva natural.',
+        'Empezá con 30 exhalaciones, descansá 1 min, repetí 3 series.',
+        'Lo mejor al despertar, en ayunas. NO de noche (te activa).',
+        'Si te mareás: parás. Es normal al principio, tu cuerpo se adapta.',
+        'Vientre se contrae y expande visiblemente. Si no, no estás haciéndolo bien.',
+        'Sentís calor subir desde el abdomen al pecho. Es Agni encendiéndose.',
+        'Evitalo si tenés hipertensión o vértigo. Consultá médico antes.',
+        'Día 1 ya despierta tu energía. Día 14 se nota baja de peso si dieta acompaña.',
+        'Combiná con limón y miel cruda después: potencia el efecto.'
+      ]
+    },
+    yoga:{
+      vata:[
+        'Practicá despacio, con pausas largas entre asanas. NO flow rápido.',
+        'Asanas de raíz: Balasana (niño), Sukhasana (sentada cómoda), Savasana.',
+        'Mantenete en cada postura 1-2 minutos. Vata necesita tiempo para asentarse.',
+        'Calentate antes con masaje de aceite. Tu cuerpo seco lo necesita.',
+        'Evitá Vinyasa rápido, Ashtanga, Bikram. Te disparan Vata.',
+        'Practicá entre 10 y 14hs. Antes está muy frío para vos.',
+        'Inversiones suaves (piernas en pared). Calman tu sistema nervioso.',
+        'Ropa abrigada incluso en sala con AC. Tu cuerpo enfría rápido.',
+        'Termina siempre con Savasana 10 min y manta. NO te saltes.',
+        '4 veces por semana ya alcanza. Más es contraproducente para Vata.'
+      ],
+      pitta:[
+        'Practicá fresca, ventilada, hidratada. Pitta se sobrecalienta rápido.',
+        'Asanas refrescantes: Chandra Namaskar (luna), Matsyasana (pez), torsiones.',
+        'Mantenete 30-60 segundos por postura. Más tiempo te recalienta.',
+        'Evitá Bikram, hot yoga, Ashtanga competitivo. Inflaman Pitta.',
+        'Practicá antes de las 9hs o después de las 18hs. NO al mediodía.',
+        'Foco en exhalación. Ayuda a soltar el calor interno.',
+        'Posturas con torsiones suaves liberan el hígado caliente.',
+        'Cero competencia con vos misma. No te exijas perfección. Pitta se enoja.',
+        'Termina con Sheetali pranayama 5 min. Refresca todo el sistema.',
+        '3 veces por semana, 45 min. Más exigencia te desbalancea más.'
+      ],
+      kapha:[
+        'Practicá VIGOROSA, dinámica, sin pausas largas. Kapha necesita movimiento.',
+        'Asanas energizantes: Surya Namaskar rápido, Virabhadrasana, Ushtrasana.',
+        'Cambios rápidos de postura. Kapha se estanca si te quedás quieta.',
+        'Sumá saltos en el lugar entre series. Activa circulación dormida.',
+        'Practicá temprano (5-7hs) cuando Kapha está más alto.',
+        'NO Yin yoga, NO Restaurativo. Te aumentan Kapha y pesadez.',
+        'Sudá. Si no sudás, no estás trabajando lo suficiente para tu dosha.',
+        'Inversiones activas (parada de manos, hombros) mueven el linfático.',
+        'Posturas de apertura del pecho liberan Kapha pulmonar.',
+        '5-6 veces por semana mínimo. Tu Kapha no perdona pereza.'
+      ]
+    },
+    abhyanga:{
+      vata:[
+        'Aceite de sésamo TIBIO (no caliente). Calentalo a baño maría.',
+        'Cantidad: 3-4 cdas para todo el cuerpo. Empapate bien.',
+        'Empezá por los pies, subiendo. Vata se aterriza con masaje desde abajo.',
+        'Movimientos largos en huesos largos, circulares en articulaciones.',
+        'Cabeza también: 1 cda en la coronilla, masaje hacia las sienes 2 min.',
+        'Dejá el aceite 15-20 min antes de ducharte. Que penetre bien.',
+        'Hacelo CADA día. Vata necesita lubricación diaria.',
+        'Mejor antes del baño que después. Lo que queda en piel hidrata todo el día.',
+        'Día 5 ya notás piel menos seca. Día 14 menos ansiedad.',
+        'Si tenés artritis o dolor articular: agregá 5 gotas de jengibre al sésamo.'
+      ],
+      pitta:[
+        'Aceite de coco a temperatura AMBIENTE, NO calentado.',
+        'Cantidad: 3 cdas para todo el cuerpo. Suficiente para deslizar.',
+        'Movimientos suaves, sin presión fuerte. Pitta se irrita con fricción.',
+        'Empezá por la cabeza si hay calor mental, por pies si hay agitación.',
+        'Foco en plantas, palmas, ombligo, sienes. Puntos refrescantes.',
+        'Dejá 15 min máximo. Más tiempo y Pitta empieza a sentir picazón.',
+        '3-4 veces por semana, no diario. Pitta no necesita lubricación constante.',
+        'Mejor al atardecer que a la mañana. A la noche calma Pitta acumulada.',
+        'Día 7 ya notás piel menos sensible y enrojecida.',
+        'Si hay urticaria o eczema: cambiá a aceite de coco con sándalo en polvo.'
+      ],
+      kapha:[
+        'GARSHANA primero (cepillado seco con guante de seda 5 min).',
+        'Después aceite de mostaza o sésamo SI hay sequedad. Si no, sin aceite.',
+        'Cantidad mínima: 1-2 cdas. Kapha ya tiene oleosidad propia.',
+        'Movimientos VIGOROSOS, fuerte presión, friccionando.',
+        'Foco en muslos, abdomen, brazos donde Kapha acumula grasa.',
+        'NO en cabeza si hay congestión. Saca al pecho y abdomen.',
+        '3 veces por semana basta. NO diario para Kapha.',
+        'Después: ducha CALIENTE para sacar todo. Caliente activa tu Kapha frío.',
+        'Día 7 notás circulación activa. Día 21 perdiste retención.',
+        'Si hay celulitis o linfedema: agregá jengibre seco molido al aceite.'
+      ]
+    },
+    meditacion:{
+      vata:[
+        'Sentate cómoda, columna recta, manta sobre las piernas.',
+        'Cerrá los ojos, sentí los pies en el piso (aterrizar Vata).',
+        'Foco en respiración LENTA. Cuenta 4 inhalá, 6 exhalá.',
+        'Empezá con 10 min. Subí a 20 después de 2 semanas.',
+        'Mejor al atardecer (18-19hs). Vata se calma con la luz baja.',
+        'Si la mente se dispersa, volvé a la respiración SIN juzgar.',
+        'Mantra interno suave: "Om" o "So Ham". Vata responde a vibración suave.',
+        'NO meditaciones guiadas con sonidos fuertes. Vata se altera.',
+        'Termina con 1 min de silencio total y manos en el corazón.',
+        'Día 14 vas a notar pensamientos menos acelerados.'
+      ],
+      pitta:[
+        'Sentate en lugar fresco, ventilado. Pitta no medita con calor.',
+        'Foco en visualización de la luna o agua fresca.',
+        'Respiración natural, exhalación más larga que inhalación.',
+        '15 min al atardecer. Pitta no responde bien a meditación matinal.',
+        'Si aparece rabia o impaciencia: respirá y observala SIN actuarla.',
+        'Mantra: "Om Shanti" suave. Calma el fuego interno.',
+        'NO meditaciones intensas tipo Vipassana al inicio. Te frustrás.',
+        'Termina con manos en el corazón y sonrisa interna.',
+        'Día 7 ya notás menos reactividad emocional.',
+        'Cuando estés enojada, NO trates de meditar. Caminá primero.'
+      ],
+      kapha:[
+        'Meditación con MOVIMIENTO. Caminata consciente, mantra en voz alta.',
+        'Si te sentás, NO en almohadón blando. Banco firme o silla recta.',
+        'Foco en mantras vibrantes: "Om Hum" o "Om Ram" en voz alta.',
+        'Empezá con solo 10 min. Más y Kapha duerme.',
+        'Mejor al despertar (5:30-7hs). Kapha despierta lento, esto activa.',
+        'Si te dormís durante la meditación: parate, salpicate agua fresca, seguí.',
+        'NO meditaciones guiadas suaves o "sleep meditations".',
+        'Sumá Bhastrika pranayama 1 min antes para activarte.',
+        'Termina con un salto en el lugar o danza libre 1 min.',
+        'Día 10 ya notás más claridad mental y menos pereza matinal.'
+      ]
+    },
+    mudras:{
+      vata:[
+        'Vayu Mudra: índice doblado a la base del pulgar, presionar suave.',
+        'Prithvi Mudra: punta del pulgar con punta del anular, otros extendidos.',
+        'Mantené cada mudra 15 min al día. No menos.',
+        'Hacelos en quietud, sentada o acostada. Vata necesita inmovilidad.',
+        'Mejor a la noche, antes de dormir. Calman para el sueño.',
+        'Combiná con respiración lenta. Potencia el efecto.',
+        'Si te tiembla la mano: descansá 1 min y volvé. Vata responde así.',
+        'Día 5 ya notás menos hormigueo, gases, ansiedad flotante.',
+        'Si tenés frío en manos: probalos cubierta con manta.',
+        'NO los hagas mientras manejás o trabajás. Necesitan foco completo.'
+      ],
+      pitta:[
+        'Apana Mudra: pulgar + medio + anular juntos. Índice y meñique extendidos.',
+        'Jalashaya Mudra: ambas manos en cuenco, una sobre la otra en el regazo.',
+        '10-15 min cada uno. Pitta no necesita más tiempo.',
+        'Hacelos en lugar fresco, idealmente a la sombra.',
+        'Mejor al atardecer. NO al sol del mediodía.',
+        'Visualizá agua fresca corriendo por las manos durante el mudra.',
+        'Si te dan calor las manos: bajá presión, Pitta se irrita.',
+        'Día 5 notás digestión más calmada y menos acidez.',
+        'Sumá durante eventos sociales tensos. Bajan la reactividad.',
+        'Combiná con Sheetali pranayama. Doble efecto refrescante.'
+      ],
+      kapha:[
+        'Surya Mudra: anular doblado a la base del pulgar, presionar firme.',
+        'Linga Mudra: dedos entrelazados, pulgar izquierdo apuntando arriba.',
+        '15-20 min con presión firme. Kapha necesita estímulo fuerte.',
+        'Hacelos al despertar o antes de hacer ejercicio.',
+        'Sentados erguidos, NO acostados. Acostado anula el efecto.',
+        'Sentís calor subir por los brazos. Es la activación de Agni.',
+        'Si tenés fiebre o calor excesivo: NO los hagas. Surya calienta más.',
+        'Día 7 notás más energía, menos congestión nasal y mucosidad.',
+        'Útiles para perder peso: combiná con dieta liviana y movimiento.',
+        'NO antes de dormir. Te activan demasiado.'
+      ]
+    },
+    chakras:{
+      vata:[
+        'Muladhara (raíz): visualizá luz roja en perineo, 3 min al despertar.',
+        'Svadhisthana (sacro): luz naranja debajo del ombligo, 3 min después.',
+        'Mantra Muladhara: "Lam" 7 veces en voz baja. Aterriza Vata.',
+        'Mantra Svadhisthana: "Vam" 7 veces. Estabiliza emociones.',
+        'Hacelo descalza tocando el piso. La tierra ayuda al chakra raíz.',
+        'Si te sentís dispersa: enfocá Muladhara más tiempo (5 min).',
+        'Si hay miedo o inseguridad: trabajá Muladhara con piedras rojas (jaspe).',
+        'Día 14 ya notás más arraigo y menos pensamientos en bucle.',
+        'Combiná con caminata descalza en pasto 5 min al día.',
+        'Aceite esencial: vetiver para Muladhara, sándalo para Svadhisthana.'
+      ],
+      pitta:[
+        'Manipura (plexo): luz amarilla suave en plexo solar, 3 min.',
+        'Anahata (corazón): luz verde clara en centro del pecho, 5 min.',
+        'Mantra Manipura: "Ram" 7 veces. Equilibra el ego y la rabia.',
+        'Mantra Anahata: "Yam" 7 veces. Abre el corazón compasivo.',
+        'Hacelo en lugar fresco, idealmente al atardecer.',
+        'Si hay ira o crítica fuerte: enfocá Anahata más tiempo (10 min).',
+        'Si hay competitividad excesiva: trabajá Manipura con piedras amarillas (citrino).',
+        'Día 7 notás menos reactividad y más empatía.',
+        'Combiná con flores blancas en la habitación durante la práctica.',
+        'Aceite esencial: rosa para Anahata, manzanilla romana para Manipura.'
+      ],
+      kapha:[
+        'Vishuddha (garganta): luz azul cielo en la garganta, 3 min.',
+        'Sahasrara (corona): luz violeta en la coronilla, 5 min.',
+        'Mantra Vishuddha: "Ham" 7 veces en voz alta. Activa la expresión.',
+        'Mantra Sahasrara: silencio puro o "Om" muy agudo.',
+        'Hacelo al despertar, NO de noche. Despierta Kapha dormido.',
+        'Si sentís pereza vocal: cantá durante el mantra Vishuddha.',
+        'Si hay apego o nostalgia: trabajá Sahasrara con piedras violetas (amatista).',
+        'Día 14 notás más claridad mental y voluntad para cambiar.',
+        'Combiná con ducha fresca antes. Despierta Vishuddha mucho más rápido.',
+        'Aceite esencial: eucalipto para Vishuddha, lavanda para Sahasrara.'
+      ]
+    },
+    hierbas:{
+      vata:[
+        'Ashwagandha: 1/2 cdita en leche tibia con miel a la noche. Calma Vata.',
+        'Bala: 1 cdita en agua tibia a la mañana. Da fuerza y peso.',
+        'Triphala: 1 cdita en agua tibia antes de dormir. Regulariza tránsito.',
+        'Brahmi: 1 cdita en ghee a la mañana. Calma mente acelerada.',
+        'Tomá hierbas SIEMPRE con vehículo (anupana): leche, ghee, miel tibia.',
+        'Empezá con UNA hierba durante 30 días antes de combinar.',
+        'NO frías, NO en agua de hielo. Vata necesita calor para asimilar.',
+        'Mejor a la noche para Ashwagandha y Triphala. Mañana para Bala.',
+        'Si embarazada o lactando: SIEMPRE consulta antes con médico.',
+        'Comprá certificadas (ANMAT en Argentina, COFEPRIS México). NO informales.'
+      ],
+      pitta:[
+        'Amalaki: 1 cdita en agua a temperatura ambiente al desayuno.',
+        'Shatavari: 1 cdita en leche tibia con cardamomo a la mañana.',
+        'Brahmi: 1/2 cdita en ghee al atardecer. Refresca la mente.',
+        'Neem: 1/4 cdita en agua tibia (es muy amargo). Limpia hígado.',
+        'Vehículo para Pitta: ghee, agua de coco, leche fresca.',
+        'NO con miel CALIENTE. La miel calentada irrita Pitta.',
+        'Mejor antes de las comidas o entre comidas. Pitta tiene Agni fuerte.',
+        'Cuidado con hierbas calientes (jengibre fuerte, pimienta). Inflaman.',
+        'Si hay condición hepática: consultá médico antes de Neem.',
+        'Comprá certificadas y orgánicas. Pitta es sensible a químicos.'
+      ],
+      kapha:[
+        'Trikatu (jengibre + pimienta + pimienta larga): 1/4 cdita con miel cruda.',
+        'Tulsi (albahaca santa): infusión fuerte 2 veces al día.',
+        'Guggulu: comprimido según indicación. Mueve grasa estancada.',
+        'Punarnava: 1 cdita con agua tibia. Saca retención y edemas.',
+        'Vehículo para Kapha: miel CRUDA (no cocida), agua caliente, jengibre.',
+        'NO con leche, NO con ghee. Aumentan tu Kapha pesado.',
+        'Mejor al despertar y entre comidas. NO con comida.',
+        'Sumá especias picantes a tus comidas: mostaza, jengibre, pimienta.',
+        'Si tenés hipertensión: cuidado con Trikatu. Consultá médico.',
+        'Coherencia importa más que dosis: 6 meses con poca > 1 mes con mucha.'
+      ]
+    },
+    rasayana:{
+      vata:[
+        'Chyavanprash: 1 cdita en leche tibia al despertar. Rejuvenece tejidos.',
+        'Sustancia clave: Ashwagandha + ghee + dátiles. Tu Rasayana ideal.',
+        'Achara Rasayana: dormir bien, hablar verdad, no juzgar.',
+        'Practicá Brahmacharya (moderación sexual) si tenés Ojas bajo.',
+        'Aceite de sésamo en pies cada noche. Sella Ojas en el cuerpo.',
+        'Cero mucho viaje, mucho movimiento. Vata pierde Ojas con eso.',
+        'Comé alimentos "Sattva": frutas frescas, leche orgánica, cereales integrales.',
+        'Cero ayuno prolongado. Tu Vata necesita combustible constante.',
+        'Practicá gratitud al dormir 3 cosas. Construye Ojas mental.',
+        'Día 30 notás más fuerza física, día 60 menos canas, día 90 piel más viva.'
+      ],
+      pitta:[
+        'Amalaki Rasayana: 1 cdita en agua de rosas al desayuno. Anti-edad ideal.',
+        'Sustancia clave: Shatavari + ghee + leche dulce.',
+        'Achara Rasayana para vos: bajar competitividad, perdonar, sonreír más.',
+        'Practicá descansar SIN culpa. Pitta acumula trabajo y pierde Ojas.',
+        'Aceite de coco en cuero cabelludo 2 veces por semana.',
+        'Cero alcohol fuerte, café excesivo, comida quemada. Destruyen Ojas.',
+        'Pasá tiempo en la luna llena. Pitta se renueva con energía lunar.',
+        'Cero auto-exigencia perfeccionista. Pitta pierde Ojas con eso.',
+        'Practicá meditación de la luna 10 min/noche. Construye Ojas femenino.',
+        'Día 30 piel más fresca, día 60 menos manchas, día 90 ojos más limpios.'
+      ],
+      kapha:[
+        'Pippali Rasayana: 1/4 cdita pippali con miel cruda al despertar.',
+        'Sustancia clave: Guggulu + Tulsi + jengibre seco.',
+        'Achara Rasayana para vos: levantarte temprano, soltar lo viejo, abrazar lo nuevo.',
+        'Practicá ayuno intermitente 14:10. Activa Rasayana metabólica.',
+        'Aceite de mostaza tibio en sienes. Despierta Ojas mental dormido.',
+        'Cero apego a personas o cosas. Kapha pierde Ojas con apego excesivo.',
+        'Practicá danza libre 10 min/día. Rejuvenece Kapha estancado.',
+        'Sumá especias picantes diarias. Tu metabolismo necesita fuego.',
+        'Practicá generosidad activa: regalá 1 cosa por semana. Limpia Kapha.',
+        'Día 30 menos pesadez, día 60 cuerpo más liviano, día 90 mente más clara.'
+      ]
+    }
+  };
+  
+  // === 3 SERIES COMPLETAS POR DISCIPLINA Y DOSHA ===
+  var VB_SERIES_PASO7={
+    yoga:{
+      vata:[
+        {nombre:'Sukhana Krama (Secuencia del descanso)',sk:'सुखन क्रम',duracion:'30 min',frecuencia:'4 veces por semana, entre 10-14hs',asanas:'1) Balasana (postura del niño) 3 min · 2) Marjaryasana-Bitilasana (gato-vaca) 2 min · 3) Adho Mukha Svanasana (perro boca abajo) 1 min · 4) Uttanasana (flexión de pie) 1 min · 5) Tadasana (montaña) 1 min · 6) Vrksasana (árbol) cada lado 1 min · 7) Setu Bandha Sarvangasana (puente) 2 min · 8) Supta Baddha Konasana (mariposa supina) 5 min · 9) Viparita Karani (piernas en pared) 8 min · 10) Savasana con manta 6 min',beneficio:'Aterriza Vata disperso. Calma el sistema nervioso. Mejora sueño desde el día 7.'},
+        {nombre:'Apana Krama (Serie del arraigo)',sk:'अपान क्रम',duracion:'25 min',frecuencia:'3 veces por semana al atardecer',asanas:'1) Sukhasana con respiración Nadi Shodhana 5 min · 2) Cat-Cow lento 2 min · 3) Vajrasana (postura del rayo) 2 min · 4) Janu Sirsasana cada lado 2 min · 5) Paschimottanasana (pinza sentada) 3 min · 6) Baddha Konasana 3 min · 7) Sucirandhrasana (ojo de aguja) 1 min cada lado · 8) Pavanamuktasana 2 min · 9) Savasana con peso en abdomen 4 min',beneficio:'Calma intestino, alivia gases, baja ansiedad somática. Notás cambios al día 5.'},
+        {nombre:'Chandra Krama (Serie lunar suave)',sk:'चन्द्र क्रम',duracion:'40 min',frecuencia:'2 veces por semana al anochecer',asanas:'1) Pranayama Nadi Shodhana 5 min · 2) Chandra Namaskar (saludo a la luna) lento 3 rondas · 3) Anjaneyasana cada lado 1 min · 4) Trikonasana cada lado 1 min · 5) Ardha Chandrasana cada lado 1 min · 6) Prasarita Padottanasana 2 min · 7) Janu Sirsasana cada lado 2 min · 8) Supta Matsyendrasana cada lado 2 min · 9) Halasana 2 min · 10) Savasana 10 min con manta y antifaz',beneficio:'Bajada total del Vata. Sueño profundo garantizado. Ideal para insomnio crónico.'}
+      ],
+      pitta:{},
+      kapha:{}
+    },
+    meditacion:{vata:[],pitta:[],kapha:[]},
+    mudras:{vata:[],pitta:[],kapha:[]},
+    pranayama:{vata:[],pitta:[],kapha:[]},
+    chakras:{vata:[],pitta:[],kapha:[]}
+  };
+  
+  // Series Yoga PITTA
+  VB_SERIES_PASO7.yoga.pitta=[
+    {nombre:'Sheetala Krama (Serie refrescante)',sk:'शीतल क्रम',duracion:'35 min',frecuencia:'3 veces por semana antes de las 9hs o después de 18hs',asanas:'1) Sukhasana con Sheetali pranayama 5 min · 2) Marjaryasana-Bitilasana 2 min · 3) Adho Mukha Svanasana 1 min · 4) Trikonasana cada lado 1 min · 5) Ardha Chandrasana suave cada lado 1 min · 6) Matsyasana (pez) 2 min · 7) Supta Baddha Konasana 5 min · 8) Jathara Parivartanasana (torsión supina) 2 min cada lado · 9) Halasana 2 min · 10) Savasana 8 min con paño fresco en frente',beneficio:'Enfría calor mental, baja irritabilidad, alivia acidez. Notás efecto al día 3.'},
+    {nombre:'Chandra Namaskar (Saludo a la luna)',sk:'चन्द्र नमस्कार',duracion:'25 min',frecuencia:'4 veces por semana, sin sol directo',asanas:'1) Tadasana 1 min · 2) Urdhva Hastasana 1 min · 3) Uttanasana 1 min · 4) Anjaneyasana derecho 1 min · 5) Adho Mukha Svanasana 1 min · 6) Bhujangasana 1 min · 7) Anjaneyasana izquierdo 1 min · 8) Uttanasana 1 min · 9) Tadasana cierre 1 min · Repetí 3 ciclos completos · Savasana final 10 min',beneficio:'Equivalente lunar al saludo al sol. Trabaja todo el cuerpo SIN generar calor.'},
+    {nombre:'Hridaya Krama (Serie del corazón)',sk:'हृदय क्रम',duracion:'40 min',frecuencia:'2 veces por semana al atardecer',asanas:'1) Sukhasana con respiración del corazón 5 min · 2) Apertura de pecho con bloque bajo escápulas 5 min · 3) Bhujangasana 2 min · 4) Salabhasana 1 min · 5) Setu Bandha 2 min · 6) Ustrasana suave 1 min · 7) Matsyasana 3 min · 8) Supta Baddha Konasana con bolster bajo espalda 8 min · 9) Viparita Karani 5 min · 10) Savasana 8 min',beneficio:'Abre corazón cerrado por exceso de exigencia. Bajan rabia y resentimiento.'}
+  ];
+  
+  // Series Yoga KAPHA
+  VB_SERIES_PASO7.yoga.kapha=[
+    {nombre:'Surya Krama (Serie solar enérgica)',sk:'सूर्य क्रम',duracion:'45 min',frecuencia:'5 veces por semana entre 5:30-7hs',asanas:'1) Bhastrika pranayama 2 min · 2) Surya Namaskar A rápido 5 rondas · 3) Surya Namaskar B 5 rondas · 4) Virabhadrasana I-II-III secuencia cada lado 2 min · 5) Trikonasana enérgica cada lado 1 min · 6) Ushtrasana 1 min · 7) Salabhasana 1 min · 8) Dhanurasana 1 min · 9) Sirsasana o parada de hombros 2 min · 10) Savasana corto 3 min',beneficio:'Activa Kapha estancado, sudás, bajás peso, despertás metabolismo. Resultados al día 14.'},
+    {nombre:'Agni Krama (Serie del fuego interno)',sk:'अग्नि क्रम',duracion:'40 min',frecuencia:'4 veces por semana al despertar',asanas:'1) Kapalabhati 3 min · 2) Surya Namaskar dinámico 7 rondas · 3) Utkatasana (silla) 30 seg × 5 series · 4) Navasana (barco) 30 seg × 5 series · 5) Plancha 1 min × 3 · 6) Chaturanga 30 seg × 3 · 7) Dhanurasana 1 min · 8) Salabhasana 1 min · 9) Sirsasana o Sarvangasana 2 min · 10) Savasana 5 min',beneficio:'Enciende Agni dormido. Quema grasa profunda. Cambia tu energía total al día 21.'},
+    {nombre:'Vata-Vahini Krama (Serie del viento)',sk:'वात-वाहिनी क्रम',duracion:'35 min',frecuencia:'3 veces por semana, mañana',asanas:'1) Bhastrika 2 min · 2) Surya Namaskar A enérgico 5 rondas · 3) Trikonasana saltada cada lado 1 min · 4) Ardha Chandrasana cada lado 1 min · 5) Parsvakonasana cada lado 1 min · 6) Garudasana cada lado 1 min · 7) Vrksasana enérgica cada lado 1 min · 8) Bakasana o Crow pose 1 min · 9) Halasana 1 min · 10) Savasana corto 4 min',beneficio:'Mueve el aire estancado, despeja congestión, libera linfático perezoso.'}
+  ];
+  
+  // Series Meditación
+  VB_SERIES_PASO7.meditacion.vata=[
+    {nombre:'Bhumi Sparsha Dhyana (Meditación del contacto con la tierra)',sk:'भूमि स्पर्श ध्यान',duracion:'15 min',frecuencia:'Diaria, antes de dormir',asanas:'Sentate descalza tocando la tierra. Cerrá ojos. Sentí los pies pesados como raíces. Respirá lento (4-6). Mantra interno "So Ham" 7 veces. Visualizá luz roja en la base de columna. Mantenelo 10 min. Cerrá con manos en el corazón 2 min.',beneficio:'Aterriza la dispersión Vata. Sueño profundo garantizado al día 5.'},
+    {nombre:'Hridaya Sthiti (Quietud del corazón)',sk:'हृदय स्थिति',duracion:'12 min',frecuencia:'Cada noche',asanas:'Acostada con manta. Manos en el corazón. Foco total en latido. Cuando aparezcan pensamientos, volvé al latido SIN juzgar. Respiración natural. Visualizá luz dorada que llena el pecho. Mantra "Om Shanti" 7 veces. Final con gratitud por 3 cosas del día.',beneficio:'Calma sistema nervioso autonómico. Baja cortisol. Mejora digestión.'},
+    {nombre:'Akasha Anubhava (Experiencia del espacio)',sk:'आकाश अनुभव',duracion:'20 min',frecuencia:'3 veces por semana',asanas:'Sentate al atardecer. Mirá el cielo abierto 5 min sin pensamiento. Cerrá ojos. Visualizá ese mismo espacio dentro tuyo. Mantra "So Ham" en respiración natural. Mantené 12 min. Cerrá con sonido "Om" 3 veces.',beneficio:'Da espaciosidad a la mente acelerada. Resuelve sensación de "no me alcanza el día".'}
+  ];
+  VB_SERIES_PASO7.meditacion.pitta=[
+    {nombre:'Chandra Drishti (Mirada lunar)',sk:'चन्द्र दृष्टि',duracion:'15 min',frecuencia:'Cada noche bajo luz suave o luna',asanas:'Sentate al atardecer. Mirá la luna o vela durante 5 min sin parpadear. Cerrá ojos, llevá la imagen al entrecejo. Mantra "Om Som" 21 veces. Visualizá agua fresca cayendo desde la coronilla. Final con manos en el corazón.',beneficio:'Enfría la mente Pitta hiperactiva. Baja juicio mental al día 3.'},
+    {nombre:'Karuna Bhavana (Cultivo de la compasión)',sk:'करुणा भावना',duracion:'18 min',frecuencia:'4 veces por semana',asanas:'Sentate cómoda. Pensá en alguien que amás (3 min). Pensá en alguien neutro (3 min). Pensá en alguien con quien tenés conflicto (5 min). Repetí mentalmente: "Que estés bien, que estés en paz". Cerrá con compasión por vos misma 4 min.',beneficio:'Disuelve resentimiento, baja ego competitivo. Cambia relaciones al día 14.'},
+    {nombre:'Sheetala Dhyana (Meditación del frescor)',sk:'शीतल ध्यान',duracion:'12 min',frecuencia:'Diaria al atardecer',asanas:'Sentate cerca de fuente fresca (ventana, planta, agua). Sheetali pranayama 3 min. Visualizá luz verde clara en el plexo solar. Sentí el calor del estómago bajando. Mantra "Om Aim" 21 veces. Cerrá con respiración lenta 3 min.',beneficio:'Apaga fuego digestivo y emocional. Baja acidez estomacal y mental.'}
+  ];
+  VB_SERIES_PASO7.meditacion.kapha=[
+    {nombre:'Jagrana Krama (Serie del despertar)',sk:'जागरण क्रम',duracion:'15 min',frecuencia:'Cada mañana al despertar',asanas:'Parate, no te sientes. Bhastrika 2 min. Caminá con conciencia 5 min repitiendo "Om Hum" en voz alta. Sentate erguido en banco. Mantra "Soham" enérgico 7 min. Cerrá con salto en lugar 1 min.',beneficio:'Despierta Kapha dormido. Activa metabolismo desde el primer minuto del día.'},
+    {nombre:'Tejas Bhavana (Cultivo del fuego claro)',sk:'तेजस् भावना',duracion:'12 min',frecuencia:'5 veces por semana antes del trabajo',asanas:'Sentate erguido. Ujjayi pranayama 3 min. Visualizá fuego dorado en el plexo solar creciendo. Mantra "Om Ram" en voz alta y firme 21 veces. Sentí cada vértebra elevándose. Cerrá con afirmación: "Hoy actúo, no postergo".',beneficio:'Saca pereza mental, vence procrastinación, da claridad para decidir.'},
+    {nombre:'Vayu Samvardhana (Activación del aire)',sk:'वायु संवर्धन',duracion:'18 min',frecuencia:'3 veces por semana',asanas:'De pie con ventana abierta. Bhastrika 5 min. Caminá afuera 8 min con foco en respiración acelerada. Sentate. Mantra "Om Vayu" 21 veces. Cerrá con danza libre 2 min sin música.',beneficio:'Mueve Kapha estancado en pulmones y mente. Despeja confusión y nostalgia.'}
+  ];
+  
+  // Series Mudras
+  VB_SERIES_PASO7.mudras.vata=[
+    {nombre:'Vata-Shanti Mudra Mala (Rosario calmante)',sk:'वात शान्ति मुद्रा माला',duracion:'45 min total',frecuencia:'1 vez por día completa',asanas:'Vayu Mudra 15 min (índice doblado base pulgar) + Prithvi Mudra 15 min (pulgar+anular) + Apan Vayu Mudra 15 min (pulgar+medio+anular). Sentada en quietud. Respiración lenta acompañando.',beneficio:'Combo completo para Vata. Calma sistema nervioso, mejora absorción, ancla energía. Día 7 menos ansiedad flotante.'},
+    {nombre:'Bhumi Sparsha Mudra Krama',sk:'भूमि स्पर्श मुद्रा क्रम',duracion:'30 min',frecuencia:'Antes de dormir',asanas:'Prithvi Mudra (tierra) 10 min · Mushti Mudra (puño suave) 5 min · Anjali Mudra (manos en oración corazón) 5 min · Dhyana Mudra (manos en regazo, una sobre otra) 10 min',beneficio:'Aterriza Vata extremo. Garantiza sueño profundo desde el día 3.'},
+    {nombre:'Prana Sthira Mudra Krama',sk:'प्राण स्थिर मुद्रा क्रम',duracion:'25 min',frecuencia:'3 veces por semana',asanas:'Prana Mudra (pulgar+anular+meñique) 10 min · Vayu Mudra 10 min · Shunya Mudra (medio doblado base pulgar) 5 min',beneficio:'Estabiliza energía vital errática. Bajan temblores, gases, frío en extremidades.'}
+  ];
+  VB_SERIES_PASO7.mudras.pitta=[
+    {nombre:'Sheetala Mudra Mala (Rosario refrescante)',sk:'शीतल मुद्रा माला',duracion:'45 min total',frecuencia:'1 vez por día al atardecer',asanas:'Apana Mudra 15 min · Jalashaya Mudra (cuenco con agua) 15 min · Varun Mudra (pulgar+meñique) 15 min',beneficio:'Combo para Pitta. Refresca mente, hígado, piel. Día 5 menos irritabilidad.'},
+    {nombre:'Hridaya Mudra Krama (Serie del corazón)',sk:'हृदय मुद्रा क्रम',duracion:'30 min',frecuencia:'Cada noche',asanas:'Hridaya Mudra (índice base pulgar + medio y anular punta pulgar) 15 min · Anjali Mudra al corazón 5 min · Padma Mudra (loto abierto) 10 min',beneficio:'Abre corazón endurecido. Disuelve resentimiento. Notable al día 14.'},
+    {nombre:'Chandra Mudra Krama (Serie lunar)',sk:'चन्द्र मुद्रा क्रम',duracion:'25 min',frecuencia:'Bajo luna llena 2 noches por mes',asanas:'Chandra Mudra (pulgar+meñique punta) 10 min · Jalashaya 10 min · Dhyana Mudra 5 min visualizando luna',beneficio:'Renueva energía lunar femenina. Equilibra ciclos hormonales.'}
+  ];
+  VB_SERIES_PASO7.mudras.kapha=[
+    {nombre:'Agni Mudra Mala (Rosario del fuego)',sk:'अग्नि मुद्रा माला',duracion:'45 min total',frecuencia:'1 vez por día al despertar',asanas:'Surya Mudra 15 min · Linga Mudra 15 min · Prana Mudra 15 min',beneficio:'Combo para Kapha. Activa metabolismo, sube energía, baja peso al día 21.'},
+    {nombre:'Vayu Sancalana Mudra Krama (Serie del aire en movimiento)',sk:'वायु संचलन मुद्रा क्रम',duracion:'30 min',frecuencia:'Cada mañana',asanas:'Surya Mudra 10 min · Vayu Mudra inverso 10 min · Apan Mudra activa 10 min',beneficio:'Mueve Kapha estancado. Despeja congestión nasal y mental.'},
+    {nombre:'Tejas Mudra Krama (Serie del fuego claro)',sk:'तेजस् मुद्रा क्रम',duracion:'25 min',frecuencia:'4 veces por semana',asanas:'Linga Mudra firme 15 min · Surya Mudra 5 min · Mushti firme 5 min',beneficio:'Saca pereza profunda, da voluntad de cambio. Día 14 cambias hábitos.'}
+  ];
+  
+  // Series Pranayama (respiración)
+  VB_SERIES_PASO7.pranayama.vata=[
+    {nombre:'Nadi Shodhana (Respiración alterna)',sk:'नाडी शोधन',duracion:'10 min',frecuencia:'Cada noche antes de dormir',asanas:'Sentada erguida. Tapá fosa derecha con pulgar. Inhalá izquierda 4 seg. Tapá izquierda con anular. Exhalá derecha 6 seg. Inhalá derecha 4. Tapá derecha. Exhalá izquierda 6. Eso es 1 ronda. Hacé 10 rondas. Cerrá con respiración natural 1 min.',beneficio:'Equilibra hemisferios. Calma Vata mental al día 1.'},
+    {nombre:'Ujjayi (Respiración victoriosa)',sk:'उज्जायी',duracion:'8 min',frecuencia:'Diaria al despertar',asanas:'Sentada. Cerrá glotis levemente como susurrando "haaa". Respirá por la nariz produciendo sonido oceánico. Inhalá 5 seg. Exhalá 7 seg. Mantenelo 8 min. Sin esfuerzo, sin tensión.',beneficio:'Calienta y calma a la vez. Ideal para Vata fría y dispersa.'},
+    {nombre:'Bhramari (Respiración de la abeja)',sk:'भ्रामरी',duracion:'12 min',frecuencia:'3 veces por semana antes de dormir',asanas:'Sentada. Tapá orejas con pulgares. Apoyá los otros dedos sobre cejas y rostro. Inhalá profundo. Al exhalar producí zumbido continuo "mmmm" como abeja. Sentí la vibración en cráneo. 12 rondas.',beneficio:'Resuelve insomnio. Calma sistema nervioso central. Notable al día 3.'}
+  ];
+  VB_SERIES_PASO7.pranayama.pitta=[
+    {nombre:'Sheetali (Respiración refrescante por lengua)',sk:'शीतली',duracion:'8 min',frecuencia:'Cada atardecer',asanas:'Sacá la lengua y enrollala como tubito. Inhalá por la lengua 5 seg sintiendo aire fresco. Cerrá la boca, retené 2 seg. Exhalá por la nariz 7 seg. 12 rondas.',beneficio:'Enfría inmediato. Día 1 ya notás baja la temperatura interna.'},
+    {nombre:'Sitkari (Respiración refrescante por dientes)',sk:'सीत्कारी',duracion:'8 min',frecuencia:'Diaria a la tarde',asanas:'Apretá dientes con labios separados. Inhalá silbando entre los dientes 5 seg. Cerrá boca, retené 2 seg. Exhalá por nariz 6 seg. 15 rondas.',beneficio:'Alternativa si no podés enrollar la lengua. Mismo efecto refrescante.'},
+    {nombre:'Chandra Bhedana (Respiración lunar)',sk:'चन्द्र भेदन',duracion:'10 min',frecuencia:'Cada noche',asanas:'Tapá fosa derecha con pulgar. Inhalá SOLO por izquierda 4 seg. Cambiá: tapá izquierda con anular. Exhalá SOLO por derecha 6 seg. Inhalá izquierda. Exhalá derecha. Repetí 10 min. Inhalación SIEMPRE por izquierda.',beneficio:'Activa el canal lunar refrescante. Baja ira y reactividad.'}
+  ];
+  VB_SERIES_PASO7.pranayama.kapha=[
+    {nombre:'Kapalabhati (Respiración de cráneo brillante)',sk:'कपालभाति',duracion:'10 min',frecuencia:'Cada mañana en ayunas',asanas:'Sentada erguida. Inhalá normal. Exhalá fuerte de golpe contrayendo abdomen. Inhalación pasiva. 30 exhalaciones rápidas. Descansá 1 min. Repetí 3 series.',beneficio:'Despierta Kapha. Limpia pulmones. Activa metabolismo desde el día 1.'},
+    {nombre:'Bhastrika (Respiración del fuelle)',sk:'भस्त्रिका',duracion:'8 min',frecuencia:'Diaria al despertar',asanas:'Sentada erguida. Inhalá fuerte por la nariz 1 seg expandiendo abdomen. Exhalá fuerte 1 seg contrayendo. Sin pausa. Hacé 20 ciclos. Descansá 30 seg con respiración natural. Repetí 3 series.',beneficio:'Enciende Agni interno. Quema grasa. Energiza inmediato.'},
+    {nombre:'Surya Bhedana (Respiración solar)',sk:'सूर्य भेदन',duracion:'10 min',frecuencia:'4 veces por semana mañana',asanas:'Tapá fosa izquierda con anular. Inhalá SOLO por derecha 5 seg. Tapá derecha con pulgar. Exhalá SOLO por izquierda 7 seg. Inhalá derecha. Exhalá izquierda. Repetí 10 min. Inhalación SIEMPRE por derecha.',beneficio:'Activa canal solar calorífico. Despierta Kapha frío y húmedo.'}
+  ];
+  
+  // Series Chakras
+  VB_SERIES_PASO7.chakras.vata=[
+    {nombre:'Mula-Svadhi Krama (Serie de raíz y sacro)',sk:'मूल-स्वाधि क्रम',duracion:'25 min',frecuencia:'Cada mañana descalza',asanas:'Sentada en piso. Visualizá luz roja en perineo. Mantra "Lam" 21 veces (8 min). Movés foco al sacro. Luz naranja. Mantra "Vam" 21 veces (8 min). Termina con manos en pelvis 9 min.',beneficio:'Aterriza Vata extrema. Da seguridad y estabilidad. Día 14 más arraigo.'},
+    {nombre:'Apana Vata Krama (Equilibrio del aire descendente)',sk:'अपान वात क्रम',duracion:'30 min',frecuencia:'3 veces por semana',asanas:'Acostada. Foco en chakras 1, 2, 3. Visualizá luz que baja desde el ombligo hacia los pies. Mantra "Lam-Vam-Ram" en cada inhalación 21 veces. Cerrá con piernas en pared 10 min.',beneficio:'Equilibra Apana Vayu (energía descendente). Mejora intestino y reproducción.'},
+    {nombre:'Bhumi Anubhava (Experiencia de la tierra)',sk:'भूमि अनुभव',duracion:'20 min',frecuencia:'Diaria al despertar',asanas:'De pie descalza en piso o pasto. Foco en planta de los pies. Visualizá raíces saliendo. Mantra "Om Bhumi Devi Namah" 21 veces. Cerrá tocando piso con manos.',beneficio:'Conexión profunda con tierra. Calma temor existencial Vata.'}
+  ];
+  VB_SERIES_PASO7.chakras.pitta=[
+    {nombre:'Manipura-Anahata Krama',sk:'मणिपुर-अनाहत क्रम',duracion:'30 min',frecuencia:'Diaria al atardecer',asanas:'Sentada. Luz amarilla suave en plexo solar. Mantra "Ram" 21 veces (10 min). Subí foco al corazón. Luz verde clara. Mantra "Yam" 21 veces (10 min). Cerrá con manos en corazón 10 min.',beneficio:'Equilibra ego y abre compasión. Día 7 cambia relaciones.'},
+    {nombre:'Hridaya Vistara (Expansión del corazón)',sk:'हृदय विस्तार',duracion:'25 min',frecuencia:'4 veces por semana',asanas:'Acostada con bolster bajo escápulas (apertura de pecho). Foco solo en Anahata. Luz verde que crece y abraza el cuerpo. Mantra "Yam" 50 veces. Cerrá con gratitud por 7 personas.',beneficio:'Disuelve resentimiento crónico. Abre vínculos cerrados.'},
+    {nombre:'Soma Sthapana (Asentamiento del néctar)',sk:'सोम स्थापन',duracion:'20 min',frecuencia:'Bajo luna llena',asanas:'Sentada con cara hacia la luna. Foco en Ajna (entrecejo). Visualizá néctar lunar bajando hasta Anahata. Mantra "Om Soma" 21 veces. Cerrá con manos en sien.',beneficio:'Renueva la mente quemada. Refresca intelecto Pitta.'}
+  ];
+  VB_SERIES_PASO7.chakras.kapha=[
+    {nombre:'Vishuddha-Sahasrara Krama',sk:'विशुद्ध-सहस्रार क्रम',duracion:'25 min',frecuencia:'Cada mañana al despertar',asanas:'Sentada erguida. Luz azul cielo en garganta. Mantra "Ham" en VOZ ALTA 21 veces (10 min). Subí foco a coronilla. Luz violeta. Silencio puro o "Om" agudo 7 veces (10 min). Cerrá con cabeza levantada 5 min.',beneficio:'Despierta Kapha pesada. Activa expresión y claridad.'},
+    {nombre:'Tejas Pradipana (Encendido de la luz interior)',sk:'तेजस् प्रदीपन',duracion:'30 min',frecuencia:'5 veces por semana mañana',asanas:'De pie con ventana abierta. Foco en Manipura ascendente. Luz dorada que sube desde plexo a corona. Mantra "Ram-Ham-Om" en escala ascendente 21 veces. Cerrá con salto en lugar 2 min.',beneficio:'Saca letargo profundo. Da claridad mental al día 3.'},
+    {nombre:'Vayu Pradana (Donación al aire)',sk:'वायु प्रदान',duracion:'20 min',frecuencia:'3 veces por semana',asanas:'De pie. Bhastrika 3 min. Foco en Vishuddha. Visualizá viento limpiando garganta y pecho. Mantra "Ham" gritado 7 veces (sin gritar fuerte, vibración intensa). Cerrá con caminata afuera 10 min.',beneficio:'Limpia Kapha pulmonar y emocional. Desbloquea voz reprimida.'}
+  ];
+  
+  // Helper para renderizar 3 series completas de una disciplina
+  function vbSeries(disciplina,doshaKey){
+    var arr=(VB_SERIES_PASO7[disciplina]&&VB_SERIES_PASO7[disciplina][doshaKey])?VB_SERIES_PASO7[disciplina][doshaKey]:[];
+    if(arr.length===0)return '';
+    var h='<div style="background:#F0FDF4;border:1px solid #5A7A53;border-radius:10px;padding:14px;margin-top:12px">';
+    h+='<p style="font-size:11px;letter-spacing:1.5px;color:#3D5A36;text-transform:uppercase;font-weight:800;margin:0 0 12px">📚 3 series completas para vos</p>';
+    arr.forEach(function(s,idx){
+      h+='<div style="background:#fff;border-radius:8px;padding:12px;margin-bottom:'+(idx<arr.length-1?'10px':'0')+';border-left:3px solid #5A7A53">';
+      h+='<p style="font-size:14px;color:#3D5A36;font-weight:700;margin:0 0 4px;line-height:1.3">Serie '+(idx+1)+': '+s.nombre+'</p>';
+      h+='<p style="font-size:10px;color:#8B7355;font-style:italic;margin:0 0 8px">'+s.sk+'</p>';
+      h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">';
+      h+='<span style="background:#FEF3C7;color:#92400E;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600">⏱️ '+s.duracion+'</span>';
+      h+='<span style="background:#EDE9FE;color:#5B21B6;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600">🔁 '+s.frecuencia+'</span>';
+      h+='</div>';
+      h+='<p style="font-size:12px;color:#3D2914;line-height:1.6;margin:0 0 8px"><strong>Cómo se hace:</strong> '+s.asanas+'</p>';
+      h+='<p style="font-size:11px;color:#065F46;line-height:1.5;margin:0;background:#D1FAE5;padding:6px 8px;border-radius:6px"><strong>✨ Resultado:</strong> '+s.beneficio+'</p>';
+      h+='</div>';
+    });
+    h+='</div>';
+    return h;
+  }
+  
+  // Helper para renderizar los 10 tips de un item
+  function vbTips(itemKey,doshaKey){
+    var tips=(VB_TIPS_PASO7[itemKey]&&VB_TIPS_PASO7[itemKey][doshaKey])?VB_TIPS_PASO7[itemKey][doshaKey]:[];
+    if(tips.length===0)return '';
+    var h='<div style="background:#FFF7ED;border:1px solid #C49E72;border-radius:10px;padding:12px;margin-top:12px">';
+    h+='<p style="font-size:11px;letter-spacing:1.5px;color:#C45F0F;text-transform:uppercase;font-weight:800;margin:0 0 10px">🌿 10 tips concretos para vos</p>';
+    h+='<ol style="margin:0;padding-left:22px;color:#3D2914;font-size:13px;line-height:1.7">';
+    tips.forEach(function(t){h+='<li style="margin-bottom:6px">'+t+'</li>';});
+    h+='</ol></div>';
+    return h;
+  }
+  
   function vbCard(emoji,titulo,paraQue,contenido,sk,prioridadColor){
     var c='<details style="background:#fff;border:1px solid '+prioridadColor+';border-radius:12px;padding:14px 16px;margin-bottom:10px;cursor:pointer">';
     c+='<summary style="list-style:none;display:flex;align-items:center;gap:12px;cursor:pointer">';
@@ -3432,6 +3993,7 @@ function vbAbrirPaso7(){
     var ahCont='<div style="background:#F0FDF4;border-left:4px solid #059669;padding:12px;border-radius:8px;margin-bottom:10px"><p style="font-size:12px;color:#065F46;font-weight:700;margin-bottom:4px">✅ Sí (sumá esto)</p><p style="font-size:13px;color:#3D2914;line-height:1.6">'+plan.si+'</p></div>';
     ahCont+='<div style="background:#FEE2E2;border-left:4px solid #DC2626;padding:12px;border-radius:8px;margin-bottom:10px"><p style="font-size:12px;color:#7F1D1D;font-weight:700;margin-bottom:4px">⚠️ No (sacá esto)</p><p style="font-size:13px;color:#3D2914;line-height:1.6">'+plan.no+'</p></div>';
     ahCont+='<div style="background:#FEF3C7;border-left:4px solid #F59E0B;padding:12px;border-radius:8px"><p style="font-size:12px;color:#92400E;font-weight:700;margin-bottom:4px">🕐 Horarios</p><p style="font-size:13px;color:#3D2914;line-height:1.6">'+plan.cuando+'</p></div>';
+    ahCont+=vbTips('ahara',doshaVikriti);
     html+=vbCard('🍽️','Comida que te conviene','Qué comer y cuándo según tu '+nombreDosha(doshaVikriti),ahCont,'Ahara · आहार','#DC2626');
   }else{
     html+=vbCard('🍽️','Comida que te conviene','Qué comer y cuándo según tu '+nombreDosha(doshaVikriti),vbVeloLock(),'Ahara · आहार','#DC2626');
@@ -3444,6 +4006,7 @@ function vbAbrirPaso7(){
     diCont+='<div style="background:#FAF7F0;border-radius:8px;padding:10px"><p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:2px">☀️ Mediodía (12-14hs)</p><p style="font-size:13px;color:#3D2914;line-height:1.6">'+rut.med+'</p></div>';
     diCont+='<div style="background:#FAF7F0;border-radius:8px;padding:10px"><p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:2px">🌙 Tarde-noche (18-22hs)</p><p style="font-size:13px;color:#3D2914;line-height:1.6">'+rut.tar+'</p></div>';
     diCont+='</div>';
+    diCont+=vbTips('dinacharya',doshaVikriti);
     html+=vbCard('⏰','Tu rutina diaria',(doshaVikriti==='vata'?'Lo MÁS importante para vos: horarios fijos':'Cuándo comer, dormir, moverte'),diCont,'Dinacharya · दिनचर्या','#DC2626');
   }else{
     html+=vbCard('⏰','Tu rutina diaria','Cuándo comer, dormir, moverte',vbVeloLock(),'Dinacharya · दिनचर्या','#DC2626');
@@ -3464,6 +4027,8 @@ function vbAbrirPaso7(){
     var prCont='<div style="background:#EFF6FF;border-left:4px solid #2563EB;padding:12px;border-radius:8px;margin-bottom:10px"><p style="font-size:12px;color:#1E40AF;font-weight:700;margin-bottom:4px">💨 Para qué sirve</p><p style="font-size:13px;color:#3D2914;line-height:1.6">'+pi.paraQue+'</p></div>';
     prCont+='<div style="background:#FAF7F0;border-radius:8px;padding:12px;margin-bottom:10px"><p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:6px">📋 Cómo se hace</p><p style="font-size:13px;color:#3D2914;line-height:1.7">'+pi.como+'</p></div>';
     prCont+='<div style="background:#FEF3C7;border-radius:8px;padding:10px"><p style="font-size:12px;color:#92400E;font-weight:700;margin-bottom:2px">🕐 Cuándo y resultado</p><p style="font-size:13px;color:#3D2914;line-height:1.6">'+pi.cuando+'</p></div>';
+    prCont+=vbTips('pranayama',doshaVikriti);
+    prCont+=vbSeries('pranayama',doshaVikriti);
     html+=vbCard('💨',pi.nombre,'Tu respiración personalizada',prCont,'Pranayama · प्राणायाम','#F97316');
   }else{
     html+=vbCard('💨',pi.nombre,'Tu respiración personalizada',vbVeloLock(),'Pranayama · प्राणायाम','#F97316');
@@ -3472,6 +4037,8 @@ function vbAbrirPaso7(){
   // ITEM 4: Yoga (asanas) — específico por dosha (usa VB_VYAYAMA)
   if(trialOk){
     var yoCont='<div style="background:#F0FDF4;border-radius:8px;padding:12px;margin-bottom:10px"><p style="font-size:12px;color:#065F46;font-weight:700;margin-bottom:4px">🧘 Tu práctica</p><p style="font-size:13px;color:#3D2914;line-height:1.7">'+VB_VYAYAMA[doshaVikriti]+'</p></div>';
+    yoCont+=vbTips('yoga',doshaVikriti);
+    yoCont+=vbSeries('yoga',doshaVikriti);
     html+=vbCard('🧘','Yoga para tu '+nombreDosha(doshaVikriti),'Asanas + ritmo + frecuencia',yoCont,'Vyayama · व्यायाम','#F97316');
   }else{
     html+=vbCard('🧘','Yoga para tu '+nombreDosha(doshaVikriti),'Asanas + ritmo + frecuencia',vbVeloLock(),'Vyayama · व्यायाम','#F97316');
@@ -3480,6 +4047,7 @@ function vbAbrirPaso7(){
   // ITEM 5: Abhyanga (automasaje con aceite) — Snehana
   if(trialOk){
     var abCont='<div style="background:#FCE7F3;border-left:4px solid #BE185D;padding:12px;border-radius:8px;margin-bottom:10px"><p style="font-size:12px;color:#831843;font-weight:700;margin-bottom:4px">💆 Tu masaje diario</p><p style="font-size:13px;color:#3D2914;line-height:1.7">'+VB_SNEHANA[doshaVikriti]+'</p></div>';
+    abCont+=vbTips('abhyanga',doshaVikriti);
     html+=vbCard('💆','Automasaje con aceite (Abhyanga)','Lubrica el cuerpo y calma el sistema nervioso',abCont,'Snehana · स्नेहन','#F97316');
   }else{
     html+=vbCard('💆','Automasaje con aceite (Abhyanga)','Lubrica el cuerpo y calma el sistema nervioso',vbVeloLock(),'Snehana · स्नेहन','#F97316');
@@ -3492,6 +4060,8 @@ function vbAbrirPaso7(){
   // ITEM 6: Meditación (Sadhana)
   if(trialOk){
     var meCont='<div style="background:#EDE9FE;border-left:4px solid #7C3AED;padding:12px;border-radius:8px;margin-bottom:10px"><p style="font-size:12px;color:#5B21B6;font-weight:700;margin-bottom:4px">🧠 Tu meditación</p><p style="font-size:13px;color:#3D2914;line-height:1.7">'+VB_SADHANA[doshaVikriti]+'</p></div>';
+    meCont+=vbTips('meditacion',doshaVikriti);
+    meCont+=vbSeries('meditacion',doshaVikriti);
     html+=vbCard('🧘‍♀️','Meditación personalizada','Calma la mente según tu '+nombreDosha(doshaVikriti),meCont,'Sadhana · साधन','#EAB308');
   }else{
     html+=vbCard('🧘‍♀️','Meditación personalizada','Calma la mente según tu dosha',vbVeloLock(),'Sadhana · साधन','#EAB308');
@@ -3507,6 +4077,8 @@ function vbAbrirPaso7(){
   if(trialOk){
     var muCont='<div style="background:#EFF6FF;border-left:4px solid #2563EB;padding:12px;border-radius:8px;margin-bottom:10px"><p style="font-size:12px;color:#1E40AF;font-weight:700;margin-bottom:4px">🤲 Tus mudras</p><p style="font-size:14px;color:#3D2914;font-weight:700;margin-bottom:6px">'+mu.nombres+'</p><p style="font-size:13px;color:#3D2914;line-height:1.7">'+mu.como+'</p></div>';
     muCont+='<div style="background:#FAF7F0;border-radius:8px;padding:10px"><p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:2px">✨ Para qué sirven</p><p style="font-size:13px;color:#3D2914;line-height:1.6">'+mu.paraQue+'</p></div>';
+    muCont+=vbTips('mudras',doshaVikriti);
+    muCont+=vbSeries('mudras',doshaVikriti);
     html+=vbCard('🤲','Mudras personalizados','Gestos con las manos que regulan tu energía',muCont,'Mudra · मुद्रा','#EAB308');
   }else{
     html+=vbCard('🤲','Mudras personalizados','Gestos con las manos que regulan tu energía',vbVeloLock(),'Mudra · मुद्रा','#EAB308');
@@ -3522,6 +4094,8 @@ function vbAbrirPaso7(){
   if(trialOk){
     var chCont='<div style="background:#FCE7F3;border-left:4px solid #BE185D;padding:12px;border-radius:8px;margin-bottom:10px"><p style="font-size:12px;color:#831843;font-weight:700;margin-bottom:4px">🌀 Tus chakras a activar</p><p style="font-size:14px;color:#3D2914;font-weight:700;margin-bottom:6px">'+ch.nombres+'</p><p style="font-size:13px;color:#3D2914;line-height:1.7">'+ch.como+'</p></div>';
     chCont+='<div style="background:#FAF7F0;border-radius:8px;padding:10px"><p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:2px">✨ Para qué sirven</p><p style="font-size:13px;color:#3D2914;line-height:1.6">'+ch.paraQue+'</p></div>';
+    chCont+=vbTips('chakras',doshaVikriti);
+    chCont+=vbSeries('chakras',doshaVikriti);
     html+=vbCard('🌀','Chakras a equilibrar','Centros de energía clave para tu dosha',chCont,'Chakra · चक्र','#EAB308');
   }else{
     html+=vbCard('🌀','Chakras a equilibrar','Centros de energía clave para tu dosha',vbVeloLock(),'Chakra · चक्र','#EAB308');
@@ -3532,6 +4106,7 @@ function vbAbrirPaso7(){
     var hCont='<div style="background:#EDE9FE;border-radius:8px;padding:12px;margin-bottom:10px"><p style="font-size:12px;color:#5B21B6;font-weight:700;margin-bottom:6px">🌿 Tus hierbas</p><p style="font-size:13px;color:#3D2914;line-height:1.7">'+(hierbas.principales||hierbas.lista||'Ashwagandha, Brahmi, Triphala, Shatavari según tu cuadro')+'</p></div>';
     if(hierbas.dosis)hCont+='<div style="background:#FAF7F0;border-radius:8px;padding:10px;margin-bottom:8px"><p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:2px">💊 Dosis</p><p style="font-size:13px;color:#3D2914;line-height:1.6">'+hierbas.dosis+'</p></div>';
     if(hierbas.cuando)hCont+='<div style="background:#FEF3C7;border-radius:8px;padding:10px"><p style="font-size:12px;color:#92400E;font-weight:700;margin-bottom:2px">🕐 Cuándo</p><p style="font-size:13px;color:#3D2914;line-height:1.6">'+hierbas.cuando+'</p></div>';
+    hCont+=vbTips('hierbas',doshaVikriti);
     html+=vbCard('🌿','Hierbas personalizadas','Aushadhi para tu '+nombreDosha(doshaVikriti),hCont,'Aushadhi · औषधि','#EAB308');
   }else{
     html+=vbCard('🌿','Hierbas personalizadas','Aushadhi para tu dosha',vbVeloLock(),'Aushadhi · औषधि','#EAB308');
@@ -3549,6 +4124,7 @@ function vbAbrirPaso7(){
     raCont+='<div style="background:#FAF7F0;border-radius:8px;padding:10px"><p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:2px">Mes 2 · Estabilización</p><p style="font-size:13px;color:#3D2914;line-height:1.6">Hierbas específicas. Re-test día 30. Ajustes finos.</p></div>';
     raCont+='<div style="background:#D1FAE5;border-radius:8px;padding:10px;border:1px solid #059669"><p style="font-size:12px;color:#065F46;font-weight:700;margin-bottom:2px">Mes 3 · Rasayana puro</p><p style="font-size:13px;color:#3D2914;line-height:1.6">Rasayanas (Chyavanprash o Ashwagandha). Re-test final. Si seguís en plan, vas hacia Sama (equilibrio total).</p></div>';
     raCont+='</div>';
+    raCont+=vbTips('rasayana',doshaVikriti);
     html+=vbCard('🌱','Cronograma 90 días','Tu plan paso a paso para reequilibrarte',raCont,'Kala + Rasayana · काल + रसायन','#059669');
   }else{
     html+=vbCard('🌱','Cronograma 90 días','Tu plan paso a paso para reequilibrarte',vbVeloLock(),'Kala + Rasayana · काल + रसायन','#059669');
@@ -3606,25 +4182,103 @@ function vbAbrirPaso7(){
   if(typeof vbMarcarPasoCompleto==='function')vbMarcarPasoCompleto(7);
 }
 
-// Mapa de profesionales (placeholder por ahora — en sesión siguiente sumamos Google Maps API)
+// Mapa de profesionales — Google Maps embed con búsqueda real
 function vbAbrirMapaProfesionales(){
-  var html='<div style="background:linear-gradient(180deg,#FAF7F0,#FEF3C7);min-height:100vh;padding:20px 16px"><div style="max-width:600px;margin:0 auto">';
-  html+='<button onclick="vbAbrirPaso7()" style="background:#fff;border:2px solid #5A7A53;color:#3D5A36;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:14px;padding:10px 18px;border-radius:10px;box-shadow:0 2px 6px rgba(90,122,83,0.12);display:inline-flex;align-items:center;gap:6px">← Volver al paso 7</button>';
+  var datos=window._vbDatos||{};
+  var doshaVikriti=(window.res&&window.res.p)||'vata';
+  function nombreDoshaCorto(d){return ({vata:'Vata',pitta:'Pitta',kapha:'Kapha'})[d]||d;}
+  
+  // Detectar ciudad del usuario para centrar el mapa
+  var ciudad=(datos.ciudad_key||'Buenos Aires').replace(/_/g,' ');
+  var ubicacion=encodeURIComponent('ayurveda '+ciudad);
+  var mapsBase='https://www.google.com/maps/embed/v1/search?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&q=';
+  // Nota: el key de arriba es público de Google demos. Reemplazar por key propia para producción.
+  
+  var html='<div style="background:linear-gradient(180deg,#FAF7F0,#F0FDF4);min-height:100vh;padding:0 0 30px 0">';
+  
+  // Navbar fijo arriba
+  html+='<div style="position:sticky;top:0;left:0;right:0;background:#fff;border-bottom:1px solid #5A7A53;padding:10px 16px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:space-between"><button onclick="vbAbrirPaso7()" style="background:#5A7A53;color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">← Volver al Paso 7</button><span style="font-size:11px;color:#5A7A53;font-weight:600;letter-spacing:0.5px">📍 Profesionales</span></div>';
+  
+  html+='<div style="padding:20px 16px"><div style="max-width:600px;margin:0 auto">';
+  
+  // Encabezado
   html+='<div style="text-align:center;margin-bottom:20px">';
-  html+='<p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700">📍 Profesionales Ayurvédicos</p>';
-  html+='<h2 style="font-family:Georgia,serif;font-size:22px;color:#3D5A36;font-weight:400;margin-top:8px;line-height:1.3">Vaidyas, masajistas y terapeutas cerca tuyo</h2>';
+  html+='<p style="font-size:11px;letter-spacing:3px;color:#5A7A53;text-transform:uppercase;font-weight:700">📍 Profesionales cerca tuyo</p>';
+  html+='<h2 style="font-family:Georgia,serif;font-size:22px;color:#3D5A36;font-weight:400;margin-top:8px;line-height:1.3">Vaidyas, masajistas y terapeutas Ayurveda</h2>';
+  html+='<p style="font-size:13px;color:#5A4A2A;margin-top:8px;line-height:1.5">Buscando en <strong>'+ciudad+'</strong></p>';
   html+='</div>';
-  html+='<div style="background:#fff;border:1px solid #C49E72;border-radius:14px;padding:24px;text-align:center;margin-bottom:14px">';
-  html+='<div style="font-size:48px;margin-bottom:14px">🚧</div>';
-  html+='<h3 style="font-family:Georgia,serif;font-size:18px;color:#3D5A36;font-weight:400;margin-bottom:10px">Estamos sumando profesionales</h3>';
-  html+='<p style="font-size:13px;color:#5A7A53;line-height:1.6;margin-bottom:14px">Próximamente vas a poder ver Vaidyas (terapeutas ayurvédicos), masajistas Abhyanga y centros Panchakarma certificados cerca de tu ubicación.</p>';
-  html+='<p style="font-size:12px;color:#8B7355;line-height:1.5;font-style:italic">Si sos profesional ayurvédico y querés sumarte, escribinos por WhatsApp: 5491153149117</p>';
+  
+  // Botones de filtro por categoría
+  html+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;justify-content:center">';
+  html+='<button onclick="vbBuscarMapa(\'ayurveda\')" style="background:#5A7A53;color:#fff;border:none;padding:8px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer">🌿 Ayurveda</button>';
+  html+='<button onclick="vbBuscarMapa(\'masaje ayurveda abhyanga\')" style="background:#fff;color:#5A7A53;border:1px solid #5A7A53;padding:8px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer">💆 Abhyanga</button>';
+  html+='<button onclick="vbBuscarMapa(\'panchakarma centro ayurvedico\')" style="background:#fff;color:#5A7A53;border:1px solid #5A7A53;padding:8px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer">🌱 Panchakarma</button>';
+  html+='<button onclick="vbBuscarMapa(\'yoga ayurveda\')" style="background:#fff;color:#5A7A53;border:1px solid #5A7A53;padding:8px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer">🧘 Yoga</button>';
+  html+='<button onclick="vbBuscarMapa(\'medico ayurveda\')" style="background:#fff;color:#5A7A53;border:1px solid #5A7A53;padding:8px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer">🩺 Médicos</button>';
   html+='</div>';
-  html+='</div></div>';
+  
+  // Iframe del mapa
+  html+='<div style="background:#fff;border:1px solid #C49E72;border-radius:14px;overflow:hidden;margin-bottom:14px;box-shadow:0 4px 14px rgba(90,122,83,0.12)">';
+  html+='<iframe id="vbMapaIframe" width="100%" height="450" style="border:0;display:block" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q='+ubicacion+'&output=embed&z=12"></iframe>';
+  html+='</div>';
+  
+  // Botón abrir en Google Maps app
+  html+='<a href="https://www.google.com/maps/search/'+ubicacion+'" target="_blank" rel="noopener" style="display:block;text-decoration:none;margin-bottom:14px">';
+  html+='<button style="width:100%;background:#fff;border:2px solid #5A7A53;color:#3D5A36;padding:14px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><span style="font-size:20px">🗺️</span>Abrir en Google Maps</button>';
+  html+='</a>';
+  
+  // Tarjeta info: cómo elegir profesional
+  html+='<div style="background:#FFF7ED;border:1px solid #C49E72;border-radius:12px;padding:16px;margin-bottom:14px">';
+  html+='<p style="font-size:13px;color:#3D5A36;font-weight:700;margin:0 0 10px">🌿 Cómo elegir un buen profesional Ayurveda</p>';
+  html+='<ul style="font-size:13px;color:#3D2914;line-height:1.7;margin:0;padding-left:22px">';
+  html+='<li>Pedile que tome tu pulso (Nadi Pariksha) en la primera consulta — es señal de formación seria</li>';
+  html+='<li>Verificá que tenga título o certificación reconocida (no solo "curso de fin de semana")</li>';
+  html+='<li>Tu '+nombreDoshaCorto(doshaVikriti)+' necesita un terapeuta que entienda específicamente tu dosha</li>';
+  html+='<li>Primera consulta no debería durar menos de 45 minutos — Ayurveda no se hace rápido</li>';
+  html+='<li>Antes de pagar tratamiento, conversá tus condiciones médicas actuales</li>';
+  html+='<li>Si está sobre tu medicación actual sin saberlo, NO es buen profesional. Buen Vaidya pregunta SIEMPRE</li>';
+  html+='</ul>';
+  html+='</div>';
+  
+  // CTA WhatsApp
+  html+='<a href="https://wa.me/5491153149117?text=Hola%2C%20busco%20un%20profesional%20Ayurveda%20en%20'+encodeURIComponent(ciudad)+'%20para%20mi%20'+nombreDoshaCorto(doshaVikriti)+'" target="_blank" rel="noopener" style="display:block;text-decoration:none;margin-bottom:14px">';
+  html+='<button style="width:100%;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border:none;padding:16px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(37,211,102,0.3)"><span style="font-size:22px">💬</span>Pedir recomendación por WhatsApp</button>';
+  html+='</a>';
+  
+  // Aviso para profesionales
+  html+='<div style="background:#FAFAF7;border:1px dashed #C49E72;border-radius:10px;padding:14px;text-align:center">';
+  html+='<p style="font-size:12px;color:#8B7355;line-height:1.5;margin:0;font-style:italic">¿Sos profesional Ayurveda y querés sumarte a Vedabite?<br>Escribinos por <a href="https://wa.me/5491153149117" target="_blank" style="color:#5A7A53;font-weight:700;text-decoration:none">WhatsApp</a></p>';
+  html+='</div>';
+  
+  html+='</div></div></div>';
+  
   var s9=document.getElementById('s9');
   if(!s9){s9=document.createElement('div');s9.className='screen';s9.id='s9';document.body.appendChild(s9);}
-  s9.innerHTML=html;show('s9');
-  try{if(typeof gtag==='function')gtag('event','mapa_profesionales_visto');}catch(e){}
+  s9.innerHTML=html;
+  show('s9');
+  
+  try{if(typeof gtag==='function')gtag('event','mapa_profesionales_visto',{ciudad:ciudad,dosha:doshaVikriti});}catch(e){}
+}
+
+// Cambia la búsqueda del mapa por categoría
+function vbBuscarMapa(categoria){
+  var datos=window._vbDatos||{};
+  var ciudad=(datos.ciudad_key||'Buenos Aires').replace(/_/g,' ');
+  var query=encodeURIComponent(categoria+' '+ciudad);
+  var iframe=document.getElementById('vbMapaIframe');
+  if(iframe){
+    iframe.src='https://www.google.com/maps?q='+query+'&output=embed&z=12';
+  }
+  // Cambiar estado visual de los botones
+  var botones=document.querySelectorAll('button[onclick^="vbBuscarMapa"]');
+  botones.forEach(function(b){
+    if(b.getAttribute('onclick').indexOf("'"+categoria+"'")>=0){
+      b.style.background='#5A7A53';b.style.color='#fff';b.style.border='none';
+    }else{
+      b.style.background='#fff';b.style.color='#5A7A53';b.style.border='1px solid #5A7A53';
+    }
+  });
+  try{if(typeof gtag==='function')gtag('event','mapa_filtro',{categoria:categoria});}catch(e){}
 }
 
 function vbCerrarPaso7(){
