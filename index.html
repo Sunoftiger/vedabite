@@ -704,6 +704,9 @@ function vbIniciarTest(){
   // Guardar en localStorage
   try{localStorage.setItem('vb_datos_basicos',JSON.stringify(window._vbDatos));}catch(e){}
   
+  // ✓ Paso 1 completo
+  if(typeof vbMarcarPasoCompleto==='function')vbMarcarPasoCompleto(1);
+  
   // GA4 event
   try{
     if(typeof gtag==='function'){
@@ -1213,6 +1216,9 @@ async function vbCalcularPrakriti(){
   try{localStorage.setItem(cacheKey,JSON.stringify(prakriti));}catch(e){}
   // Guardar en datos
   window._vbDatos.prakriti=prakriti;
+  
+  // ✓ Paso 2 completo
+  if(typeof vbMarcarPasoCompleto==='function')vbMarcarPasoCompleto(2);
   try{localStorage.setItem('vb_datos_basicos',JSON.stringify(window._vbDatos));}catch(e){}
   
   // GA4
@@ -1558,7 +1564,7 @@ function getRes(){
 }
 function showEmail(){res=getRes();var a=D[res.p];document.getElementById("eDosha").textContent=a.e,document.getElementById("eName").textContent=a.n,show("s3")}
 function submitEmail(){var a=document.getElementById("emailIn").value;if(!a||!a.includes("@"))return alert("Email inválido");(async function(){try{var emailClean=a.trim().toLowerCase();var msgBuffer=new TextEncoder().encode(emailClean);var hashBuffer=await crypto.subtle.digest('SHA-256',msgBuffer);var hashed=Array.from(new Uint8Array(hashBuffer)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');if(typeof gtag==='function'){gtag('set','user_data',{'sha256_email_address':hashed});}}catch(e){}})();userEmail=a;window.userEmail=a;window.res=res;try{localStorage.setItem("vb_email",a);}catch(e){}try{if(window.clarity){window.clarity('identify',a);window.clarity('set','userEmail',a);window.clarity('set','dosha',res.p);}}catch(e){}var e=D[res.p];emailjs.send("service_xf7v0x7","template_vzggqyx",{to_email:a,dosha_name:e.n,dosha_emoji:e.e,dosha_desc:e.desc,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha}).then(function(){}).catch(function(a){});try{if(window._vbSaveLead)window._vbSaveLead({email:a,dosha:res.p,dosha_name:e.n,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha,source:document.referrer||"direct",utm:location.search||""}).catch(function(){});}catch(e){}try{localStorage.setItem("vb_trialStart",new Date().toISOString());gtag("event","generate_lead");if(window._vbTrack)window._vbTrack()}catch(a){}saveSession(),showResults()}
-function showResults(){var a=D[res.p];document.getElementById("resHeader").style.background=a.bg,document.getElementById("resEmoji").textContent=a.e,document.getElementById("resName").textContent=a.n,document.getElementById("resDesc").textContent=a.desc,document.getElementById("resPct").innerHTML=Object.entries(res.pct).sort(function(a,e){return e[1]-a[1]}).map(function(a){return'<div style="background:#fff;padding:8px 16px;border-radius:8px"><div style="font-weight:700;color:'+D[a[0]].c+'">'+a[1]+'%</div><div style="font-size:12px">'+D[a[0]].e+"</div></div>"}).join("");try{vbRenderDevolucionIntegral();}catch(e){console.error('[devolucion]',e);}var tabsGrid=document.getElementById("tabsGrid");tabsGrid.innerHTML="";renderTabs(a),show("s4")}
+function showResults(){var a=D[res.p];document.getElementById("resHeader").style.background=a.bg,document.getElementById("resEmoji").textContent=a.e,document.getElementById("resName").textContent=a.n,document.getElementById("resDesc").textContent=a.desc,document.getElementById("resPct").innerHTML=Object.entries(res.pct).sort(function(a,e){return e[1]-a[1]}).map(function(a){return'<div style="background:#fff;padding:8px 16px;border-radius:8px"><div style="font-weight:700;color:'+D[a[0]].c+'">'+a[1]+'%</div><div style="font-size:12px">'+D[a[0]].e+"</div></div>"}).join("");try{vbRenderDevolucionIntegral();}catch(e){console.error('[devolucion]',e);}var tabsGrid=document.getElementById("tabsGrid");tabsGrid.innerHTML="";renderTabs(a),show("s4");if(typeof vbMarcarPasoCompleto==='function')vbMarcarPasoCompleto(3);}
 
 // === DEVOLUCIÓN INTEGRAL — sin pedir nada nuevo, evalúa lo acumulado ===
 function vbEvaluarCompletitud(){
@@ -1686,20 +1692,34 @@ function vbRenderDevolucionIntegral(){
   html+='<div style="background:linear-gradient(180deg,#FAF7F0,#F5EFE0);border:1px solid #C49E72;border-radius:16px;padding:22px 18px;margin-bottom:24px">';
   html+='<div style="text-align:center;margin-bottom:20px;padding:16px 12px;background:linear-gradient(135deg,#FFF7ED,#FEF3C7);border-radius:14px;border:1px solid #C49E72"><p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700;margin-bottom:8px">✨ Esto es solo para vos</p><h3 style="font-family:Georgia,serif;font-size:22px;color:#3D5A36;font-weight:600;margin:0 0 10px 0;line-height:1.3">Tu camino personalizado<br>de '+nombreDosha(doshaVikriti)+'</h3><p style="font-size:13px;color:#5A4A2A;margin:8px 0;line-height:1.55">Acabamos de leer tu cuerpo.<br>Ahora te llevamos paso a paso por <strong>tu camino</strong> para volver a tu equilibrio.</p><p style="font-size:11px;color:#8B7355;margin-top:10px;font-style:italic;line-height:1.4">Estos son los 8 pasos personalizados que vamos a recorrer juntos</p></div>';
   
-  var pasos=[
-    {n:1,t:'Datos básicos',sk:'Vyaktigata Vivara · व्यक्तिगत विवरा',d:'Sexo, edad, fecha y hora de nacimiento, ciudad, condiciones de salud',obj:'Conocer tu situación actual',estado:'completado',precio:'gratis'},
-    {n:2,t:'Carta natal védica',sk:'Janma Kundali Jyotish · जन्म कुण्डली ज्योतिष',d:'Lagna, Surya Rashi, Chandra Rashi, Nakshatra · Tu Prakriti calculada por API real',obj:'Conocer tu naturaleza desde el nacimiento',estado:'completado',precio:'gratis'},
-    {n:3,t:'Test del estado actual',sk:'Vikriti Pariksha · विकृति परीक्षा',d:'50 preguntas que cubren las 14 zonas que mide el Ayurveda · Tu estado actual en porcentajes Vata/Pitta/Kapha',obj:'Saber cómo estás vos hoy',estado:'completado',precio:'gratis'},
-    {n:4,t:'Tu escáner físico',sk:'Asta Sthana Pariksha · अष्ट स्थान परीक्षा',d:'18 chequeos en tu cuerpo · Lengua, ojos y uñas con foto + IA · Pulso, sudor, voz, postura',obj:'Confirmar tu diagnóstico mirando tu cuerpo',estado:'proximo',precio:'7 días gratis'},
-    {n:5,t:'Tu lectura',sk:'Vaidya Nirnaya · वैद्य निर्णय',d:'Cómo naciste vs cómo estás hoy · Las 5 cualidades · La dirección y el movimiento de tu desorden',obj:'Entender qué se te desordenó',estado:'pendiente',precio:'incluido'},
-    {n:6,t:'Diagnóstico hiper personalizado',sk:'Samprapti · सम्प्राप्ति',d:'Línea de tiempo 6m/2a/5a/10a · 13 canales (Srotas) · Tus toxinas (Ama) · Las 6 etapas Kriyakala',obj:'Ver hacia dónde vas si no actuás hoy',estado:'pendiente',precio:'incluido'},
-    {n:7,t:'Cómo transitar hacia tu equilibrio',sk:'Chikitsa · चिकित्सा',d:'7 módulos prescriptos · 12 hierbas Rasayana · 4 recetas para hacer en casa · Mujer/hombre · Mapa profesionales',obj:'Transitar hacia tu equilibrio',estado:'pendiente',precio:'USD 20/mes'},
-    {n:8,t:'Seguimiento mensual',sk:'Anubandha · अनुबन्ध',d:'Re-test cada 30 días · Ajuste automático del plan · Comparativa día 60/90 · Acceso premium a Vaidyas verificados',obj:'Mantener tu equilibrio en el tiempo',estado:'pendiente',precio:'USD 20/mes'}
+  var pasosBase=[
+    {n:1,t:'Datos básicos',sk:'Vyaktigata Vivara · व्यक्तिगत विवरा',d:'Sexo, edad, fecha y hora de nacimiento, ciudad, condiciones de salud',obj:'Conocer tu situación actual',precio:'gratis'},
+    {n:2,t:'Carta natal védica',sk:'Janma Kundali Jyotish · जन्म कुण्डली ज्योतिष',d:'Lagna, Surya Rashi, Chandra Rashi, Nakshatra · Tu Prakriti calculada por API real',obj:'Conocer tu naturaleza desde el nacimiento',precio:'gratis'},
+    {n:3,t:'Test del estado actual',sk:'Vikriti Pariksha · विकृति परीक्षा',d:'50 preguntas que cubren las 14 zonas que mide el Ayurveda · Tu estado actual en porcentajes Vata/Pitta/Kapha',obj:'Saber cómo estás vos hoy',precio:'gratis'},
+    {n:4,t:'Tu escáner físico',sk:'Asta Sthana Pariksha · अष्ट स्थान परीक्षा',d:'18 chequeos en tu cuerpo · Lengua, ojos y uñas con foto + IA · Pulso, sudor, voz, postura',obj:'Confirmar tu diagnóstico mirando tu cuerpo',precio:'7 días gratis'},
+    {n:5,t:'Tu lectura',sk:'Vaidya Nirnaya · वैद्य निर्णय',d:'Cómo naciste vs cómo estás hoy · Las 5 cualidades · La dirección y el movimiento de tu desorden',obj:'Entender qué se te desordenó',precio:'incluido'},
+    {n:6,t:'Diagnóstico hiper personalizado',sk:'Samprapti · सम्प्राप्ति',d:'Línea de tiempo 6m/2a/5a/10a · 13 canales (Srotas) · Tus toxinas (Ama) · Las 6 etapas Kriyakala',obj:'Ver hacia dónde vas si no actuás hoy',precio:'incluido'},
+    {n:7,t:'Cómo transitar hacia tu equilibrio',sk:'Chikitsa · चिकित्सा',d:'7 módulos prescriptos · 12 hierbas Rasayana · 4 recetas para hacer en casa · Mujer/hombre · Mapa profesionales',obj:'Transitar hacia tu equilibrio',precio:'USD 20/mes'},
+    {n:8,t:'Seguimiento mensual',sk:'Anubandha · अनुबन्ध',d:'Re-test cada 30 días · Ajuste automático del plan · Comparativa día 60/90 · Acceso premium a Vaidyas verificados',obj:'Mantener tu equilibrio en el tiempo',precio:'USD 20/mes'}
   ];
+  
+  // Estado dinámico según validaciones encadenadas
+  var pasos=pasosBase.map(function(p){
+    var cumplido=(typeof vbPasoEstaCompleto==='function')?vbPasoEstaCompleto(p.n):false;
+    var anteriorOk=(p.n===1)?true:((typeof vbPasoEstaCompleto==='function')?vbPasoEstaCompleto(p.n-1):false);
+    if(cumplido)p.estado='completado';
+    else if(anteriorOk)p.estado='proximo';
+    else p.estado='bloqueado';
+    return p;
+  });
   
   pasos.forEach(function(p){
     var bg,bd,ic,col,opa,prCol,prBg,objBg,objCol,clickHandler,cursor;
-    if(p.estado==='completado'){bg='#D1FAE5';bd='#059669';ic='✅';col='#065F46';opa='1';prCol='#065F46';prBg='#A7F3D0';objBg='#FFFFFF';objCol='#059669';}
+    if(p.estado==='bloqueado'){
+      // 🔒 Bloqueado — gris suave con candado
+      bg='#F5F5F4';bd='#A8A29E';ic='🔒';col='#78716C';opa='0.6';prCol='#78716C';prBg='#E7E5E4';objBg='#F5F5F4';objCol='#A8A29E';
+    }
+    else if(p.estado==='completado'){bg='#D1FAE5';bd='#059669';ic='✅';col='#065F46';opa='1';prCol='#065F46';prBg='#A7F3D0';objBg='#FFFFFF';objCol='#059669';}
     else if(p.estado==='proximo'){bg='#FEF3C7';bd='#F59E0B';ic='🔵';col='#92400E';opa='1';prCol='#78350F';prBg='#FDE68A';objBg='#FFFFFF';objCol='#D97706';}
     else if(p.n===5||p.n===6){
       // Pendientes incluidos en el trial — blanco con borde verde claro
@@ -1710,12 +1730,15 @@ function vbRenderDevolucionIntegral(){
       bg='#FFFFFF';bd='#C4B5FD';ic='🔮';col='#5B21B6';opa='1';prCol='#5B21B6';prBg='#EDE9FE';objBg='#F5F3FF';objCol='#7C3AED';
     }
     
-    // Acción al tocar cada paso del roadmap
-    if(p.n===4){clickHandler='vbAbrirPaso4()';cursor='pointer';}
-    else if(p.n===5){clickHandler='document.getElementById(\'vbDevolucionIntegral\').scrollIntoView({behavior:\'smooth\',block:\'start\'})';cursor='pointer';}
-    else if(p.n===6){clickHandler='document.getElementById(\'vbDevolucionIntegral\').scrollIntoView({behavior:\'smooth\',block:\'end\'})';cursor='pointer';}
-    else if(p.n===7){clickHandler='vbAbrirPaso7()';cursor='pointer';}
-    else if(p.n===8){clickHandler='vbAbrirPaso8()';cursor='pointer';}
+    // Acción al tocar cada paso del roadmap (todos pasan por validación)
+    if(p.n===1){clickHandler='vbIrAPaso(1)';cursor='pointer';}
+    else if(p.n===2){clickHandler='vbValidarYAbrir(2)';cursor='pointer';}
+    else if(p.n===3){clickHandler='vbValidarYAbrir(3)';cursor='pointer';}
+    else if(p.n===4){clickHandler='vbValidarYAbrir(4)';cursor='pointer';}
+    else if(p.n===5){clickHandler='vbValidarYAbrir(5)';cursor='pointer';}
+    else if(p.n===6){clickHandler='vbValidarYAbrir(6)';cursor='pointer';}
+    else if(p.n===7){clickHandler='vbValidarYAbrir(7)';cursor='pointer';}
+    else if(p.n===8){clickHandler='vbValidarYAbrir(8)';cursor='pointer';}
     else {clickHandler='';cursor='default';}
     
     var onclickAttr=clickHandler?' onclick="'+clickHandler+'" role="button" tabindex="0"':'';
@@ -1747,11 +1770,11 @@ function vbRenderDevolucionIntegral(){
     if(p.n<8){
       var siguiente=pasos[p.n]; // pasos[p.n] es el siguiente (índice 0-based)
       var btnHandler='';
-      if(p.n+1===4)btnHandler='vbAbrirPaso4()';
-      else if(p.n+1===5)btnHandler="vbAbrirPaso5()";
-      else if(p.n+1===6)btnHandler="vbAbrirPaso6()";
-      else if(p.n+1===7)btnHandler='vbAbrirPaso7()';
-      else if(p.n+1===8)btnHandler="if(typeof vbAbrirPaso8==='function')vbAbrirPaso8()";
+      if(p.n+1===4)btnHandler='vbValidarYAbrir(4)';
+      else if(p.n+1===5)btnHandler='vbValidarYAbrir(5)';
+      else if(p.n+1===6)btnHandler='vbValidarYAbrir(6)';
+      else if(p.n+1===7)btnHandler='vbValidarYAbrir(7)';
+      else if(p.n+1===8)btnHandler='vbValidarYAbrir(8)';
       else btnHandler='';
       
       if(btnHandler){
@@ -2930,6 +2953,8 @@ function vbCerrarPaso4(){
     var devo=document.getElementById('vbDevolucionIntegral');
     if(devo)devo.scrollIntoView({behavior:'smooth',block:'start'});
   },150);
+  // ✓ Paso 4 visto (al menos abrió y vio la pantalla del escáner)
+  if(typeof vbMarcarPasoCompleto==='function')vbMarcarPasoCompleto(4);
   try{if(typeof gtag==='function')gtag('event','paso4_cerrado');}catch(e){}
 }
 
@@ -2994,6 +3019,7 @@ function vbAbrirPaso5(){
     }
   }
   try{if(typeof gtag==='function')gtag('event','paso5_visto');}catch(e){}
+  if(typeof vbMarcarPasoCompleto==='function')vbMarcarPasoCompleto(5);
 }
 
 function vbCerrarPaso5(){
@@ -3025,6 +3051,255 @@ function vbAbrirPaso6FromPaso5(){
 }
 
 // ============================================================
+// SISTEMA DE VALIDACIÓN ENCADENADA DE PASOS
+// ============================================================
+// Cada paso al completarse marca un flag en localStorage.
+// vbValidarPaso(n) verifica que todos los pasos anteriores estén OK.
+
+function vbMarcarPasoCompleto(n){
+  try{
+    localStorage.setItem('vb_paso'+n+'_ok','true');
+    localStorage.setItem('vb_paso'+n+'_ts',new Date().toISOString());
+  }catch(e){}
+}
+
+function vbPasoEstaCompleto(n){
+  try{
+    return localStorage.getItem('vb_paso'+n+'_ok')==='true';
+  }catch(e){return false;}
+}
+
+// Detecta si el usuario es PAGO (suscripción Práctica activa)
+function vbEsUsuarioPago(){
+  try{
+    // Detectar por suscripción Lemon Squeezy guardada en localStorage
+    if(localStorage.getItem('vb_subscription_active')==='true')return true;
+    // Detectar por flag global
+    if(window.VB_USER_PRO===true)return true;
+    // Detectar trial activo (cuenta como "pago" para validaciones)
+    if(typeof vbTrialActivo==='function'&&vbTrialActivo())return true;
+    return false;
+  }catch(e){return false;}
+}
+
+// Validación DETALLADA por paso — devuelve qué falta exactamente
+function vbValidacionDetallada(n){
+  // Devuelve {ok:true} si el paso está bien
+  // Devuelve {ok:false, problema:'texto', accion:'qué hacer', queFalta:[...]} si falta algo
+  
+  if(n===1){
+    var d=window._vbDatos||{};
+    var faltan=[];
+    if(!d.sexo)faltan.push('tu sexo');
+    if(!d.edad)faltan.push('tu edad');
+    if(!d.fecha_nacimiento)faltan.push('tu fecha de nacimiento');
+    if(!d.pais_codigo)faltan.push('tu país');
+    if(!d.ciudad_key)faltan.push('tu ciudad');
+    if(faltan.length===0)return {ok:true};
+    return {
+      ok:false,
+      problema:'Te faltan '+faltan.length+(faltan.length===1?' dato básico':' datos básicos'),
+      detalle:faltan.join(', '),
+      accion:'Volver al Paso 1'
+    };
+  }
+  
+  if(n===2){
+    var p=window._vbPrakriti||(window._vbDatos&&window._vbDatos.prakriti);
+    if(p&&p.dosha_predominante)return {ok:true};
+    return {
+      ok:false,
+      problema:'Tu carta natal todavía no se calculó',
+      detalle:'Sin esto no podemos saber tu naturaleza original',
+      accion:'Volver al Paso 2'
+    };
+  }
+  
+  if(n===3){
+    if(window.res&&window.res.p)return {ok:true};
+    return {
+      ok:false,
+      problema:'Te falta hacer el test de las 50 preguntas',
+      detalle:'Sin esto no sabemos cómo estás vos hoy',
+      accion:'Hacer el test'
+    };
+  }
+  
+  if(n===4){
+    // Acepta paso 4 cualquier, ya que las fotos son acción opcional pero el paso se marcó visto
+    if(vbPasoEstaCompleto(4))return {ok:true};
+    return {
+      ok:false,
+      problema:'Te falta tu escáner físico',
+      detalle:'Tu cuerpo te cuenta cosas mirando lengua, ojos y uñas',
+      accion:'Hacer el escáner'
+    };
+  }
+  
+  // 5, 6, 7, 8: solo validamos que esté visto (para ahora)
+  if(vbPasoEstaCompleto(n))return {ok:true};
+  return {
+    ok:false,
+    problema:'Te falta abrir el Paso '+n,
+    detalle:'',
+    accion:'Ir al Paso '+n
+  };
+}
+
+function vbValidarPaso(n){
+  // Verifica que TODOS los pasos anteriores estén bien (validación detallada)
+  for(var i=1;i<n;i++){
+    var v=vbValidacionDetallada(i);
+    if(!v.ok)return {ok:false,faltante:i,detalleFaltante:v};
+  }
+  return {ok:true};
+}
+
+// Devuelve el nombre del paso (para mensajes)
+function vbNombrePaso(n){
+  return ({
+    1:'Datos básicos',
+    2:'Carta natal védica',
+    3:'Test del estado actual',
+    4:'Tu escáner físico',
+    5:'Tu lectura',
+    6:'Tu diagnóstico',
+    7:'Tu plan personalizado',
+    8:'Seguimiento mensual'
+  })[n]||'Paso '+n;
+}
+
+// Modal con tono cálido y mensajes diferenciados según paso/nivel usuario
+function vbMostrarModalBloqueado(numPasoQueQuiereAbrir,numPasoFaltante,detalleFaltante){
+  var modal=document.getElementById('vbModalBloqueado');
+  if(modal)modal.remove();
+  modal=document.createElement('div');
+  modal.id='vbModalBloqueado';
+  modal.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;font-family:inherit';
+  
+  var esPago=vbEsUsuarioPago();
+  var pasoIntenta=numPasoQueQuiereAbrir;
+  var pasoFalta=numPasoFaltante;
+  var pasosFaltan=[];
+  
+  // Recolectar TODOS los pasos que faltan (no solo el primero)
+  for(var i=1;i<pasoIntenta;i++){
+    var v=vbValidacionDetallada(i);
+    if(!v.ok)pasosFaltan.push({n:i,info:v});
+  }
+  
+  // Determinar caso A/B/C/D según consenso de los maestros
+  var pasoEsPremium=(pasoIntenta>=7);
+  var caso;
+  if(esPago){
+    caso='C'; // Usuario pago, falta paso anterior
+  }else if(pasoEsPremium){
+    caso='B'; // Gratis intenta entrar a paso pago
+  }else if(pasosFaltan.length>=2){
+    caso='D'; // Falta mucho
+  }else{
+    caso='A'; // Gratis falta paso gratuito
+  }
+  
+  var emoji,titulo,cuerpo,btnPrincipal,btnPrincipalAccion,btnSecundario,btnSecundarioAccion;
+  
+  // === CASO A: Gratis, falta paso gratuito ===
+  if(caso==='A'){
+    emoji='🌿';
+    titulo='Hola, falta una cosita';
+    var info=detalleFaltante||vbValidacionDetallada(pasoFalta);
+    cuerpo='<p style="font-size:14px;color:#5A4A2A;line-height:1.6;margin:0 0 8px"><strong>'+info.problema+'</strong></p>'
+      +(info.detalle?'<p style="font-size:13px;color:#8B7355;line-height:1.5;margin:0 0 16px;font-style:italic">'+info.detalle+'</p>':'')
+      +'<p style="font-size:13px;color:#5A4A2A;line-height:1.5;margin:0 0 16px">Sin esto, lo que viene después no sale preciso.</p>';
+    btnPrincipal='Volver al Paso '+pasoFalta+' →';
+    btnPrincipalAccion='vbIrAPaso('+pasoFalta+')';
+    btnSecundario='Cancelar';
+  }
+  // === CASO B: Gratis intenta entrar a paso PAGO ===
+  else if(caso==='B'){
+    emoji='🔒';
+    titulo='Esto es para quien camina todo el sendero';
+    cuerpo='<p style="font-size:14px;color:#5A4A2A;line-height:1.6;margin:0 0 8px">El <strong>Paso '+pasoIntenta+': '+vbNombrePaso(pasoIntenta)+'</strong> está dentro de Vedabite Práctica.</p>'
+      +'<p style="font-size:13px;color:#5A7A53;line-height:1.5;margin:0 0 16px;font-weight:600">USD 20/mes · 7 días gratis · Sin tarjeta</p>';
+    if(pasosFaltan.length>0){
+      cuerpo+='<p style="font-size:13px;color:#8B7355;line-height:1.5;margin:0 0 8px">Pero antes te falta:</p><ul style="font-size:13px;color:#5A4A2A;line-height:1.7;margin:0 0 16px;padding-left:22px">';
+      pasosFaltan.forEach(function(pf){
+        cuerpo+='<li>'+pf.info.problema+'</li>';
+      });
+      cuerpo+='</ul>';
+    }
+    btnPrincipal='Empezar mi prueba gratis →';
+    btnPrincipalAccion='if(typeof _vbMostrarSuscripcion===\'function\')_vbMostrarSuscripcion();else window.open(\'https://vedabite.lemonsqueezy.com/checkout/buy/ec74072d-7b30-4273-b369-1950cc7820d0\',\'_blank\')';
+    btnSecundario=pasosFaltan.length>0?('Volver al Paso '+pasosFaltan[0].n):'Cancelar';
+    btnSecundarioAccion=pasosFaltan.length>0?('vbIrAPaso('+pasosFaltan[0].n+')'):'';
+  }
+  // === CASO C: Usuario PAGO, falta paso anterior ===
+  else if(caso==='C'){
+    emoji='✨';
+    titulo='Una atención antes de seguir';
+    cuerpo='<p style="font-size:14px;color:#5A4A2A;line-height:1.6;margin:0 0 12px">Tu plan necesita estos datos para ser <strong>100% personalizado:</strong></p>';
+    if(pasosFaltan.length>0){
+      cuerpo+='<ul style="font-size:13px;color:#5A4A2A;line-height:1.7;margin:0 0 14px;padding-left:22px">';
+      pasosFaltan.forEach(function(pf){
+        cuerpo+='<li><strong>'+pf.info.problema+'</strong>'+(pf.info.detalle?' — '+pf.info.detalle:'')+'</li>';
+      });
+      cuerpo+='</ul>';
+    }
+    cuerpo+='<p style="font-size:13px;color:#8B7355;line-height:1.5;margin:0 0 16px;font-style:italic">¿Lo completamos juntos? Tarda menos de lo que pensás.</p>';
+    btnPrincipal='Sí, completar ahora →';
+    btnPrincipalAccion='vbIrAPaso('+pasoFalta+')';
+    btnSecundario='Más tarde';
+  }
+  // === CASO D: Falta MUCHO ===
+  else {
+    emoji='🌿';
+    titulo='Vamos paso a paso';
+    cuerpo='<p style="font-size:14px;color:#5A4A2A;line-height:1.6;margin:0 0 12px">Estás intentando ir al <strong>Paso '+pasoIntenta+'</strong>.</p>'
+      +'<p style="font-size:13px;color:#5A4A2A;line-height:1.5;margin:0 0 12px">Para que ese plan sea <strong>tu plan</strong>, todavía te faltan:</p>'
+      +'<ul style="font-size:13px;color:#5A4A2A;line-height:1.7;margin:0 0 14px;padding-left:22px">';
+    pasosFaltan.forEach(function(pf){
+      cuerpo+='<li><strong>Paso '+pf.n+':</strong> '+vbNombrePaso(pf.n)+'</li>';
+    });
+    cuerpo+='</ul><p style="font-size:13px;color:#8B7355;line-height:1.5;margin:0 0 16px;font-style:italic">Empezamos por el más cercano.</p>';
+    btnPrincipal='Continuar Paso '+pasoFalta+' →';
+    btnPrincipalAccion='vbIrAPaso('+pasoFalta+')';
+    btnSecundario='Cancelar';
+  }
+  
+  modal.innerHTML='<div style="background:#fff;border-radius:16px;max-width:400px;width:100%;padding:28px 22px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,0.25);max-height:90vh;overflow-y:auto">'
+    +'<div style="font-size:48px;margin-bottom:10px">'+emoji+'</div>'
+    +'<h3 style="font-family:Georgia,serif;font-size:20px;color:#3D5A36;margin:0 0 14px;line-height:1.3">'+titulo+'</h3>'
+    +'<div style="text-align:left">'+cuerpo+'</div>'
+    +'<button onclick="document.getElementById(\'vbModalBloqueado\').remove();'+btnPrincipalAccion+'" style="display:block;width:100%;padding:14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px">'+btnPrincipal+'</button>'
+    +(btnSecundarioAccion?'<button onclick="document.getElementById(\'vbModalBloqueado\').remove();'+btnSecundarioAccion+'" style="background:#fff;border:1px solid #C49E72;color:#5A4A2A;padding:10px;border-radius:10px;font-size:13px;cursor:pointer;width:100%;margin-bottom:8px">'+btnSecundario+'</button>':'<button onclick="document.getElementById(\'vbModalBloqueado\').remove()" style="background:none;border:none;color:#8B7355;font-size:12px;cursor:pointer;text-decoration:underline">'+btnSecundario+'</button>')
+    +'</div>';
+  document.body.appendChild(modal);
+}
+
+// Va al paso indicado (1-8) usando la función correspondiente
+function vbIrAPaso(n){
+  if(n===1){show('s1b');}
+  else if(n===2){show('s1c');}
+  else if(n===3){show('s2');}
+  else if(n===4){if(typeof vbAbrirPaso4==='function')vbAbrirPaso4();}
+  else if(n===5){if(typeof vbAbrirPaso5==='function')vbAbrirPaso5();}
+  else if(n===6){if(typeof vbAbrirPaso6==='function')vbAbrirPaso6();}
+  else if(n===7){if(typeof vbAbrirPaso7==='function')vbAbrirPaso7();}
+  else if(n===8){if(typeof vbAbrirPaso8==='function')vbAbrirPaso8();}
+}
+
+// Wrapper que valida ANTES de abrir un paso. Si falla, muestra modal detallado.
+function vbValidarYAbrir(n){
+  var v=vbValidarPaso(n);
+  if(!v.ok){
+    vbMostrarModalBloqueado(n,v.faltante,v.detalleFaltante);
+    return false;
+  }
+  vbIrAPaso(n);
+  return true;
+}
+
+// ============================================================
 // PASO 6 — abre/cierra la pantalla embebida
 // ============================================================
 function vbAbrirPaso6(){
@@ -3044,6 +3319,7 @@ function vbAbrirPaso6(){
     p6.scrollIntoView({behavior:'smooth',block:'start'});
   }
   try{if(typeof gtag==='function')gtag('event','paso6_visto');}catch(e){}
+  if(typeof vbMarcarPasoCompleto==='function')vbMarcarPasoCompleto(6);
 }
 
 function vbCerrarPaso6(){
@@ -3126,80 +3402,159 @@ function vbAbrirPaso7(){
     html+='<div style="background:#FEF3C7;border:2px solid #F59E0B;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#92400E;font-weight:700">🔒 Tu prueba terminó (día '+diaActual+')</p><p style="font-size:11px;color:#78350F;margin-top:4px">Suscribite por USD 20/mes para desbloquear tu plan completo</p></div>';
   }
   
-  // === SECCIÓN 1: AHARA (Alimentación) ===
-  html+='<div style="background:#fff;border:1px solid #5A7A53;border-radius:14px;padding:20px;margin-bottom:14px">';
-  html+='<p style="font-size:11px;letter-spacing:2px;color:#5A7A53;text-transform:uppercase;font-weight:700;margin-bottom:10px">1 · Ahara (alimentación)</p>';
-  html+='<h3 style="font-family:Georgia,serif;font-size:18px;color:#3D5A36;font-weight:400;margin-bottom:14px">Qué comer y cuándo</h3>';
+  // ============================================================
+  // PASO 7 — REORGANIZADO POR PRIORIDAD CON CARDS EXPANDIBLES
+  // ============================================================
+  
+  // Helper para crear card expandible
+  function vbCard(emoji,titulo,paraQue,contenido,sk,prioridadColor){
+    var c='<details style="background:#fff;border:1px solid '+prioridadColor+';border-radius:12px;padding:14px 16px;margin-bottom:10px;cursor:pointer">';
+    c+='<summary style="list-style:none;display:flex;align-items:center;gap:12px;cursor:pointer">';
+    c+='<span style="font-size:26px;flex-shrink:0">'+emoji+'</span>';
+    c+='<div style="flex:1;min-width:0">';
+    c+='<div style="font-size:15px;color:#3D5A36;font-weight:700;line-height:1.3">'+titulo+'</div>';
+    c+='<div style="font-size:12px;color:#7a7a7a;margin-top:2px;line-height:1.4">'+paraQue+'</div>';
+    c+='</div>';
+    c+='<span style="font-size:18px;color:'+prioridadColor+';font-weight:700">▾</span>';
+    c+='</summary>';
+    c+='<div style="margin-top:14px;padding-top:14px;border-top:1px solid #E8DFC8">';
+    c+=contenido;
+    if(sk)c+='<p style="font-size:10px;color:#8B7355;font-style:italic;margin:14px 0 0;text-align:right">📜 '+sk+'</p>';
+    c+='</div></details>';
+    return c;
+  }
+  
+  // ====== 🔴 LO URGENTE PARA VOS HOY ======
+  html+='<div style="margin-bottom:20px"><div style="background:linear-gradient(135deg,#FEE2E2,#FCA5A5);border-radius:12px;padding:14px;margin-bottom:10px;text-align:center"><p style="font-size:11px;color:#7F1D1D;letter-spacing:2px;text-transform:uppercase;font-weight:800;margin:0 0 4px">🔴 Lo URGENTE para vos hoy</p><p style="font-size:12px;color:#991B1B;margin:0;line-height:1.4">Esto es lo más importante. Empezá HOY mismo.</p></div>';
+  
+  // ITEM URGENTE 1: Ahara (alimentación) — para todos los doshas es lo primero
   if(trialOk){
-    html+='<div style="background:#F0FDF4;border-left:4px solid #059669;padding:12px;border-radius:8px;margin-bottom:10px"><p style="font-size:12px;color:#065F46;font-weight:700;margin-bottom:4px">✅ Sí (sumá esto)</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">'+plan.si+'</p></div>';
-    html+='<div style="background:#FEE2E2;border-left:4px solid #DC2626;padding:12px;border-radius:8px;margin-bottom:10px"><p style="font-size:12px;color:#7F1D1D;font-weight:700;margin-bottom:4px">⚠️ No (sacá esto)</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">'+plan.no+'</p></div>';
-    html+='<div style="background:#FEF3C7;border-left:4px solid #F59E0B;padding:12px;border-radius:8px"><p style="font-size:12px;color:#92400E;font-weight:700;margin-bottom:4px">🕐 Horarios</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">'+plan.cuando+'</p></div>';
-  }else{html+=vbVeloLock();}
+    var ahCont='<div style="background:#F0FDF4;border-left:4px solid #059669;padding:12px;border-radius:8px;margin-bottom:10px"><p style="font-size:12px;color:#065F46;font-weight:700;margin-bottom:4px">✅ Sí (sumá esto)</p><p style="font-size:13px;color:#3D2914;line-height:1.6">'+plan.si+'</p></div>';
+    ahCont+='<div style="background:#FEE2E2;border-left:4px solid #DC2626;padding:12px;border-radius:8px;margin-bottom:10px"><p style="font-size:12px;color:#7F1D1D;font-weight:700;margin-bottom:4px">⚠️ No (sacá esto)</p><p style="font-size:13px;color:#3D2914;line-height:1.6">'+plan.no+'</p></div>';
+    ahCont+='<div style="background:#FEF3C7;border-left:4px solid #F59E0B;padding:12px;border-radius:8px"><p style="font-size:12px;color:#92400E;font-weight:700;margin-bottom:4px">🕐 Horarios</p><p style="font-size:13px;color:#3D2914;line-height:1.6">'+plan.cuando+'</p></div>';
+    html+=vbCard('🍽️','Comida que te conviene','Qué comer y cuándo según tu '+nombreDosha(doshaVikriti),ahCont,'Ahara · आहार','#DC2626');
+  }else{
+    html+=vbCard('🍽️','Comida que te conviene','Qué comer y cuándo según tu '+nombreDosha(doshaVikriti),vbVeloLock(),'Ahara · आहार','#DC2626');
+  }
+  
+  // ITEM URGENTE 2: Dinacharya (rutina) — la base que todo equilibra
+  if(trialOk){
+    var diCont='<div style="display:flex;flex-direction:column;gap:8px">';
+    diCont+='<div style="background:#FAF7F0;border-radius:8px;padding:10px"><p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:2px">🌅 Mañana (5:30-9hs)</p><p style="font-size:13px;color:#3D2914;line-height:1.6">'+rut.man+'</p></div>';
+    diCont+='<div style="background:#FAF7F0;border-radius:8px;padding:10px"><p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:2px">☀️ Mediodía (12-14hs)</p><p style="font-size:13px;color:#3D2914;line-height:1.6">'+rut.med+'</p></div>';
+    diCont+='<div style="background:#FAF7F0;border-radius:8px;padding:10px"><p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:2px">🌙 Tarde-noche (18-22hs)</p><p style="font-size:13px;color:#3D2914;line-height:1.6">'+rut.tar+'</p></div>';
+    diCont+='</div>';
+    html+=vbCard('⏰','Tu rutina diaria',(doshaVikriti==='vata'?'Lo MÁS importante para vos: horarios fijos':'Cuándo comer, dormir, moverte'),diCont,'Dinacharya · दिनचर्या','#DC2626');
+  }else{
+    html+=vbCard('⏰','Tu rutina diaria','Cuándo comer, dormir, moverte',vbVeloLock(),'Dinacharya · दिनचर्या','#DC2626');
+  }
   html+='</div>';
   
-  // === SECCIÓN 2: DINACHARYA (Rutina diaria) ===
-  html+='<div style="background:#fff;border:1px solid #C49E72;border-radius:14px;padding:20px;margin-bottom:14px">';
-  html+='<p style="font-size:11px;letter-spacing:2px;color:#C49E72;text-transform:uppercase;font-weight:700;margin-bottom:10px">2 · Dinacharya (rutina diaria)</p>';
-  html+='<h3 style="font-family:Georgia,serif;font-size:18px;color:#3D5A36;font-weight:400;margin-bottom:14px">Tu día ideal hora por hora</h3>';
+  // ====== 🟠 EMPEZÁ ESTA SEMANA ======
+  html+='<div style="margin-bottom:20px"><div style="background:linear-gradient(135deg,#FFEDD5,#FDBA74);border-radius:12px;padding:14px;margin-bottom:10px;text-align:center"><p style="font-size:11px;color:#7C2D12;letter-spacing:2px;text-transform:uppercase;font-weight:800;margin:0 0 4px">🟠 Empezá ESTA semana</p><p style="font-size:12px;color:#9A3412;margin:0;line-height:1.4">Cosas que sumás de a una para sostener el equilibrio.</p></div>';
+  
+  // ITEM 3: Pranayama (respiración) — específico por dosha
+  var pranayamaInfo={
+    vata:{nombre:'Nadi Shodhana (respiración alterna)',paraQue:'Calma tu sistema nervioso. Aterriza la mente.',como:'Sentate cómoda. Tapá la fosa derecha con el pulgar, inhalá por la izquierda 4 segundos. Cambiá: tapá la izquierda con el anular, exhalá por la derecha 6 segundos. Inhalá por la derecha 4. Tapá la derecha, exhalá por la izquierda 6. Eso es 1 ronda. Hacé 10 rondas.',cuando:'10 minutos por la noche, antes de dormir. Sentís el efecto desde el día 1.'},
+    pitta:{nombre:'Sheetali (respiración refrescante)',paraQue:'Enfría el calor interno y la irritabilidad.',como:'Sentate cómoda. Sacá la lengua y enrollala como un tubito. Inhalá por la lengua sintiendo el aire fresco. Cerrá la boca, exhalá por la nariz lentamente. Repetí 12 veces.',cuando:'5-10 minutos al atardecer (cuando Pitta sube). En 3-5 días notás menos calor mental.'},
+    kapha:{nombre:'Kapalabhati (respiración energizante)',paraQue:'Activa, despeja la pesadez matinal, mueve el Kapha estancado.',como:'Sentate erguida. Inhalá normal. Exhalá de golpe contrayendo el abdomen (como soplar fuerte por la nariz). La inhalación es pasiva. Hacé 30 exhalaciones rápidas. Descansá 1 minuto. Repetí 3 series.',cuando:'5-10 minutos al despertar (NO antes de dormir). Sentís activación inmediata.'}
+  };
+  var pi=pranayamaInfo[doshaVikriti]||pranayamaInfo.vata;
   if(trialOk){
-    html+='<div style="display:flex;flex-direction:column;gap:10px">';
-    html+='<div style="background:#FEF3C7;border-radius:8px;padding:12px"><p style="font-size:12px;color:#92400E;font-weight:700;margin-bottom:4px">🌅 Mañana (Brahma Muhurta · hora del despertar consciente)</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">'+rut.m+'</p></div>';
-    html+='<div style="background:#FED7AA;border-radius:8px;padding:12px"><p style="font-size:12px;color:#7C2D12;font-weight:700;margin-bottom:4px">☀️ Mediodía y tarde</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">'+rut.t+'</p></div>';
-    html+='<div style="background:#E0E7FF;border-radius:8px;padding:12px"><p style="font-size:12px;color:#3730A3;font-weight:700;margin-bottom:4px">🌙 Noche</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">'+rut.n+'</p></div>';
-    html+='</div>';
-  }else{html+=vbVeloLock();}
+    var prCont='<div style="background:#EFF6FF;border-left:4px solid #2563EB;padding:12px;border-radius:8px;margin-bottom:10px"><p style="font-size:12px;color:#1E40AF;font-weight:700;margin-bottom:4px">💨 Para qué sirve</p><p style="font-size:13px;color:#3D2914;line-height:1.6">'+pi.paraQue+'</p></div>';
+    prCont+='<div style="background:#FAF7F0;border-radius:8px;padding:12px;margin-bottom:10px"><p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:6px">📋 Cómo se hace</p><p style="font-size:13px;color:#3D2914;line-height:1.7">'+pi.como+'</p></div>';
+    prCont+='<div style="background:#FEF3C7;border-radius:8px;padding:10px"><p style="font-size:12px;color:#92400E;font-weight:700;margin-bottom:2px">🕐 Cuándo y resultado</p><p style="font-size:13px;color:#3D2914;line-height:1.6">'+pi.cuando+'</p></div>';
+    html+=vbCard('💨',pi.nombre,'Tu respiración personalizada',prCont,'Pranayama · प्राणायाम','#F97316');
+  }else{
+    html+=vbCard('💨',pi.nombre,'Tu respiración personalizada',vbVeloLock(),'Pranayama · प्राणायाम','#F97316');
+  }
+  
+  // ITEM 4: Yoga (asanas) — específico por dosha (usa VB_VYAYAMA)
+  if(trialOk){
+    var yoCont='<div style="background:#F0FDF4;border-radius:8px;padding:12px;margin-bottom:10px"><p style="font-size:12px;color:#065F46;font-weight:700;margin-bottom:4px">🧘 Tu práctica</p><p style="font-size:13px;color:#3D2914;line-height:1.7">'+VB_VYAYAMA[doshaVikriti]+'</p></div>';
+    html+=vbCard('🧘','Yoga para tu '+nombreDosha(doshaVikriti),'Asanas + ritmo + frecuencia',yoCont,'Vyayama · व्यायाम','#F97316');
+  }else{
+    html+=vbCard('🧘','Yoga para tu '+nombreDosha(doshaVikriti),'Asanas + ritmo + frecuencia',vbVeloLock(),'Vyayama · व्यायाम','#F97316');
+  }
+  
+  // ITEM 5: Abhyanga (automasaje con aceite) — Snehana
+  if(trialOk){
+    var abCont='<div style="background:#FCE7F3;border-left:4px solid #BE185D;padding:12px;border-radius:8px;margin-bottom:10px"><p style="font-size:12px;color:#831843;font-weight:700;margin-bottom:4px">💆 Tu masaje diario</p><p style="font-size:13px;color:#3D2914;line-height:1.7">'+VB_SNEHANA[doshaVikriti]+'</p></div>';
+    html+=vbCard('💆','Automasaje con aceite (Abhyanga)','Lubrica el cuerpo y calma el sistema nervioso',abCont,'Snehana · स्नेहन','#F97316');
+  }else{
+    html+=vbCard('💆','Automasaje con aceite (Abhyanga)','Lubrica el cuerpo y calma el sistema nervioso',vbVeloLock(),'Snehana · स्नेहन','#F97316');
+  }
   html+='</div>';
   
-  // === SECCIÓN 3: AUSHADHI + RASAYANA COMPLETO ===
-  html+='<div style="background:#fff;border:1px solid #7B68EE;border-radius:14px;padding:20px;margin-bottom:14px">';
-  html+='<p style="font-size:11px;letter-spacing:2px;color:#5B21B6;text-transform:uppercase;font-weight:700;margin-bottom:10px">3 · Aushadhi + Rasayana (hierbas y rejuvenecimiento)</p>';
-  html+='<h3 style="font-family:Georgia,serif;font-size:18px;color:#3D5A36;font-weight:400;margin-bottom:14px">Tu protocolo completo según Charaka Samhita</h3>';
+  // ====== 🟡 SUMALO CUANDO ESTÉS ======
+  html+='<div style="margin-bottom:20px"><div style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);border-radius:12px;padding:14px;margin-bottom:10px;text-align:center"><p style="font-size:11px;color:#78350F;letter-spacing:2px;text-transform:uppercase;font-weight:800;margin:0 0 4px">🟡 Sumalo cuando estés</p><p style="font-size:12px;color:#92400E;margin:0;line-height:1.4">Cuando lo de arriba ya esté instalado, sumá esto.</p></div>';
+  
+  // ITEM 6: Meditación (Sadhana)
   if(trialOk){
-    html+=vbRenderRasayana(doshaVikriti,sexo);
-    html+='<p style="font-size:11px;color:#8B7355;margin-top:10px;font-style:italic;line-height:1.5">⚠️ Consultá con tu médico antes de empezar cualquier hierba, especialmente si estás medicada, embarazada o tenés condiciones diagnosticadas. Vedabite acompaña, no diagnostica.</p>';
-  }else{html+=vbVeloLock();}
+    var meCont='<div style="background:#EDE9FE;border-left:4px solid #7C3AED;padding:12px;border-radius:8px;margin-bottom:10px"><p style="font-size:12px;color:#5B21B6;font-weight:700;margin-bottom:4px">🧠 Tu meditación</p><p style="font-size:13px;color:#3D2914;line-height:1.7">'+VB_SADHANA[doshaVikriti]+'</p></div>';
+    html+=vbCard('🧘‍♀️','Meditación personalizada','Calma la mente según tu '+nombreDosha(doshaVikriti),meCont,'Sadhana · साधन','#EAB308');
+  }else{
+    html+=vbCard('🧘‍♀️','Meditación personalizada','Calma la mente según tu dosha',vbVeloLock(),'Sadhana · साधन','#EAB308');
+  }
+  
+  // ITEM 7: Mudras (gestos con manos)
+  var mudrasInfo={
+    vata:{nombres:'Vayu Mudra + Prithvi Mudra',como:'Vayu (calma el aire): doblá el dedo índice hacia la base del pulgar, presioná suave con el pulgar. Mantenelo así. Prithvi (arraiga): juntá la punta del pulgar con la punta del anular. Los otros dedos extendidos. Mantenelo 15 minutos al día.',paraQue:'Bajan ansiedad, gases, temblores. Aterrizan tu energía.'},
+    pitta:{nombres:'Apana Mudra + Jalashaya Mudra',como:'Apana (refresca y purifica): juntá las puntas del pulgar, medio y anular. Índice y meñique extendidos. Jalashaya: la mano izquierda en el regazo en forma de cuenco, la derecha encima en la misma forma. 15 minutos al día.',paraQue:'Bajan acidez, irritabilidad, calor mental. Refrescan el sistema.'},
+    kapha:{nombres:'Surya Mudra + Linga Mudra',como:'Surya (activa el calor interno): doblá el anular hacia la base del pulgar, presioná suave con el pulgar. Linga: cruzá los dedos de las dos manos entrelazadas, mantené el pulgar izquierdo apuntando arriba. 15 minutos al día.',paraQue:'Suben la energía, mueven el Kapha estancado, activan metabolismo.'}
+  };
+  var mu=mudrasInfo[doshaVikriti]||mudrasInfo.vata;
+  if(trialOk){
+    var muCont='<div style="background:#EFF6FF;border-left:4px solid #2563EB;padding:12px;border-radius:8px;margin-bottom:10px"><p style="font-size:12px;color:#1E40AF;font-weight:700;margin-bottom:4px">🤲 Tus mudras</p><p style="font-size:14px;color:#3D2914;font-weight:700;margin-bottom:6px">'+mu.nombres+'</p><p style="font-size:13px;color:#3D2914;line-height:1.7">'+mu.como+'</p></div>';
+    muCont+='<div style="background:#FAF7F0;border-radius:8px;padding:10px"><p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:2px">✨ Para qué sirven</p><p style="font-size:13px;color:#3D2914;line-height:1.6">'+mu.paraQue+'</p></div>';
+    html+=vbCard('🤲','Mudras personalizados','Gestos con las manos que regulan tu energía',muCont,'Mudra · मुद्रा','#EAB308');
+  }else{
+    html+=vbCard('🤲','Mudras personalizados','Gestos con las manos que regulan tu energía',vbVeloLock(),'Mudra · मुद्रा','#EAB308');
+  }
+  
+  // ITEM 8: Chakras
+  var chakrasInfo={
+    vata:{nombres:'Muladhara (raíz) + Svadhisthana (sacro)',como:'Muladhara: visualizá una luz roja en el perineo (entre genitales y ano) mientras inhalás profundo 3 minutos. Svadhisthana: luz naranja debajo del ombligo, inhalás 3 minutos. Después de la meditación.',paraQue:'Te aterrizan, te dan seguridad, calman la mente dispersa de Vata.'},
+    pitta:{nombres:'Manipura (plexo) + Anahata (corazón)',como:'Manipura: luz amarilla suave en el plexo solar, respiración tranquila 3 minutos. Anahata: luz verde clara en el centro del pecho, respiración del corazón 5 minutos.',paraQue:'Equilibran el ego y la rabia. Abren el corazón. Bajan competitividad.'},
+    kapha:{nombres:'Vishuddha (garganta) + Sahasrara (corona)',como:'Vishuddha: luz azul cielo en la garganta, mantra "Ham" 3 minutos. Sahasrara: luz violeta en la coronilla, sentís expansión 5 minutos.',paraQue:'Te despiertan, te dan claridad, mueven el Kapha pesado, abren a lo nuevo.'}
+  };
+  var ch=chakrasInfo[doshaVikriti]||chakrasInfo.vata;
+  if(trialOk){
+    var chCont='<div style="background:#FCE7F3;border-left:4px solid #BE185D;padding:12px;border-radius:8px;margin-bottom:10px"><p style="font-size:12px;color:#831843;font-weight:700;margin-bottom:4px">🌀 Tus chakras a activar</p><p style="font-size:14px;color:#3D2914;font-weight:700;margin-bottom:6px">'+ch.nombres+'</p><p style="font-size:13px;color:#3D2914;line-height:1.7">'+ch.como+'</p></div>';
+    chCont+='<div style="background:#FAF7F0;border-radius:8px;padding:10px"><p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:2px">✨ Para qué sirven</p><p style="font-size:13px;color:#3D2914;line-height:1.6">'+ch.paraQue+'</p></div>';
+    html+=vbCard('🌀','Chakras a equilibrar','Centros de energía clave para tu dosha',chCont,'Chakra · चक्र','#EAB308');
+  }else{
+    html+=vbCard('🌀','Chakras a equilibrar','Centros de energía clave para tu dosha',vbVeloLock(),'Chakra · चक्र','#EAB308');
+  }
+  
+  // ITEM 9: Hierbas (Aushadhi)
+  if(trialOk){
+    var hCont='<div style="background:#EDE9FE;border-radius:8px;padding:12px;margin-bottom:10px"><p style="font-size:12px;color:#5B21B6;font-weight:700;margin-bottom:6px">🌿 Tus hierbas</p><p style="font-size:13px;color:#3D2914;line-height:1.7">'+(hierbas.principales||hierbas.lista||'Ashwagandha, Brahmi, Triphala, Shatavari según tu cuadro')+'</p></div>';
+    if(hierbas.dosis)hCont+='<div style="background:#FAF7F0;border-radius:8px;padding:10px;margin-bottom:8px"><p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:2px">💊 Dosis</p><p style="font-size:13px;color:#3D2914;line-height:1.6">'+hierbas.dosis+'</p></div>';
+    if(hierbas.cuando)hCont+='<div style="background:#FEF3C7;border-radius:8px;padding:10px"><p style="font-size:12px;color:#92400E;font-weight:700;margin-bottom:2px">🕐 Cuándo</p><p style="font-size:13px;color:#3D2914;line-height:1.6">'+hierbas.cuando+'</p></div>';
+    html+=vbCard('🌿','Hierbas personalizadas','Aushadhi para tu '+nombreDosha(doshaVikriti),hCont,'Aushadhi · औषधि','#EAB308');
+  }else{
+    html+=vbCard('🌿','Hierbas personalizadas','Aushadhi para tu dosha',vbVeloLock(),'Aushadhi · औषधि','#EAB308');
+  }
   html+='</div>';
   
-  // === SECCIÓN 4: VYAYAMA (Movimiento — yoga + ejercicio) ===
-  html+='<div style="background:#fff;border:1px solid #E07A1F;border-radius:14px;padding:20px;margin-bottom:14px">';
-  html+='<p style="font-size:11px;letter-spacing:2px;color:#E07A1F;text-transform:uppercase;font-weight:700;margin-bottom:10px">4 · Vyayama (movimiento)</p>';
-  html+='<h3 style="font-family:Georgia,serif;font-size:18px;color:#3D5A36;font-weight:400;margin-bottom:14px">Tu yoga + ejercicio según tu tránsito hacia el equilibrio</h3>';
+  // ====== 🟢 RASAYANA (estilo de vida) ======
+  html+='<div style="margin-bottom:20px"><div style="background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border-radius:14px;padding:18px;margin-bottom:10px;text-align:center"><p style="font-size:11px;color:#FDE68A;letter-spacing:2px;text-transform:uppercase;font-weight:800;margin:0 0 6px">🟢 RASAYANA · Tu estilo de vida</p><p style="font-size:13px;color:#fff;margin:0 0 4px;line-height:1.5;font-weight:600">Cuando todo lo anterior se vuelve hábito.</p><p style="font-size:11px;color:#A7F3D0;margin:0;line-height:1.4;font-style:italic">Acá es donde se cierra el ciclo. Después de los 8 pasos te ganaste el derecho de entrar.</p></div>';
+  
+  // ITEM 10: Cronograma 90 días + Rasayana
   if(trialOk){
-    html+='<div style="background:#FFF7ED;border-radius:8px;padding:14px"><p style="font-size:13px;color:#3D5A36;line-height:1.7">'+(VB_VYAYAMA[doshaVikriti]||VB_VYAYAMA.vata)+'</p></div>';
-  }else{html+=vbVeloLock();}
+    var raCont='<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px">';
+    raCont+='<div style="background:#FAF7F0;border-radius:8px;padding:10px"><p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:2px">Semana 1-2 · Limpieza (Shodhana)</p><p style="font-size:13px;color:#3D2914;line-height:1.6">Sacá lo que NO va. Agua tibia, infusiones, comidas calientes. Cero alcohol/procesados. Regularizá horarios.</p></div>';
+    raCont+='<div style="background:#FAF7F0;border-radius:8px;padding:10px"><p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:2px">Semana 3-4 · Reconstrucción (Shamana)</p><p style="font-size:13px;color:#3D2914;line-height:1.6">Sumá lo que SÍ va. Triphala suave. Establecé Dinacharya. Movimiento 30 min/día.</p></div>';
+    raCont+='<div style="background:#FAF7F0;border-radius:8px;padding:10px"><p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:2px">Mes 2 · Estabilización</p><p style="font-size:13px;color:#3D2914;line-height:1.6">Hierbas específicas. Re-test día 30. Ajustes finos.</p></div>';
+    raCont+='<div style="background:#D1FAE5;border-radius:8px;padding:10px;border:1px solid #059669"><p style="font-size:12px;color:#065F46;font-weight:700;margin-bottom:2px">Mes 3 · Rasayana puro</p><p style="font-size:13px;color:#3D2914;line-height:1.6">Rasayanas (Chyavanprash o Ashwagandha). Re-test final. Si seguís en plan, vas hacia Sama (equilibrio total).</p></div>';
+    raCont+='</div>';
+    html+=vbCard('🌱','Cronograma 90 días','Tu plan paso a paso para reequilibrarte',raCont,'Kala + Rasayana · काल + रसायन','#059669');
+  }else{
+    html+=vbCard('🌱','Cronograma 90 días','Tu plan paso a paso para reequilibrarte',vbVeloLock(),'Kala + Rasayana · काल + रसायन','#059669');
+  }
   html+='</div>';
   
-  // === SECCIÓN 5: SADHANA (Meditación + respiración + mudras + chakras) ===
-  html+='<div style="background:#fff;border:1px solid #6366F1;border-radius:14px;padding:20px;margin-bottom:14px">';
-  html+='<p style="font-size:11px;letter-spacing:2px;color:#4338CA;text-transform:uppercase;font-weight:700;margin-bottom:10px">5 · Sadhana (práctica mental)</p>';
-  html+='<h3 style="font-family:Georgia,serif;font-size:18px;color:#3D5A36;font-weight:400;margin-bottom:14px">Tu meditación, respiración y mudras del día</h3>';
-  if(trialOk){
-    html+='<div style="background:#EEF2FF;border-radius:8px;padding:14px"><p style="font-size:13px;color:#3D5A36;line-height:1.7">'+(VB_SADHANA[doshaVikriti]||VB_SADHANA.vata)+'</p></div>';
-  }else{html+=vbVeloLock();}
-  html+='</div>';
-  
-  // === SECCIÓN 6: SNEHANA (Terapias corporales) ===
-  html+='<div style="background:#fff;border:1px solid #EC4899;border-radius:14px;padding:20px;margin-bottom:14px">';
-  html+='<p style="font-size:11px;letter-spacing:2px;color:#BE185D;text-transform:uppercase;font-weight:700;margin-bottom:10px">6 · Snehana (terapias corporales)</p>';
-  html+='<h3 style="font-family:Georgia,serif;font-size:18px;color:#3D5A36;font-weight:400;margin-bottom:14px">Masajes y terapias para tu cuadro</h3>';
-  if(trialOk){
-    html+='<div style="background:#FDF2F8;border-radius:8px;padding:14px"><p style="font-size:13px;color:#3D5A36;line-height:1.7">'+(VB_SNEHANA[doshaVikriti]||VB_SNEHANA.vata)+'</p></div>';
-  }else{html+=vbVeloLock();}
-  html+='</div>';
-  
-  // === SECCIÓN 7: KALA (Cronograma 90 días) ===
-  html+='<div style="background:#fff;border:1px solid #DC2626;border-radius:14px;padding:20px;margin-bottom:18px">';
-  html+='<p style="font-size:11px;letter-spacing:2px;color:#DC2626;text-transform:uppercase;font-weight:700;margin-bottom:10px">7 · Kala (cronograma 90 días)</p>';
-  html+='<h3 style="font-family:Georgia,serif;font-size:18px;color:#3D5A36;font-weight:400;margin-bottom:14px">Tu plan paso a paso para reequilibrarte</h3>';
-  if(trialOk){
-    html+='<div style="display:flex;flex-direction:column;gap:8px">';
-    html+='<div style="background:#FAF7F0;border-radius:8px;padding:12px"><p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:4px">Semana 1-2 · Limpieza inicial (Shodhana)</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">Sacá lo que NO va. Sumá agua tibia, infusiones, comidas calientes. Cero alcohol y procesados. Foco en regularizar horarios.</p></div>';
-    html+='<div style="background:#FAF7F0;border-radius:8px;padding:12px"><p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:4px">Semana 3-4 · Reconstrucción (Shamana)</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">Sumá lo que SÍ va. Empezá con Triphala suave. Establecé Dinacharya. Movimiento 30 min/día.</p></div>';
-    html+='<div style="background:#FAF7F0;border-radius:8px;padding:12px"><p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:4px">Mes 2 · Estabilización</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">Hierbas específicas según tu cuadro. Re-test al día 30 para ver progreso. Ajustes finos.</p></div>';
-    html+='<div style="background:#FAF7F0;border-radius:8px;padding:12px"><p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:4px">Mes 3 · Rasayana (rejuvenecimiento)</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">Sumá Rasayanas (Chyavanprash o Ashwagandha). Re-test final. Si seguís en plan, vas hacia Sama (equilibrio).</p></div>';
-    html+='</div>';
-  }else{html+=vbVeloLock();}
-  html+='</div>';
   
   // === HERRAMIENTAS DEL PASO 7 ===
   html+='<div style="background:linear-gradient(135deg,#FAF7F0,#F0FDF4);border:2px solid #5A7A53;border-radius:14px;padding:20px;margin-bottom:14px">';
@@ -3248,6 +3603,7 @@ function vbAbrirPaso7(){
     if(typeof gtag==='function')gtag('event','paso7_visto',{trial_activo:trialOk,dia_trial:diaActual,dosha:doshaVikriti});
     if(window.clarity){window.clarity('set','paso7_visto','si');window.clarity('event','paso7_'+(trialOk?'trial':'bloqueado'));}
   }catch(e){}
+  if(typeof vbMarcarPasoCompleto==='function')vbMarcarPasoCompleto(7);
 }
 
 // Mapa de profesionales (placeholder por ahora — en sesión siguiente sumamos Google Maps API)
