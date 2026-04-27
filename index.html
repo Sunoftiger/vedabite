@@ -513,7 +513,7 @@ Pequeños ajustes que cambian todo.
 <div style="background:linear-gradient(180deg,#FEF3C7,#FDE68A);min-height:100vh;padding:24px">
 <div class="container" style="max-width:560px;margin:0 auto">
 <div style="text-align:center;margin-bottom:24px;padding-top:8px">
-<p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700;margin-bottom:8px">📋 Datos básicos · Paso 1 de 8</p>
+<p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700;margin-bottom:8px">📋 Datos básicos · Paso 1 de 9</p>
 <p style="font-size:12px;letter-spacing:2px;color:var(--sage);text-transform:uppercase;font-weight:700">Antes de empezar</p>
 <h2 style="font-family:Georgia,serif;font-size:22px;color:#3D5A36;margin-top:8px;line-height:1.3">Para que tu equilibrio sea<br><em style="color:#C49E72">tuyo</em>, contame quién sos</h2>
 <p style="font-size:13px;color:#7a7a7a;margin-top:10px;line-height:1.5">Tu cuerpo no es genérico. Tu plan tampoco.<br>30 segundos · 100% privado</p>
@@ -1285,7 +1285,7 @@ function vbContinuarTest(){
 <div style="background:linear-gradient(180deg,#FEF3C7,#FDE68A);min-height:100vh;padding:24px">
 <div class="container" style="max-width:560px;margin:0 auto">
 <div style="text-align:center;margin-bottom:18px;padding-top:8px">
-<p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700">📋 Tu carta natal védica · Paso 2 de 8</p>
+<p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700">📋 Tu carta natal védica · Paso 2 de 9</p>
 <p style="font-size:13px;color:#7a7a7a;margin-top:6px">Jyotish — la lectura del cielo en tu nacimiento</p>
 </div>
 <div class="card" id="vbPrakritiResult" style="text-align:center;padding:24px;min-height:300px">
@@ -1305,7 +1305,7 @@ function vbContinuarTest(){
 <div class="screen" id="s2">
 <div style="background:linear-gradient(180deg,#FEF3C7,#FDE68A);min-height:100vh;padding:24px">
 <div style="text-align:center;margin-bottom:14px;padding-top:8px">
-<p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700">📋 Test Vikriti · Paso 3 de 8</p>
+<p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700">📋 Test Vikriti · Paso 3 de 9</p>
 <p style="font-size:12px;color:#7a7a7a;margin-top:4px">50 preguntas que el terapeuta ayurvédico te haría hoy</p>
 </div>
 <div style="text-align:center;margin-bottom:24px">
@@ -1532,8 +1532,37 @@ function vbVolverInicio(){
   if(window.res&&window.res.p){show("s4")}else{show("s1")}
   try{if(typeof gtag==='function')gtag('event','boton_inicio_click')}catch(e){}
 }
-function startTest(){try{var ss=document.getElementById("savedSession");if(ss)ss.style.display="none";}catch(e){}show("s1b")}
-function renderQ(){var e=Q[qi];document.getElementById("qnum").textContent=qi+1;var qt=document.getElementById("qtotal");if(qt)qt.textContent=Q.length;document.getElementById("pbar").style.width=(qi+1)/Q.length*100+"%",document.getElementById("qcat").textContent=e.c,document.getElementById("qtxt").textContent=e.q,document.getElementById("qopts").innerHTML=[{v:0,l:"No me identifica"},{v:1,l:"A veces"},{v:2,l:"Frecuentemente"},{v:3,l:"Totalmente"}].map(function(a){return'<div class="test-opt" onclick="answer(\''+e.d+"',"+a.v+')"><span>'+a.l+"</span></div>"}).join("")}
+function startTest(){
+  // Feedback visual inmediato — el usuario sabe que tocó algo
+  try{
+    var btn=document.querySelector('.btn-cta-hero');
+    if(btn){btn.style.transform='scale(0.97)';btn.style.opacity='0.85';btn.innerHTML='<div style="display:flex;align-items:center;justify-content:center;gap:8px"><span style="display:inline-block;width:16px;height:16px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:vbspin 0.6s linear infinite"></span>Cargando...</div>';}
+  }catch(e){}
+  // Track inicio de transición
+  try{if(typeof gtag==='function')gtag('event','start_test_clicked');}catch(e){}
+  // Esconder savedSession si existe
+  try{var ss=document.getElementById("savedSession");if(ss)ss.style.display="none";}catch(e){}
+  // Pasar a s1b — el navegador respira un instante
+  setTimeout(function(){
+    show("s1b");
+    try{if(typeof gtag==='function')gtag('event','s1b_mostrado');}catch(e){}
+  },50);
+}
+function renderQ(){
+  var e=Q[qi];
+  // GUARDIA: si qi se sale del rango por cualquier motivo, terminamos el test
+  if(!e){
+    console.warn('[renderQ] qi fuera de rango:',qi,'/',Q.length,'→ enviando a showEmail');
+    if(qi>=Q.length){showEmail();return;}
+    qi=0;e=Q[0];
+  }
+  document.getElementById("qnum").textContent=qi+1;
+  var qt=document.getElementById("qtotal");if(qt)qt.textContent=Q.length;
+  document.getElementById("pbar").style.width=(qi+1)/Q.length*100+"%";
+  document.getElementById("qcat").textContent=e.c;
+  document.getElementById("qtxt").textContent=e.q;
+  document.getElementById("qopts").innerHTML=[{v:0,l:"No me identifica"},{v:1,l:"A veces"},{v:2,l:"Frecuentemente"},{v:3,l:"Totalmente"}].map(function(a){return'<div class="test-opt" onclick="answer(\''+e.d+"',"+a.v+')"><span>'+a.l+"</span></div>"}).join("");
+}
 function answer(a,e){ans[a]+=e,(Q.length<=++qi?showEmail:renderQ)()}
 function prevQ(){0<qi?(qi--,renderQ()):show("s1")}
 function getRes(){
@@ -1563,7 +1592,7 @@ function getRes(){
   };
 }
 function showEmail(){res=getRes();var a=D[res.p];document.getElementById("eDosha").textContent=a.e,document.getElementById("eName").textContent=a.n,show("s3")}
-function submitEmail(){var a=document.getElementById("emailIn").value;if(!a||!a.includes("@"))return alert("Email inválido");(async function(){try{var emailClean=a.trim().toLowerCase();var msgBuffer=new TextEncoder().encode(emailClean);var hashBuffer=await crypto.subtle.digest('SHA-256',msgBuffer);var hashed=Array.from(new Uint8Array(hashBuffer)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');if(typeof gtag==='function'){gtag('set','user_data',{'sha256_email_address':hashed});}}catch(e){}})();userEmail=a;window.userEmail=a;window.res=res;try{localStorage.setItem("vb_email",a);}catch(e){}try{if(window.clarity){window.clarity('identify',a);window.clarity('set','userEmail',a);window.clarity('set','dosha',res.p);}}catch(e){}var e=D[res.p];emailjs.send("service_xf7v0x7","template_vzggqyx",{to_email:a,dosha_name:e.n,dosha_emoji:e.e,dosha_desc:e.desc,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha}).then(function(){}).catch(function(a){});try{if(window._vbSaveLead)window._vbSaveLead({email:a,dosha:res.p,dosha_name:e.n,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha,source:document.referrer||"direct",utm:location.search||""}).catch(function(){});}catch(e){}try{localStorage.setItem("vb_trialStart",new Date().toISOString());gtag("event","generate_lead");if(window._vbTrack)window._vbTrack()}catch(a){}saveSession(),showResults()}
+function submitEmail(){var a=document.getElementById("emailIn").value;if(!a||!a.includes("@"))return alert("Email inválido");(async function(){try{var emailClean=a.trim().toLowerCase();var msgBuffer=new TextEncoder().encode(emailClean);var hashBuffer=await crypto.subtle.digest('SHA-256',msgBuffer);var hashed=Array.from(new Uint8Array(hashBuffer)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');if(typeof gtag==='function'){gtag('set','user_data',{'sha256_email_address':hashed});}}catch(e){}})();userEmail=a;window.userEmail=a;window.res=res;try{localStorage.setItem("vb_email",a);}catch(e){}try{if(window.clarity){window.clarity('identify',a);window.clarity('set','userEmail',a);window.clarity('set','dosha',res.p);}}catch(e){}var e=D[res.p];emailjs.send("service_xf7v0x7","template_cwvkmyu",{to_email:a,dosha_name:e.n,dosha_emoji:e.e,dosha_desc:e.desc,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha}).then(function(r){console.log('[email] enviado OK',r);}).catch(function(err){console.error('[email] FALLÓ:',err);try{if(typeof gtag==='function')gtag('event','email_envio_fallo',{error:String(err).substring(0,100)});}catch(e2){}});try{if(window._vbSaveLead)window._vbSaveLead({email:a,dosha:res.p,dosha_name:e.n,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha,source:document.referrer||"direct",utm:location.search||""}).catch(function(){});}catch(e){}try{localStorage.setItem("vb_trialStart",new Date().toISOString());gtag("event","generate_lead");if(window._vbTrack)window._vbTrack()}catch(a){}saveSession(),showResults()}
 function showResults(){
   var a=D[res.p];
   document.getElementById("resHeader").style.background=a.bg;
@@ -1809,9 +1838,9 @@ function vbRenderDevolucionIntegral(){
     html+='<div style="font-size:12px;color:'+col+';line-height:1.5;opacity:0.85;margin-bottom:6px">'+p.d+'</div>';
     html+='<div style="background:'+objBg+';border-radius:6px;padding:6px 10px;display:inline-block"><span style="font-size:11px;color:'+objCol+';font-weight:700">🎯 Objetivo: </span><span style="font-size:11px;color:'+col+';font-weight:600">'+p.obj+'</span></div>';
     
-    // === BARRITA GIGANTE con números 1-8 visibles ===
+    // === BARRITA GIGANTE con números 1-9 visibles ===
     var dots='';
-    for(var k=1;k<=8;k++){
+    for(var k=1;k<=9;k++){
       var isCompleto=(k<p.n);
       var isActual=(k===p.n);
       var dotBg=isCompleto?'#059669':(isActual?bd:'#E5E5E4');
@@ -1821,7 +1850,7 @@ function vbRenderDevolucionIntegral(){
       dots+='<div style="display:inline-flex;align-items:center;justify-content:center;width:'+dotSize+'px;height:'+dotSize+'px;border-radius:50%;background:'+dotBg+';color:'+dotTextColor+';font-size:'+dotFont+'px;font-weight:800;margin:0 3px;vertical-align:middle;box-shadow:'+(isActual?'0 2px 8px rgba(0,0,0,0.18)':'none')+'">'+(isCompleto?'✓':k)+'</div>';
     }
     html+='<div style="margin-top:14px;padding:14px 10px;background:#FAFAF7;border-radius:10px;border:1px solid '+bd+'">';
-    html+='<p style="font-size:11px;color:#8B7355;text-align:center;margin:0 0 10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700">Estás en el paso '+p.n+' de 8</p>';
+    html+='<p style="font-size:11px;color:#8B7355;text-align:center;margin:0 0 10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700">Estás en el paso '+p.n+' de 9</p>';
     html+='<div style="text-align:center;margin-bottom:14px;line-height:1">'+dots+'</div>';
     
     // === BOTÓN GIGANTE VERDE para ir al siguiente paso ===
@@ -1839,7 +1868,7 @@ function vbRenderDevolucionIntegral(){
       if(btnHandler){
         html+='<button onclick="event.stopPropagation();'+btnHandler+'" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(90,122,83,0.3);text-align:center;line-height:1.3">→ IR AL PASO '+(p.n+1)+' DE 9<div style="font-size:12px;font-weight:600;color:#D1FAE5;margin-top:4px">'+siguiente.t+'</div></button>';
       }else{
-        html+='<p style="font-size:13px;color:'+col+';text-align:center;margin:0;font-weight:700">→ Próximo: Paso '+(p.n+1)+' de 8 · '+siguiente.t+'</p>';
+        html+='<p style="font-size:13px;color:'+col+';text-align:center;margin:0;font-weight:700">→ Próximo: Paso '+(p.n+1)+' de 9 · '+siguiente.t+'</p>';
       }
     }else{
       html+='<div style="background:linear-gradient(135deg,#059669,#047857);color:#fff;border-radius:12px;padding:14px;text-align:center"><p style="font-size:13px;font-weight:700;margin:0">✓ Último paso · Mantenés tu equilibrio en el tiempo</p></div>';
@@ -1861,7 +1890,7 @@ function vbRenderDevolucionIntegral(){
   
   // Encabezado del paso 5
   html+='<div style="text-align:center;margin-bottom:18px">';
-  html+='<p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700">✨ Paso 5 de 8 · Tu lectura</p>';
+  html+='<p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700">✨ Paso 5 de 9 · Tu lectura</p>';
   html+='<h2 style="font-family:Georgia,serif;font-size:22px;color:#3D5A36;font-weight:400;margin-top:8px">Cómo naciste vs cómo estás hoy</h2>';
   html+='<p style="font-size:13px;color:#5A4A2A;margin-top:8px;line-height:1.5">Acá vas a ver <strong>qué se desordenó en vos</strong>. Tu cuerpo te lo está mostrando.</p>';
   html+='<p style="font-size:10px;color:#A8A29E;margin-top:6px;font-style:italic;letter-spacing:0.3px">Vaidya Nirnaya · वैद्य निर्णय</p>';
@@ -1968,8 +1997,15 @@ function vbRenderDevolucionIntegral(){
   
   // === Botón ir al paso 6 al final del paso 5 ===
   html+='<div style="margin:24px 0 0 0;padding:18px 14px;background:#FAFAF7;border-radius:12px;border:2px solid #5A7A53">';
-  html+='<p style="font-size:11px;color:#8B7355;text-align:center;margin:0 0 10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700">Ya hiciste el paso 5 de 8</p>';
-  html+='<button onclick="vbAbrirPaso6FromPaso5()" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(90,122,83,0.3);text-align:center;line-height:1.3">→ IR AL PASO 6 DE 8<div style="font-size:12px;font-weight:600;color:#D1FAE5;margin-top:4px">Tu diagnóstico</div></button>';
+  html+='<p style="font-size:11px;color:#8B7355;text-align:center;margin:0 0 10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700">Ya hiciste el paso 5 de 9</p>';
+  var dots5='';
+  for(var k=1;k<=9;k++){
+    var iC=(k<=5),iA=(k===5);
+    var bgD=iC?'#059669':'#E5E5E4',colD=iC?'#fff':'#A8A29E',sz=iA?32:26,fs=iA?14:12;
+    dots5+='<div style="display:inline-flex;align-items:center;justify-content:center;width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:'+bgD+';color:'+colD+';font-size:'+fs+'px;font-weight:800;margin:0 3px;vertical-align:middle">'+(k<5?'✓':k)+'</div>';
+  }
+  html+='<div style="text-align:center;margin-bottom:14px;line-height:1">'+dots5+'</div>';
+  html+='<button onclick="vbAbrirPaso6FromPaso5()" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(90,122,83,0.3);text-align:center;line-height:1.3">→ IR AL PASO 6 DE 9<div style="font-size:12px;font-weight:600;color:#D1FAE5;margin-top:4px">Tu diagnóstico</div></button>';
   html+='</div>';
   
   html+='</div>'; // cierre vbPantallaPaso5
@@ -1985,7 +2021,7 @@ function vbRenderDevolucionIntegral(){
     // TRIAL ACTIVO → 5 capas DETALLADAS Y EJECUTABLES
     html+='<div style="background:linear-gradient(180deg,#FAF7F0,#F5EFE0);color:#3D5A36;border:2px solid #C49E72;border-radius:14px;padding:22px;margin-bottom:14px;position:relative;overflow:hidden">';
     html+='<div style="position:absolute;top:14px;right:14px;background:#059669;color:#fff;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px">🎁 GRATIS</div>';
-    html+='<p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700;margin-bottom:8px;text-align:center">✨ Paso 6 de 8 · Tu diagnóstico</p>';
+    html+='<p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700;margin-bottom:8px;text-align:center">✨ Paso 6 de 9 · Tu diagnóstico</p>';
     html+='<h3 style="font-family:Georgia,serif;font-size:22px;color:#3D5A36;font-weight:600;margin-bottom:8px;line-height:1.4;text-align:center">Esto es lo que pasa en tu cuerpo hoy</h3>';
     html+='<p style="font-size:13px;color:#5A4A2A;line-height:1.6;margin-bottom:8px;text-align:center">5 lecturas profundas. Cada una te dice <strong>qué pasa, cómo lo ves vos y qué hacer hoy.</strong></p>';
     html+='<p style="font-size:10px;color:#8B7355;font-style:italic;text-align:center;margin-bottom:14px;letter-spacing:0.3px">Samprapti · सम्प्राप्ति</p>';
@@ -2135,8 +2171,8 @@ function vbRenderDevolucionIntegral(){
   
   // === Botón ir al paso 7 al final del paso 6 ===
   html+='<div style="margin:24px 0 0 0;padding:18px 14px;background:#FAFAF7;border-radius:12px;border:2px solid #5A7A53">';
-  html+='<p style="font-size:11px;color:#8B7355;text-align:center;margin:0 0 10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700">Ya hiciste el paso 6 de 8</p>';
-  html+='<button onclick="vbCerrarPaso6();setTimeout(function(){if(typeof vbAbrirPaso7===\'function\')vbAbrirPaso7();},200);" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(90,122,83,0.3);text-align:center;line-height:1.3">→ IR AL PASO 7 DE 8<div style="font-size:12px;font-weight:600;color:#D1FAE5;margin-top:4px">Tu plan personalizado</div></button>';
+  html+='<p style="font-size:11px;color:#8B7355;text-align:center;margin:0 0 10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700">Ya hiciste el paso 6 de 9</p>';
+  html+='<button onclick="vbCerrarPaso6();setTimeout(function(){if(typeof vbAbrirPaso7===\'function\')vbAbrirPaso7();},200);" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(90,122,83,0.3);text-align:center;line-height:1.3">→ IR AL PASO 7 DE 9<div style="font-size:12px;font-weight:600;color:#D1FAE5;margin-top:4px">Tu plan personalizado</div></button>';
   html+='</div>';
   
   html+='</div>'; // cierre vbPantallaPaso6
@@ -2239,7 +2275,7 @@ function vbAbrirPaso6(){
   html+='<button onclick="vbCerrarPaso6()" style="background:#fff;border:2px solid #5A7A53;color:#3D5A36;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:14px;padding:10px 18px;border-radius:10px;box-shadow:0 2px 6px rgba(90,122,83,0.12);display:inline-flex;align-items:center;gap:6px">← Volver al diagnóstico</button>';
   
   html+='<div style="text-align:center;margin-bottom:20px">';
-  html+='<p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700">📋 Diagnóstico integral · Paso 6 de 8</p>';
+  html+='<p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700">📋 Diagnóstico integral · Paso 6 de 9</p>';
   html+='<h2 style="font-family:Georgia,serif;font-size:24px;color:#3D5A36;font-weight:400;margin-top:8px;line-height:1.3">Lo que un Vaidya (terapeuta ayurvédico) con 80 años de experiencia vería en vos</h2>';
   html+='</div>';
   
@@ -2325,7 +2361,7 @@ function vbAbrirPaso6(){
   // CAPA 5 + CTA
   // === PASO 4 INTERMEDIO — Escáner del Vaidya (después del diagnóstico, antes del plan) ===
   html+='<div style="background:#fff;border:2px solid #5A7A53;border-radius:18px;padding:22px;margin-bottom:18px">';
-  html+='<div style="text-align:center;margin-bottom:14px"><p style="font-size:11px;letter-spacing:3px;color:#5A7A53;text-transform:uppercase;font-weight:700">📋 Paso 4 de 8</p><h3 style="font-family:Georgia,serif;font-size:20px;color:#3D5A36;font-weight:400;margin-top:8px;line-height:1.3">Tu escáner físico</h3><p style="font-size:13px;color:#7a7a7a;margin-top:8px;line-height:1.5">Antes de tu plan, mirá tu lengua, tus ojos y tus uñas. <strong>Tu cuerpo te cuenta lo que pasa adentro.</strong> Sacá las 3 fotos y la IA te lo lee.</p></div>';
+  html+='<div style="text-align:center;margin-bottom:14px"><p style="font-size:11px;letter-spacing:3px;color:#5A7A53;text-transform:uppercase;font-weight:700">📋 Paso 4 de 9</p><h3 style="font-family:Georgia,serif;font-size:20px;color:#3D5A36;font-weight:400;margin-top:8px;line-height:1.3">Tu escáner físico</h3><p style="font-size:13px;color:#7a7a7a;margin-top:8px;line-height:1.5">Antes de tu plan, mirá tu lengua, tus ojos y tus uñas. <strong>Tu cuerpo te cuenta lo que pasa adentro.</strong> Sacá las 3 fotos y la IA te lo lee.</p></div>';
   html+='<button onclick="vbCerrarPaso6();setTimeout(function(){showTab(\'escanerEquilibrio\')},80)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:16px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;box-shadow:0 4px 14px rgba(90,122,83,0.25)">📷 Sacar mis 3 fotos →</button>';
   html+='</div>';
   
@@ -2347,19 +2383,19 @@ function vbAbrirPaso6(){
   
   // === BOTÓN GIGANTE: IR AL PASO 7 ===
   html+='<div style="margin:24px 0;padding:18px 14px;background:#FAFAF7;border-radius:12px;border:2px solid #5A7A53">';
-  html+='<p style="font-size:11px;color:#8B7355;text-align:center;margin:0 0 10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700">Ya hiciste el paso 6 de 8</p>';
+  html+='<p style="font-size:11px;color:#8B7355;text-align:center;margin:0 0 10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700">Ya hiciste el paso 6 de 9</p>';
   var dots6='';
-  for(var k=1;k<=8;k++){
+  for(var k=1;k<=9;k++){
     var iC=(k<=6),iA=(k===6);
     var bgD=iC?'#059669':'#E5E5E4',colD=iC?'#fff':'#A8A29E',sz=iA?32:26,fs=iA?14:12;
     dots6+='<div style="display:inline-flex;align-items:center;justify-content:center;width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:'+bgD+';color:'+colD+';font-size:'+fs+'px;font-weight:800;margin:0 3px;vertical-align:middle">'+(k<6?'✓':k)+'</div>';
   }
   html+='<div style="text-align:center;margin-bottom:14px;line-height:1">'+dots6+'</div>';
   if(ctaTrialOk){
-    html+='<button onclick="vbAbrirPaso7()" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(90,122,83,0.3);text-align:center;line-height:1.3">→ IR AL PASO 7 DE 8<div style="font-size:12px;font-weight:600;color:#D1FAE5;margin-top:4px">Cómo transitar hacia tu equilibrio</div></button>';
+    html+='<button onclick="vbAbrirPaso7()" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(90,122,83,0.3);text-align:center;line-height:1.3">→ IR AL PASO 7 DE 9<div style="font-size:12px;font-weight:600;color:#D1FAE5;margin-top:4px">Cómo transitar hacia tu equilibrio</div></button>';
     html+='<p style="font-size:11px;color:#8B7355;text-align:center;margin:8px 0 0;font-style:italic">'+ctaDiasRest+' día'+(ctaDiasRest!==1?'s':'')+' gratis · Después USD 20/mes</p>';
   }else{
-    html+='<button onclick="vbCheckoutPaso7()" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(224,122,31,0.4);text-align:center;line-height:1.3">→ IR AL PASO 7 DE 8 · USD 20/mes<div style="font-size:12px;font-weight:600;color:#FDE68A;margin-top:4px">Tu prueba terminó · Cancelás cuando quieras</div></button>';
+    html+='<button onclick="vbCheckoutPaso7()" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(224,122,31,0.4);text-align:center;line-height:1.3">→ IR AL PASO 7 DE 9 · USD 20/mes<div style="font-size:12px;font-weight:600;color:#FDE68A;margin-top:4px">Tu prueba terminó · Cancelás cuando quieras</div></button>';
   }
   html+='</div>';
   
@@ -2940,12 +2976,12 @@ function vbAbrirPaso4(){
   // === Construir HTML ===
   var html='<div style="background:linear-gradient(180deg,#FAF7F0,#F5EFE0);min-height:100vh;padding:0 0 20px 0">';
   // === NAVBAR FIJO ARRIBA ===
-  html+='<div style="position:sticky;top:0;left:0;right:0;background:#fff;border-bottom:1px solid #C49E72;padding:10px 16px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:space-between"><button onclick="vbCerrarPaso4()" style="background:#5A7A53;color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px">📖 Volver al índice</button><span style="font-size:11px;color:#8B7355;font-weight:600;letter-spacing:0.5px">Paso 4 de 8</span></div>';
+  html+='<div style="position:sticky;top:0;left:0;right:0;background:#fff;border-bottom:1px solid #C49E72;padding:10px 16px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:space-between"><button onclick="vbCerrarPaso4()" style="background:#5A7A53;color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px">📖 Volver al índice</button><span style="font-size:11px;color:#8B7355;font-weight:600;letter-spacing:0.5px">Paso 4 de 9</span></div>';
   html+='<div style="padding:20px 16px"><div style="max-width:600px;margin:0 auto">';
   
   // Encabezado
   html+='<div style="text-align:center;margin-bottom:20px;padding:18px 14px;background:linear-gradient(135deg,#FFF7ED,#FEF3C7);border-radius:14px;border:1px solid #C49E72">';
-  html+='<p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700;margin-bottom:6px">📋 Paso 4 de 8</p>';
+  html+='<p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700;margin-bottom:6px">📋 Paso 4 de 9</p>';
   html+='<h2 style="font-family:Georgia,serif;font-size:22px;color:#3D5A36;font-weight:600;margin:0 0 6px 0;line-height:1.3">Tu escáner físico</h2>';
   html+='<p style="font-size:11px;color:#8B7355;margin:0 0 8px;font-style:italic;letter-spacing:0.3px">Asta Sthana Pariksha · अष्ट स्थान परीक्षा</p>';
   html+='<p style="font-size:13px;color:#5A4A2A;margin:0;line-height:1.5">Tu cuerpo te habla. <strong>18 evaluaciones</strong> según las escrituras sagradas.<br>Las que tu '+nombreDosha(doshaVikriti)+' necesita están <strong style="color:#059669">en verde</strong>.</p>';
@@ -2975,16 +3011,16 @@ function vbAbrirPaso4(){
   
   // === BOTÓN GIGANTE: IR AL PASO SIGUIENTE ===
   html+='<div style="margin:24px 0;padding:18px 14px;background:#FAFAF7;border-radius:12px;border:2px solid #5A7A53">';
-  html+='<p style="font-size:11px;color:#8B7355;text-align:center;margin:0 0 10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700">Ya hiciste el paso 4 de 8</p>';
+  html+='<p style="font-size:11px;color:#8B7355;text-align:center;margin:0 0 10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700">Ya hiciste el paso 4 de 9</p>';
   // Barrita
   var dots4='';
-  for(var k=1;k<=8;k++){
+  for(var k=1;k<=9;k++){
     var iC=(k<=4),iA=(k===4);
     var bgD=iC?'#059669':'#E5E5E4',colD=iC?'#fff':'#A8A29E',sz=iA?32:26,fs=iA?14:12;
     dots4+='<div style="display:inline-flex;align-items:center;justify-content:center;width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:'+bgD+';color:'+colD+';font-size:'+fs+'px;font-weight:800;margin:0 3px;vertical-align:middle">'+(k<4?'✓':k)+'</div>';
   }
   html+='<div style="text-align:center;margin-bottom:14px;line-height:1">'+dots4+'</div>';
-  html+='<button onclick="vbCerrarPaso4()" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(90,122,83,0.3);text-align:center;line-height:1.3">→ IR AL PASO 5 DE 8<div style="font-size:12px;font-weight:600;color:#D1FAE5;margin-top:4px">Tu lectura</div></button>';
+  html+='<button onclick="vbCerrarPaso4();setTimeout(function(){if(typeof vbAbrirPaso5===\'function\')vbAbrirPaso5();},200);" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(90,122,83,0.3);text-align:center;line-height:1.3">→ IR AL PASO 5 DE 9<div style="font-size:12px;font-weight:600;color:#D1FAE5;margin-top:4px">Tu lectura</div></button>';
   html+='</div>';
   
   // Cita textual
@@ -3459,12 +3495,12 @@ function vbAbrirPaso7(){
   
   var html='<div style="background:linear-gradient(180deg,#FAF7F0,#F0FDF4);min-height:100vh;padding:0 0 20px 0">';
   // === NAVBAR FIJO ARRIBA ===
-  html+='<div style="position:sticky;top:0;left:0;right:0;background:#fff;border-bottom:1px solid #5A7A53;padding:10px 16px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:space-between"><button onclick="vbCerrarPaso7()" style="background:#5A7A53;color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px">📖 Volver al índice</button><span style="font-size:11px;color:#5A7A53;font-weight:600;letter-spacing:0.5px">Paso 7 de 8</span></div>';
+  html+='<div style="position:sticky;top:0;left:0;right:0;background:#fff;border-bottom:1px solid #5A7A53;padding:10px 16px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:space-between"><button onclick="vbCerrarPaso7()" style="background:#5A7A53;color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px">📖 Volver al índice</button><span style="font-size:11px;color:#5A7A53;font-weight:600;letter-spacing:0.5px">Paso 7 de 9</span></div>';
   html+='<div style="padding:20px 16px"><div style="max-width:600px;margin:0 auto">';
   
   // Header
   html+='<div style="text-align:center;margin-bottom:20px">';
-  html+='<p style="font-size:11px;letter-spacing:3px;color:#5A7A53;text-transform:uppercase;font-weight:700">🌿 Tu plan de equilibrio · Paso 7 de 8</p>';
+  html+='<p style="font-size:11px;letter-spacing:3px;color:#5A7A53;text-transform:uppercase;font-weight:700">🌿 Tu plan de equilibrio · Paso 7 de 9</p>';
   html+='<h2 style="font-family:Georgia,serif;font-size:24px;color:#3D5A36;font-weight:400;margin-top:8px;line-height:1.3">Chikitsa (tratamiento) personalizado para equilibrar tu '+nombreDosha(doshaVikriti)+'</h2>';
   html+='<p style="font-size:13px;color:#7a7a7a;margin-top:6px">'+tituloSexo(sexo)+' · '+edad+' años · Plan basado en Charaka Samhita</p>';
   html+='</div>';
@@ -4186,15 +4222,15 @@ function vbAbrirPaso7(){
   }
   // === BOTÓN GIGANTE: IR AL PASO SIGUIENTE (SIEMPRE VISIBLE) ===
   html+='<div style="margin:24px 0;padding:18px 14px;background:#FAFAF7;border-radius:12px;border:2px solid #5A7A53">';
-  html+='<p style="font-size:11px;color:#8B7355;text-align:center;margin:0 0 10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700">Ya hiciste el paso 7 de 8</p>';
+  html+='<p style="font-size:11px;color:#8B7355;text-align:center;margin:0 0 10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700">Ya hiciste el paso 7 de 9</p>';
   var dots7='';
-  for(var k=1;k<=8;k++){
+  for(var k=1;k<=9;k++){
     var iC=(k<=7),iA=(k===7);
     var bgD=iC?'#059669':'#E5E5E4',colD=iC?'#fff':'#A8A29E',sz=iA?32:26,fs=iA?14:12;
     dots7+='<div style="display:inline-flex;align-items:center;justify-content:center;width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:'+bgD+';color:'+colD+';font-size:'+fs+'px;font-weight:800;margin:0 3px;vertical-align:middle">'+(k<7?'✓':k)+'</div>';
   }
   html+='<div style="text-align:center;margin-bottom:14px;line-height:1">'+dots7+'</div>';
-  html+='<button onclick="vbAbrirPaso8()" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(90,122,83,0.3);text-align:center;line-height:1.3">→ IR AL PASO 8 DE 8<div style="font-size:12px;font-weight:600;color:#D1FAE5;margin-top:4px">Seguimiento mensual</div></button>';
+  html+='<button onclick="vbAbrirPaso8()" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(90,122,83,0.3);text-align:center;line-height:1.3">→ IR AL PASO 8 DE 9<div style="font-size:12px;font-weight:600;color:#D1FAE5;margin-top:4px">Seguimiento mensual</div></button>';
   html+='</div>';
   
   html+='<p style="font-size:11px;color:#8B7355;text-align:center;font-style:italic;line-height:1.6;margin-bottom:30px">Vedabite acompaña, no diagnostica enfermedad ni reemplaza atención médica. Plan basado en Charaka Samhita, Ashtanga Hridayam y la tradición ayurvédica clásica.</p>';
@@ -4584,11 +4620,11 @@ function vbAbrirPaso8(){
   
   var html='<div style="background:linear-gradient(180deg,#FAF7F0,#F5F3FF);min-height:100vh;padding:0 0 20px 0">';
   // === NAVBAR FIJO ARRIBA ===
-  html+='<div style="position:sticky;top:0;left:0;right:0;background:#fff;border-bottom:1px solid #5B21B6;padding:10px 16px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:space-between"><button onclick="vbCerrarPaso8()" style="background:#5B21B6;color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px">📖 Volver al índice</button><span style="font-size:11px;color:#5B21B6;font-weight:600;letter-spacing:0.5px">Paso 8 de 8</span></div>';
+  html+='<div style="position:sticky;top:0;left:0;right:0;background:#fff;border-bottom:1px solid #5B21B6;padding:10px 16px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:space-between"><button onclick="vbCerrarPaso8()" style="background:#5B21B6;color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px">📖 Volver al índice</button><span style="font-size:11px;color:#5B21B6;font-weight:600;letter-spacing:0.5px">Paso 8 de 9</span></div>';
   html+='<div style="padding:20px 16px"><div style="max-width:600px;margin:0 auto">';
   
   html+='<div style="text-align:center;margin-bottom:20px">';
-  html+='<p style="font-size:11px;letter-spacing:3px;color:#5B21B6;text-transform:uppercase;font-weight:700">📊 Seguimiento mensual · Paso 8 de 8</p>';
+  html+='<p style="font-size:11px;letter-spacing:3px;color:#5B21B6;text-transform:uppercase;font-weight:700">📊 Seguimiento mensual · Paso 8 de 9</p>';
   html+='<h2 style="font-family:Georgia,serif;font-size:24px;color:#3D5A36;font-weight:400;margin-top:8px;line-height:1.3">Tu evolución mes a mes</h2>';
   html+='<p style="font-size:13px;color:#7a7a7a;margin-top:6px">Re-test cada 30 días · Ajuste automático del plan según progreso</p>';
   html+='</div>';
@@ -4625,14 +4661,17 @@ function vbAbrirPaso8(){
   }
   
   // === BLOQUE FINAL: ÍNDICE COMPLETO ===
-  html+='<div style="margin:24px 0;padding:18px 14px;background:#FAFAF7;border-radius:12px;border:2px solid #059669">';
-  html+='<p style="font-size:11px;color:#059669;text-align:center;margin:0 0 10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700">Completaste los 8 pasos</p>';
+  html+='<div style="margin:24px 0;padding:18px 14px;background:#FAFAF7;border-radius:12px;border:2px solid #5A7A53">';
+  html+='<p style="font-size:11px;color:#8B7355;text-align:center;margin:0 0 10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700">Ya hiciste el paso 8 de 9</p>';
   var dots8='';
-  for(var k=1;k<=8;k++){
-    dots8+='<div style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#059669;color:#fff;font-size:13px;font-weight:800;margin:0 3px;vertical-align:middle">✓</div>';
+  for(var k=1;k<=9;k++){
+    var iC=(k<=8),iA=(k===8);
+    var bgD=iC?'#059669':'#E5E5E4',colD=iC?'#fff':'#A8A29E',sz=iA?32:26,fs=iA?14:12;
+    dots8+='<div style="display:inline-flex;align-items:center;justify-content:center;width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:'+bgD+';color:'+colD+';font-size:'+fs+'px;font-weight:800;margin:0 3px;vertical-align:middle">'+(k<8?'✓':k)+'</div>';
   }
   html+='<div style="text-align:center;margin-bottom:14px;line-height:1">'+dots8+'</div>';
-  html+='<div style="background:linear-gradient(135deg,#059669,#047857);color:#fff;border-radius:12px;padding:16px;text-align:center"><p style="font-size:14px;font-weight:700;margin:0 0 4px">✓ Último paso · Anubandha</p><p style="font-size:12px;color:#D1FAE5;margin:0">Mantenés tu equilibrio en el tiempo</p></div>';
+  // Botón al paso 9 (Rasayana)
+  html+='<button onclick="vbCerrarPaso8();setTimeout(function(){if(typeof vbAbrirPaso9Rasayana===\'function\')vbAbrirPaso9Rasayana();},200);" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(90,122,83,0.3);text-align:center;line-height:1.3">→ IR AL PASO 9 DE 9<div style="font-size:12px;font-weight:600;color:#D1FAE5;margin-top:4px">🌱 Rasayana · Tu nuevo estilo de vida</div></button>';
   html+='</div>';
   
   html+='<p style="font-size:11px;color:#8B7355;text-align:center;font-style:italic;line-height:1.6;margin-bottom:30px">Vedabite acompaña, no diagnostica enfermedad ni reemplaza atención médica.</p>';
@@ -4678,7 +4717,7 @@ e+='<div class="tab-content" id="t-meditacion"><button class="back-btn" onclick=
 e+='<div class="tab-content" id="t-ubicacion"><button class="back-btn" onclick="backIdx()">← Volver</button><h3>📍 Cerca Tuyo</h3><div class="card"><a href="https://google.com/maps/search/yoga+cerca" target="_blank" class="btn btn-sage" style="margin-bottom:10px">🧘 Centros de Yoga</a><a href="https://google.com/maps/search/spa+cerca" target="_blank" class="btn btn-sage" style="margin-bottom:10px">💆 Spas</a><a href="https://google.com/maps/search/dietetica+cerca" target="_blank" class="btn btn-sage">🥗 Dietéticas</a></div></div>';
 e+='<div class="tab-content" id="t-salud"><button class="back-btn" onclick="backIdx()">← Volver</button><h3>🏥 Salud</h3><div class="card" style="background:#FEE2E2"><h4>⚠️ Riesgos</h4><ul>'+a.salud.r.map(function(a){return"<li>⚠️ "+a+"</li>"}).join("")+'</ul></div><div class="card" style="background:#D1FAE5"><h4>✅ Prevención</h4><ul>'+a.salud.p.map(function(a){return"<li>✓ "+a+"</li>"}).join("")+"</ul></div>"+tips(a.saludTips)+"</div>";
 e+='<div class="tab-content" id="t-escaner"><button class="back-btn" onclick="backIdx()">← Volver</button><h3>📷 Escáner de menú</h3><div class="card"><p style="margin-bottom:12px">Escribí los platos del menú separados por coma. Te decimos cuál sí y cuál no según tu constitución.</p><textarea class="escaner-input" id="prodIn" placeholder="Ejemplo: milanesa, papas fritas, ensalada cruda, helado" style="min-height:80px;resize:vertical;font-family:inherit"></textarea><button class="btn btn-sage" onclick="scan()" style="width:100%;margin-top:8px">🔍 Analizar menú completo</button><div id="scanRes"></div></div><div class="card" style="background:#F0F9FF"><h4>💡 Probá rápido:</h4><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px"><span class="quick-tag" onclick="qScan(\'café\')">☕ café</span><span class="quick-tag" onclick="qScan(\'helado\')">🍦 helado</span><span class="quick-tag" onclick="qScan(\'arroz\')">🍚 arroz</span><span class="quick-tag" onclick="qScan(\'banana\')">🍌 banana</span><span class="quick-tag" onclick="qScan(\'chocolate\')">🍫 chocolate</span><span class="quick-tag" onclick="qScan(\'milanesa, papas, ensalada\')">🍽️ menú típico</span></div></div></div>';
-e+='<div class="tab-content" id="t-escanerEquilibrio"><button class="back-btn" onclick="backIdx()">← Volver</button><div style="text-align:center;margin:8px 0 18px"><p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700">📋 Escáner del Vaidya · Paso 4 de 8</p><p style="font-size:13px;color:#7a7a7a;margin-top:6px">Las 3 evaluaciones principales del terapeuta ayurvédico</p></div>'+
+e+='<div class="tab-content" id="t-escanerEquilibrio"><button class="back-btn" onclick="backIdx()">← Volver</button><div style="text-align:center;margin:8px 0 18px"><p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700">📋 Escáner del Vaidya · Paso 4 de 9</p><p style="font-size:13px;color:#7a7a7a;margin-top:6px">Las 3 evaluaciones principales del terapeuta ayurvédico</p></div>'+
 '<div style="background:linear-gradient(180deg,#F0FDF4,#FAF7F0);border:2px solid #5A7A53;border-radius:14px;padding:18px;margin-bottom:18px"><p style="font-size:11px;letter-spacing:2px;color:#5A7A53;text-transform:uppercase;font-weight:700;margin-bottom:12px;text-align:center">⭐ Las 3 evaluaciones principales</p><div style="display:flex;flex-direction:column;gap:10px"><a href="#evaluacion-lengua" style="background:#fff;border:1px solid #C49E72;border-radius:10px;padding:14px;text-decoration:none;color:#3D5A36;display:flex;align-items:center;gap:12px"><span style="font-size:28px">👅</span><div><div style="font-size:14px;font-weight:700">Jihva Pariksha (lengua)</div><div style="font-size:12px;color:#7a7a7a">Mapa del intestino y digestión</div></div></a><a href="#evaluacion-ojos" style="background:#fff;border:1px solid #C49E72;border-radius:10px;padding:14px;text-decoration:none;color:#3D5A36;display:flex;align-items:center;gap:12px"><span style="font-size:28px">👁️</span><div><div style="font-size:14px;font-weight:700">Netra Pariksha (ojos)</div><div style="font-size:12px;color:#7a7a7a">Hígado, energía, sistema nervioso</div></div></a><a href="#evaluacion-unas" style="background:#fff;border:1px solid #C49E72;border-radius:10px;padding:14px;text-decoration:none;color:#3D5A36;display:flex;align-items:center;gap:12px"><span style="font-size:28px">💅</span><div><div style="font-size:14px;font-weight:700">Nakha Pariksha (uñas)</div><div style="font-size:12px;color:#7a7a7a">Minerales, calidad de tejidos, dosha óseo</div></div></a></div><p style="font-size:11px;color:#8B7355;margin-top:14px;text-align:center;font-style:italic">Las 17 evaluaciones complementarias están más abajo</p></div>'+
 '<h3>🔬 Escáner de Equilibrio</h3>'+(window.INFO&&window.INFO[res.p]&&window.INFO[res.p].escanerEquilibrio?window.INFO[res.p].escanerEquilibrio:"")+'<div class="card" style="background:#FEF3C7;border:2px solid #F59E0B;margin-top:16px"><p style="font-size:13px;color:#78350F;margin:0;line-height:1.6"><strong>🔬 Análisis experimental — versión Early Access</strong><br><br>Este análisis usa inteligencia artificial entrenada con textos clásicos del Ayurveda (Charaka Samhita, Sushruta Samhita). Está en fase de aprendizaje continuo y mejora con cada uso.<br><br><strong>⚠️ No reemplaza la consulta con un vaidya certificado ni con un médico.</strong><br><br>Si tenés dudas sobre lo que encontró, consultá con un profesional. Vedabite te acompaña, no te diagnostica.</p></div></div>';
 e+='<div class="tab-content" id="t-astrologia"><button class="back-btn" onclick="backIdx()">← Volver</button><h3>🪐 Carta Astral Védica</h3><div class="card" style="text-align:center"><p style="margin-bottom:16px">Descubrí tu carta astral védica. La astrología védica (Jyotish) revela tu dharma y propósito.</p><div style="font-size:48px;margin:20px 0">🪐✨🌙</div></div><div class="card"><h4>📝 Tus datos de nacimiento</h4><p style="color:#666;font-size:14px;margin-bottom:16px">Completá para ver tu carta astral védica</p><input type="date" class="astro-input" id="astroFecha"><input type="time" class="astro-input" id="astroHora"><input type="text" class="astro-input" id="astroLugar" placeholder="Ciudad (ej: Buenos Aires)"><button class="btn btn-gold" onclick="calcAstro()">🔮 VER MI CARTA ASTRAL →</button></div><div id="astroResult"></div></div>';
