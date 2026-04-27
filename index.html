@@ -1744,13 +1744,26 @@ function vbRenderDevolucionIntegral(){
     {n:5,t:'Tu lectura',sk:'Vaidya Nirnaya · वैद्य निर्णय',d:'Cómo naciste vs cómo estás hoy · Las 5 cualidades · La dirección y el movimiento de tu desorden',obj:'Entender qué se te desordenó',precio:'incluido'},
     {n:6,t:'Diagnóstico hiper personalizado',sk:'Samprapti · सम्प्राप्ति',d:'Línea de tiempo 6m/2a/5a/10a · 13 canales (Srotas) · Tus toxinas (Ama) · Las 6 etapas Kriyakala',obj:'Ver hacia dónde vas si no actuás hoy',precio:'incluido'},
     {n:7,t:'Cómo transitar hacia tu equilibrio',sk:'Chikitsa · चिकित्सा',d:'7 módulos prescriptos · 12 hierbas Rasayana · 4 recetas para hacer en casa · Mujer/hombre · Mapa profesionales',obj:'Transitar hacia tu equilibrio',precio:'USD 20/mes'},
-    {n:8,t:'Seguimiento mensual',sk:'Anubandha · अनुबन्ध',d:'Re-test cada 30 días · Ajuste automático del plan · Comparativa día 60/90 · Acceso premium a Vaidyas verificados',obj:'Mantener tu equilibrio en el tiempo',precio:'USD 20/mes'}
+    {n:8,t:'Seguimiento mensual',sk:'Anubandha · अनुबन्ध',d:'Re-test cada 30 días · Ajuste automático del plan · Comparativa día 60/90 · Acceso premium a Vaidyas verificados',obj:'Mantener tu equilibrio en el tiempo',precio:'USD 20/mes'},
+    {n:9,t:'🌱 Rasayana · Tu nuevo estilo de vida',sk:'Rasayana · रसायन',d:'Las 10 conductas · 7 alimentos · 12 hierbas · Anti-edad · Vitalidad sexual · Estilo de vida que sostiene el equilibrio',obj:'Donde tu cuerpo se vuelve eterno',precio:'incluido en Práctica'}
   ];
   
   // Estado dinámico según validaciones encadenadas
   var pasos=pasosBase.map(function(p){
     var cumplido=(typeof vbPasoEstaCompleto==='function')?vbPasoEstaCompleto(p.n):false;
     var anteriorOk=(p.n===1)?true:((typeof vbPasoEstaCompleto==='function')?vbPasoEstaCompleto(p.n-1):false);
+    
+    // CASO ESPECIAL paso 9 (Rasayana): desbloqueado durante trial o pago, requiere solo paso 3 (test) hecho
+    if(p.n===9){
+      var test3OK=(typeof vbPasoEstaCompleto==='function')?vbPasoEstaCompleto(3):false;
+      var trialOK=(typeof vbTrialActivo==='function')?vbTrialActivo():false;
+      var pagoOK=(typeof vbEsUsuarioPago==='function')?vbEsUsuarioPago():false;
+      if(cumplido)p.estado='completado';
+      else if(test3OK&&(trialOK||pagoOK))p.estado='proximo';
+      else p.estado='bloqueado';
+      return p;
+    }
+    
     if(cumplido)p.estado='completado';
     else if(anteriorOk)p.estado='proximo';
     else p.estado='bloqueado';
@@ -1783,13 +1796,14 @@ function vbRenderDevolucionIntegral(){
     else if(p.n===6){clickHandler='vbValidarYAbrir(6)';cursor='pointer';}
     else if(p.n===7){clickHandler='vbValidarYAbrir(7)';cursor='pointer';}
     else if(p.n===8){clickHandler='vbValidarYAbrir(8)';cursor='pointer';}
+    else if(p.n===9){clickHandler='vbValidarYAbrir(9)';cursor='pointer';}
     else {clickHandler='';cursor='default';}
     
     var onclickAttr=clickHandler?' onclick="'+clickHandler+'" role="button" tabindex="0"':'';
     
     html+='<div'+onclickAttr+' style="background:'+bg+';border-left:4px solid '+bd+';padding:12px 14px;border-radius:8px;margin-bottom:8px;opacity:'+opa+';cursor:'+cursor+';transition:transform 0.15s,box-shadow 0.15s" onmouseover="if(this.onclick){this.style.transform=\'translateX(4px)\';this.style.boxShadow=\'0 4px 12px rgba(0,0,0,0.08)\'}" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'\'">';
     html+='<div style="display:flex;align-items:flex-start;gap:10px"><div style="font-size:18px;flex-shrink:0;margin-top:2px">'+ic+'</div><div style="flex:1;min-width:0">';
-    html+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px"><div style="font-size:11px;color:'+col+';font-weight:700;letter-spacing:1px">PASO '+p.n+' DE 8</div><div style="font-size:10px;color:'+prCol+';background:'+prBg+';padding:2px 8px;border-radius:50px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase">'+p.precio+'</div>'+(clickHandler?'<div style="font-size:10px;color:'+col+';margin-left:auto;opacity:0.6">→ Tocá para abrir</div>':'')+'</div>';
+    html+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px"><div style="font-size:11px;color:'+col+';font-weight:700;letter-spacing:1px">PASO '+p.n+' DE 9</div><div style="font-size:10px;color:'+prCol+';background:'+prBg+';padding:2px 8px;border-radius:50px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase">'+p.precio+'</div>'+(clickHandler?'<div style="font-size:10px;color:'+col+';margin-left:auto;opacity:0.6">→ Tocá para abrir</div>':'')+'</div>';
     html+='<div style="font-size:14px;color:'+col+';font-weight:700;line-height:1.3;margin-bottom:2px">'+p.t+'</div>';
     html+='<div style="font-size:10px;color:'+col+';opacity:0.7;font-style:italic;margin-bottom:6px;letter-spacing:0.3px">'+p.sk+'</div>';
     html+='<div style="font-size:12px;color:'+col+';line-height:1.5;opacity:0.85;margin-bottom:6px">'+p.d+'</div>';
@@ -1811,7 +1825,7 @@ function vbRenderDevolucionIntegral(){
     html+='<div style="text-align:center;margin-bottom:14px;line-height:1">'+dots+'</div>';
     
     // === BOTÓN GIGANTE VERDE para ir al siguiente paso ===
-    if(p.n<8){
+    if(p.n<9){
       var siguiente=pasos[p.n]; // pasos[p.n] es el siguiente (índice 0-based)
       var btnHandler='';
       if(p.n+1===4)btnHandler='vbValidarYAbrir(4)';
@@ -1819,10 +1833,11 @@ function vbRenderDevolucionIntegral(){
       else if(p.n+1===6)btnHandler='vbValidarYAbrir(6)';
       else if(p.n+1===7)btnHandler='vbValidarYAbrir(7)';
       else if(p.n+1===8)btnHandler='vbValidarYAbrir(8)';
+      else if(p.n+1===9)btnHandler='vbValidarYAbrir(9)';
       else btnHandler='';
       
       if(btnHandler){
-        html+='<button onclick="event.stopPropagation();'+btnHandler+'" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(90,122,83,0.3);text-align:center;line-height:1.3">→ IR AL PASO '+(p.n+1)+' DE 8<div style="font-size:12px;font-weight:600;color:#D1FAE5;margin-top:4px">'+siguiente.t+'</div></button>';
+        html+='<button onclick="event.stopPropagation();'+btnHandler+'" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(90,122,83,0.3);text-align:center;line-height:1.3">→ IR AL PASO '+(p.n+1)+' DE 9<div style="font-size:12px;font-weight:600;color:#D1FAE5;margin-top:4px">'+siguiente.t+'</div></button>';
       }else{
         html+='<p style="font-size:13px;color:'+col+';text-align:center;margin:0;font-weight:700">→ Próximo: Paso '+(p.n+1)+' de 8 · '+siguiente.t+'</p>';
       }
@@ -3191,7 +3206,20 @@ function vbValidacionDetallada(n){
 }
 
 function vbValidarPaso(n){
-  // Verifica que TODOS los pasos anteriores estén bien (validación detallada)
+  // CASO ESPECIAL: paso 9 (Rasayana) — desbloqueado durante los 7 días de trial
+  // Solo requiere haber hecho el test (paso 3) para tener un dosha sobre el cual armar Rasayana
+  if(n===9){
+    // Verificar que al menos hizo el test (paso 3) para tener dosha
+    var v3=vbValidacionDetallada(3);
+    if(!v3.ok)return {ok:false,faltante:3,detalleFaltante:v3};
+    // Si tiene trial activo o ya pagó, desbloqueado
+    if(typeof vbTrialActivo==='function'&&vbTrialActivo())return {ok:true};
+    if(typeof vbEsUsuarioPago==='function'&&vbEsUsuarioPago())return {ok:true};
+    // Sin trial y sin pago → bloqueado pero el motivo es PAGO, no falta de pasos
+    return {ok:false,faltante:9,detalleFaltante:{ok:false,problema:'Tu prueba terminó',detalle:'Suscribite a Vedabite Práctica para acceder a Rasayana',accion:'Empezar suscripción'}};
+  }
+  
+  // Resto de pasos: verificación encadenada normal
   for(var i=1;i<n;i++){
     var v=vbValidacionDetallada(i);
     if(!v.ok)return {ok:false,faltante:i,detalleFaltante:v};
@@ -3209,7 +3237,8 @@ function vbNombrePaso(n){
     5:'Tu lectura',
     6:'Tu diagnóstico',
     7:'Tu plan personalizado',
-    8:'Seguimiento mensual'
+    8:'Seguimiento mensual',
+    9:'Rasayana · Tu nuevo estilo de vida'
   })[n]||'Paso '+n;
 }
 
@@ -3330,6 +3359,7 @@ function vbIrAPaso(n){
   else if(n===6){if(typeof vbAbrirPaso6==='function')vbAbrirPaso6();}
   else if(n===7){if(typeof vbAbrirPaso7==='function')vbAbrirPaso7();}
   else if(n===8){if(typeof vbAbrirPaso8==='function')vbAbrirPaso8();}
+  else if(n===9){if(typeof vbAbrirPaso9Rasayana==='function')vbAbrirPaso9Rasayana();}
 }
 
 // Wrapper que valida ANTES de abrir un paso. Si falla, muestra modal detallado.
@@ -4290,6 +4320,224 @@ function vbCerrarPaso7(){
 // Velo y candado para secciones bloqueadas
 function vbVeloLock(){
   return '<div style="position:relative;background:#FAF7F0;border-radius:8px;padding:18px;text-align:center"><div style="filter:blur(4px);user-select:none;color:#5A7A53;font-size:13px;line-height:1.6">Contenido completo disponible solo con suscripción activa. Cereales calientes, legumbres bien cocidas con especias, vegetales con ghee, frutas dulces. Horarios específicos. Detalles personalizados según tu cuadro.</div><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;padding:10px 16px;border-radius:50px;border:2px solid #C49E72;font-size:13px;color:#3D5A36;font-weight:700;white-space:nowrap">🔒 Suscribite para ver</div></div>';
+}
+
+// ============================================================
+// PASO 9 — RASAYANA (Tu nuevo estilo de vida)
+// ============================================================
+function vbAbrirPaso9Rasayana(){
+  var datos=window._vbDatos||{};
+  var prakriti=window._vbPrakriti||(datos.prakriti||null);
+  var vikriti=window.res||null;
+  var doshaVikriti=(vikriti&&vikriti.p)||'vata';
+  var doshaPrakriti=prakriti?prakriti.dosha_predominante:doshaVikriti;
+  var pctVikriti=(vikriti&&vikriti.pct)||{vata:33,pitta:33,kapha:33};
+  var edad=datos.edad||60;
+  
+  // Estimación días en equilibrio (desde inicio del trial)
+  var diasEquilibrio=0;
+  try{
+    var tStart=localStorage.getItem('vb_trialStart');
+    if(tStart){
+      var t0=new Date(tStart);
+      var hoy=new Date();
+      diasEquilibrio=Math.floor((hoy-t0)/(1000*60*60*24));
+    }
+  }catch(e){}
+  if(diasEquilibrio<1)diasEquilibrio=1;
+  
+  function nombreDoshaCorto(d){return ({vata:'Vata',pitta:'Pitta',kapha:'Kapha'})[d]||d;}
+  function emojiDosha(d){return ({vata:'🌬️',pitta:'🔥',kapha:'💧'})[d]||'';}
+  
+  // === DATOS DE LOS 7 PILARES ===
+  var R_AUSHADHI={
+    vata:[
+      {bnf:'Fuerza profunda, calma sistema nervioso, mejora vitalidad',sk:'Ashwagandha'},
+      {bnf:'Reconstruye tejidos consumidos',sk:'Bala · "fuerza" en sánscrito'},
+      {bnf:'Nutre, hidrata, especialmente bueno para mujeres',sk:'Shatavari'},
+      {bnf:'Vitalidad nerviosa, dopamina natural',sk:'Kapikacchu'}
+    ],
+    pitta:[
+      {bnf:'El anti-edad supremo, refresca',sk:'Amalaki · el Rasayana maestro'},
+      {bnf:'Nutre, refresca, equilibra hormonas femeninas',sk:'Shatavari'},
+      {bnf:'Claridad mental sin sobreestimular',sk:'Brahmi'},
+      {bnf:'Calma acidez, suaviza membranas',sk:'Yashtimadhu · regaliz'}
+    ],
+    kapha:[
+      {bnf:'Activa metabolismo dormido',sk:'Pippali · pimienta larga'},
+      {bnf:'Limpia canales bloqueados, baja colesterol',sk:'Guggulu'},
+      {bnf:'Despeja pulmones y mente',sk:'Tulsi · albahaca santa'},
+      {bnf:'Saca retención, cuida riñones',sk:'Punarnava'}
+    ]
+  };
+  
+  // ============ HTML ============
+  var html='<div style="background:linear-gradient(180deg,#FAF7F0,#F0FDF4);min-height:100vh;padding:0 0 40px 0">';
+  
+  // === NAVBAR FIJO ===
+  html+='<div style="position:sticky;top:0;left:0;right:0;background:#fff;border-bottom:1px solid #5A7A53;padding:10px 16px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:space-between"><button onclick="vbCerrarPaso9()" style="background:#5A7A53;color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">📖 Volver al índice</button><span style="font-size:11px;color:#5A7A53;font-weight:600;letter-spacing:0.5px">🌱 Paso 9 de 9</span></div>';
+  
+  // === HERO ===
+  html+='<div style="padding:32px 20px 24px;text-align:center;background:linear-gradient(180deg,#5A7A53,#3D5A36);color:#fff;border-radius:0 0 24px 24px;margin-bottom:24px">';
+  html+='<div style="font-size:11px;letter-spacing:3px;color:#FDE68A;text-transform:uppercase;font-weight:800;margin-bottom:10px">✨ Paso 9 de 9</div>';
+  html+='<h1 style="font-family:Georgia,serif;font-size:32px;font-weight:400;margin-bottom:10px;line-height:1.2;color:#fff">🌱 <strong>Rasayana</strong> <span style="font-size:14px;color:#A7F3D0;font-weight:400;font-style:italic;letter-spacing:1px;display:inline-block;margin-left:6px;vertical-align:middle">रसायन</span></h1>';
+  html+='<div style="font-size:13px;color:#A7F3D0;font-style:italic;letter-spacing:1px;margin-bottom:14px"><strong>El camino del Rasa</strong> (el plasma vital)</div>';
+  html+='<p style="font-size:14px;line-height:1.6;color:#D1FAE5;max-width:480px;margin:0 auto">Acá empieza otra cosa. No es un paso más.<br>Es donde tu cuerpo se vuelve eterno.</p>';
+  html+='</div>';
+  
+  html+='<div style="padding:0 16px;max-width:600px;margin:0 auto">';
+  
+  // === BIENVENIDA ===
+  html+='<div style="background:#fff;border:2px solid #5A7A53;border-radius:16px;padding:24px 20px;margin-bottom:20px;text-align:center">';
+  html+='<h2 style="font-family:Georgia,serif;font-size:20px;color:#3D5A36;font-weight:600;margin-bottom:14px;line-height:1.3">Llegaste hasta acá</h2>';
+  html+='<p style="font-size:14px;color:#5A4A2A;line-height:1.7;margin-bottom:8px">Hiciste el camino completo: limpiaste lo que sobraba, equilibraste lo que faltaba, sostuviste tu plan.</p>';
+  html+='<p style="font-size:14px;color:#5A4A2A;line-height:1.7;margin-bottom:8px"><strong>Ahora viene el último capítulo: rejuvenecer.</strong></p>';
+  html+='<div style="font-style:italic;color:#8B7355;border-left:3px solid #C49E72;padding-left:12px;text-align:left;margin-top:14px;font-size:13px;line-height:1.6">"<strong>Rasayana significa el camino del Rasa, el plasma vital.</strong> No es un suplemento ni un producto. Es una disciplina de vida que detiene el envejecimiento celular." <em style="color:#8B7355;font-size:11px;display:block;margin-top:6px">— Charaka Samhita · चरक संहिता</em></div>';
+  html+='</div>';
+  
+  // === SECCIÓN 1 De Bono: ¿Qué cambió? ===
+  html+='<div style="background:#fff;border-radius:16px;padding:22px 18px;margin-bottom:20px;box-shadow:0 2px 12px rgba(90,122,83,0.08);border-top:4px solid #059669">';
+  html+='<div style="font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:800;margin-bottom:8px;color:#059669">Sección 1 · Espejo</div>';
+  html+='<h2 style="font-family:Georgia,serif;font-size:22px;font-weight:600;margin-bottom:14px;line-height:1.3;color:#065F46">¿Qué cambió en vos desde que empezaste?</h2>';
+  html+='<p style="font-size:14px;color:#5A4A2A;line-height:1.7;margin-bottom:10px">Esto es lo que tu cuerpo ganó hasta hoy. Mirá lo que ya tenés instalado:</p>';
+  html+='<div style="display:flex;flex-direction:column;gap:10px;margin-top:14px">';
+  html+='<div style="background:#F0FDF4;border-left:4px solid #059669;padding:10px 14px;border-radius:8px"><div style="font-size:13px;color:#065F46;font-weight:700;margin-bottom:4px">📊 Tu Vikriti hoy</div><div style="font-size:13px;color:#3D2914;line-height:1.5">'+emojiDosha('vata')+' Vata '+pctVikriti.vata+'% · '+emojiDosha('pitta')+' Pitta '+pctVikriti.pitta+'% · '+emojiDosha('kapha')+' Kapha '+pctVikriti.kapha+'%</div></div>';
+  html+='<div style="background:#F0FDF4;border-left:4px solid #059669;padding:10px 14px;border-radius:8px"><div style="font-size:13px;color:#065F46;font-weight:700;margin-bottom:4px">🔥 Días en tu camino</div><div style="font-size:13px;color:#3D2914;line-height:1.5"><strong>'+diasEquilibrio+' día'+(diasEquilibrio!==1?'s':'')+'</strong> · vas instalando el cambio</div></div>';
+  html+='<div style="background:#F0FDF4;border-left:4px solid #059669;padding:10px 14px;border-radius:8px"><div style="font-size:13px;color:#065F46;font-weight:700;margin-bottom:4px">💪 Hábitos que vas instalando</div><div style="font-size:13px;color:#3D2914;line-height:1.5">Comida que te conviene · Tu rutina diaria · Pranayama · Yoga para tu '+nombreDoshaCorto(doshaVikriti)+' · Automasaje</div></div>';
+  html+='<div style="background:#F0FDF4;border-left:4px solid #059669;padding:10px 14px;border-radius:8px"><div style="font-size:13px;color:#065F46;font-weight:700;margin-bottom:4px">⏳ Tu edad biológica estimada</div><div style="font-size:13px;color:#3D2914;line-height:1.5">Cronológica: <strong>'+edad+' años</strong> · Si seguís: -3 a -5 años en 12 meses</div></div>';
+  html+='</div></div>';
+  
+  // === SECCIÓN 2 De Bono: Riesgo de regresión ===
+  html+='<div style="background:#fff;border-radius:16px;padding:22px 18px;margin-bottom:20px;box-shadow:0 2px 12px rgba(90,122,83,0.08);border-top:4px solid #DC2626">';
+  html+='<div style="font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:800;margin-bottom:8px;color:#DC2626">Sección 2 · Riesgo de regresión</div>';
+  html+='<h2 style="font-family:Georgia,serif;font-size:22px;font-weight:600;margin-bottom:14px;line-height:1.3;color:#7F1D1D">¿Qué pasa en vos si dejás de hacer esto?</h2>';
+  html+='<p style="font-size:14px;color:#5A4A2A;line-height:1.7;margin-bottom:10px">El cuerpo tiene memoria, pero también tiene velocidad de regresión. Esto es lo que vuelve si parás:</p>';
+  html+='<div style="display:flex;flex-direction:column;gap:10px;margin-top:14px">';
+  html+='<div style="background:#FEE2E2;border-left:4px solid #DC2626;padding:10px 14px;border-radius:8px"><div style="font-size:11px;color:#7F1D1D;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">⏱️ En 30 días</div><div style="font-size:13px;color:#3D2914;line-height:1.5">Vuelven los primeros síntomas: pérdida de calidad de sueño, ansiedad sostenida 2-3 días/semana, sequedad de piel</div></div>';
+  html+='<div style="background:#FEE2E2;border-left:4px solid #DC2626;padding:10px 14px;border-radius:8px"><div style="font-size:11px;color:#7F1D1D;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">⏱️ En 90 días</div><div style="font-size:13px;color:#3D2914;line-height:1.5">Tu Vikriti se desbalancea otra vez al nivel original. Volvés al punto de partida, pero con tejido más cansado</div></div>';
+  html+='<div style="background:#FEE2E2;border-left:4px solid #DC2626;padding:10px 14px;border-radius:8px"><div style="font-size:11px;color:#7F1D1D;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">⏱️ En 1 año</div><div style="font-size:13px;color:#3D2914;line-height:1.5">Estás peor que antes de empezar: tu cuerpo "registró" el desorden como nuevo normal. Recuperar cuesta el doble</div></div>';
+  html+='<div style="background:#FEE2E2;border-left:4px solid #DC2626;padding:10px 14px;border-radius:8px"><div style="font-size:11px;color:#7F1D1D;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">⏱️ En 5 años</div><div style="font-size:13px;color:#3D2914;line-height:1.5">Tu <strong>vitalidad profunda</strong> <em style="color:#7F1D1D;font-size:11px">(Ojas)</em> se disipó. Aparece envejecimiento acelerado: piel, articulaciones, mente</div></div>';
+  html+='</div></div>';
+  
+  // === SECCIÓN 3 De Bono: Lo que se desbloquea ===
+  html+='<div style="background:#fff;border-radius:16px;padding:22px 18px;margin-bottom:20px;box-shadow:0 2px 12px rgba(90,122,83,0.08);border-top:4px solid #C49E72">';
+  html+='<div style="font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:800;margin-bottom:8px;color:#C49E72">Sección 3 · Tu camino completo</div>';
+  html+='<h2 style="font-family:Georgia,serif;font-size:22px;font-weight:600;margin-bottom:14px;line-height:1.3;color:#3D5A36">¿Qué se desbloquea si seguís?</h2>';
+  html+='<p style="font-size:14px;color:#5A4A2A;line-height:1.7;margin-bottom:14px">Si entrás a Rasayana de verdad, esto es lo que viene. Tu plan está armado para tu <strong>'+nombreDoshaCorto(doshaVikriti)+'</strong>:</p>';
+  
+  // Tabs
+  html+='<div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:14px">';
+  var tabs=[
+    {id:'achara',e:'📜',t:'Conductas'},
+    {id:'ahara',e:'🍽️',t:'Alimentos'},
+    {id:'aushadhi',e:'🌿',t:'Hierbas'},
+    {id:'vihara',e:'🧘',t:'Estilo de vida'},
+    {id:'medhya',e:'🧠',t:'Mente'},
+    {id:'vajikarana',e:'👤',t:'Vitalidad sexual'},
+    {id:'vaya',e:'⏳',t:'Anti-edad'}
+  ];
+  tabs.forEach(function(tab,idx){
+    html+='<button id="rtab-btn-'+tab.id+'" onclick="vbRasayanaTab(\''+tab.id+'\')" style="flex-shrink:0;padding:10px 14px;background:'+(idx===0?'#3D5A36':'#fff')+';border:1px solid '+(idx===0?'#3D5A36':'#C49E72')+';color:'+(idx===0?'#fff':'#5A4A2A')+';border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap">'+tab.e+' '+tab.t+'</button>';
+  });
+  html+='</div>';
+  
+  // Contenido tabs (todos hidden excepto el primero)
+  // TAB 1: Achara
+  html+='<div id="rtab-achara" style="display:block"><div style="background:#FFF7ED;border:1px solid #C49E72;border-radius:12px;padding:16px"><div style="font-size:11px;letter-spacing:2px;color:#C45F0F;text-transform:uppercase;font-weight:800;margin-bottom:6px">📜 Pilar 1</div><h3 style="font-size:18px;color:#3D5A36;font-weight:600;margin-bottom:6px"><strong>Las 10 conductas que rejuvenecen</strong></h3><div style="font-size:11px;color:#8B7355;font-style:italic;margin-bottom:10px">Achara Rasayana · आचार रसायन</div><p style="font-size:13px;color:#3D2914;line-height:1.7;margin-bottom:8px">Universales (no varían por dosha). Son la base ética. Sin ellas, ninguna hierba ni alimento funciona.</p><ol style="padding-left:22px;font-size:13px;color:#3D2914;line-height:1.7"><li><strong>Decir la verdad sin agredir</strong> — la mentira deteriora el Ojas</li><li><strong>No dañar a ningún ser vivo</strong> — Ahimsa</li><li><strong>Mantener los sentidos limpios</strong> — vista, oído, gusto</li><li><strong>Devoción</strong> — hacia algo más grande que vos</li><li><strong>Estudio diario</strong> que eleve la mente <em style="color:#8B7355;font-size:11px">(Svadhyaya)</em></li><li><strong>Compañía de personas sabias</strong> <em style="color:#8B7355;font-size:11px">(Satsanga)</em></li><li><strong>Generosidad activa</strong> — dar más de lo que recibís</li><li><strong>Gratitud diaria</strong> — al menos 3 cosas por día</li><li><strong>Cuidado del cuerpo</strong> como templo</li><li><strong>Vivir según tu Dharma</strong> — propósito personal</li></ol></div></div>';
+  
+  // TAB 2: Ahara
+  html+='<div id="rtab-ahara" style="display:none"><div style="background:#FFF7ED;border:1px solid #C49E72;border-radius:12px;padding:16px"><div style="font-size:11px;letter-spacing:2px;color:#C45F0F;text-transform:uppercase;font-weight:800;margin-bottom:6px">🍽️ Pilar 2</div><h3 style="font-size:18px;color:#3D5A36;font-weight:600;margin-bottom:6px"><strong>Los 7 alimentos que rejuvenecen</strong></h3><div style="font-size:11px;color:#8B7355;font-style:italic;margin-bottom:10px">Ahara Rasayana · आहार रसायन</div><p style="font-size:13px;color:#3D2914;line-height:1.7;margin-bottom:8px">Alimentos comunes con poder Rasayana cuando se consumen con intención y momento correcto:</p><table style="width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;margin-top:12px;font-size:12px"><thead><tr><th style="background:#5A7A53;color:#fff;padding:8px;text-align:left">Alimento</th><th style="background:#5A7A53;color:#fff;padding:8px;text-align:left">Vata</th><th style="background:#5A7A53;color:#fff;padding:8px;text-align:left">Pitta</th><th style="background:#5A7A53;color:#fff;padding:8px;text-align:left">Kapha</th></tr></thead><tbody><tr><td style="padding:8px;border-bottom:1px solid #E8DFC8;color:#3D2914">Ghee orgánico</td><td style="padding:8px;border-bottom:1px solid #E8DFC8;color:#3D2914">✅ 1-2 cdas</td><td style="padding:8px;border-bottom:1px solid #E8DFC8;color:#3D2914">✅ 1 cda</td><td style="padding:8px;border-bottom:1px solid #E8DFC8;color:#3D2914">⚠️ 1/2 cda</td></tr><tr><td style="padding:8px;border-bottom:1px solid #E8DFC8;color:#3D2914">Leche tibia con dátiles</td><td style="padding:8px;border-bottom:1px solid #E8DFC8;color:#3D2914">✅</td><td style="padding:8px;border-bottom:1px solid #E8DFC8;color:#3D2914">✅</td><td style="padding:8px;border-bottom:1px solid #E8DFC8;color:#3D2914">❌</td></tr><tr><td style="padding:8px;border-bottom:1px solid #E8DFC8;color:#3D2914">Almendras remojadas</td><td style="padding:8px;border-bottom:1px solid #E8DFC8;color:#3D2914">✅ 7/día</td><td style="padding:8px;border-bottom:1px solid #E8DFC8;color:#3D2914">✅ 5/día</td><td style="padding:8px;border-bottom:1px solid #E8DFC8;color:#3D2914">⚠️ 3/día</td></tr><tr><td style="padding:8px;border-bottom:1px solid #E8DFC8;color:#3D2914">Miel cruda (NO calentada)</td><td style="padding:8px;border-bottom:1px solid #E8DFC8;color:#3D2914">⚠️ Poca</td><td style="padding:8px;border-bottom:1px solid #E8DFC8;color:#3D2914">⚠️ Poca</td><td style="padding:8px;border-bottom:1px solid #E8DFC8;color:#3D2914">✅ 1 cdita</td></tr><tr><td style="padding:8px;border-bottom:1px solid #E8DFC8;color:#3D2914">Frutas dulces frescas</td><td style="padding:8px;border-bottom:1px solid #E8DFC8;color:#3D2914">✅</td><td style="padding:8px;border-bottom:1px solid #E8DFC8;color:#3D2914">✅</td><td style="padding:8px;border-bottom:1px solid #E8DFC8;color:#3D2914">⚠️ Moderado</td></tr><tr><td style="padding:8px;border-bottom:1px solid #E8DFC8;color:#3D2914">Azafrán</td><td style="padding:8px;border-bottom:1px solid #E8DFC8;color:#3D2914">✅</td><td style="padding:8px;border-bottom:1px solid #E8DFC8;color:#3D2914">✅</td><td style="padding:8px;border-bottom:1px solid #E8DFC8;color:#3D2914">✅</td></tr><tr><td style="padding:8px;color:#3D2914">Ghee + cúrcuma</td><td style="padding:8px;color:#3D2914">✅ Mañana</td><td style="padding:8px;color:#3D2914">✅ Mañana</td><td style="padding:8px;color:#3D2914">❌</td></tr></tbody></table></div></div>';
+  
+  // TAB 3: Aushadhi (cambia según dosha del usuario)
+  var hierbasUsuario=R_AUSHADHI[doshaVikriti]||R_AUSHADHI.vata;
+  var auCont='<div id="rtab-aushadhi" style="display:none"><div style="background:#FFF7ED;border:1px solid #C49E72;border-radius:12px;padding:16px"><div style="font-size:11px;letter-spacing:2px;color:#C45F0F;text-transform:uppercase;font-weight:800;margin-bottom:6px">🌿 Pilar 3</div><h3 style="font-size:18px;color:#3D5A36;font-weight:600;margin-bottom:6px"><strong>Las 12 hierbas Rasayana clásicas</strong></h3><div style="font-size:11px;color:#8B7355;font-style:italic;margin-bottom:10px">Aushadhi Rasayana · औषधि रसायन</div><p style="font-size:13px;color:#3D2914;line-height:1.7;margin-bottom:8px">Las hierbas Rasayana NO son las mismas que usaste en el Paso 7. Son superiores: actúan a nivel celular profundo. Tus 4 hierbas para tu <strong>'+nombreDoshaCorto(doshaVikriti)+'</strong>:</p><ul style="padding-left:22px;font-size:13px;color:#3D2914;line-height:1.8">';
+  hierbasUsuario.forEach(function(h){
+    auCont+='<li><strong>'+h.bnf+'</strong> <em style="color:#8B7355;font-size:11px">('+h.sk+')</em></li>';
+  });
+  auCont+='</ul></div></div>';
+  html+=auCont;
+  
+  // TAB 4: Vihara
+  html+='<div id="rtab-vihara" style="display:none"><div style="background:#FFF7ED;border:1px solid #C49E72;border-radius:12px;padding:16px"><div style="font-size:11px;letter-spacing:2px;color:#C45F0F;text-transform:uppercase;font-weight:800;margin-bottom:6px">🧘 Pilar 4</div><h3 style="font-size:18px;color:#3D5A36;font-weight:600;margin-bottom:6px"><strong>El estilo de vida que sostiene</strong></h3><div style="font-size:11px;color:#8B7355;font-style:italic;margin-bottom:10px">Vihara Rasayana · विहार रसायन</div><p style="font-size:13px;color:#3D2914;line-height:1.7;margin-bottom:8px">Las hierbas y alimentos solo funcionan si tu vida los acompaña. Cuatro disciplinas no negociables:</p><ul style="padding-left:22px;font-size:13px;color:#3D2914;line-height:1.8"><li><strong>Moderación sexual proporcional a tu edad</strong> <em style="color:#8B7355;font-size:11px">(Brahmacharya)</em> — no es abstinencia, es sabiduría sobre la esencia reproductiva (Shukra)</li><li><strong>Práctica espiritual diaria</strong> <em style="color:#8B7355;font-size:11px">(Sadhana)</em> — meditación + pranayama 30 min</li><li><strong>Rutina diaria estricta</strong> <em style="color:#8B7355;font-size:11px">(Dinacharya)</em> — la rutina que aprendiste en Paso 7</li><li><strong>Adaptarse a las estaciones</strong> <em style="color:#8B7355;font-size:11px">(Ritucharya)</em> — Ayurveda cambia con cada Ritu</li></ul></div></div>';
+  
+  // TAB 5: Medhya
+  html+='<div id="rtab-medhya" style="display:none"><div style="background:#FFF7ED;border:1px solid #C49E72;border-radius:12px;padding:16px"><div style="font-size:11px;letter-spacing:2px;color:#C45F0F;text-transform:uppercase;font-weight:800;margin-bottom:6px">🧠 Pilar 5</div><h3 style="font-size:18px;color:#3D5A36;font-weight:600;margin-bottom:6px"><strong>Rejuvenecedores mentales</strong></h3><div style="font-size:11px;color:#8B7355;font-style:italic;margin-bottom:10px">Medhya Rasayana · मेध्य रसायन</div><p style="font-size:13px;color:#3D2914;line-height:1.7;margin-bottom:8px">Hierbas específicas para inteligencia, memoria y claridad mental:</p><ul style="padding-left:22px;font-size:13px;color:#3D2914;line-height:1.8"><li><strong>Memoria de corto plazo y foco</strong> <em style="color:#8B7355;font-size:11px">(Brahmi · Bacopa monnieri)</em></li><li><strong>Memoria de largo plazo, regeneración neuronal</strong> <em style="color:#8B7355;font-size:11px">(Mandukaparni / Gotu Kola)</em></li><li><strong>Claridad mental, paz interior</strong> <em style="color:#8B7355;font-size:11px">(Shankhpushpi)</em></li><li><strong>Intelecto agudo, comprensión profunda</strong> <em style="color:#8B7355;font-size:11px">(Jyotishmati)</em></li></ul><p style="font-size:13px;color:#3D2914;line-height:1.7;margin-top:12px"><strong>Cómo tomarlas:</strong> Una hierba a la vez por 90 días, después rotar. Con ghee tibio o leche.</p></div></div>';
+  
+  // TAB 6: Vajikarana
+  html+='<div id="rtab-vajikarana" style="display:none"><div style="background:#FFF7ED;border:1px solid #C49E72;border-radius:12px;padding:16px"><div style="font-size:11px;letter-spacing:2px;color:#C45F0F;text-transform:uppercase;font-weight:800;margin-bottom:6px">👤 Pilar 6</div><h3 style="font-size:18px;color:#3D5A36;font-weight:600;margin-bottom:6px"><strong>Vitalidad sexual y reproductiva</strong></h3><div style="font-size:11px;color:#8B7355;font-style:italic;margin-bottom:10px">Vajikarana · वाजीकरण</div><p style="font-size:13px;color:#3D2914;line-height:1.7;margin-bottom:8px">La <strong>energía reproductiva</strong> <em style="color:#8B7355;font-size:11px">(Shukra)</em> es uno de los 7 dhatus principales. Su salud determina vitalidad general, no solo sexual.</p><h4 style="color:#3D5A36;margin:12px 0 6px;font-size:14px">👩 Mujer:</h4><ul style="padding-left:22px;font-size:13px;color:#3D2914;line-height:1.8"><li><strong>La reina de las hierbas femeninas</strong> <em style="color:#8B7355;font-size:11px">(Shatavari · "la que tiene 100 maridos")</em></li><li><strong>Útero saludable, ciclo regular</strong> <em style="color:#8B7355;font-size:11px">(Ashoka)</em></li><li><strong>Equilibra hormonas, mejora flujo</strong> <em style="color:#8B7355;font-size:11px">(Lodhra)</em></li></ul><h4 style="color:#3D5A36;margin:12px 0 6px;font-size:14px">👨 Hombre:</h4><ul style="padding-left:22px;font-size:13px;color:#3D2914;line-height:1.8"><li><strong>Fuerza, vitalidad, libido</strong> <em style="color:#8B7355;font-size:11px">(Ashwagandha)</em></li><li><strong>Dopamina, motivación, función eréctil</strong> <em style="color:#8B7355;font-size:11px">(Kapikacchu)</em></li><li><strong>Testosterona natural, próstata</strong> <em style="color:#8B7355;font-size:11px">(Gokshura)</em></li><li><strong>Vigor y resistencia</strong> <em style="color:#8B7355;font-size:11px">(Safed Musli)</em></li></ul></div></div>';
+  
+  // TAB 7: Vaya Sthapana
+  html+='<div id="rtab-vaya" style="display:none"><div style="background:#FFF7ED;border:1px solid #C49E72;border-radius:12px;padding:16px"><div style="font-size:11px;letter-spacing:2px;color:#C45F0F;text-transform:uppercase;font-weight:800;margin-bottom:6px">⏳ Pilar 7</div><h3 style="font-size:18px;color:#3D5A36;font-weight:600;margin-bottom:6px"><strong>Estabilizadores anti-edad</strong></h3><div style="font-size:11px;color:#8B7355;font-style:italic;margin-bottom:10px">Vaya Sthapana · वय स्थापन</div><p style="font-size:13px;color:#3D2914;line-height:1.7;margin-bottom:8px">Hierbas específicas para detener el deterioro celular y prolongar la juventud activa. Las 3 más estudiadas:</p><ul style="padding-left:22px;font-size:13px;color:#3D2914;line-height:1.8"><li><strong>Inmunidad celular, longevidad — el "néctar de los dioses"</strong> <em style="color:#8B7355;font-size:11px">(Guduchi · Tinospora cordifolia · Amrita)</em></li><li><strong>El anti-aging maestro, máxima vitamina C natural</strong> <em style="color:#8B7355;font-size:11px">(Amalaki)</em></li><li><strong>Limpieza profunda continua del colon</strong> <em style="color:#8B7355;font-size:11px">(Haritaki)</em></li></ul><p style="font-size:13px;color:#3D2914;line-height:1.7;margin-top:12px"><strong>Combinación clásica:</strong> Triphala (Amalaki + Haritaki + Bibhitaki) + Guduchi diario después de los 40.</p></div></div>';
+  
+  html+='</div>'; // cierre sección 3
+  
+  // === BENEFICIOS CONCRETOS ===
+  html+='<div style="background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border-radius:16px;padding:22px 18px;margin-bottom:20px">';
+  html+='<h2 style="font-family:Georgia,serif;color:#fff;margin-bottom:14px;font-size:20px;font-weight:600">📊 Beneficios concretos que vas a notar</h2>';
+  var beneficios=[
+    {t:'Mes 3',d:'Piel más firme, menos arrugas finas. Despertar con energía propia (sin café). Digestión silenciosa.'},
+    {t:'Mes 6',d:'Más energía sostenida durante el día. Menos fatiga al atardecer. Sueño profundo de 7-8 hs sin interrupciones.'},
+    {t:'Año 1',d:'Edad biológica medible -3 a -5 años. Pelo más fuerte, uñas firmes, ojos más claros.'},
+    {t:'Año 3',d:'Longevidad celular optimizada. Marcadores cardiovasculares en rangos de persona 10 años más joven.'},
+    {t:'Año 5+',d:'Tu <strong>vitalidad profunda</strong> <em style="color:#FDE68A;font-size:11px">(Ojas)</em> se reconstruyó. Vitalidad estable. Mente clara. Cuerpo que no envejece como el de tus pares.'}
+  ];
+  beneficios.forEach(function(b){
+    html+='<div style="background:rgba(255,255,255,0.12);border-left:3px solid #FDE68A;padding:10px 14px;border-radius:8px;margin-bottom:10px"><div style="font-size:11px;color:#FDE68A;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">📍 '+b.t+'</div><div style="font-size:13px;color:#fff;line-height:1.5">'+b.d+'</div></div>';
+  });
+  html+='</div>';
+  
+  // === CTA FINAL ===
+  html+='<div style="background:#fff;border:2px dashed #C49E72;border-radius:14px;padding:22px;text-align:center;margin-bottom:20px">';
+  html+='<h3 style="font-family:Georgia,serif;font-size:18px;color:#3D5A36;margin-bottom:10px;font-weight:600">🌱 Empezá tu Rasayana hoy</h3>';
+  html+='<p style="font-size:13px;color:#5A4A2A;line-height:1.6;margin-bottom:14px">El primer paso es elegir 1 sola cosa de cada pilar y sostenerla 90 días. No quieras todo a la vez. Rasayana es paciencia.</p>';
+  html+='<button onclick="alert(\'Próximamente: programa Rasayana de 90 días con seguimiento\')" style="display:inline-block;width:100%;padding:14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">Activar mi programa Rasayana →</button>';
+  html+='</div>';
+  
+  html+='<p style="font-size:11px;color:#8B7355;font-style:italic;text-align:center;line-height:1.5;padding:14px 20px">Vedabite acompaña, no diagnostica enfermedad ni reemplaza atención médica. Las hierbas Rasayana se toman bajo guía de un Vaidya certificado, especialmente con medicación crónica, embarazo o lactancia.</p>';
+  
+  html+='</div></div>';
+  
+  // Crear o actualizar pantalla s11
+  var s11=document.getElementById('s11');
+  if(!s11){s11=document.createElement('div');s11.className='screen';s11.id='s11';document.body.appendChild(s11);}
+  s11.innerHTML=html;
+  show('s11');
+  
+  // Marcar paso 9 visto
+  if(typeof vbMarcarPasoCompleto==='function')vbMarcarPasoCompleto(9);
+  
+  try{if(typeof gtag==='function')gtag('event','paso9_visto',{dosha:doshaVikriti});}catch(e){}
+}
+
+// Cambia el tab activo en Rasayana
+function vbRasayanaTab(tabId){
+  var tabs=['achara','ahara','aushadhi','vihara','medhya','vajikarana','vaya'];
+  tabs.forEach(function(t){
+    var content=document.getElementById('rtab-'+t);
+    if(content)content.style.display=(t===tabId?'block':'none');
+    var btn=document.getElementById('rtab-btn-'+t);
+    if(btn){
+      if(t===tabId){
+        btn.style.background='#3D5A36';
+        btn.style.color='#fff';
+        btn.style.border='1px solid #3D5A36';
+      }else{
+        btn.style.background='#fff';
+        btn.style.color='#5A4A2A';
+        btn.style.border='1px solid #C49E72';
+      }
+    }
+  });
+  try{if(typeof gtag==='function')gtag('event','rasayana_tab',{tab:tabId});}catch(e){}
+}
+
+function vbCerrarPaso9(){
+  show('s4');
+  setTimeout(function(){
+    var devo=document.getElementById('vbDevolucionIntegral');
+    if(devo)devo.scrollIntoView({behavior:'smooth',block:'start'});
+  },150);
+  try{if(typeof gtag==='function')gtag('event','paso9_cerrado');}catch(e){}
 }
 
 // ============================================================
