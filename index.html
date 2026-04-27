@@ -500,7 +500,11 @@ Pequeños ajustes que cambian todo.
 .btn-cta-hero:hover{transform:scale(1.02);box-shadow:0 6px 20px rgba(224,122,31,.45)}
 .btn-cta-hero:active{transform:scale(0.97)}
 </style>
-<p style="font-size:13px;color:#8B7355;margin-top:14px;letter-spacing:0.3px">✓ Sin tarjeta · ✓ 100% gratis · ✓ Resultado al instante</p>
+<div style="margin-top:24px;padding:18px 16px;background:rgba(255,255,255,0.5);border-radius:12px;border-left:3px solid #C49E72;text-align:left">
+<p style="font-size:14px;color:#3D5A36;line-height:1.7;margin:0 0 10px;font-style:italic">🌊 Tu cuerpo es como un río: nunca es el mismo.<br>Como el agua, todo lo que metés adentro fluye y causa un efecto.</p>
+<p style="font-size:14px;color:#3D5A36;line-height:1.7;margin:0;font-weight:600">Estás a tiempo. Siempre estás a tiempo de revertir.</p>
+</div>
+<p style="font-size:12px;color:#8B7355;margin-top:14px;letter-spacing:0.3px;text-align:center">✓ Sin tarjeta · ✓ 100% gratis · ✓ Resultado al instante</p>
 <div id="savedSession" style="display:none;margin-top:24px"><div class="card" style="background:#F0FDF4;border:2px solid #5A7A53;padding:18px"><p style="margin-bottom:14px;font-size:15px;color:#3D5A36;font-weight:600">🎉 ¡Tenés una sesión guardada!</p><p style="margin-bottom:16px;font-size:13px;color:#5A7A53">Podés continuar donde la dejaste o empezar de cero.</p><button type="button" class="btn btn-sage" style="padding:18px;font-size:15px;touch-action:manipulation;min-height:54px" onclick="loadSession()">CONTINUAR MI PERFIL →</button><button type="button" style="margin-top:14px;padding:8px;background:none;border:none;color:#8B7355;font-size:12px;text-decoration:underline;cursor:pointer;display:block;margin-left:auto;margin-right:auto" onclick="confirmClearSession()">empezar de nuevo</button></div></div>
 </div>
 </div>
@@ -1685,9 +1689,9 @@ function vbRenderDevolucionIntegral(){
   var pasos=[
     {n:1,t:'Datos básicos',sk:'Vyaktigata Vivara · व्यक्तिगत विवरा',d:'Sexo, edad, fecha y hora de nacimiento, ciudad, condiciones de salud',obj:'Conocer tu situación actual',estado:'completado',precio:'gratis'},
     {n:2,t:'Carta natal védica',sk:'Janma Kundali Jyotish · जन्म कुण्डली ज्योतिष',d:'Lagna, Surya Rashi, Chandra Rashi, Nakshatra · Tu Prakriti calculada por API real',obj:'Conocer tu naturaleza desde el nacimiento',estado:'completado',precio:'gratis'},
-    {n:3,t:'Test del estado actual',sk:'Vikriti Pariksha · विकृति परीक्षा',d:'50 preguntas según las 14 áreas del Vaidya · Tu estado actual en porcentajes Vata/Pitta/Kapha',obj:'Leer cómo estás hoy',estado:'completado',precio:'gratis'},
-    {n:4,t:'Escáner del Vaidya',sk:'Asta Sthana Pariksha · अष्ट स्थान परीक्षा',d:'18 evaluaciones físicas · Lengua, ojos, uñas con foto + IA · Pulso, sudor, voz, postura',obj:'Confirmar el diagnóstico con tu cuerpo',estado:'proximo',precio:'7 días gratis'},
-    {n:5,t:'Lectura del Vaidya',sk:'Vaidya Nirnaya · वैद्य निर्णय',d:'Cruce Prakriti vs Vikriti · 5 cualidades · Vikara y Gati de tu tránsito',obj:'Entender qué se salió de equilibrio',estado:'pendiente',precio:'incluido'},
+    {n:3,t:'Test del estado actual',sk:'Vikriti Pariksha · विकृति परीक्षा',d:'50 preguntas que cubren las 14 zonas que mide el Ayurveda · Tu estado actual en porcentajes Vata/Pitta/Kapha',obj:'Saber cómo estás vos hoy',estado:'completado',precio:'gratis'},
+    {n:4,t:'Tu escáner físico',sk:'Asta Sthana Pariksha · अष्ट स्थान परीक्षा',d:'18 chequeos en tu cuerpo · Lengua, ojos y uñas con foto + IA · Pulso, sudor, voz, postura',obj:'Confirmar tu diagnóstico mirando tu cuerpo',estado:'proximo',precio:'7 días gratis'},
+    {n:5,t:'Tu lectura',sk:'Vaidya Nirnaya · वैद्य निर्णय',d:'Cómo naciste vs cómo estás hoy · Las 5 cualidades · La dirección y el movimiento de tu desorden',obj:'Entender qué se te desordenó',estado:'pendiente',precio:'incluido'},
     {n:6,t:'Diagnóstico hiper personalizado',sk:'Samprapti · सम्प्राप्ति',d:'Línea de tiempo 6m/2a/5a/10a · 13 canales (Srotas) · Tus toxinas (Ama) · Las 6 etapas Kriyakala',obj:'Ver hacia dónde vas si no actuás hoy',estado:'pendiente',precio:'incluido'},
     {n:7,t:'Cómo transitar hacia tu equilibrio',sk:'Chikitsa · चिकित्सा',d:'7 módulos prescriptos · 12 hierbas Rasayana · 4 recetas para hacer en casa · Mujer/hombre · Mapa profesionales',obj:'Transitar hacia tu equilibrio',estado:'pendiente',precio:'USD 20/mes'},
     {n:8,t:'Seguimiento mensual',sk:'Anubandha · अनुबन्ध',d:'Re-test cada 30 días · Ajuste automático del plan · Comparativa día 60/90 · Acceso premium a Vaidyas verificados',obj:'Mantener tu equilibrio en el tiempo',estado:'pendiente',precio:'USD 20/mes'}
@@ -1831,7 +1835,7 @@ function vbRenderDevolucionIntegral(){
     }else{
       html+='<p style="font-size:13px;color:#5A7A53;line-height:1.6;margin-bottom:8px">Naciste <strong>'+nombreDosha(doshaPrakriti)+'</strong> pero hoy estás siendo <strong>'+nombreDosha(doshaVikriti)+'</strong>.</p>';
       html+='<p style="font-size:13px;color:#5A7A53;line-height:1.6;margin-bottom:8px">Tu cuerpo se está apartando de su naturaleza. No estás siendo lo que naciste para ser.</p>';
-      html+='<p style="font-size:12px;color:#8B7355;line-height:1.5">El <strong>Vaidya</strong> (terapeuta ayurvédico) lee esto como una señal: hay algo en tu rutina, alimentación, emociones o estación del año que está empujando a tu cuerpo en la dirección opuesta.</p>';
+      html+='<p style="font-size:12px;color:#8B7355;line-height:1.5">Esto es una señal: hay algo en <strong>tu rutina, alimentación, emociones o la estación del año</strong> que está empujando a tu cuerpo en la dirección opuesta a tu naturaleza.</p>';
     }
     html+='</div>';
   }
@@ -1907,8 +1911,8 @@ function vbRenderDevolucionIntegral(){
     var capas5=[
       {
         n:'1 · Las 14 áreas detalladas',
-        s:'Asta Sthana Pariksha (los 8 exámenes clásicos del Vaidya)',
-        que:'El Vaidya examina 14 zonas de tu cuerpo para leer cómo está cada función vital. Cada zona da información distinta.',
+        s:'Las 8 zonas clásicas del Ayurveda',
+        que:'Tu cuerpo te habla por 14 zonas distintas. Cada una te dice algo diferente sobre cómo está funcionando tu organismo hoy.',
         areas:[
           'Nadi (pulso) — ritmo cardíaco y energía',
           'Mutra (orina) — hidratación y filtrado renal',
@@ -1925,7 +1929,7 @@ function vbRenderDevolucionIntegral(){
           'Bala (energía vital) — fuerza diaria',
           'Ojas (esencia vital) — vitalidad profunda'
         ],
-        hacer:'Hoy, antes de comer, prestá atención a tu lengua (Jihva) y a cómo te sentís de energía (Bala). Anotá en una nota del celular qué notás. Esa es la observación base del Vaidya.'
+        hacer:'Hoy, antes de comer, prestá atención a tu lengua y a cómo te sentís de energía. Anotá en una nota del celular qué notás. Esa es la observación base que vas a repetir cada día.'
       },
       {
         n:'2 · Canales bloqueados',
@@ -2021,11 +2025,11 @@ function vbRenderDevolucionIntegral(){
     html+='<div style="background:linear-gradient(180deg,#3D5A36,#2D3A26);color:#fff;border-radius:14px;padding:22px;margin-bottom:14px;text-align:center;position:relative;overflow:hidden">';
     html+='<div style="position:absolute;top:14px;right:14px;background:#C49E72;color:#fff;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px">PAGO · USD 20</div>';
     html+='<p style="font-size:11px;letter-spacing:3px;color:#FDE68A;text-transform:uppercase;font-weight:700;margin-bottom:8px">🔒 Diagnóstico integral</p>';
-    html+='<h3 style="font-family:Georgia,serif;font-size:22px;color:#FFF;font-weight:400;margin-bottom:14px;line-height:1.4">El Vaidya (terapeuta ayurvédico) necesita 5 lecturas más para darte el diagnóstico completo</h3>';
+    html+='<h3 style="font-family:Georgia,serif;font-size:22px;color:#FFF;font-weight:400;margin-bottom:14px;line-height:1.4">Faltan 5 lecturas más para que tengas tu diagnóstico completo</h3>';
     
     html+='<div style="text-align:left;background:rgba(255,255,255,0.05);border-radius:12px;padding:16px;margin-bottom:16px">';
     var capasPago=[
-      {n:'Las 14 áreas detalladas',s:'Asta Sthana Pariksha (los 8 exámenes del Vaidya)',d:'desglose de tus puntos en Agni (fuego digestivo), Mala (heces), Mutra (orina), Sveda (sudor), Nidra (sueño), Manas (mente), Bala (energía vital) y las 8 áreas restantes'},
+      {n:'Las 14 áreas detalladas',s:'Las 8 zonas clásicas del Ayurveda',d:'desglose de tus puntos en Agni (fuego digestivo), Mala (heces), Mutra (orina), Sveda (sudor), Nidra (sueño), Manas (mente), Bala (energía vital) y las 8 áreas restantes'},
       {n:'Canales bloqueados',s:'Sthana Samshraya (zona donde se aloja) · Srotas (canales energéticos)',d:'cuáles de los 13 canales del cuerpo están obstruidos y por qué'},
       {n:'Toxinas no digeridas',s:'Ama (residuo de mala digestión)',d:'si hay acumulación de toxinas por digestión incompleta'},
       {n:'Tu fuerza vital actual',s:'Bala (energía vital): Pravara (fuerte), Madhyama (media), Avara (baja)',d:'define qué tan agresiva o suave puede ser la corrección'},
@@ -2227,7 +2231,7 @@ function vbAbrirPaso6(){
   var areasTop=topByDosha[doshaVikriti]||topByDosha.vata;
   html+='<div style="background:#fff;border:1px solid #5A7A53;border-radius:14px;padding:20px;margin-bottom:14px">';
   html+='<p style="font-size:11px;letter-spacing:2px;color:#5A7A53;text-transform:uppercase;font-weight:700;margin-bottom:10px">Capa 4 · Lo que tu cuerpo te dice hoy</p>';
-  html+='<p style="font-size:14px;color:#5A7A53;line-height:1.7;margin-bottom:14px">De las 14 áreas que examiné en tu test (los 8 exámenes clásicos del Vaidya · Asta Sthana Pariksha), las que están más cargadas en tu '+doshaVikriti+' son:</p>';
+  html+='<p style="font-size:14px;color:#5A7A53;line-height:1.7;margin-bottom:14px">De las 14 áreas que mide el Ayurveda en tu cuerpo, las que están más cargadas en tu '+doshaVikriti+' son:</p>';
   html+='<div style="display:flex;flex-direction:column;gap:8px">';
   areasTop.forEach(function(a,idx){
     html+='<div style="background:#FAF7F0;border-radius:10px;padding:12px 14px"><p style="font-size:13px;color:#3D5A36;font-weight:700;margin-bottom:4px">'+(idx+1)+'. '+a.n+'</p><p style="font-size:12px;color:#5A7A53;line-height:1.5">'+a.d+'</p></div>';
@@ -2239,8 +2243,8 @@ function vbAbrirPaso6(){
   // CAPA 5 + CTA
   // === PASO 4 INTERMEDIO — Escáner del Vaidya (después del diagnóstico, antes del plan) ===
   html+='<div style="background:#fff;border:2px solid #5A7A53;border-radius:18px;padding:22px;margin-bottom:18px">';
-  html+='<div style="text-align:center;margin-bottom:14px"><p style="font-size:11px;letter-spacing:3px;color:#5A7A53;text-transform:uppercase;font-weight:700">📋 Paso 4 de 8</p><h3 style="font-family:Georgia,serif;font-size:20px;color:#3D5A36;font-weight:400;margin-top:8px;line-height:1.3">Escáner del terapeuta ayurvédico</h3><p style="font-size:10px;color:#A8A29E;margin-top:2px;font-style:italic;letter-spacing:0.3px">Vaidya · वैद्य</p><p style="font-size:13px;color:#7a7a7a;margin-top:6px;line-height:1.5">Antes de tu plan, dejá que el terapeuta lea tu cuerpo. Lengua, ojos y uñas cuentan lo que está pasando adentro.</p></div>';
-  html+='<button onclick="vbCerrarPaso6();setTimeout(function(){showTab(\'escanerEquilibrio\')},80)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:16px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;box-shadow:0 4px 14px rgba(90,122,83,0.25)">📷 Hacer mi Escáner del Vaidya →</button>';
+  html+='<div style="text-align:center;margin-bottom:14px"><p style="font-size:11px;letter-spacing:3px;color:#5A7A53;text-transform:uppercase;font-weight:700">📋 Paso 4 de 8</p><h3 style="font-family:Georgia,serif;font-size:20px;color:#3D5A36;font-weight:400;margin-top:8px;line-height:1.3">Tu escáner físico</h3><p style="font-size:13px;color:#7a7a7a;margin-top:8px;line-height:1.5">Antes de tu plan, mirá tu lengua, tus ojos y tus uñas. <strong>Tu cuerpo te cuenta lo que pasa adentro.</strong> Sacá las 3 fotos y la IA te lo lee.</p></div>';
+  html+='<button onclick="vbCerrarPaso6();setTimeout(function(){showTab(\'escanerEquilibrio\')},80)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:16px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;box-shadow:0 4px 14px rgba(90,122,83,0.25)">📷 Sacar mis 3 fotos →</button>';
   html+='</div>';
   
   html+='<div style="background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border-radius:18px;padding:28px 22px;text-align:center;margin-bottom:14px">';
@@ -2860,7 +2864,7 @@ function vbAbrirPaso4(){
   // Encabezado
   html+='<div style="text-align:center;margin-bottom:20px;padding:18px 14px;background:linear-gradient(135deg,#FFF7ED,#FEF3C7);border-radius:14px;border:1px solid #C49E72">';
   html+='<p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700;margin-bottom:6px">📋 Paso 4 de 8</p>';
-  html+='<h2 style="font-family:Georgia,serif;font-size:22px;color:#3D5A36;font-weight:600;margin:0 0 6px 0;line-height:1.3">Escáner del terapeuta ayurvédico</h2>';
+  html+='<h2 style="font-family:Georgia,serif;font-size:22px;color:#3D5A36;font-weight:600;margin:0 0 6px 0;line-height:1.3">Tu escáner físico</h2>';
   html+='<p style="font-size:11px;color:#8B7355;margin:0 0 8px;font-style:italic;letter-spacing:0.3px">Asta Sthana Pariksha · अष्ट स्थान परीक्षा</p>';
   html+='<p style="font-size:13px;color:#5A4A2A;margin:0;line-height:1.5">Tu cuerpo te habla. <strong>18 evaluaciones</strong> según las escrituras sagradas.<br>Las que tu '+nombreDosha(doshaVikriti)+' necesita están <strong style="color:#059669">en verde</strong>.</p>';
   html+='</div>';
@@ -2873,7 +2877,7 @@ function vbAbrirPaso4(){
   html+='</div>';
   
   // Sección 2: Las 8 grandes (Asta Sthana)
-  html+='<div style="margin-bottom:20px"><p style="font-size:11px;color:#5A7A53;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin:0 0 10px;text-align:center">🟡 Las 8 grandes evaluaciones del terapeuta</p>';
+  html+='<div style="margin-bottom:20px"><p style="font-size:11px;color:#5A7A53;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin:0 0 10px;text-align:center">🟡 Las 8 grandes lecturas</p>';
   ESCANERES.filter(function(e){return e.cat==='asta';}).forEach(function(e){
     var rel=(e.desbalance&&e.desbalance[doshaVikriti])?'recomendado':'complementario';
     html+=vbRenderEscaner(e,doshaVikriti,rel);
@@ -2898,7 +2902,7 @@ function vbAbrirPaso4(){
     dots4+='<div style="display:inline-flex;align-items:center;justify-content:center;width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:'+bgD+';color:'+colD+';font-size:'+fs+'px;font-weight:800;margin:0 3px;vertical-align:middle">'+(k<4?'✓':k)+'</div>';
   }
   html+='<div style="text-align:center;margin-bottom:14px;line-height:1">'+dots4+'</div>';
-  html+='<button onclick="vbCerrarPaso4()" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(90,122,83,0.3);text-align:center;line-height:1.3">→ IR AL PASO 5 DE 8<div style="font-size:12px;font-weight:600;color:#D1FAE5;margin-top:4px">Lectura del terapeuta ayurvédico</div></button>';
+  html+='<button onclick="vbCerrarPaso4()" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(90,122,83,0.3);text-align:center;line-height:1.3">→ IR AL PASO 5 DE 8<div style="font-size:12px;font-weight:600;color:#D1FAE5;margin-top:4px">Tu lectura</div></button>';
   html+='</div>';
   
   // Cita textual
