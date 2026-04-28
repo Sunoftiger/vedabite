@@ -4718,8 +4718,36 @@ function vbCerrarPaso8(){
 window.vbAbrirPaso7=vbAbrirPaso7;
 window.vbAbrirPaso8=vbAbrirPaso8;
 function tips(a){return a&&a.length?'<div style="margin-top:20px"><h4 style="margin-bottom:12px">💡 7 Tips Personalizados</h4>'+a.map(function(a,e){return'<div class="tip-card"><span class="tip-num">'+(e+1)+"</span>"+a+"</div>"}).join("")+"</div>":""}
-function showTab(a){document.querySelectorAll(".tab-content").forEach(function(a){a.classList.remove("active")});var el=document.getElementById("t-"+a);if(el){el.classList.add("active");document.getElementById("tabsGrid").style.display="none";window.scrollTo(0,0);if(a==="escanerEquilibrio"){try{var dd=res&&res.p?res.p:"desconocido";if(window._vbTrack)window._vbTrack("tab_abierto",{tab:"escaner_equilibrio",dosha:dd});if(typeof window._vbFetchEstadoEscaner==='function')window._vbFetchEstadoEscaner();// IDs para anchor-scroll a las 3 evaluaciones principales
-try{var lengua=el.querySelector('[data-sec="lengua"]');if(lengua)lengua.id='evaluacion-lengua';var ojos=el.querySelector('[data-sec="ojos"]');if(ojos)ojos.id='evaluacion-ojos';var unas=el.querySelector('[data-sec="unas"]');if(unas)unas.id='evaluacion-unas';}catch(e){}if(!el._vbBound){el._vbBound=true;el.addEventListener("click",function(ev){if(ev.target.closest('.vb-foto-btn')||ev.target.closest('input[type="file"]'))return;var card=ev.target.closest("[data-sec]");if(card){try{if(window._vbTrack)window._vbTrack("escaner_seccion",{seccion:card.getAttribute("data-sec"),dosha:card.getAttribute("data-dosha")});}catch(e){}}});}}catch(e){}}}}
+function showTab(a){
+  // FIX: si los tabs viven en #s4 y estamos en otra pantalla (ej #s10),
+  // hay que activar #s4 PRIMERO para que el tab se vea.
+  var s4=document.getElementById('s4');
+  if(s4&&!s4.classList.contains('active')){
+    document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+    s4.classList.add('active');
+  }
+  document.querySelectorAll(".tab-content").forEach(function(a){a.classList.remove("active")});
+  var el=document.getElementById("t-"+a);
+  if(el){
+    el.classList.add("active");
+    var tg=document.getElementById("tabsGrid");
+    if(tg)tg.style.display="none";
+    window.scrollTo(0,0);
+    if(a==="escanerEquilibrio"){
+      try{var dd=res&&res.p?res.p:"desconocido";if(window._vbTrack)window._vbTrack("tab_abierto",{tab:"escaner_equilibrio",dosha:dd});if(typeof window._vbFetchEstadoEscaner==='function')window._vbFetchEstadoEscaner();}catch(e){}
+      // IDs para anchor-scroll a las 3 evaluaciones principales
+      try{var lengua=el.querySelector('[data-sec="lengua"]');if(lengua)lengua.id='evaluacion-lengua';var ojos=el.querySelector('[data-sec="ojos"]');if(ojos)ojos.id='evaluacion-ojos';var unas=el.querySelector('[data-sec="unas"]');if(unas)unas.id='evaluacion-unas';}catch(e){}
+      if(!el._vbBound){
+        el._vbBound=true;
+        el.addEventListener("click",function(ev){
+          if(ev.target.closest('.vb-foto-btn')||ev.target.closest('input[type="file"]'))return;
+          var card=ev.target.closest("[data-sec]");
+          if(card){try{if(window._vbTrack)window._vbTrack("escaner_seccion",{seccion:card.getAttribute("data-sec"),dosha:card.getAttribute("data-dosha")});}catch(e){}}
+        });
+      }
+    }
+  }
+}
 function backIdx(){document.querySelectorAll(".tab-content").forEach(function(a){a.classList.remove("active")}),document.getElementById("tabsGrid").style.display="grid",window.scrollTo(0,0)}
 function scan(){var input=document.getElementById("prodIn").value.toLowerCase().trim();if(!input){document.getElementById("scanRes").innerHTML='<div class="result-neutral">⚠️ Escribí al menos un alimento o un menú entero separando con comas.</div>';return}var perfil=P[res.p];var items=input.split(/[,;]|\sy\s|\n/).map(function(s){return s.trim()}).filter(function(s){return s.length>0});var html='<div style="margin-top:16px"><h4 style="margin-bottom:12px;color:#5A7A53">📋 Análisis de '+items.length+' '+(items.length===1?'alimento':'alimentos')+':</h4>';var goodCount=0,badCount=0,neutralCount=0;items.forEach(function(item){var esBueno=perfil.g.some(function(a){return item.includes(a)||a.includes(item)});var esMalo=perfil.b.some(function(a){return item.includes(a)||a.includes(item)});if(esBueno&&!esMalo){goodCount++;html+='<div class="result-good" style="margin:6px 0;padding:10px 14px;background:#D1FAE5;border-left:4px solid #10B981;border-radius:6px"><strong>✅ '+item+'</strong> — Ideal para vos</div>'}else if(esMalo){badCount++;var sub=null;Object.keys(perfil.sub||{}).forEach(function(k){if(item.includes(k)||k.includes(item))sub=perfil.sub[k]});html+='<div class="result-bad" style="margin:6px 0;padding:10px 14px;background:#FEE2E2;border-left:4px solid #EF4444;border-radius:6px"><strong>⚠️ '+item+'</strong> — Mejor evitalo'+(sub?'<br><span style="font-size:13px;color:#666">💡 Cambialo por: <strong>'+sub+'</strong></span>':'')+'</div>'}else{neutralCount++;html+='<div class="result-neutral" style="margin:6px 0;padding:10px 14px;background:#FEF3C7;border-left:4px solid #F59E0B;border-radius:6px"><strong>🤔 '+item+'</strong> — Con moderación, no es ideal pero no te hace daño</div>'}});html+='<div style="margin-top:16px;padding:12px;background:#F0FDF4;border-radius:8px;text-align:center;font-size:14px"><strong>Resumen:</strong> '+goodCount+' ideales · '+badCount+' a evitar · '+neutralCount+' moderados</div>';if(badCount>0&&items.length>1){html+='<div style="margin-top:12px;padding:12px;background:#FFFBEB;border-radius:8px;font-size:13px"><strong>💡 Tip:</strong> Si estás en un restaurante, pedí los marcados con ✅ y reemplazá los ⚠️ con las alternativas sugeridas.</div>'}html+='</div>';document.getElementById("scanRes").innerHTML=html;try{if(typeof gtag==='function')gtag('event','scanner_uso',{event_category:'engagement',event_label:res.p,items_count:items.length,good_count:goodCount,bad_count:badCount});if(typeof window.clarity==='function')window.clarity('event','scanner_'+res.p)}catch(e){}}
 function qScan(a){document.getElementById("prodIn").value=a,scan()}
