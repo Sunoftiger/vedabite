@@ -1078,11 +1078,15 @@ async function vbApiGeo(lugar){
 // Llamado real a la API: paso 2 - Timezone (lat/lon + fecha → tz)
 async function vbApiTimezone(lat,lon,fecha){
   try{
+    var ctrl=new AbortController();
+    var timeoutId=setTimeout(function(){ctrl.abort();},8000);
     var r=await fetch('https://json.freeastrologyapi.com/timezone-with-dst',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':window._vbAPI},
-      body:JSON.stringify({latitude:lat,longitude:lon,date:fecha})
+      body:JSON.stringify({latitude:lat,longitude:lon,date:fecha}),
+      signal:ctrl.signal
     });
+    clearTimeout(timeoutId);
     var d=await r.json();
     if(d&&d.output&&typeof d.output.timezone==='number')return d.output.timezone;
     return null;
@@ -1092,11 +1096,15 @@ async function vbApiTimezone(lat,lon,fecha){
 // Llamado real a la API: paso 3 - Planets (devuelve Lagna, Sol, Luna)
 async function vbApiPlanets(payload){
   try{
+    var ctrl=new AbortController();
+    var timeoutId=setTimeout(function(){ctrl.abort();},10000);
     var r=await fetch('https://json.freeastrologyapi.com/planets',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':window._vbAPI},
-      body:JSON.stringify(payload)
+      body:JSON.stringify(payload),
+      signal:ctrl.signal
     });
+    clearTimeout(timeoutId);
     var d=await r.json();
     return d&&d.output?d.output:null;
   }catch(e){console.error('[vbApiPlanets]',e);return null;}
