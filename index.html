@@ -1981,9 +1981,74 @@ function vbContinuarTest(){
 <div id="tabContents"></div>
 <div style="padding:20px"><div class="card" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);text-align:center"><h4 style="margin-bottom:12px">📥 Descargá tu informe</h4><p style="font-size:13px;color:#666;margin-bottom:14px">Elegí en qué voz querés leerlo:</p><div style="display:grid;gap:10px"><button class="btn btn-sage" onclick="downloadPDF('medico')">🩺 Médico Occidental</button><button class="btn btn-primary" onclick="downloadPDF('ayurveda')">🌿 Terapeuta Ayurvédico</button><button class="btn btn-gold" onclick="downloadPDF('amiga')">💚 Como una Amiga</button></div></div>
 
-<div id="vbBloquePostInforme" style="margin-top:24px;font-family:inherit;display:none">
-<!-- Bloque post-informe Vedabite v1 ELIMINADO — reemplazado por el roadmap navegable + paso 7 prescriptivo -->
+<div id="vbBloquePostInforme" style="margin-top:24px;font-family:inherit;padding:0 20px">
+<!-- Puente post-informe v2 — entrada al roadmap (Arreglo 1) -->
+<div style="background:#FAF7F0;border:1px solid #E8DFC8;border-radius:18px;padding:26px 22px;text-align:center">
+<div style="margin-bottom:14px">
+<span style="display:inline-block;padding:5px 14px;background:#fff;border:1px solid #D4B896;border-radius:50px;font-size:10px;font-weight:600;color:#8B7355;letter-spacing:2px">UN PASO MÁS</span>
 </div>
+<div style="width:30px;height:1px;background:#D4B896;margin:14px auto"></div>
+<p id="vbPuentePostInformeTexto" style="font-size:15px;line-height:1.7;color:#3D5A36;margin:0 0 22px;font-family:inherit">&nbsp;</p>
+<button id="vbPuentePostInformeBtn" onclick="_vbPuentePostInformeClick()" style="display:block;width:100%;padding:16px;background:#5A7A53;color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit;letter-spacing:0.3px">Empezar mi camino →</button>
+</div>
+</div>
+
+<script>
+(function(){
+  function _vbDoshaLegible(d){
+    return ({vata:'Vata',pitta:'Pitta',kapha:'Kapha'})[d]||d;
+  }
+  function _vbRenderPuente(){
+    var cont=document.getElementById('vbPuentePostInformeTexto');
+    if(!cont)return false;
+    var r=window.res;
+    if(!r||!r.p)return false;
+    var vikriti=_vbDoshaLegible(r.p);
+    var prakritiNombre=(window._vbPrakriti&&window._vbPrakriti.prakriti_nombre)?window._vbPrakriti.prakriti_nombre:null;
+    var texto;
+    if(prakritiNombre){
+      texto='Tu <strong>Prakriti (constitución de nacimiento)</strong> es '+prakritiNombre+' y hoy tu cuerpo está expresando <strong>'+vikriti+' (Vikriti — desequilibrio actual)</strong>. Hay algo pidiendo equilibrio.';
+    }else{
+      texto='El test mostró que tu cuerpo está expresando <strong>'+vikriti+' (Vikriti — desequilibrio actual)</strong>. Eso es una pista, no un diagnóstico.';
+    }
+    cont.innerHTML=texto;
+    return true;
+  }
+  // Retry porque s4 se renderiza después de showResults()
+  var intentos=0;
+  var iv=setInterval(function(){
+    intentos++;
+    if(_vbRenderPuente()||intentos>20){clearInterval(iv);}
+  },300);
+  window._vbRenderPuentePostInforme=_vbRenderPuente;
+})();
+
+function _vbPuentePostInformeClick(){
+  try{
+    var country=(window._vbPaymentConfig&&window._vbPaymentConfig.country)||'XX';
+    var dosha=(window.res&&window.res.p)||'sin_dosha';
+    var tienePrakriti=!!(window._vbPrakriti&&window._vbPrakriti.prakriti_nombre);
+    if(typeof gtag==='function'){
+      gtag('event','vb_puente_post_informe_click',{
+        event_category:'engagement',
+        event_label:'puente_a_paso7',
+        dosha:dosha,
+        tiene_prakriti:tienePrakriti,
+        pais:country
+      });
+    }
+    if(typeof window.clarity==='function'){
+      window.clarity('set','puente_post_informe','clicked');
+      window.clarity('event','vb_puente_post_informe_click');
+    }
+  }catch(e){}
+  if(typeof vbAbrirPaso7==='function'){
+    vbAbrirPaso7();
+  }else{
+    console.warn('[vedabite] vbAbrirPaso7 no disponible en el momento del click');
+  }
+}
+</script>
 
 <button class="btn btn-outline" style="margin-top:24px" onclick="confirmRestart()">🔄 Rehacer el test</button>
 </div>
