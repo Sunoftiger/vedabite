@@ -2287,7 +2287,7 @@ function getRes(){
   };
 }
 function showEmail(){res=getRes();var a=D[res.p];document.getElementById("eDosha").textContent=a.e,document.getElementById("eName").textContent=a.n,show("s3")}
-function submitEmail(){var a=document.getElementById("emailIn").value;if(!a||!a.includes("@"))return alert("Email inválido");(async function(){try{var emailClean=a.trim().toLowerCase();var msgBuffer=new TextEncoder().encode(emailClean);var hashBuffer=await crypto.subtle.digest('SHA-256',msgBuffer);var hashed=Array.from(new Uint8Array(hashBuffer)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');if(typeof gtag==='function'){gtag('set','user_data',{'sha256_email_address':hashed});}}catch(e){}})();userEmail=a;window.userEmail=a;window.res=res;try{localStorage.setItem("vb_email",a);}catch(e){}try{if(window.clarity){window.clarity('identify',a);window.clarity('set','userEmail',a);window.clarity('set','dosha',res.p);}}catch(e){}var e=D[res.p];emailjs.send("service_xf7v0x7","template_cwvkmyu",{to_email:a,dosha_name:e.n,dosha_emoji:e.e,dosha_desc:e.desc,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha}).then(function(r){console.log('[email] enviado OK',r);}).catch(function(err){console.error('[email] FALLÓ:',err);try{if(typeof gtag==='function')gtag('event','email_envio_fallo',{error:String(err).substring(0,100)});}catch(e2){}});try{if(window._vbSaveLead)window._vbSaveLead({email:a,dosha:res.p,dosha_name:e.n,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha,source:document.referrer||"direct",utm:location.search||""}).catch(function(){});}catch(e){}try{localStorage.setItem("vb_trialStart",new Date().toISOString());gtag("event","generate_lead");if(window._vbTrack)window._vbTrack()}catch(a){}saveSession(),showResults()}
+function submitEmail(){var a=document.getElementById("emailIn").value;if(!a||!a.includes("@"))return alert("Email inválido");(async function(){try{var emailClean=a.trim().toLowerCase();var msgBuffer=new TextEncoder().encode(emailClean);var hashBuffer=await crypto.subtle.digest('SHA-256',msgBuffer);var hashed=Array.from(new Uint8Array(hashBuffer)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');if(typeof gtag==='function'){gtag('set','user_data',{'sha256_email_address':hashed});}}catch(e){}})();userEmail=a;window.userEmail=a;window.res=res;try{localStorage.setItem("vb_email",a);}catch(e){}try{if(window.clarity){window.clarity('identify',a);window.clarity('set','userEmail',a);window.clarity('set','dosha',res.p);}}catch(e){}var e=D[res.p];emailjs.send("service_xf7v0x7","template_cwvkmyu",{to_email:a,dosha_name:e.n,dosha_emoji:e.e,dosha_desc:e.desc,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha}).then(function(r){console.log('[email] enviado OK',r);}).catch(function(err){console.error('[email] FALLÓ:',err);try{if(typeof gtag==='function')gtag('event','email_envio_fallo',{error:String(err).substring(0,100)});}catch(e2){}});try{if(window._vbSaveLead)window._vbSaveLead({email:a,dosha:res.p,dosha_name:e.n,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha,source:document.referrer||"direct",utm:location.search||""}).catch(function(){});}catch(e){}try{gtag("event","generate_lead");if(window._vbTrack)window._vbTrack()}catch(a){}saveSession(),showResults()}
 function showResults(){
   var a=D[res.p];
   document.getElementById("resHeader").style.background=a.bg;
@@ -3132,16 +3132,8 @@ function vbCheckoutPaso7(){
 // ============================================================
 // HELPERS TRIAL — 7 días gratis con todo desbloqueado
 // ============================================================
-// AUTO-INICIO DE TRIAL: cualquier visitante nuevo desde hoy (26/4/2026)
-// arranca su contador de 7 días al primer load de la página.
-// Esto se respeta aunque no completen el email todavía.
-(function vbAutoStartTrial(){
-  try{
-    if(!localStorage.getItem('vb_trialStart')){
-      localStorage.setItem('vb_trialStart',new Date().toISOString());
-    }
-  }catch(e){}
-})();
+// El trial arranca SOLO con click explícito del usuario en el botón
+// "EMPEZAR LOS 7 DÍAS GRATIS" del paso 8. (vbAutoStartTrial removido — Arreglo 2)
 
 function vbDiasTrial(){
   try{
@@ -3162,6 +3154,10 @@ function vbTrialActivo(){
   }catch(e){return true;}
 }
 function vbDiasRestantes(){
+  // null = trial nunca arrancado (no setear vb_trialStart antes del click explícito)
+  try{
+    if(!localStorage.getItem('vb_trialStart'))return null;
+  }catch(e){}
   return Math.max(0,7-vbDiasTrial());
 }
 
@@ -4208,9 +4204,18 @@ function vbAbrirPaso7(){
   html+='<p style="font-size:13px;color:#7a7a7a;margin-top:6px">'+tituloSexo(sexo)+' · '+edad+' años · Plan basado en Charaka Samhita</p>';
   html+='</div>';
   
-  // Banner trial
+  // Banner trial — Arreglo 2: adaptativo según vb_trialStart y día actual
   if(trialOk){
-    html+='<div style="background:#D1FAE5;border:2px solid #059669;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#065F46;font-weight:700">🎁 Acceso gratis · Te quedan '+diasRest+' día'+(diasRest!==1?'s':'')+' de prueba</p><p style="font-size:11px;color:#047857;margin-top:4px">Después USD 20/mes · Cancelás cuando quieras</p></div>';
+    if(diasRest===null){
+      // Trial nunca arrancado, paywall off → mostrar plan desbloqueado sin contador
+      html+='<div style="background:#D1FAE5;border:2px solid #059669;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#065F46;font-weight:700">🎁 Plan completo desbloqueado</p><p style="font-size:11px;color:#047857;margin-top:4px">Mirá tu plan. Cuando estés lista, empezás los 7 días gratis en el paso 8.</p></div>';
+    }else if(diasRest===1 && (new Date()).getHours()>=12){
+      // Banner naranja día 7 desde mediodía → CTA al checkout
+      html+='<div style="background:#FFEDD5;border:2px solid #EA580C;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#9A3412;font-weight:700">⏳ Te queda 1 día. ¿Seguís?</p><p style="font-size:11px;color:#9A3412;margin:6px 0 10px">Mañana arranca tu programa completo · USD 20/mes</p><button onclick="vbCheckoutPaso7()" style="background:#EA580C;color:#fff;border:none;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Suscribirme ahora →</button></div>';
+    }else{
+      // Banner verde original con contador de días restantes
+      html+='<div style="background:#D1FAE5;border:2px solid #059669;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#065F46;font-weight:700">🎁 Acceso gratis · Te quedan '+diasRest+' día'+(diasRest!==1?'s':'')+' de prueba</p><p style="font-size:11px;color:#047857;margin-top:4px">Después USD 20/mes · Cancelás cuando quieras</p></div>';
+    }
   }else{
     html+='<div style="background:#FEF3C7;border:2px solid #F59E0B;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#92400E;font-weight:700">🔒 Tu prueba terminó (día '+diaActual+')</p><p style="font-size:11px;color:#78350F;margin-top:4px">Suscribite por USD 20/mes para desbloquear tu plan completo</p></div>';
   }
@@ -5317,6 +5322,9 @@ function vbCerrarPaso9(){
 // PASO 8 — SEGUIMIENTO MENSUAL (bloqueado completo si trial vencido)
 // ============================================================
 function vbAbrirPaso8(){
+  // Arreglo 2: gate inicial Opción B
+  var tieneTrialStart=false;
+  try{tieneTrialStart=!!localStorage.getItem('vb_trialStart');}catch(e){}
   var trialOk=vbTrialActivo();
   var diasRest=vbDiasRestantes();
   var diaActual=vbDiasTrial();
@@ -5332,9 +5340,25 @@ function vbAbrirPaso8(){
   html+='<p style="font-size:13px;color:#7a7a7a;margin-top:6px">Re-test cada 30 días · Ajuste automático del plan según progreso</p>';
   html+='</div>';
   
-  if(trialOk){
-    // Banner trial
-    html+='<div style="background:#D1FAE5;border:2px solid #059669;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#065F46;font-weight:700">🎁 Acceso gratis · Te quedan '+diasRest+' día'+(diasRest!==1?'s':'')+' de prueba</p></div>';
+  if(!tieneTrialStart){
+    // ESTADO 1 — Gate inicial: usuario nunca arrancó trial
+    html+='<div style="background:#FAF7F0;border:1px solid #E8DFC8;border-radius:18px;padding:28px 22px;text-align:center;margin-bottom:14px">';
+    html+='<div style="margin-bottom:14px"><span style="display:inline-block;padding:5px 14px;background:#fff;border:1px solid #D4B896;border-radius:50px;font-size:10px;font-weight:600;color:#8B7355;letter-spacing:2px">EMPEZÁ HOY</span></div>';
+    html+='<div style="width:30px;height:1px;background:#D4B896;margin:14px auto"></div>';
+    html+='<h3 style="font-family:Georgia,serif;font-size:22px;color:#3D5A36;font-weight:400;margin-bottom:12px;line-height:1.3">Hoy es día 1 de tu camino</h3>';
+    html+='<p style="font-size:15px;color:#3D5A36;line-height:1.7;margin-bottom:22px">Te acompañamos los próximos 7 días gratis.<br>Después decidís si seguís.</p>';
+    html+='<button onclick="_vbIniciarTrialClick()" style="display:block;width:100%;padding:18px;background:#5A7A53;color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:600;cursor:pointer;letter-spacing:0.5px;font-family:inherit">EMPEZAR LOS 7 DÍAS GRATIS</button>';
+    html+='<p style="font-size:11px;color:#8B7355;margin-top:12px;font-style:italic">Sin tarjeta · Sin compromiso</p>';
+    html+='</div>';
+  }else if(trialOk){
+    // ESTADO 2 — Trial vigente o pago activo: contenido completo
+    
+    // Banner adaptativo: naranja día 7 mediodía / verde día normal
+    if(diasRest===1 && (new Date()).getHours()>=12){
+      html+='<div style="background:#FFEDD5;border:2px solid #EA580C;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#9A3412;font-weight:700">⏳ Te queda 1 día. ¿Seguís?</p><p style="font-size:11px;color:#9A3412;margin:6px 0 10px">Mañana arranca tu programa completo · USD 20/mes</p><button onclick="vbCheckoutPaso7()" style="background:#EA580C;color:#fff;border:none;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Suscribirme ahora →</button></div>';
+    }else{
+      html+='<div style="background:#D1FAE5;border:2px solid #059669;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#065F46;font-weight:700">🎁 Acceso gratis · Te quedan '+diasRest+' día'+(diasRest!==1?'s':'')+' de prueba</p></div>';
+    }
     
     // Contenido completo
     html+='<div style="background:#fff;border:1px solid #C49E72;border-radius:14px;padding:20px;margin-bottom:14px">';
@@ -5353,7 +5377,7 @@ function vbAbrirPaso8(){
     html+='</div>';
     
   }else{
-    // BLOQUEADO COMPLETO
+    // ESTADO 3 — Trial vencido: muro de suscripción
     html+='<div style="background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border-radius:18px;padding:32px 22px;text-align:center;margin-bottom:14px">';
     html+='<div style="font-size:48px;margin-bottom:14px">🔒</div>';
     html+='<h3 style="font-family:Georgia,serif;font-size:24px;color:#fff;font-weight:400;margin-bottom:14px;line-height:1.3">Seguimiento mensual</h3>';
@@ -5394,6 +5418,25 @@ function vbAbrirPaso8(){
 function vbCerrarPaso8(){
   show('s7');
   try{if(typeof gtag==='function')gtag('event','paso8_cerrado');}catch(e){}
+}
+
+// Arreglo 2: handler del click en "EMPEZAR LOS 7 DÍAS GRATIS" del paso 8
+function _vbIniciarTrialClick(){
+  try{
+    localStorage.setItem('vb_trialStart',new Date().toISOString());
+    if(typeof gtag==='function'){
+      gtag('event','vb_trial_iniciado_click',{
+        event_category:'engagement',
+        event_label:'paso8_boton_7dias',
+        dosha:(window.res&&window.res.p)||'sin_dosha'
+      });
+    }
+    if(typeof window.clarity==='function'){
+      window.clarity('set','trial_iniciado','si');
+      window.clarity('event','vb_trial_iniciado_click');
+    }
+  }catch(e){}
+  vbAbrirPaso8();
 }
 
 // Conectar paso 6 → paso 7 directo (en lugar de checkout) cuando trial activo
@@ -7751,32 +7794,74 @@ function enviarRegalo(){
   btn.addEventListener('touchend',function(){this.style.transform='scale(1)';},{passive:true});
 })();
 
-// Tocar Tu camino:
-// - Si NO pagó → checkout directo (gancho de conversión)
-// - Si YA pagó → abre la pantalla completa del GPS
+// Tocar Tu camino — Arreglo 4 (botón roto)
+// Lógica: pago > trial vigente > sin trial / vencido
+// NOTA: usa localStorage directo en vez de vbTrialActivo() porque esa función
+// con paywall off devuelve true para todos (BUG-06). Cuando se active paywall,
+// vbTrialActivo() debería migrar a esta misma lógica.
 function _vbAbrirTuCamino(){
+  // 1. Estado del usuario
   var yaPago=false;
-  try{yaPago=localStorage.getItem('vb_paid')==='true';}catch(e){}
-  
+  var trialStart=null;
+  var diasDesdeTrial=null;
   try{
-    if(typeof gtag==='function'){
-      if(yaPago){
-        gtag('event','gps_abierto',{event_category:'engagement',event_label:'usuario_pago'});
-      }else{
-        gtag('event','cta_post_informe',{event_category:'conversion',event_label:'tu_camino_flotante',variant:'tu_camino_gancho'});
-      }
-    }
-    if(typeof window.clarity==='function'){
-      window.clarity('event',yaPago?'gps_abierto':'tu_camino_click_checkout');
+    yaPago=localStorage.getItem('vb_paid')==='true';
+    trialStart=localStorage.getItem('vb_trialStart');
+    if(trialStart){
+      diasDesdeTrial=Math.floor((Date.now()-new Date(trialStart).getTime())/(1000*60*60*24));
     }
   }catch(e){}
-  
+
+  // 2. Determinar rama
+  var rama;
   if(yaPago){
-    _vbAbrirPantallaGPS();
+    rama='pagado';
+  }else if(!trialStart){
+    rama='sin_trial';
+  }else if(diasDesdeTrial<=7){
+    rama='trial_activo';
   }else{
-    if(typeof _vbAccionPracticaPostInforme==='function'){
-      _vbAccionPracticaPostInforme('tu_camino_flotante');
+    rama='trial_vencido';
+  }
+
+  // 3. Tracking limpio según rama (1 evento gtag + 1 evento clarity por rama)
+  try{
+    if(typeof gtag==='function'){
+      gtag('event','tu_camino_click',{
+        event_category:'engagement',
+        event_label:rama,
+        rama:rama,
+        dias_trial:diasDesdeTrial,
+        dosha:(window.res&&window.res.p)||'sin_dosha'
+      });
     }
+    if(typeof window.clarity==='function'){
+      var eventoClarity={
+        'pagado':'tu_camino_pagado',
+        'sin_trial':'tu_camino_sin_trial',
+        'trial_activo':'tu_camino_trial_activo',
+        'trial_vencido':'tu_camino_trial_vencido'
+      }[rama];
+      window.clarity('event',eventoClarity);
+      window.clarity('set','tu_camino_rama',rama);
+    }
+  }catch(e){}
+
+  // 4. Routing
+  try{
+    if(rama==='pagado' && typeof _vbAbrirPantallaGPS==='function'){
+      _vbAbrirPantallaGPS();
+    }else if(rama==='trial_activo' && typeof vbAbrirPaso7==='function'){
+      vbAbrirPaso7();
+    }else if(typeof vbAbrirPaso8==='function'){
+      // sin_trial → gate con botón "EMPEZAR LOS 7 DÍAS GRATIS" (Opción B Arreglo 2)
+      // trial_vencido → muro USD 20/mes (hoy invisible por paywall off)
+      vbAbrirPaso8();
+    }else{
+      console.warn('[vedabite] _vbAbrirTuCamino: no hay handler disponible para rama',rama);
+    }
+  }catch(e){
+    console.error('[vedabite] _vbAbrirTuCamino routing error:',e);
   }
 }
 
