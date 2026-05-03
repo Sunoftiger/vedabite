@@ -3054,11 +3054,6 @@ function vbAbrirPaso6(){
   html+='</div>';
   
   // CAPA 5 + CTA
-  // === PASO 4 INTERMEDIO — Escáner del Vaidya (después del diagnóstico, antes del plan) ===
-  html+='<div style="background:#fff;border:2px solid #5A7A53;border-radius:18px;padding:22px;margin-bottom:18px">';
-  html+='<div style="text-align:center;margin-bottom:14px"><p style="font-size:11px;letter-spacing:3px;color:#5A7A53;text-transform:uppercase;font-weight:700">📋 Paso 4 de 9</p><h3 style="font-family:Georgia,serif;font-size:20px;color:#3D5A36;font-weight:400;margin-top:8px;line-height:1.3">Tu escáner físico</h3><p style="font-size:13px;color:#7a7a7a;margin-top:8px;line-height:1.5">Antes de tu plan, mirá tu lengua, tus ojos y tus uñas. <strong>Tu cuerpo te cuenta lo que pasa adentro.</strong> Sacá las 3 fotos y la IA te lo lee.</p></div>';
-  html+='<button onclick="vbCerrarPaso6();setTimeout(function(){showTab(\'escanerEquilibrio\')},80)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:16px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;box-shadow:0 4px 14px rgba(90,122,83,0.25)">📷 Sacar mis 3 fotos →</button>';
-  html+='</div>';
   
   html+='<div style="background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border-radius:18px;padding:28px 22px;text-align:center;margin-bottom:14px">';
   html+='<p style="font-size:11px;letter-spacing:3px;color:#FDE68A;text-transform:uppercase;font-weight:700;margin-bottom:10px">Capa 5 · La esperanza concreta</p>';
@@ -3388,6 +3383,34 @@ function vbRenderRasayana(doshaVikriti, sexo){
   
   return html;
 }
+
+// ============================================================
+// PASO 4 → ESCÁNER · función robusta para abrir el tab desde el acordeón
+// (extraída del onclick inline para evitar problemas con <details> en mobile)
+// ============================================================
+window._vbAbrirEscanerDesdePaso4=function(ev,escanerId){
+  try{
+    if(ev){ev.preventDefault();ev.stopPropagation();}
+    console.log('[Vedabite] Click en escáner:',escanerId);
+    if(typeof gtag==='function')gtag('event','paso4_click_escaner',{escaner:escanerId});
+    if(window.clarity)window.clarity('event','paso4_click_escaner_'+escanerId);
+    // Cerrar la pantalla del Paso 4 (s10) y volver a s4
+    if(typeof vbCerrarPaso4==='function'){vbCerrarPaso4();}
+    // Esperar un tick para que la pantalla cambie y después abrir el tab del escáner
+    setTimeout(function(){
+      if(typeof showTab==='function'){
+        showTab('escanerEquilibrio');
+        console.log('[Vedabite] Tab escanerEquilibrio abierto');
+      }else{
+        console.error('[Vedabite] showTab no está definida');
+      }
+    },200);
+  }catch(err){
+    console.error('[Vedabite] Error abriendo escáner:',err);
+    alert('No se pudo abrir el escáner. Probá recargando la página.');
+  }
+  return false;
+};
 
 // ============================================================
 // PASO 4 — ESCÁNER DEL VAIDYA (18 evaluaciones según escrituras sagradas)
@@ -3775,7 +3798,7 @@ function vbRenderEscaner(e,dosha,relevancia){
   html+='<div style="margin-bottom:10px;padding:10px;background:#EEF2FF;border-left:3px solid #6366F1;border-radius:6px"><p style="font-size:10px;color:#4338CA;text-transform:uppercase;font-weight:700;letter-spacing:1px;margin:0 0 4px">🌿 Qué hacer</p><p style="font-size:12px;color:#3D5A36;line-height:1.6;margin:0">'+accion+'</p></div>';
   
   if(e.foto){
-    html+='<button onclick="event.preventDefault();event.stopPropagation();showTab(\'escanerEquilibrio\');" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:12px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px">📷 Sacar foto + análisis con IA</button>';
+    html+='<button data-vb-escaner="'+e.id+'" onclick="window._vbAbrirEscanerDesdePaso4(event,\''+e.id+'\')" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:12px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;position:relative;z-index:10">📷 Sacar foto + análisis con IA</button>';
   }
   html+='<p style="font-size:10px;color:#8B7355;font-style:italic;margin:10px 0 0;text-align:right">📜 '+e.fuente+'</p>';
   html+='</div></details>';
