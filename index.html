@@ -2188,7 +2188,7 @@ function loadSession(){
   }
 }
 function checkSaved(){try{localStorage.getItem("vb_res")&&(document.getElementById("savedSession").style.display="block")}catch(a){}}
-function clearSession(){try{localStorage.removeItem("vb_res"),localStorage.removeItem("vb_email"),localStorage.removeItem("vb_dosha"),document.getElementById("savedSession").style.display="none"}catch(a){}}
+function clearSession(){try{localStorage.removeItem("vb_res"),localStorage.removeItem("vb_email"),localStorage.removeItem("vb_dosha"),document.getElementById("savedSession").style.display="none";if(typeof window._vbResetFotos==='function')window._vbResetFotos();}catch(a){}}
 function confirmClearSession(){if(confirm("¿Seguro que querés empezar de nuevo? Vas a perder tu progreso anterior.")){clearSession();try{if(window._vbTrack)window._vbTrack('sesion_borrada_confirmada');}catch(e){}}else{try{if(window._vbTrack)window._vbTrack('sesion_borrada_cancelada');}catch(e){}}}
 function vbHacerPDF(htmlContent,nombre){var doc='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+nombre+'</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Helvetica,Arial,sans-serif;color:#1a1a1a;background:#fff;padding:20px;max-width:600px;margin:0 auto;line-height:1.5}h1{font-size:22px;margin:8px 0}h3{font-size:16px;margin:0 0 8px}h4{font-size:14px;margin:8px 0 4px}p{margin:4px 0;font-size:13px}@media print{body{padding:10px}}</style></head><body>'+htmlContent+'</body></html>';try{var blob=new Blob([doc],{type:'text/html;charset=utf-8'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=nombre.replace('.pdf','.html');a.style.display='none';document.body.appendChild(a);a.click();setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);}catch(e){var w=window.open('','_blank');if(w){w.document.open();w.document.write(doc);w.document.close();w.focus();setTimeout(function(){try{w.print()}catch(e2){}},500);}else{alert('No se pudo descargar el informe. Intentá desde otro navegador.');}}}
 function downloadPDF(voz){
@@ -2237,6 +2237,8 @@ function startTest(){
   try{if(typeof gtag==='function')gtag('event','start_test_clicked');}catch(e){}
   // Esconder savedSession si existe
   try{var ss=document.getElementById("savedSession");if(ss)ss.style.display="none";}catch(e){}
+  // RESET FOTOS — incluso usuarias suscriptas deben sacárselas otra vez en cada test
+  try{if(typeof window._vbResetFotos==='function')window._vbResetFotos();}catch(e){}
   // Pasar a s1b — el navegador respira un instante
   setTimeout(function(){
     show("s1b");
@@ -3385,6 +3387,73 @@ function vbRenderRasayana(doshaVikriti, sexo){
 }
 
 // ============================================================
+// VALIDACIÓN OBLIGATORIA — Lengua + Ojos antes de pasar a Paso 5
+// Las fotos son obligatorias SIEMPRE, incluso para usuarias suscriptas
+// ============================================================
+window._vbFotosObligatorias=['lengua','ojos'];
+
+window._vbFotosCompletas=function(){
+  try{
+    for(var i=0;i<window._vbFotosObligatorias.length;i++){
+      var sec=window._vbFotosObligatorias[i];
+      if(!localStorage.getItem('vb_escaner_'+sec))return false;
+    }
+    return true;
+  }catch(e){return false;}
+};
+
+window._vbResetFotos=function(){
+  // Llamar al iniciar un test nuevo — fuerza tomar fotos otra vez
+  try{
+    localStorage.removeItem('vb_escaner_lengua');
+    localStorage.removeItem('vb_escaner_ojos');
+    localStorage.removeItem('vb_escaner_detox');
+    localStorage.removeItem('vb_escaner_unas');
+    localStorage.removeItem('vb_escaner_piel');
+  }catch(e){}
+};
+
+window._vbIntentarPaso5=function(){
+  // Validar las 2 fotos obligatorias
+  var faltan=[];
+  if(!localStorage.getItem('vb_escaner_lengua'))faltan.push('Lengua');
+  if(!localStorage.getItem('vb_escaner_ojos'))faltan.push('Ojos');
+  
+  if(faltan.length>0){
+    try{
+      if(typeof gtag==='function')gtag('event','paso4_bloqueado_fotos',{faltan:faltan.join(',')});
+      if(window.clarity)window.clarity('event','paso4_bloqueado_fotos');
+    }catch(e){}
+    
+    // Mensaje claro
+    var msg='Para continuar al Paso 5, necesitamos que primero te saques las fotos del:\n\n';
+    faltan.forEach(function(f){msg+='📷 '+f+'\n';});
+    msg+='\nLas fotos son la base de tu diagnóstico ayurvédico personalizado. Sin ellas no podemos darte tu lectura.';
+    alert(msg);
+    
+    // Hacer scroll al primer escáner faltante
+    var primero=faltan[0].toLowerCase();
+    var seccionId=primero==='lengua'?'lengua':'ojos';
+    var card=document.querySelector('[data-sec="'+seccionId+'"]');
+    if(card){
+      var details=card.closest('details');
+      if(details){details.open=true;}
+      card.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+    return false;
+  }
+  
+  // Todo OK — avanzar
+  try{
+    if(typeof gtag==='function')gtag('event','paso4_completado');
+    if(window.clarity)window.clarity('event','paso4_completado_ok');
+  }catch(e){}
+  vbCerrarPaso4();
+  setTimeout(function(){if(typeof vbAbrirPaso5==='function')vbAbrirPaso5();},200);
+  return true;
+};
+
+// ============================================================
 // PASO 4 — ESCÁNER DEL VAIDYA (18 evaluaciones según escrituras sagradas)
 // ============================================================
 function vbAbrirPaso4(){
@@ -3706,7 +3775,29 @@ function vbAbrirPaso4(){
     dots4+='<div style="display:inline-flex;align-items:center;justify-content:center;width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:'+bgD+';color:'+colD+';font-size:'+fs+'px;font-weight:800;margin:0 3px;vertical-align:middle">'+(k<4?'✓':k)+'</div>';
   }
   html+='<div style="text-align:center;margin-bottom:14px;line-height:1">'+dots4+'</div>';
-  html+='<button onclick="vbCerrarPaso4();setTimeout(function(){if(typeof vbAbrirPaso5===\'function\')vbAbrirPaso5();},200);" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(90,122,83,0.3);text-align:center;line-height:1.3">→ IR AL PASO 5 DE 9<div style="font-size:12px;font-weight:600;color:#D1FAE5;margin-top:4px">Tu lectura</div></button>';
+  
+  // === CHECKLIST FOTOS OBLIGATORIAS ===
+  var fLengua=!!localStorage.getItem('vb_escaner_lengua');
+  var fOjos=!!localStorage.getItem('vb_escaner_ojos');
+  var todasOk=fLengua&&fOjos;
+  
+  html+='<div style="background:'+(todasOk?'#D1FAE5':'#FEF3C7')+';border:2px solid '+(todasOk?'#059669':'#F59E0B')+';border-radius:10px;padding:14px;margin-bottom:14px">';
+  html+='<p style="font-size:11px;color:'+(todasOk?'#065F46':'#92400E')+';font-weight:700;text-transform:uppercase;letter-spacing:1px;margin:0 0 10px;text-align:center">'+(todasOk?'✅ Listo · Podés avanzar':'📷 Fotos obligatorias para continuar')+'</p>';
+  html+='<div style="display:flex;flex-direction:column;gap:6px">';
+  html+='<div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#3D5A36"><span style="font-size:18px">'+(fLengua?'✅':'⏳')+'</span><span style="font-weight:'+(fLengua?'700':'500')+'">Foto de tu lengua '+(fLengua?'(tomada)':'(falta)')+'</span></div>';
+  html+='<div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#3D5A36"><span style="font-size:18px">'+(fOjos?'✅':'⏳')+'</span><span style="font-weight:'+(fOjos?'700':'500')+'">Foto de tus ojos '+(fOjos?'(tomada)':'(falta)')+'</span></div>';
+  html+='</div>';
+  if(!todasOk){
+    html+='<p style="font-size:11px;color:#92400E;margin:10px 0 0;text-align:center;line-height:1.5;font-style:italic">Sin estas fotos no podemos darte tu lectura personalizada.</p>';
+  }
+  html+='</div>';
+  
+  // === BOTÓN CONDICIONADO ===
+  if(todasOk){
+    html+='<button onclick="window._vbIntentarPaso5()" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(90,122,83,0.3);text-align:center;line-height:1.3">→ IR AL PASO 5 DE 9<div style="font-size:12px;font-weight:600;color:#D1FAE5;margin-top:4px">Tu lectura</div></button>';
+  }else{
+    html+='<button onclick="window._vbIntentarPaso5()" style="display:block;width:100%;padding:16px 14px;background:#A8A29E;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;line-height:1.3;opacity:0.85">🔒 Completá las fotos para avanzar<div style="font-size:12px;font-weight:500;color:#F5F5F4;margin-top:4px">Tocá para ver qué falta</div></button>';
+  }
   html+='</div>';
   
   // Cita textual
