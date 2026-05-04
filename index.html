@@ -3779,17 +3779,29 @@ window.vbValidarFotosObligatoriasYAvanzar=function(){
 
 // Renderiza un escáner individual con acordeón
 function vbRenderEscaner(e,dosha,relevancia){
+  // ¿Tiene foto sacada o audio grabado?
+  var fueEscaneado = false;
+  try{
+    var fotos = JSON.parse(localStorage.getItem('vb_fotos_paso4')||'{}');
+    var audios = JSON.parse(localStorage.getItem('vb_audios_paso4')||'{}');
+    if(fotos[e.id] || audios[e.id]) fueEscaneado = true;
+  }catch(err){}
+  
   var bg,border,labelBg,labelTxt,labelText;
-  if(relevancia==='recomendado'){
-    bg='#fff';border='#059669';labelBg='#D1FAE5';labelTxt='#065F46';labelText='✓ Para vos hoy';
+  
+  // === LÓGICA NUEVA ===
+  // Solo "✓ Para vos hoy" si fue escaneado.
+  // Si no, muestra "Pendiente" en informativa o complementaria — sin diagnóstico falso.
+  if(fueEscaneado){
+    bg='#fff';border='#059669';labelBg='#D1FAE5';labelTxt='#065F46';labelText='✓ Escaneado · resultado abajo';
+  }else if(relevancia==='recomendado'){
+    // Antes era "Para vos hoy". Ahora es "Pendiente" porque no se escaneó.
+    bg='#FFF8E1';border='#F59E0B';labelBg='#FEF3C7';labelTxt='#92400E';labelText='⏳ Pendiente · sacá foto';
   }else if(relevancia==='complementario'){
     bg='#FAFAFA';border='#A8A29E';labelBg='#F5F5F4';labelTxt='#78716C';labelText='Informativa';
   }else{
-    bg='#FAFAFA';border='#A8A29E';labelBg='#F5F5F4';labelTxt='#78716C';labelText='No aplica hoy';
+    bg='#FAFAFA';border='#A8A29E';labelBg='#F5F5F4';labelTxt='#78716C';labelText='Informativa';
   }
-  
-  var detalle=e.desbalance&&e.desbalance[dosha]?e.desbalance[dosha]:'Esta evaluación es informativa para tu cuadro.';
-  var accion=e.hacer&&e.hacer[dosha]?e.hacer[dosha]:'Consultá con un Vaidya para ver si aplica.';
   
   var html='<details style="background:'+bg+';border:1px solid '+border+';border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer">';
   html+='<summary style="list-style:none;display:flex;align-items:center;gap:10px;cursor:pointer">';
@@ -3804,8 +3816,22 @@ function vbRenderEscaner(e,dosha,relevancia){
   html+='<div style="margin-top:14px;padding-top:14px;border-top:1px solid #E8DFC8">';
   html+='<div style="margin-bottom:10px"><p style="font-size:10px;color:#8B7355;text-transform:uppercase;font-weight:700;letter-spacing:1px;margin:0 0 4px">Qué se observa</p><p style="font-size:12px;color:#3D5A36;line-height:1.6;margin:0">'+e.observa+'</p></div>';
   html+='<div style="margin-bottom:10px;padding:10px;background:#F0FDF4;border-left:3px solid #059669;border-radius:6px"><p style="font-size:10px;color:#065F46;text-transform:uppercase;font-weight:700;letter-spacing:1px;margin:0 0 4px">✓ En equilibrio</p><p style="font-size:12px;color:#3D5A36;line-height:1.6;margin:0">'+e.equilibrio+'</p></div>';
-  html+='<div style="margin-bottom:10px;padding:10px;background:#FEF3C7;border-left:3px solid #F59E0B;border-radius:6px"><p style="font-size:10px;color:#92400E;text-transform:uppercase;font-weight:700;letter-spacing:1px;margin:0 0 4px">⚠️ En tu cuadro hoy ('+dosha+')</p><p style="font-size:12px;color:#3D5A36;line-height:1.6;margin:0">'+detalle+'</p></div>';
-  html+='<div style="margin-bottom:10px;padding:10px;background:#EEF2FF;border-left:3px solid #6366F1;border-radius:6px"><p style="font-size:10px;color:#4338CA;text-transform:uppercase;font-weight:700;letter-spacing:1px;margin:0 0 4px">🌿 Qué hacer</p><p style="font-size:12px;color:#3D5A36;line-height:1.6;margin:0">'+accion+'</p></div>';
+  
+  // ===== DIAGNÓSTICO PERSONALIZADO: solo si fue escaneado =====
+  // Para evaluaciones SIN foto disponible (8 grandes + complementarias) → mostrar siempre la info general (Vata/Pitta/Kapha) pero sin afirmar que es del usuario
+  // Para evaluaciones CON foto (lengua/ojos) → si sacó foto, ya muestra resultado real arriba; si no, no muestra diagnóstico
+  
+  if(e.foto && !fueEscaneado){
+    // Es escáner con cámara y NO sacó foto → invitar a escanear, no diagnosticar
+    html+='<div style="margin-bottom:10px;padding:12px;background:#FEF3C7;border-left:3px solid #F59E0B;border-radius:6px;text-align:center"><p style="font-size:11px;color:#92400E;text-transform:uppercase;font-weight:700;letter-spacing:1px;margin:0 0 6px">⏳ Pendiente de escaneo</p><p style="font-size:12px;color:#78350F;line-height:1.5;margin:0">No podemos darte un diagnóstico personalizado sin ver tu foto. Sacá la foto y la IA cruza tu Prakriti + Vikriti.</p></div>';
+  } else if(!e.foto){
+    // Las 8 grandes y complementarias → mostrar señales generales por dosha pero CLARAMENTE como info general
+    var detalle=e.desbalance&&e.desbalance[dosha]?e.desbalance[dosha]:'Esta evaluación es informativa.';
+    var accion=e.hacer&&e.hacer[dosha]?e.hacer[dosha]:'Consultá con un Vaidya.';
+    html+='<div style="margin-bottom:10px;padding:10px;background:#F5F3FF;border-left:3px solid #8B5CF6;border-radius:6px"><p style="font-size:10px;color:#5B21B6;text-transform:uppercase;font-weight:700;letter-spacing:1px;margin:0 0 4px">📚 Información general · '+dosha+'</p><p style="font-size:11px;color:#5B21B6;font-style:italic;margin:0 0 6px;line-height:1.4">Esto es lo que la tradición ayurvédica describe para tu dosha. <strong>No es un diagnóstico personalizado tuyo</strong> — para eso hay que escanear.</p><p style="font-size:12px;color:#3D5A36;line-height:1.6;margin:0">'+detalle+'</p></div>';
+    html+='<div style="margin-bottom:10px;padding:10px;background:#EEF2FF;border-left:3px solid #6366F1;border-radius:6px"><p style="font-size:10px;color:#4338CA;text-transform:uppercase;font-weight:700;letter-spacing:1px;margin:0 0 4px">🌿 Qué hacer (orientativo)</p><p style="font-size:12px;color:#3D5A36;line-height:1.6;margin:0">'+accion+'</p></div>';
+  }
+  // Si fue escaneado y tiene foto → no muestro nada acá porque el resultado real va a aparecer en el preview tras la API
   
   if(e.foto){
     html+='<button type="button" data-vbfoto-paso4="'+e.id+'" data-dosha-paso4="'+dosha+'" onclick="event.preventDefault();event.stopPropagation();return false;" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:12px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px">📷 Sacar foto + análisis con IA</button>';
