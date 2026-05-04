@@ -714,6 +714,34 @@ function _vbAccionPracticaPostInforme(variant){
     }
   }
 
+  // === Helper: renderizar análisis sea string o objeto ===
+  window.vbRenderAnalisisObjeto = function(obj){
+    if(!obj || typeof obj !== 'object') return String(obj||'');
+    var html = '';
+    // Iterar las propiedades del objeto y renderizarlas como secciones
+    Object.keys(obj).forEach(function(key){
+      var valor = obj[key];
+      // Capitalizar y formatear el key como título
+      var titulo = key.replace(/_/g,' ').replace(/^./, function(c){return c.toUpperCase();});
+      
+      if(typeof valor === 'string'){
+        html += '<div style="margin-bottom:14px"><p style="font-size:11px;letter-spacing:1.5px;color:#5A7A53;text-transform:uppercase;font-weight:700;margin-bottom:6px">'+titulo+'</p><p style="font-size:13px;color:#3D5A36;line-height:1.6;white-space:pre-wrap">'+valor+'</p></div>';
+      } else if(Array.isArray(valor)){
+        html += '<div style="margin-bottom:14px"><p style="font-size:11px;letter-spacing:1.5px;color:#5A7A53;text-transform:uppercase;font-weight:700;margin-bottom:6px">'+titulo+'</p><ul style="margin:0;padding-left:20px;font-size:13px;color:#3D5A36;line-height:1.7">';
+        valor.forEach(function(item){
+          html += '<li style="margin-bottom:4px">'+(typeof item==='string'?item:JSON.stringify(item))+'</li>';
+        });
+        html += '</ul></div>';
+      } else if(valor && typeof valor === 'object'){
+        // Objeto anidado: renderizar recursivamente
+        html += '<div style="margin-bottom:14px;padding:10px;background:#FAF7F0;border-radius:8px"><p style="font-size:11px;letter-spacing:1.5px;color:#5A7A53;text-transform:uppercase;font-weight:700;margin-bottom:6px">'+titulo+'</p>'+window.vbRenderAnalisisObjeto(valor)+'</div>';
+      } else if(valor !== null && valor !== undefined){
+        html += '<div style="margin-bottom:8px;display:flex;justify-content:space-between"><span style="font-size:12px;color:#8B7355">'+titulo+'</span><strong style="font-size:12px;color:#3D5A36">'+valor+'</strong></div>';
+      }
+    });
+    return html;
+  };
+
   // === API pública del Trust Layer ===
   window.vbTrust = {
     // Obtener log completo
@@ -844,7 +872,7 @@ Pequeños ajustes que cambian todo.
 <p style="font-size:14px;color:#3D5A36;line-height:1.7;margin:0;font-weight:600">Estás a tiempo. Siempre estás a tiempo de revertir.</p>
 </div>
 <p style="font-size:12px;color:#8B7355;margin-top:14px;letter-spacing:0.3px;text-align:center">✓ Sin tarjeta · ✓ 100% gratis · ✓ Resultado al instante</p>
-<div id="savedSession" style="display:none;margin-top:24px"><div class="card" style="background:#F0FDF4;border:2px solid #5A7A53;padding:18px"><p style="margin-bottom:14px;font-size:15px;color:#3D5A36;font-weight:600">🎉 ¡Tenés una sesión guardada!</p><p style="margin-bottom:16px;font-size:13px;color:#5A7A53">Podés continuar donde la dejaste, comenzar tu Rasayana, o empezar de cero.</p><button type="button" class="btn btn-sage" style="padding:18px;font-size:15px;touch-action:manipulation;min-height:54px;width:100%" onclick="loadSession()">CONTINUAR MI PERFIL →</button><button type="button" style="margin-top:10px;padding:18px;font-size:15px;touch-action:manipulation;min-height:54px;width:100%;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(224,122,31,0.3)" onclick="_vbIrCheckout('home_returning','rasayana_directa')">🌱 COMENZAR LA RASAYANA →</button><button type="button" style="margin-top:14px;padding:8px;background:none;border:none;color:#8B7355;font-size:12px;text-decoration:underline;cursor:pointer;display:block;margin-left:auto;margin-right:auto" onclick="confirmClearSession()">empezar de nuevo</button></div></div>
+<div id="savedSession" style="display:none;margin-top:24px"><div class="card" style="background:#F0FDF4;border:2px solid #5A7A53;padding:18px"><p style="margin-bottom:14px;font-size:15px;color:#3D5A36;font-weight:600">🎉 ¡Tenés una sesión guardada!</p><p style="margin-bottom:16px;font-size:13px;color:#5A7A53">Podés continuar donde la dejaste o empezar de cero.</p><button type="button" class="btn btn-sage" style="padding:18px;font-size:15px;touch-action:manipulation;min-height:54px" onclick="loadSession()">CONTINUAR MI PERFIL →</button><button type="button" style="margin-top:14px;padding:8px;background:none;border:none;color:#8B7355;font-size:12px;text-decoration:underline;cursor:pointer;display:block;margin-left:auto;margin-right:auto" onclick="confirmClearSession()">empezar de nuevo</button></div></div>
 </div>
 </div>
 </div>
@@ -1749,6 +1777,21 @@ function vbMostrarPrakriti(p){
   html+='<div style="display:flex;justify-content:space-between;padding:6px 0"><span style="font-size:12px;color:#8B7355">Nakshatra</span><strong style="font-size:12px;color:#3D5A36">'+p.nakshatra.nombre+'</strong></div>';
   html+='</div>';
   
+  // === GATING: la expansión completa de la carta natal solo para Práctica ===
+  var tieneAcceso = window._vbTieneAccesoPractica ? window._vbTieneAccesoPractica() : false;
+  
+  if(!tieneAcceso){
+    // Esencia: mostrar lock con CTA
+    html+='<div style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:2px dashed #D97706;border-radius:12px;padding:20px;margin-bottom:18px;text-align:center">';
+    html+='<div style="font-size:48px;margin-bottom:8px">🔒</div>';
+    html+='<h4 style="margin:6px 0 8px;color:#92400E;font-size:15px">Tu carta natal completa está en Práctica</h4>';
+    html+='<p style="font-size:12px;color:#78350F;margin:0 0 14px;line-height:1.6">Acá ves los 4 pilares. En Práctica accedés a:<br>• Los 9 grahas con sus casas y grados exactos<br>• Las 12 bhavas con sus regentes<br>• Conclusión ayurvédica por cada item<br>• El cruce con tu test del estado actual</p>';
+    html+='<button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="if(window._vbMostrarSuscripcion)window._vbMostrarSuscripcion()">🔥 Probar Práctica 10 días gratis</button>';
+    html+='<p style="font-size:11px;color:#92400E;margin:6px 0 0">Sin tarjeta · Cancelás cuando quieras</p>';
+    html+='</div>';
+  } else {
+    // Práctica: mostrar acordeones completos
+  
   // ===== ACORDEÓN 1: LAGNA EXPANDIDO =====
   var lagnaInfoFull = VB_RASHI_INFO[p.lagna.signIdx] || {};
   var contLagna = '<p style="margin-bottom:8px"><strong>Tu Ascendente</strong> es el signo que estaba subiendo en el horizonte oriental al momento de tu nacimiento. Define tu cuerpo físico, tu salud general, y cómo te presentás al mundo.</p>';
@@ -1847,6 +1890,8 @@ function vbMostrarPrakriti(p){
   contScore += '</div>';
   contScore += '<p style="background:#F0FDF4;padding:10px;border-left:3px solid '+color+';border-radius:6px;margin-top:10px"><strong>📌 Tu Prakriti:</strong> '+p.prakriti_nombre+'. Este es tu equilibrio natural desde el nacimiento — tu firma constitucional única.</p>';
   html+=ac('score','📊 Cómo se calculó tu Prakriti','Sistema clásico Jyotish con peso por pilares',contScore);
+  
+  } // fin del else (tieneAcceso)
   
   // ===== TRANSICIÓN AL TEST =====
   html+='<div style="margin-top:20px">';
@@ -1979,76 +2024,11 @@ function vbContinuarTest(){
 </div>
 <div class="tabs-grid" id="tabsGrid"></div>
 <div id="tabContents"></div>
+<div style="padding:20px"><div class="card" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);text-align:center"><h4 style="margin-bottom:12px">📥 Descargá tu informe</h4><p style="font-size:13px;color:#666;margin-bottom:14px">Elegí en qué voz querés leerlo:</p><div style="display:grid;gap:10px"><button class="btn btn-sage" onclick="downloadPDF('medico')">🩺 Médico Occidental</button><button class="btn btn-primary" onclick="downloadPDF('ayurveda')">🌿 Terapeuta Ayurvédico</button><button class="btn btn-gold" onclick="downloadPDF('amiga')">💚 Como una Amiga</button></div></div>
 
-
-<div id="vbBloquePostInforme" style="margin-top:24px;font-family:inherit;padding:0 20px">
-<!-- Puente post-informe v2 — entrada al roadmap (Arreglo 1) -->
-<div style="background:#FAF7F0;border:1px solid #E8DFC8;border-radius:18px;padding:26px 22px;text-align:center">
-<div style="margin-bottom:14px">
-<span style="display:inline-block;padding:5px 14px;background:#fff;border:1px solid #D4B896;border-radius:50px;font-size:10px;font-weight:600;color:#8B7355;letter-spacing:2px">UN PASO MÁS</span>
+<div id="vbBloquePostInforme" style="margin-top:24px;font-family:inherit;display:none">
+<!-- Bloque post-informe Vedabite v1 ELIMINADO — reemplazado por el roadmap navegable + paso 7 prescriptivo -->
 </div>
-<div style="width:30px;height:1px;background:#D4B896;margin:14px auto"></div>
-<p id="vbPuentePostInformeTexto" style="font-size:15px;line-height:1.7;color:#3D5A36;margin:0 0 22px;font-family:inherit">&nbsp;</p>
-<button id="vbPuentePostInformeBtn" onclick="_vbPuentePostInformeClick()" style="display:block;width:100%;padding:16px;background:#5A7A53;color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit;letter-spacing:0.3px">Empezar mi camino →</button>
-</div>
-</div>
-
-<script>
-(function(){
-  function _vbDoshaLegible(d){
-    return ({vata:'Vata',pitta:'Pitta',kapha:'Kapha'})[d]||d;
-  }
-  function _vbRenderPuente(){
-    var cont=document.getElementById('vbPuentePostInformeTexto');
-    if(!cont)return false;
-    var r=window.res;
-    if(!r||!r.p)return false;
-    var vikriti=_vbDoshaLegible(r.p);
-    var prakritiNombre=(window._vbPrakriti&&window._vbPrakriti.prakriti_nombre)?window._vbPrakriti.prakriti_nombre:null;
-    var texto;
-    if(prakritiNombre){
-      texto='Tu <strong>Prakriti (constitución de nacimiento)</strong> es '+prakritiNombre+' y hoy tu cuerpo está expresando <strong>'+vikriti+' (Vikriti — desequilibrio actual)</strong>. Hay algo pidiendo equilibrio.';
-    }else{
-      texto='El test mostró que tu cuerpo está expresando <strong>'+vikriti+' (Vikriti — desequilibrio actual)</strong>. Eso es una pista, no un diagnóstico.';
-    }
-    cont.innerHTML=texto;
-    return true;
-  }
-  // Retry porque s4 se renderiza después de showResults()
-  var intentos=0;
-  var iv=setInterval(function(){
-    intentos++;
-    if(_vbRenderPuente()||intentos>20){clearInterval(iv);}
-  },300);
-  window._vbRenderPuentePostInforme=_vbRenderPuente;
-})();
-
-function _vbPuentePostInformeClick(){
-  try{
-    var country=(window._vbPaymentConfig&&window._vbPaymentConfig.country)||'XX';
-    var dosha=(window.res&&window.res.p)||'sin_dosha';
-    var tienePrakriti=!!(window._vbPrakriti&&window._vbPrakriti.prakriti_nombre);
-    if(typeof gtag==='function'){
-      gtag('event','vb_puente_post_informe_click',{
-        event_category:'engagement',
-        event_label:'puente_a_paso7',
-        dosha:dosha,
-        tiene_prakriti:tienePrakriti,
-        pais:country
-      });
-    }
-    if(typeof window.clarity==='function'){
-      window.clarity('set','puente_post_informe','clicked');
-      window.clarity('event','vb_puente_post_informe_click');
-    }
-  }catch(e){}
-  if(typeof vbAbrirPaso7==='function'){
-    vbAbrirPaso7();
-  }else{
-    console.warn('[vedabite] vbAbrirPaso7 no disponible en el momento del click');
-  }
-}
-</script>
 
 <button class="btn btn-outline" style="margin-top:24px" onclick="confirmRestart()">🔄 Rehacer el test</button>
 </div>
@@ -2188,7 +2168,7 @@ function loadSession(){
   }
 }
 function checkSaved(){try{localStorage.getItem("vb_res")&&(document.getElementById("savedSession").style.display="block")}catch(a){}}
-function clearSession(){try{localStorage.removeItem("vb_res"),localStorage.removeItem("vb_email"),localStorage.removeItem("vb_dosha"),document.getElementById("savedSession").style.display="none";if(typeof window._vbResetFotos==='function')window._vbResetFotos();}catch(a){}}
+function clearSession(){try{localStorage.removeItem("vb_res"),localStorage.removeItem("vb_email"),localStorage.removeItem("vb_dosha"),document.getElementById("savedSession").style.display="none"}catch(a){}}
 function confirmClearSession(){if(confirm("¿Seguro que querés empezar de nuevo? Vas a perder tu progreso anterior.")){clearSession();try{if(window._vbTrack)window._vbTrack('sesion_borrada_confirmada');}catch(e){}}else{try{if(window._vbTrack)window._vbTrack('sesion_borrada_cancelada');}catch(e){}}}
 function vbHacerPDF(htmlContent,nombre){var doc='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+nombre+'</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Helvetica,Arial,sans-serif;color:#1a1a1a;background:#fff;padding:20px;max-width:600px;margin:0 auto;line-height:1.5}h1{font-size:22px;margin:8px 0}h3{font-size:16px;margin:0 0 8px}h4{font-size:14px;margin:8px 0 4px}p{margin:4px 0;font-size:13px}@media print{body{padding:10px}}</style></head><body>'+htmlContent+'</body></html>';try{var blob=new Blob([doc],{type:'text/html;charset=utf-8'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=nombre.replace('.pdf','.html');a.style.display='none';document.body.appendChild(a);a.click();setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);}catch(e){var w=window.open('','_blank');if(w){w.document.open();w.document.write(doc);w.document.close();w.focus();setTimeout(function(){try{w.print()}catch(e2){}},500);}else{alert('No se pudo descargar el informe. Intentá desde otro navegador.');}}}
 function downloadPDF(voz){
@@ -2237,8 +2217,6 @@ function startTest(){
   try{if(typeof gtag==='function')gtag('event','start_test_clicked');}catch(e){}
   // Esconder savedSession si existe
   try{var ss=document.getElementById("savedSession");if(ss)ss.style.display="none";}catch(e){}
-  // RESET FOTOS — incluso usuarias suscriptas deben sacárselas otra vez en cada test
-  try{if(typeof window._vbResetFotos==='function')window._vbResetFotos();}catch(e){}
   // Pasar a s1b — el navegador respira un instante
   setTimeout(function(){
     show("s1b");
@@ -2289,7 +2267,7 @@ function getRes(){
   };
 }
 function showEmail(){res=getRes();var a=D[res.p];document.getElementById("eDosha").textContent=a.e,document.getElementById("eName").textContent=a.n,show("s3")}
-function submitEmail(){var a=document.getElementById("emailIn").value;if(!a||!a.includes("@"))return alert("Email inválido");(async function(){try{var emailClean=a.trim().toLowerCase();var msgBuffer=new TextEncoder().encode(emailClean);var hashBuffer=await crypto.subtle.digest('SHA-256',msgBuffer);var hashed=Array.from(new Uint8Array(hashBuffer)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');if(typeof gtag==='function'){gtag('set','user_data',{'sha256_email_address':hashed});}}catch(e){}})();userEmail=a;window.userEmail=a;window.res=res;try{localStorage.setItem("vb_email",a);}catch(e){}try{if(window.clarity){window.clarity('identify',a);window.clarity('set','userEmail',a);window.clarity('set','dosha',res.p);}}catch(e){}var e=D[res.p];emailjs.send("service_xf7v0x7","template_cwvkmyu",{to_email:a,dosha_name:e.n,dosha_emoji:e.e,dosha_desc:e.desc,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha}).then(function(r){console.log('[email] enviado OK',r);}).catch(function(err){console.error('[email] FALLÓ:',err);try{if(typeof gtag==='function')gtag('event','email_envio_fallo',{error:String(err).substring(0,100)});}catch(e2){}});try{if(window._vbSaveLead)window._vbSaveLead({email:a,dosha:res.p,dosha_name:e.n,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha,source:document.referrer||"direct",utm:location.search||""}).catch(function(){});}catch(e){}try{gtag("event","generate_lead");if(window._vbTrack)window._vbTrack()}catch(a){}saveSession(),showResults()}
+function submitEmail(){var a=document.getElementById("emailIn").value;if(!a||!a.includes("@"))return alert("Email inválido");(async function(){try{var emailClean=a.trim().toLowerCase();var msgBuffer=new TextEncoder().encode(emailClean);var hashBuffer=await crypto.subtle.digest('SHA-256',msgBuffer);var hashed=Array.from(new Uint8Array(hashBuffer)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');if(typeof gtag==='function'){gtag('set','user_data',{'sha256_email_address':hashed});}}catch(e){}})();userEmail=a;window.userEmail=a;window.res=res;try{localStorage.setItem("vb_email",a);}catch(e){}try{if(window.clarity){window.clarity('identify',a);window.clarity('set','userEmail',a);window.clarity('set','dosha',res.p);}}catch(e){}var e=D[res.p];emailjs.send("service_xf7v0x7","template_cwvkmyu",{to_email:a,dosha_name:e.n,dosha_emoji:e.e,dosha_desc:e.desc,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha}).then(function(r){console.log('[email] enviado OK',r);}).catch(function(err){console.error('[email] FALLÓ:',err);try{if(typeof gtag==='function')gtag('event','email_envio_fallo',{error:String(err).substring(0,100)});}catch(e2){}});try{if(window._vbSaveLead)window._vbSaveLead({email:a,dosha:res.p,dosha_name:e.n,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha,source:document.referrer||"direct",utm:location.search||""}).catch(function(){});}catch(e){}try{localStorage.setItem("vb_trialStart",new Date().toISOString());gtag("event","generate_lead");if(window._vbTrack)window._vbTrack()}catch(a){}saveSession(),showResults()}
 function showResults(){
   var a=D[res.p];
   document.getElementById("resHeader").style.background=a.bg;
@@ -3056,6 +3034,11 @@ function vbAbrirPaso6(){
   html+='</div>';
   
   // CAPA 5 + CTA
+  // === PASO 4 INTERMEDIO — Escáner del Vaidya (después del diagnóstico, antes del plan) ===
+  html+='<div style="background:#fff;border:2px solid #5A7A53;border-radius:18px;padding:22px;margin-bottom:18px">';
+  html+='<div style="text-align:center;margin-bottom:14px"><p style="font-size:11px;letter-spacing:3px;color:#5A7A53;text-transform:uppercase;font-weight:700">📋 Paso 4 de 9</p><h3 style="font-family:Georgia,serif;font-size:20px;color:#3D5A36;font-weight:400;margin-top:8px;line-height:1.3">Tu escáner físico</h3><p style="font-size:13px;color:#7a7a7a;margin-top:8px;line-height:1.5">Antes de tu plan, mirá tu lengua, tus ojos y tus uñas. <strong>Tu cuerpo te cuenta lo que pasa adentro.</strong> Sacá las 3 fotos y la IA te lo lee.</p></div>';
+  html+='<button onclick="vbCerrarPaso6();setTimeout(function(){showTab(\'escanerEquilibrio\')},80)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:16px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;box-shadow:0 4px 14px rgba(90,122,83,0.25)">📷 Sacar mis 3 fotos →</button>';
+  html+='</div>';
   
   html+='<div style="background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border-radius:18px;padding:28px 22px;text-align:center;margin-bottom:14px">';
   html+='<p style="font-size:11px;letter-spacing:3px;color:#FDE68A;text-transform:uppercase;font-weight:700;margin-bottom:10px">Capa 5 · La esperanza concreta</p>';
@@ -3129,8 +3112,16 @@ function vbCheckoutPaso7(){
 // ============================================================
 // HELPERS TRIAL — 7 días gratis con todo desbloqueado
 // ============================================================
-// El trial arranca SOLO con click explícito del usuario en el botón
-// "EMPEZAR LOS 7 DÍAS GRATIS" del paso 8. (vbAutoStartTrial removido — Arreglo 2)
+// AUTO-INICIO DE TRIAL: cualquier visitante nuevo desde hoy (26/4/2026)
+// arranca su contador de 7 días al primer load de la página.
+// Esto se respeta aunque no completen el email todavía.
+(function vbAutoStartTrial(){
+  try{
+    if(!localStorage.getItem('vb_trialStart')){
+      localStorage.setItem('vb_trialStart',new Date().toISOString());
+    }
+  }catch(e){}
+})();
 
 function vbDiasTrial(){
   try{
@@ -3141,22 +3132,31 @@ function vbDiasTrial(){
   }catch(e){return 0;}
 }
 function vbTrialActivo(){
-  // FLAG GLOBAL: durante el lanzamiento todo está GRATIS
-  // Cuando queramos activar paywall, cambiar VB_PAYWALL_ACTIVO a true
-  if(window.VB_PAYWALL_ACTIVO===false||typeof window.VB_PAYWALL_ACTIVO==='undefined')return true;
-  // Pago activo (Lemon Squeezy webhook futuro) o trial vigente (≤7 días)
+  // FLAG GLOBAL: paywall ACTIVO. Cambiar a false si querés desactivar bloqueos.
+  if(typeof window.VB_PAYWALL_ACTIVO==='undefined')window.VB_PAYWALL_ACTIVO=true;
+  if(window.VB_PAYWALL_ACTIVO===false)return true;
+  
+  // ADMINS PREMIUM PERMANENTES: siempre tienen acceso completo
+  try{
+    var adminEmails = ['juanseelunico@gmail.com','juanse@vedabite.com','jf@dinalight.com'];
+    var emailActual = (window.userEmail||localStorage.getItem('vb_email')||'').toLowerCase().trim();
+    if(emailActual && adminEmails.indexOf(emailActual) >= 0)return true;
+  }catch(e){}
+  
+  // Pago activo (Lemon Squeezy webhook) o trial vigente (≤10 días)
   try{
     if(localStorage.getItem('vb_pago_activo')==='si')return true;
-    return vbDiasTrial()<=7;
+    return vbDiasTrial()<=10;
   }catch(e){return true;}
 }
 function vbDiasRestantes(){
-  // null = trial nunca arrancado (no setear vb_trialStart antes del click explícito)
-  try{
-    if(!localStorage.getItem('vb_trialStart'))return null;
-  }catch(e){}
-  return Math.max(0,7-vbDiasTrial());
+  return Math.max(0,10-vbDiasTrial());
 }
+
+// Función pública para el sistema de gating de tabs y bloqueos
+window._vbTieneAccesoPractica=function(){
+  try{ return vbTrialActivo(); }catch(e){ return false; }
+};
 
 // ============================================================
 // PASO 7 — TRATAMIENTO PERSONALIZADO
@@ -3385,73 +3385,6 @@ function vbRenderRasayana(doshaVikriti, sexo){
   
   return html;
 }
-
-// ============================================================
-// VALIDACIÓN OBLIGATORIA — Lengua + Ojos antes de pasar a Paso 5
-// Las fotos son obligatorias SIEMPRE, incluso para usuarias suscriptas
-// ============================================================
-window._vbFotosObligatorias=['lengua','ojos'];
-
-window._vbFotosCompletas=function(){
-  try{
-    for(var i=0;i<window._vbFotosObligatorias.length;i++){
-      var sec=window._vbFotosObligatorias[i];
-      if(!localStorage.getItem('vb_escaner_'+sec))return false;
-    }
-    return true;
-  }catch(e){return false;}
-};
-
-window._vbResetFotos=function(){
-  // Llamar al iniciar un test nuevo — fuerza tomar fotos otra vez
-  try{
-    localStorage.removeItem('vb_escaner_lengua');
-    localStorage.removeItem('vb_escaner_ojos');
-    localStorage.removeItem('vb_escaner_detox');
-    localStorage.removeItem('vb_escaner_unas');
-    localStorage.removeItem('vb_escaner_piel');
-  }catch(e){}
-};
-
-window._vbIntentarPaso5=function(){
-  // Validar las 2 fotos obligatorias
-  var faltan=[];
-  if(!localStorage.getItem('vb_escaner_lengua'))faltan.push('Lengua');
-  if(!localStorage.getItem('vb_escaner_ojos'))faltan.push('Ojos');
-  
-  if(faltan.length>0){
-    try{
-      if(typeof gtag==='function')gtag('event','paso4_bloqueado_fotos',{faltan:faltan.join(',')});
-      if(window.clarity)window.clarity('event','paso4_bloqueado_fotos');
-    }catch(e){}
-    
-    // Mensaje claro
-    var msg='Para continuar al Paso 5, necesitamos que primero te saques las fotos del:\n\n';
-    faltan.forEach(function(f){msg+='📷 '+f+'\n';});
-    msg+='\nLas fotos son la base de tu diagnóstico ayurvédico personalizado. Sin ellas no podemos darte tu lectura.';
-    alert(msg);
-    
-    // Hacer scroll al primer escáner faltante
-    var primero=faltan[0].toLowerCase();
-    var seccionId=primero==='lengua'?'lengua':'ojos';
-    var card=document.querySelector('[data-sec="'+seccionId+'"]');
-    if(card){
-      var details=card.closest('details');
-      if(details){details.open=true;}
-      card.scrollIntoView({behavior:'smooth',block:'center'});
-    }
-    return false;
-  }
-  
-  // Todo OK — avanzar
-  try{
-    if(typeof gtag==='function')gtag('event','paso4_completado');
-    if(window.clarity)window.clarity('event','paso4_completado_ok');
-  }catch(e){}
-  vbCerrarPaso4();
-  setTimeout(function(){if(typeof vbAbrirPaso5==='function')vbAbrirPaso5();},200);
-  return true;
-};
 
 // ============================================================
 // PASO 4 — ESCÁNER DEL VAIDYA (18 evaluaciones según escrituras sagradas)
@@ -3775,29 +3708,7 @@ function vbAbrirPaso4(){
     dots4+='<div style="display:inline-flex;align-items:center;justify-content:center;width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:'+bgD+';color:'+colD+';font-size:'+fs+'px;font-weight:800;margin:0 3px;vertical-align:middle">'+(k<4?'✓':k)+'</div>';
   }
   html+='<div style="text-align:center;margin-bottom:14px;line-height:1">'+dots4+'</div>';
-  
-  // === CHECKLIST FOTOS OBLIGATORIAS ===
-  var fLengua=!!localStorage.getItem('vb_escaner_lengua');
-  var fOjos=!!localStorage.getItem('vb_escaner_ojos');
-  var todasOk=fLengua&&fOjos;
-  
-  html+='<div style="background:'+(todasOk?'#D1FAE5':'#FEF3C7')+';border:2px solid '+(todasOk?'#059669':'#F59E0B')+';border-radius:10px;padding:14px;margin-bottom:14px">';
-  html+='<p style="font-size:11px;color:'+(todasOk?'#065F46':'#92400E')+';font-weight:700;text-transform:uppercase;letter-spacing:1px;margin:0 0 10px;text-align:center">'+(todasOk?'✅ Listo · Podés avanzar':'📷 Fotos obligatorias para continuar')+'</p>';
-  html+='<div style="display:flex;flex-direction:column;gap:6px">';
-  html+='<div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#3D5A36"><span style="font-size:18px">'+(fLengua?'✅':'⏳')+'</span><span style="font-weight:'+(fLengua?'700':'500')+'">Foto de tu lengua '+(fLengua?'(tomada)':'(falta)')+'</span></div>';
-  html+='<div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#3D5A36"><span style="font-size:18px">'+(fOjos?'✅':'⏳')+'</span><span style="font-weight:'+(fOjos?'700':'500')+'">Foto de tus ojos '+(fOjos?'(tomada)':'(falta)')+'</span></div>';
-  html+='</div>';
-  if(!todasOk){
-    html+='<p style="font-size:11px;color:#92400E;margin:10px 0 0;text-align:center;line-height:1.5;font-style:italic">Sin estas fotos no podemos darte tu lectura personalizada.</p>';
-  }
-  html+='</div>';
-  
-  // === BOTÓN CONDICIONADO ===
-  if(todasOk){
-    html+='<button onclick="window._vbIntentarPaso5()" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(90,122,83,0.3);text-align:center;line-height:1.3">→ IR AL PASO 5 DE 9<div style="font-size:12px;font-weight:600;color:#D1FAE5;margin-top:4px">Tu lectura</div></button>';
-  }else{
-    html+='<button onclick="window._vbIntentarPaso5()" style="display:block;width:100%;padding:16px 14px;background:#A8A29E;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;line-height:1.3;opacity:0.85">🔒 Completá las fotos para avanzar<div style="font-size:12px;font-weight:500;color:#F5F5F4;margin-top:4px">Tocá para ver qué falta</div></button>';
-  }
+  html+='<button onclick="vbCerrarPaso4();setTimeout(function(){if(typeof vbAbrirPaso5===\'function\')vbAbrirPaso5();},200);" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(90,122,83,0.3);text-align:center;line-height:1.3">→ IR AL PASO 5 DE 9<div style="font-size:12px;font-weight:600;color:#D1FAE5;margin-top:4px">Tu lectura</div></button>';
   html+='</div>';
   
   // Cita textual
@@ -3854,19 +3765,14 @@ function vbRenderEscaner(e,dosha,relevancia){
   html+='<span style="font-size:18px;color:#8B7355">▾</span>';
   html+='</summary>';
   
-  // Mapeo de id → seccion del sistema de escáner real
-  var secMap={jihva:'lengua',netra:'ojos',mutra:'detox',nakha:'unas'};
-  var seccion=secMap[e.id]||e.id;
-  
-  html+='<div data-sec="'+seccion+'" data-dosha="'+dosha+'" style="margin-top:14px;padding-top:14px;border-top:1px solid #E8DFC8">';
+  html+='<div style="margin-top:14px;padding-top:14px;border-top:1px solid #E8DFC8">';
   html+='<div style="margin-bottom:10px"><p style="font-size:10px;color:#8B7355;text-transform:uppercase;font-weight:700;letter-spacing:1px;margin:0 0 4px">Qué se observa</p><p style="font-size:12px;color:#3D5A36;line-height:1.6;margin:0">'+e.observa+'</p></div>';
   html+='<div style="margin-bottom:10px;padding:10px;background:#F0FDF4;border-left:3px solid #059669;border-radius:6px"><p style="font-size:10px;color:#065F46;text-transform:uppercase;font-weight:700;letter-spacing:1px;margin:0 0 4px">✓ En equilibrio</p><p style="font-size:12px;color:#3D5A36;line-height:1.6;margin:0">'+e.equilibrio+'</p></div>';
   html+='<div style="margin-bottom:10px;padding:10px;background:#FEF3C7;border-left:3px solid #F59E0B;border-radius:6px"><p style="font-size:10px;color:#92400E;text-transform:uppercase;font-weight:700;letter-spacing:1px;margin:0 0 4px">⚠️ En tu cuadro hoy ('+dosha+')</p><p style="font-size:12px;color:#3D5A36;line-height:1.6;margin:0">'+detalle+'</p></div>';
   html+='<div style="margin-bottom:10px;padding:10px;background:#EEF2FF;border-left:3px solid #6366F1;border-radius:6px"><p style="font-size:10px;color:#4338CA;text-transform:uppercase;font-weight:700;letter-spacing:1px;margin:0 0 4px">🌿 Qué hacer</p><p style="font-size:12px;color:#3D5A36;line-height:1.6;margin:0">'+accion+'</p></div>';
   
   if(e.foto){
-    html+='<button type="button" data-vbfoto="1" onclick="event.stopPropagation();window._vbAbrirEscanerFoto&&window._vbAbrirEscanerFoto(this);return false" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto para análisis</button>';
-    html+='<div class="vb-foto-preview" style="display:none;margin-top:10px"></div>';
+    html+='<button onclick="event.preventDefault();event.stopPropagation();showTab(\'escanerEquilibrio\');" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:12px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px">📷 Sacar foto + análisis con IA</button>';
   }
   html+='<p style="font-size:10px;color:#8B7355;font-style:italic;margin:10px 0 0;text-align:right">📜 '+e.fuente+'</p>';
   html+='</div></details>';
@@ -4295,18 +4201,9 @@ function vbAbrirPaso7(){
   html+='<p style="font-size:13px;color:#7a7a7a;margin-top:6px">'+tituloSexo(sexo)+' · '+edad+' años · Plan basado en Charaka Samhita</p>';
   html+='</div>';
   
-  // Banner trial — Arreglo 2: adaptativo según vb_trialStart y día actual
+  // Banner trial
   if(trialOk){
-    if(diasRest===null){
-      // Trial nunca arrancado, paywall off → mostrar plan desbloqueado sin contador
-      html+='<div style="background:#D1FAE5;border:2px solid #059669;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#065F46;font-weight:700">🎁 Plan completo desbloqueado</p><p style="font-size:11px;color:#047857;margin-top:4px">Mirá tu plan. Cuando estés lista, empezás los 7 días gratis en el paso 8.</p></div>';
-    }else if(diasRest===1 && (new Date()).getHours()>=12){
-      // Banner naranja día 7 desde mediodía → CTA al checkout
-      html+='<div style="background:#FFEDD5;border:2px solid #EA580C;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#9A3412;font-weight:700">⏳ Te queda 1 día. ¿Seguís?</p><p style="font-size:11px;color:#9A3412;margin:6px 0 10px">Mañana arranca tu programa completo · USD 20/mes</p><button onclick="vbCheckoutPaso7()" style="background:#EA580C;color:#fff;border:none;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Suscribirme ahora →</button></div>';
-    }else{
-      // Banner verde original con contador de días restantes
-      html+='<div style="background:#D1FAE5;border:2px solid #059669;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#065F46;font-weight:700">🎁 Acceso gratis · Te quedan '+diasRest+' día'+(diasRest!==1?'s':'')+' de prueba</p><p style="font-size:11px;color:#047857;margin-top:4px">Después USD 20/mes · Cancelás cuando quieras</p></div>';
-    }
+    html+='<div style="background:#D1FAE5;border:2px solid #059669;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#065F46;font-weight:700">🎁 Acceso gratis · Te quedan '+diasRest+' día'+(diasRest!==1?'s':'')+' de prueba</p><p style="font-size:11px;color:#047857;margin-top:4px">Después USD 20/mes · Cancelás cuando quieras</p></div>';
   }else{
     html+='<div style="background:#FEF3C7;border:2px solid #F59E0B;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#92400E;font-weight:700">🔒 Tu prueba terminó (día '+diaActual+')</p><p style="font-size:11px;color:#78350F;margin-top:4px">Suscribite por USD 20/mes para desbloquear tu plan completo</p></div>';
   }
@@ -5413,9 +5310,6 @@ function vbCerrarPaso9(){
 // PASO 8 — SEGUIMIENTO MENSUAL (bloqueado completo si trial vencido)
 // ============================================================
 function vbAbrirPaso8(){
-  // Arreglo 2: gate inicial Opción B
-  var tieneTrialStart=false;
-  try{tieneTrialStart=!!localStorage.getItem('vb_trialStart');}catch(e){}
   var trialOk=vbTrialActivo();
   var diasRest=vbDiasRestantes();
   var diaActual=vbDiasTrial();
@@ -5431,62 +5325,9 @@ function vbAbrirPaso8(){
   html+='<p style="font-size:13px;color:#7a7a7a;margin-top:6px">Re-test cada 30 días · Ajuste automático del plan según progreso</p>';
   html+='</div>';
   
-  if(!tieneTrialStart){
-    // ESTADO 1 — Gate inicial: usuario nunca arrancó trial
-    html+='<div style="background:#FAF7F0;border:1px solid #E8DFC8;border-radius:18px;padding:28px 22px;text-align:center;margin-bottom:14px">';
-    html+='<div style="margin-bottom:14px"><span style="display:inline-block;padding:5px 14px;background:#fff;border:1px solid #D4B896;border-radius:50px;font-size:10px;font-weight:600;color:#8B7355;letter-spacing:2px">EMPEZÁ HOY</span></div>';
-    html+='<div style="width:30px;height:1px;background:#D4B896;margin:14px auto"></div>';
-    html+='<h3 style="font-family:Georgia,serif;font-size:22px;color:#3D5A36;font-weight:400;margin-bottom:12px;line-height:1.3">Hoy es día 1 de tu camino</h3>';
-    html+='<p style="font-size:15px;color:#3D5A36;line-height:1.7;margin-bottom:22px">Te acompañamos los próximos 7 días gratis.<br>Después decidís si seguís.</p>';
-    html+='<button onclick="_vbIniciarTrialClick()" style="display:block;width:100%;padding:18px;background:#5A7A53;color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:600;cursor:pointer;letter-spacing:0.5px;font-family:inherit">EMPEZAR LOS 7 DÍAS GRATIS</button>';
-    html+='<p style="font-size:11px;color:#8B7355;margin-top:12px;font-style:italic">Sin tarjeta · Sin compromiso</p>';
-    html+='</div>';
-  }else if(trialOk){
-    // ESTADO 2 — Trial vigente o pago activo: contenido completo
-    
-    // Banner adaptativo: naranja día 7 mediodía / verde día normal
-    if(diasRest===1 && (new Date()).getHours()>=12){
-      html+='<div style="background:#FFEDD5;border:2px solid #EA580C;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#9A3412;font-weight:700">⏳ Te queda 1 día. ¿Seguís?</p><p style="font-size:11px;color:#9A3412;margin:6px 0 10px">Mañana arranca tu programa completo · USD 20/mes</p><button onclick="vbCheckoutPaso7()" style="background:#EA580C;color:#fff;border:none;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Suscribirme ahora →</button></div>';
-    }else{
-      html+='<div style="background:#D1FAE5;border:2px solid #059669;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#065F46;font-weight:700">🎁 Acceso gratis · Te quedan '+diasRest+' día'+(diasRest!==1?'s':'')+' de prueba</p></div>';
-    }
-    
-    // Contenido completo
-    
-    // === LAS 3 VOCES — DESBLOQUEADAS CON SUSCRIPCIÓN ===
-    html+='<div style="background:#fff;border:2px solid #5A7A53;border-radius:14px;padding:20px;margin-bottom:14px">';
-    html+='<p style="font-size:11px;letter-spacing:2px;color:#5A7A53;text-transform:uppercase;font-weight:700;margin-bottom:10px;text-align:center">🎁 Tus 3 informes desbloqueados</p>';
-    html+='<h3 style="font-family:Georgia,serif;font-size:18px;color:#3D5A36;font-weight:400;margin-bottom:8px;text-align:center">Para llevarlo con vos</h3>';
-    html+='<p style="font-size:13px;color:#5A7A53;line-height:1.6;text-align:center;margin-bottom:16px">Compartilo con quien te entiende. Cada voz dice lo mismo, pero en su idioma.</p>';
-    
-    // Bloque 1: Informe principal
-    html+='<div style="background:#FAF7F0;border-radius:10px;padding:14px;margin-bottom:12px">';
-    html+='<p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:10px">📥 Tu informe completo</p>';
-    html+='<div style="display:grid;gap:8px">';
-    html+='<button class="btn btn-sage" onclick="downloadPDF(\'medico\')" style="font-size:13px">🩺 Para tu Médico</button>';
-    html+='<button class="btn btn-primary" onclick="downloadPDF(\'ayurveda\')" style="font-size:13px">🌿 Para tu Terapeuta Ayurvédico</button>';
-    html+='<button class="btn btn-gold" onclick="downloadPDF(\'amiga\')" style="font-size:13px">💚 Para vos · Como te lo diría una amiga</button>';
-    html+='</div></div>';
-    
-    // Bloque 2: Carta astral
-    html+='<div style="background:#FAF7F0;border-radius:10px;padding:14px">';
-    html+='<p style="font-size:12px;color:#3D5A36;font-weight:700;margin-bottom:10px">🪐 Tu carta astral védica</p>';
-    html+='<div style="display:grid;gap:8px">';
-    html+='<button class="btn btn-sage" onclick="downloadAstro(\'medico\')" style="font-size:13px">🩺 Para tu Médico</button>';
-    html+='<button class="btn btn-primary" onclick="downloadAstro(\'ayurveda\')" style="font-size:13px">🌿 Para tu Terapeuta Ayurvédico</button>';
-    html+='<button class="btn btn-gold" onclick="downloadAstro(\'amiga\')" style="font-size:13px">💚 Para vos · Como te lo diría una amiga</button>';
-    html+='</div></div>';
-    
-    html+='</div>';
-    
-    // === BOTÓN PAGO POST-3 VOCES (consenso maestros: aprovechar pico emocional) ===
-    html+='<div style="background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border-radius:14px;padding:20px;margin-bottom:14px;text-align:center">';
-    html+='<p style="font-size:11px;letter-spacing:2px;color:#FDE68A;text-transform:uppercase;font-weight:700;margin-bottom:8px">Asegurá tu acceso</p>';
-    html+='<h3 style="font-family:Georgia,serif;font-size:18px;color:#fff;font-weight:400;margin-bottom:10px;line-height:1.3">Convertí tu trial antes que se corte</h3>';
-    html+='<p style="font-size:13px;color:#E8DFC8;line-height:1.6;margin-bottom:16px">Mantené tus 3 voces, tu carta astral, el seguimiento mensual y tu programa Rasayana.</p>';
-    html+='<button onclick="_vbIrCheckout(\'paso8_post_voces\',\'trial_activo\')" style="width:100%;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;padding:16px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:0.3px;box-shadow:0 4px 14px rgba(224,122,31,0.4)">Suscribirme ahora · '+(window._vbPrecio?window._vbPrecio():'USD 20')+'/mes →</button>';
-    html+='<p style="font-size:11px;color:#FDE68A;opacity:0.9;margin-top:10px;font-style:italic">Pagás con '+(window._vbMetodoPago?window._vbMetodoPago():'Mercado Pago')+' · Cancelás cuando quieras</p>';
-    html+='</div>';
+  if(trialOk){
+    // Banner trial
+    html+='<div style="background:#D1FAE5;border:2px solid #059669;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#065F46;font-weight:700">🎁 Acceso gratis · Te quedan '+diasRest+' día'+(diasRest!==1?'s':'')+' de prueba</p></div>';
     
     // Contenido completo
     html+='<div style="background:#fff;border:1px solid #C49E72;border-radius:14px;padding:20px;margin-bottom:14px">';
@@ -5505,15 +5346,11 @@ function vbAbrirPaso8(){
     html+='</div>';
     
   }else{
-    // ESTADO 3 — Trial vencido: muro de suscripción
+    // BLOQUEADO COMPLETO
     html+='<div style="background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border-radius:18px;padding:32px 22px;text-align:center;margin-bottom:14px">';
     html+='<div style="font-size:48px;margin-bottom:14px">🔒</div>';
     html+='<h3 style="font-family:Georgia,serif;font-size:24px;color:#fff;font-weight:400;margin-bottom:14px;line-height:1.3">Seguimiento mensual</h3>';
-    html+='<p style="font-size:15px;color:#E8DFC8;line-height:1.7;margin-bottom:18px">El seguimiento mensual con re-test automático, ajuste del plan y gráfico de evolución es exclusivo de la suscripción Vedabite Práctica.</p>';
-    html+='<div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:14px;margin-bottom:22px;text-align:left">';
-    html+='<p style="font-size:12px;color:#FDE68A;font-weight:700;margin-bottom:8px">🔓 También desbloqueás:</p>';
-    html+='<p style="font-size:13px;color:#E8DFC8;line-height:1.7;margin:0">📥 Tu informe completo en 3 voces (médico, terapeuta, amiga)<br>🪐 Tu carta astral védica en 3 voces<br>📊 Re-test cada 30 días con ajuste automático del plan</p>';
-    html+='</div>';
+    html+='<p style="font-size:15px;color:#E8DFC8;line-height:1.7;margin-bottom:22px">El seguimiento mensual con re-test automático, ajuste del plan y gráfico de evolución es exclusivo de la suscripción Vedabite Práctica.</p>';
     html+='<button onclick="vbCheckoutPaso7()" style="width:100%;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;padding:18px;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:0.3px;box-shadow:0 4px 14px rgba(224,122,31,0.4);margin-bottom:10px">Suscribirme · USD 20/mes →</button>';
     html+='<p style="font-size:12px;color:#FDE68A;opacity:0.9">Cancelás cuando quieras</p>';
     html+='</div>';
@@ -5552,25 +5389,6 @@ function vbCerrarPaso8(){
   try{if(typeof gtag==='function')gtag('event','paso8_cerrado');}catch(e){}
 }
 
-// Arreglo 2: handler del click en "EMPEZAR LOS 7 DÍAS GRATIS" del paso 8
-function _vbIniciarTrialClick(){
-  try{
-    localStorage.setItem('vb_trialStart',new Date().toISOString());
-    if(typeof gtag==='function'){
-      gtag('event','vb_trial_iniciado_click',{
-        event_category:'engagement',
-        event_label:'paso8_boton_7dias',
-        dosha:(window.res&&window.res.p)||'sin_dosha'
-      });
-    }
-    if(typeof window.clarity==='function'){
-      window.clarity('set','trial_iniciado','si');
-      window.clarity('event','vb_trial_iniciado_click');
-    }
-  }catch(e){}
-  vbAbrirPaso8();
-}
-
 // Conectar paso 6 → paso 7 directo (en lugar de checkout) cuando trial activo
 window.vbAbrirPaso7=vbAbrirPaso7;
 window.vbAbrirPaso8=vbAbrirPaso8;
@@ -5594,7 +5412,22 @@ e+='<div class="tab-content" id="t-respiracion"><button class="back-btn" onclick
 e+='<div class="tab-content" id="t-meditacion"><button class="back-btn" onclick="backIdx()">← Volver</button><h3>🧘 Meditación</h3><div class="card"><h4>'+a.medit.n+'</h4><p style="color:#666;margin-bottom:12px">Duración: '+a.medit.d+'</p><ol style="padding-left:20px">'+a.medit.p.map(function(a){return'<li style="padding:6px 0">'+a+"</li>"}).join("")+"</ol></div>"+tips(a.meditacionTips)+"</div>";
 e+='<div class="tab-content" id="t-ubicacion"><button class="back-btn" onclick="backIdx()">← Volver</button><h3>📍 Cerca Tuyo</h3><div class="card"><a href="https://google.com/maps/search/yoga+cerca" target="_blank" class="btn btn-sage" style="margin-bottom:10px">🧘 Centros de Yoga</a><a href="https://google.com/maps/search/spa+cerca" target="_blank" class="btn btn-sage" style="margin-bottom:10px">💆 Spas</a><a href="https://google.com/maps/search/dietetica+cerca" target="_blank" class="btn btn-sage">🥗 Dietéticas</a></div></div>';
 e+='<div class="tab-content" id="t-salud"><button class="back-btn" onclick="backIdx()">← Volver</button><h3>🏥 Salud</h3><div class="card" style="background:#FEE2E2"><h4>⚠️ Riesgos</h4><ul>'+a.salud.r.map(function(a){return"<li>⚠️ "+a+"</li>"}).join("")+'</ul></div><div class="card" style="background:#D1FAE5"><h4>✅ Prevención</h4><ul>'+a.salud.p.map(function(a){return"<li>✓ "+a+"</li>"}).join("")+"</ul></div>"+tips(a.saludTips)+"</div>";
-e+='<div class="tab-content" id="t-escaner"><button class="back-btn" onclick="backIdx()">← Volver</button><h3>📷 Escáner de menú</h3><div class="card"><p style="margin-bottom:12px">Escribí los platos del menú separados por coma. Te decimos cuál sí y cuál no según tu constitución.</p><textarea class="escaner-input" id="prodIn" placeholder="Ejemplo: milanesa, papas fritas, ensalada cruda, helado" style="min-height:80px;resize:vertical;font-family:inherit"></textarea><button class="btn btn-sage" onclick="scan()" style="width:100%;margin-top:8px">🔍 Analizar menú completo</button><div id="scanRes"></div></div><div class="card" style="background:#F0F9FF"><h4>💡 Probá rápido:</h4><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px"><span class="quick-tag" onclick="qScan(\'café\')">☕ café</span><span class="quick-tag" onclick="qScan(\'helado\')">🍦 helado</span><span class="quick-tag" onclick="qScan(\'arroz\')">🍚 arroz</span><span class="quick-tag" onclick="qScan(\'banana\')">🍌 banana</span><span class="quick-tag" onclick="qScan(\'chocolate\')">🍫 chocolate</span><span class="quick-tag" onclick="qScan(\'milanesa, papas, ensalada\')">🍽️ menú típico</span></div></div></div>';
+e+='<div class="tab-content" id="t-escaner"><button class="back-btn" onclick="backIdx()">← Volver</button><h3>📷 Escáner de menú</h3>'+
+  '<div class="card" style="background:linear-gradient(180deg,#F0FDF4,#FAF7F0);border:2px solid #5A7A53">'+
+    '<p style="font-size:11px;letter-spacing:2px;color:#5A7A53;text-transform:uppercase;font-weight:700;margin-bottom:8px;text-align:center">📸 Sacale foto al menú</p>'+
+    '<p style="font-size:12px;color:#3D5A36;line-height:1.5;margin-bottom:14px;text-align:center">Sacá una foto a la carta del restaurante.<br>La IA cruza tu carta natal védica + test dosha y te dice qué pedir para equilibrarte.</p>'+
+    '<button type="button" data-vbfoto-menu="1" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:16px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📸 Sacar foto del menú</button>'+
+    '<div id="vbMenuFotoPreview" style="display:none;margin-top:14px"></div>'+
+  '</div>'+
+  '<div class="card" style="margin-top:14px">'+
+    '<p style="font-size:11px;letter-spacing:2px;color:#8B7355;text-transform:uppercase;font-weight:700;margin-bottom:8px">✏️ O escribí los platos manualmente</p>'+
+    '<p style="margin-bottom:12px;font-size:13px;color:#7a7a7a">Si la foto no salió bien, escribí los platos separados por coma.</p>'+
+    '<textarea class="escaner-input" id="prodIn" placeholder="Ejemplo: milanesa, papas fritas, ensalada cruda, helado" style="min-height:80px;resize:vertical;font-family:inherit"></textarea>'+
+    '<button class="btn btn-sage" onclick="scan()" style="width:100%;margin-top:8px">🔍 Analizar menú escrito</button>'+
+    '<div id="scanRes"></div>'+
+  '</div>'+
+  '<div class="card" style="background:#F0F9FF"><h4>💡 Probá rápido:</h4><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px"><span class="quick-tag" onclick="qScan(\'café\')">☕ café</span><span class="quick-tag" onclick="qScan(\'helado\')">🍦 helado</span><span class="quick-tag" onclick="qScan(\'arroz\')">🍚 arroz</span><span class="quick-tag" onclick="qScan(\'banana\')">🍌 banana</span><span class="quick-tag" onclick="qScan(\'chocolate\')">🍫 chocolate</span><span class="quick-tag" onclick="qScan(\'milanesa, papas, ensalada\')">🍽️ menú típico</span></div></div>'+
+'</div>';
 e+='<div class="tab-content" id="t-escanerEquilibrio"><button class="back-btn" onclick="backIdx()">← Volver</button><div style="text-align:center;margin:8px 0 18px"><p style="font-size:11px;letter-spacing:3px;color:#C49E72;text-transform:uppercase;font-weight:700">📋 Escáner del Vaidya · Paso 4 de 9</p><p style="font-size:13px;color:#7a7a7a;margin-top:6px">Las 3 evaluaciones principales del terapeuta ayurvédico</p></div>'+
 '<div style="background:linear-gradient(180deg,#F0FDF4,#FAF7F0);border:2px solid #5A7A53;border-radius:14px;padding:18px;margin-bottom:18px"><p style="font-size:11px;letter-spacing:2px;color:#5A7A53;text-transform:uppercase;font-weight:700;margin-bottom:12px;text-align:center">⭐ Las 3 evaluaciones principales</p><div style="display:flex;flex-direction:column;gap:10px"><a href="#evaluacion-lengua" style="background:#fff;border:1px solid #C49E72;border-radius:10px;padding:14px;text-decoration:none;color:#3D5A36;display:flex;align-items:center;gap:12px"><span style="font-size:28px">👅</span><div><div style="font-size:14px;font-weight:700">Jihva Pariksha (lengua)</div><div style="font-size:12px;color:#7a7a7a">Mapa del intestino y digestión</div></div></a><a href="#evaluacion-ojos" style="background:#fff;border:1px solid #C49E72;border-radius:10px;padding:14px;text-decoration:none;color:#3D5A36;display:flex;align-items:center;gap:12px"><span style="font-size:28px">👁️</span><div><div style="font-size:14px;font-weight:700">Netra Pariksha (ojos)</div><div style="font-size:12px;color:#7a7a7a">Hígado, energía, sistema nervioso</div></div></a><a href="#evaluacion-unas" style="background:#fff;border:1px solid #C49E72;border-radius:10px;padding:14px;text-decoration:none;color:#3D5A36;display:flex;align-items:center;gap:12px"><span style="font-size:28px">💅</span><div><div style="font-size:14px;font-weight:700">Nakha Pariksha (uñas)</div><div style="font-size:12px;color:#7a7a7a">Minerales, calidad de tejidos, dosha óseo</div></div></a></div><p style="font-size:11px;color:#8B7355;margin-top:14px;text-align:center;font-style:italic">Las 17 evaluaciones complementarias están más abajo</p></div>'+
 '<h3>🔬 Escáner de Equilibrio</h3>'+(window.INFO&&window.INFO[res.p]&&window.INFO[res.p].escanerEquilibrio?window.INFO[res.p].escanerEquilibrio:"")+'<div class="card" style="background:#FEF3C7;border:2px solid #F59E0B;margin-top:16px"><p style="font-size:13px;color:#78350F;margin:0;line-height:1.6"><strong>🔬 Análisis experimental — versión Early Access</strong><br><br>Este análisis usa inteligencia artificial entrenada con textos clásicos del Ayurveda (Charaka Samhita, Sushruta Samhita). Está en fase de aprendizaje continuo y mejora con cada uso.<br><br><strong>⚠️ No reemplaza la consulta con un vaidya certificado ni con un médico.</strong><br><br>Si tenés dudas sobre lo que encontró, consultá con un profesional. Vedabite te acompaña, no te diagnostica.</p></div></div>';
@@ -5639,6 +5472,7 @@ z+="<li><strong>Sol en "+N+":</strong> Tu esencia y propósito vital</li>";
 z+="<li><strong>Luna en "+H+":</strong> Tu mente emocional y mundo interior</li>";
 z+="<li><strong>Ascendente "+T+":</strong> Tu personalidad y cómo te perciben</li>";
 z+="<li><strong>Júpiter en "+U+":</strong> Tu crecimiento y expansión espiritual</li></ul></div>";
+z+='<div class="card" style="margin-top:16px;background:linear-gradient(135deg,#FEF3C7,#FDE68A);text-align:center"><h4 style="margin-bottom:12px">📥 Descargá tu carta astral védica</h4><p style="font-size:13px;color:#666;margin-bottom:14px">Elegí la voz del informe:</p><div style="display:grid;gap:10px"><button class="btn btn-sage" onclick="downloadAstro(&#39;medico&#39;)">🩺 Médico Occidental</button><button class="btn btn-primary" onclick="downloadAstro(&#39;ayurveda&#39;)">🌿 Terapeuta Ayurvédico</button><button class="btn btn-gold" onclick="downloadAstro(&#39;amiga&#39;)">💚 Como una Amiga</button></div></div>';
 document.getElementById("astroResult").innerHTML=z}else alert("Completá todos los campos");
 function B(a){return Math.floor((a%360+360)%360/30)}function L(a){return Math.floor((a%360+360)%360%30)}function ea(a){return Math.floor((a-Y+360)%360/30)+1}}
 
@@ -6418,14 +6252,15 @@ window.renderTabs=function(a){
   // FILTRO DE GATING: tabs que se filtran por plan
   var tabsConGating=['mudras','meditacion','respiracion','chakras','terapias','ejercicio','recetas','horarios','proyeccion','salud'];
   var estado=window._vbEstado||{plan:'esencia',bloqueado:true};
-  var tieneAccesoCompleto=true;
+  // GATING REAL: lee el estado del usuario (Esencia bloquea, Práctica/trial activo abre)
+  var tieneAccesoCompleto = window._vbTieneAccesoPractica ? window._vbTieneAccesoPractica() : !estado.bloqueado;
   function aplicarGating(htmlOriginal,tabId){
     if(tieneAccesoCompleto)return htmlOriginal;
     if(tabsConGating.indexOf(tabId)===-1)return htmlOriginal;
     // Para usuarias Esencia: dejar solo la primera card (la intro "por qué te equilibra") y agregar lock visual
     var matches=htmlOriginal.match(/<div class="card"[^>]*>[\s\S]*?<\/div>/);
     var intro=matches?matches[0]:'';
-    var lockHTML='<div class="card" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);text-align:center;padding:24px;border:2px dashed #D97706"><div style="font-size:50px;margin-bottom:8px">🔒</div><h4 style="margin:8px 0 4px;color:#92400E">El CÓMO se hace está en Práctica</h4><p style="font-size:13px;color:#78350F;margin:0 0 16px;line-height:1.6">Acá te decimos QUÉ hacer. Los pasos exactos, los tiempos, los porqués detallados y los 7 tips para esta tab están en Vedabite Práctica.</p><button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="_vbMostrarSuscripcion()">🔥 Probar Práctica 7 días gratis</button><p style="font-size:11px;color:#92400E;margin:8px 0 0">Sin tarjeta · Cancelás cuando quieras</p></div>';
+    var lockHTML='<div class="card" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);text-align:center;padding:24px;border:2px dashed #D97706"><div style="font-size:50px;margin-bottom:8px">🔒</div><h4 style="margin:8px 0 4px;color:#92400E">El CÓMO se hace está en Práctica</h4><p style="font-size:13px;color:#78350F;margin:0 0 16px;line-height:1.6">Acá te decimos QUÉ hacer. Los pasos exactos, los tiempos, los porqués detallados y los 7 tips para esta tab están en Vedabite Práctica.</p><button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="_vbMostrarSuscripcion()">🔥 Probar Práctica 10 días gratis</button><p style="font-size:11px;color:#92400E;margin:8px 0 0">Sin tarjeta · Cancelás cuando quieras</p></div>';
     return intro+lockHTML;
   }
   var html='';
@@ -6777,14 +6612,210 @@ window._vbActualizarContadorFotos=function(){
     ev.preventDefault();
     ev.stopPropagation();
     
+    // GATING: solo Práctica (trial activo o pago)
+    if(window._vbTieneAccesoPractica && !window._vbTieneAccesoPractica()){
+      vbMostrarBloqueoEscaner(btn);
+      return;
+    }
+    
     abrirCamaraOArchivo(btn);
   }, true);
+  
+  // Bloqueo visual cuando Esencia intenta usar escáner
+  function vbMostrarBloqueoEscaner(btn){
+    var card = btn.closest('[data-sec]');
+    var preview = card ? card.querySelector('.vb-foto-preview') : null;
+    if(!preview){
+      preview = document.createElement('div');
+      preview.className = 'vb-foto-preview';
+      preview.style.marginTop = '10px';
+      btn.parentNode.appendChild(preview);
+    }
+    preview.style.display = 'block';
+    preview.innerHTML = 
+      '<div style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:2px dashed #D97706;border-radius:10px;padding:18px;text-align:center">' +
+      '<div style="font-size:42px;margin-bottom:6px">🔒</div>' +
+      '<h4 style="margin:6px 0 4px;color:#92400E;font-size:14px">El análisis con IA está en Práctica</h4>' +
+      '<p style="font-size:12px;color:#78350F;margin:0 0 14px;line-height:1.5">Subí tu foto y la IA cruza tu Prakriti, Vikriti y carta natal. 10 días gratis.</p>' +
+      '<button class="btn btn-gold" style="width:100%;margin-bottom:6px" onclick="if(window._vbMostrarSuscripcion)window._vbMostrarSuscripcion()">🔥 Probar Práctica 10 días gratis</button>' +
+      '<p style="font-size:10px;color:#92400E;margin:6px 0 0">Sin tarjeta · Cancelás cuando quieras</p>' +
+      '</div>';
+  }
   
   // Exponer función globalmente como respaldo
   window._vbAbrirEscanerFoto = function(btn){
     if(!btn) return;
     abrirCamaraOArchivo(btn);
   };
+  
+  // === ESCÁNER DE MENÚ DE RESTAURANT (foto) ===
+  document.addEventListener('click', function(ev){
+    var btn = ev.target.closest('[data-vbfoto-menu]');
+    if(!btn) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    
+    // GATING: solo Práctica
+    if(window._vbTieneAccesoPractica && !window._vbTieneAccesoPractica()){
+      var preview = document.getElementById('vbMenuFotoPreview');
+      if(preview){
+        preview.style.display = 'block';
+        preview.innerHTML = 
+          '<div style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:2px dashed #D97706;border-radius:10px;padding:18px;text-align:center">' +
+          '<div style="font-size:42px;margin-bottom:6px">🔒</div>' +
+          '<h4 style="margin:6px 0 4px;color:#92400E;font-size:14px">El escáner de menú con IA está en Práctica</h4>' +
+          '<p style="font-size:12px;color:#78350F;margin:0 0 14px;line-height:1.5">Sacá foto del menú del restaurante y la IA cruza con tu Prakriti + Vikriti para recomendarte qué pedir. 10 días gratis.</p>' +
+          '<button class="btn btn-gold" style="width:100%;margin-bottom:6px" onclick="if(window._vbMostrarSuscripcion)window._vbMostrarSuscripcion()">🔥 Probar Práctica 10 días gratis</button>' +
+          '<p style="font-size:10px;color:#92400E;margin:6px 0 0">Sin tarjeta · Cancelás cuando quieras</p>' +
+          '</div>';
+      }
+      return;
+    }
+    
+    abrirCamaraMenu(btn);
+  }, true);
+  
+  function abrirCamaraMenu(btn){
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    if(esMobil()){
+      input.setAttribute('capture', 'environment');
+    }
+    input.style.display = 'none';
+    
+    input.onchange = function(){
+      if(input.files && input.files[0]){
+        procesarFotoMenu(input.files[0]);
+      }
+      setTimeout(function(){ if(input.parentNode) input.parentNode.removeChild(input); }, 500);
+    };
+    
+    document.body.appendChild(input);
+    input.click();
+  }
+  
+  function procesarFotoMenu(file){
+    if(!file.type.match(/^image\//)){
+      alert('Por favor seleccioná una imagen');
+      return;
+    }
+    if(file.size > 15 * 1024 * 1024){
+      alert('Imagen muy grande. Máximo 15 MB');
+      return;
+    }
+    
+    // Recopilar contexto del usuario: Prakriti + Vikriti + dosha actual
+    var prakriti = window._vbPrakriti || {};
+    var dosha = (window.res && window.res.p) || prakriti.dosha_predominante || '';
+    var prakritiNombre = prakriti.prakriti_nombre || '';
+    var email = window.userEmail || (typeof userEmail !== 'undefined' ? userEmail : '') || localStorage.getItem('vb_email') || '';
+    var lagna = prakriti.lagna ? prakriti.lagna.sign : '';
+    var nakshatra = prakriti.nakshatra ? prakriti.nakshatra.nombre : '';
+    var score = prakriti.score || {};
+    
+    var preview = document.getElementById('vbMenuFotoPreview');
+    if(!preview) return;
+    preview.style.display = 'block';
+    
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var imgB64 = e.target.result;
+      
+      preview.innerHTML = 
+        '<img src="' + imgB64 + '" style="width:100%;max-height:280px;object-fit:contain;border-radius:10px;background:#000;margin-bottom:10px">' +
+        '<div style="background:#FAF7F0;border:1px solid #E8DFC8;border-radius:8px;padding:14px;text-align:center">' +
+        '<div style="display:inline-block;width:22px;height:22px;border:3px solid #E8DFC8;border-top-color:#5A7A53;border-radius:50%;animation:vbSpin 1s linear infinite;vertical-align:middle"></div>' +
+        '<span style="margin-left:10px;font-size:13px;color:#5A7A53">Cruzando menú con tu Prakriti '+(prakritiNombre||'')+' + Vikriti '+(dosha||'')+'...</span>' +
+        '</div>';
+      
+      try{
+        if(typeof gtag === 'function') gtag('event','escaner_menu_foto_enviada',{dosha:dosha});
+        if(window.clarity) window.clarity('event','escaner_menu_foto_enviada');
+      }catch(e){}
+      
+      var API_MENU_URL = 'https://analizarfotoayurveda-j3yesrdcba-rj.a.run.app';
+      
+      fetch(API_MENU_URL, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          email: email,
+          seccion: 'menu_restaurant',
+          dosha: dosha,
+          prakriti: prakritiNombre,
+          lagna: lagna,
+          nakshatra: nakshatra,
+          score: score,
+          imagen: imgB64,
+          imagenBase64: imgB64,
+          image: imgB64,
+          imageBase64: imgB64,
+          photo: imgB64,
+          foto: imgB64,
+          data: imgB64,
+          base64: imgB64,
+          img: imgB64,
+          contexto: 'Analizá la foto del menú de restaurant. El usuario es '+prakritiNombre+' (Prakriti) con Vikriti '+dosha+' hoy. Lagna '+lagna+', Nakshatra '+nakshatra+'. Identificá los platos visibles en la foto y recomendá: cuáles SÍ pedir para equilibrar, cuáles NO pedir, y cuáles pedir con moderación.'
+        })
+      })
+      .then(function(r){ return r.json().then(function(d){ return {status:r.status, data:d}; }); })
+      .then(function(res){
+        var certBadge = '';
+        try{
+          if(window.vbTrust){
+            var llamadasEscaner = window.vbTrust.porCategoria('escaner');
+            if(llamadasEscaner.length>0){
+              var ultima = llamadasEscaner[llamadasEscaner.length-1];
+              certBadge = '<div style="margin:10px 0">'+window.vbTrust.renderBadge(ultima)+'</div>';
+            }
+          }
+        }catch(e){}
+        
+        if(res.status === 200 && res.data && (res.data.ok || res.data.analisis || res.data.resultado || res.data.texto)){
+          var analisisRaw = res.data.analisis || res.data.resultado || res.data.texto || '';
+          // Soporta string o objeto: si es objeto, lo renderizamos lindo
+          var analisis = '';
+          if(typeof analisisRaw === 'string'){
+            analisis = analisisRaw;
+          } else if(analisisRaw && typeof analisisRaw === 'object'){
+            // Renderizar objeto como HTML estructurado
+            analisis = vbRenderAnalisisObjeto(analisisRaw);
+          }
+          
+          preview.innerHTML = 
+            '<img src="' + imgB64 + '" style="width:100%;max-height:280px;object-fit:contain;border-radius:10px;background:#000;margin-bottom:10px">' +
+            '<div style="background:#F0FDF4;border-left:4px solid #5A7A53;border-radius:8px;padding:14px">' +
+            '<p style="font-size:11px;letter-spacing:1.5px;color:#5A7A53;text-transform:uppercase;font-weight:700;margin-bottom:8px">🍽️ Recomendación personalizada</p>' +
+            '<p style="font-size:11px;color:#8B7355;margin-bottom:10px;font-style:italic">Cruce: '+(prakritiNombre||'tu Prakriti')+' + '+(dosha?dosha+' actual':'tu Vikriti')+(lagna?' + Lagna '+lagna:'')+'</p>' +
+            '<div style="font-size:13px;color:#3D5A36;line-height:1.6;white-space:pre-wrap">' + analisis + '</div>' +
+            certBadge +
+            '<p style="font-size:10px;color:#8B7355;margin-top:12px;font-style:italic;text-align:center">Vedabite acompaña, no diagnostica. Si dudás de algún ingrediente, consultá al mozo.</p>' +
+            '</div>';
+          
+          try{
+            if(typeof gtag === 'function') gtag('event','escaner_menu_completado',{dosha:dosha});
+            if(window.clarity) window.clarity('event','escaner_menu_completado');
+          }catch(e){}
+        } else {
+          var msg = (res.data && (res.data.error || res.data.message)) || 'No pudimos procesar la foto del menú.';
+          preview.innerHTML = 
+            '<img src="' + imgB64 + '" style="width:100%;max-height:280px;object-fit:contain;border-radius:10px;background:#000;margin-bottom:10px">' +
+            '<div style="background:#FEE2E2;border-left:4px solid #C44E4E;border-radius:8px;padding:12px">' +
+            '<p style="font-size:13px;color:#7F1D1D;line-height:1.5">' + msg + '</p>'+certBadge+
+            '<p style="font-size:11px;color:#8B7355;margin-top:10px">Probá escribir los platos manualmente abajo.</p>'+
+            '</div>';
+        }
+      })
+      .catch(function(err){
+        preview.innerHTML = 
+          '<img src="' + imgB64 + '" style="width:100%;max-height:280px;object-fit:contain;border-radius:10px;background:#000;margin-bottom:10px">' +
+          '<div style="background:#FEE2E2;border-left:4px solid #C44E4E;border-radius:8px;padding:12px">' +
+          '<p style="font-size:13px;color:#7F1D1D;line-height:1.5">⚠️ No pudimos conectar con el servidor. Probá escribir los platos manualmente abajo.</p></div>';
+      });
+    };
+    reader.readAsDataURL(file);
+  }
   
   // Abre cámara (móvil) o selector (PC)
   function abrirCamaraOArchivo(btn){
@@ -6842,6 +6873,7 @@ window._vbActualizarContadorFotos=function(){
     var reader = new FileReader();
     reader.onload = function(e){
       var imgB64 = e.target.result;
+      var imgB64SinPrefijo = imgB64.replace(/^data:image\/[a-z]+;base64,/i, '');
       
       // Mostrar foto + loader
       preview.innerHTML = 
@@ -6858,6 +6890,7 @@ window._vbActualizarContadorFotos=function(){
       }catch(e){}
       
       // Mandar a la API — la API ya conoce los síntomas del cuestionario y la carta natal por el email
+      // Mandamos la imagen con todos los nombres posibles de campo + ambas versiones (con y sin prefijo data:)
       fetch(API_URL, {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
@@ -6865,14 +6898,31 @@ window._vbActualizarContadorFotos=function(){
           email: email,
           seccion: seccion,
           dosha: dosha,
-          imagen: imgB64,
-          imagenBase64: imgB64
+          imagen: imgB64SinPrefijo,
+          imagenBase64: imgB64SinPrefijo,
+          image: imgB64SinPrefijo,
+          imageBase64: imgB64SinPrefijo,
+          photo: imgB64SinPrefijo,
+          foto: imgB64SinPrefijo,
+          data: imgB64SinPrefijo,
+          base64: imgB64SinPrefijo,
+          img: imgB64SinPrefijo,
+          imagenConPrefijo: imgB64,
+          imageDataUrl: imgB64
         })
       })
       .then(function(r){ return r.json().then(function(d){ return {status:r.status, data:d}; }); })
       .then(function(res){
         if(res.status === 200 && res.data && (res.data.ok || res.data.analisis || res.data.resultado || res.data.texto)){
-          var analisis = res.data.analisis || res.data.resultado || res.data.texto || '';
+          var analisisRaw = res.data.analisis || res.data.resultado || res.data.texto || '';
+          // Soporta string o objeto: si es objeto, lo renderizamos lindo
+          var analisis = '';
+          if(typeof analisisRaw === 'string'){
+            analisis = analisisRaw;
+          } else if(analisisRaw && typeof analisisRaw === 'object'){
+            // Renderizar objeto como HTML estructurado
+            analisis = vbRenderAnalisisObjeto(analisisRaw);
+          }
           try{ localStorage.setItem('vb_escaner_'+seccion, JSON.stringify({seccion:seccion, dosha:dosha, fecha:new Date().toISOString(), resumen:analisis.substring(0,200)})); }catch(e){}
           
           // Obtener última certificación de la API del escáner para mostrarla
@@ -7925,74 +7975,32 @@ function enviarRegalo(){
   btn.addEventListener('touchend',function(){this.style.transform='scale(1)';},{passive:true});
 })();
 
-// Tocar Tu camino — Arreglo 4 (botón roto)
-// Lógica: pago > trial vigente > sin trial / vencido
-// NOTA: usa localStorage directo en vez de vbTrialActivo() porque esa función
-// con paywall off devuelve true para todos (BUG-06). Cuando se active paywall,
-// vbTrialActivo() debería migrar a esta misma lógica.
+// Tocar Tu camino:
+// - Si NO pagó → checkout directo (gancho de conversión)
+// - Si YA pagó → abre la pantalla completa del GPS
 function _vbAbrirTuCamino(){
-  // 1. Estado del usuario
   var yaPago=false;
-  var trialStart=null;
-  var diasDesdeTrial=null;
-  try{
-    yaPago=localStorage.getItem('vb_paid')==='true';
-    trialStart=localStorage.getItem('vb_trialStart');
-    if(trialStart){
-      diasDesdeTrial=Math.floor((Date.now()-new Date(trialStart).getTime())/(1000*60*60*24));
-    }
-  }catch(e){}
-
-  // 2. Determinar rama
-  var rama;
-  if(yaPago){
-    rama='pagado';
-  }else if(!trialStart){
-    rama='sin_trial';
-  }else if(diasDesdeTrial<=7){
-    rama='trial_activo';
-  }else{
-    rama='trial_vencido';
-  }
-
-  // 3. Tracking limpio según rama (1 evento gtag + 1 evento clarity por rama)
+  try{yaPago=localStorage.getItem('vb_paid')==='true';}catch(e){}
+  
   try{
     if(typeof gtag==='function'){
-      gtag('event','tu_camino_click',{
-        event_category:'engagement',
-        event_label:rama,
-        rama:rama,
-        dias_trial:diasDesdeTrial,
-        dosha:(window.res&&window.res.p)||'sin_dosha'
-      });
+      if(yaPago){
+        gtag('event','gps_abierto',{event_category:'engagement',event_label:'usuario_pago'});
+      }else{
+        gtag('event','cta_post_informe',{event_category:'conversion',event_label:'tu_camino_flotante',variant:'tu_camino_gancho'});
+      }
     }
     if(typeof window.clarity==='function'){
-      var eventoClarity={
-        'pagado':'tu_camino_pagado',
-        'sin_trial':'tu_camino_sin_trial',
-        'trial_activo':'tu_camino_trial_activo',
-        'trial_vencido':'tu_camino_trial_vencido'
-      }[rama];
-      window.clarity('event',eventoClarity);
-      window.clarity('set','tu_camino_rama',rama);
+      window.clarity('event',yaPago?'gps_abierto':'tu_camino_click_checkout');
     }
   }catch(e){}
-
-  // 4. Routing
-  try{
-    if(rama==='pagado' && typeof _vbAbrirPantallaGPS==='function'){
-      _vbAbrirPantallaGPS();
-    }else if(rama==='trial_activo' && typeof vbAbrirPaso7==='function'){
-      vbAbrirPaso7();
-    }else if(typeof vbAbrirPaso8==='function'){
-      // sin_trial → gate con botón "EMPEZAR LOS 7 DÍAS GRATIS" (Opción B Arreglo 2)
-      // trial_vencido → muro USD 20/mes (hoy invisible por paywall off)
-      vbAbrirPaso8();
-    }else{
-      console.warn('[vedabite] _vbAbrirTuCamino: no hay handler disponible para rama',rama);
+  
+  if(yaPago){
+    _vbAbrirPantallaGPS();
+  }else{
+    if(typeof _vbAccionPracticaPostInforme==='function'){
+      _vbAccionPracticaPostInforme('tu_camino_flotante');
     }
-  }catch(e){
-    console.error('[vedabite] _vbAbrirTuCamino routing error:',e);
   }
 }
 
