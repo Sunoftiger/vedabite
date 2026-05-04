@@ -6799,7 +6799,7 @@ window._vbActualizarContadorFotos=function(){
       porcentajes = {vata:33, pitta:33, kapha:34};
     }
     
-    var preview = document.querySelector('.vb-foto-preview-paso4[data-sec-id="'+seccion+'"]');
+    var preview = document.querySelector('.vb-foto-preview-paso4[data-sec-id="'+seccionId+'"]');
     if(!preview) return;
     preview.style.display = 'block';
     
@@ -6888,6 +6888,7 @@ window._vbActualizarContadorFotos=function(){
             var fotosKey = 'vb_fotos_paso4';
             var fotosSacadas = JSON.parse(localStorage.getItem(fotosKey)||'{}');
             fotosSacadas[seccion] = new Date().toISOString();
+            fotosSacadas[seccionId] = new Date().toISOString();
             localStorage.setItem(fotosKey, JSON.stringify(fotosSacadas));
           }catch(e){}
         } else {
