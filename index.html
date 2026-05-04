@@ -3142,7 +3142,18 @@ function vbTrialActivo(){
   try{
     var adminEmails = ['juanseelunico@gmail.com','juanse@vedabite.com','jf@dinalight.com'];
     var emailActual = (window.userEmail||localStorage.getItem('vb_email')||'').toLowerCase().trim();
-    if(emailActual && adminEmails.indexOf(emailActual) >= 0)return true;
+    // Buscar email también en inputs visibles del formulario
+    if(!emailActual){
+      var inputEmail = document.getElementById('emailIn');
+      if(inputEmail && inputEmail.value)emailActual = inputEmail.value.toLowerCase().trim();
+    }
+    if(emailActual && adminEmails.indexOf(emailActual) >= 0){
+      // Marcar como admin en localStorage para próximas sesiones
+      try{ localStorage.setItem('vb_admin','si'); }catch(e){}
+      return true;
+    }
+    // Si ya estaba marcado admin antes
+    if(localStorage.getItem('vb_admin')==='si')return true;
   }catch(e){}
   
   // Pago activo (Lemon Squeezy webhook) o trial vigente (≤10 días)
