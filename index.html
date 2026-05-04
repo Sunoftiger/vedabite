@@ -3734,8 +3734,8 @@ window.vbValidarFotosObligatoriasYAvanzar=function(){
   try{ fotosSacadas = JSON.parse(localStorage.getItem('vb_fotos_paso4')||'{}'); }catch(e){}
   
   var falta=[];
-  if(!fotosSacadas.jihva) falta.push('👅 Lengua (Jihva Pariksha)');
-  if(!fotosSacadas.netra) falta.push('👁️ Ojos (Netra Pariksha)');
+  if(!fotosSacadas.lengua && !fotosSacadas.jihva) falta.push('👅 Lengua (Jihva Pariksha)');
+  if(!fotosSacadas.ojos && !fotosSacadas.netra) falta.push('👁️ Ojos (Netra Pariksha)');
   
   if(falta.length>0){
     // Mostrar modal de bloqueo
@@ -6758,7 +6758,21 @@ window._vbActualizarContadorFotos=function(){
       return;
     }
     
-    var seccion = btn.getAttribute('data-vbfoto-paso4') || 'general';
+    var seccionId = btn.getAttribute('data-vbfoto-paso4') || 'general';
+    // Mapear ID interno → valores que la Cloud Function acepta
+    var SECCION_MAP = {
+      'jihva': 'lengua',
+      'netra': 'ojos',
+      'mutra': 'orina',
+      'mala': 'heces',
+      'nakha': 'unas',
+      'twak': 'piel',
+      'kesha': 'cabello',
+      'akriti': 'cuerpo',
+      'mukha': 'cara',
+      'oshtha': 'labios'
+    };
+    var seccion = SECCION_MAP[seccionId] || seccionId;
     var dosha = btn.getAttribute('data-dosha-paso4') || (window.res && window.res.p) || '';
     var email = window.userEmail || (typeof userEmail !== 'undefined' ? userEmail : '') || localStorage.getItem('vb_email') || '';
     
