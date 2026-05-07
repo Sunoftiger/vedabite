@@ -2712,7 +2712,17 @@ function vbRenderDevolucionIntegral(){
     dots5+='<div style="display:inline-flex;align-items:center;justify-content:center;width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:'+bgD+';color:'+colD+';font-size:'+fs+'px;font-weight:800;margin:0 3px;vertical-align:middle">'+(k<5?'✓':k)+'</div>';
   }
   html+='<div style="text-align:center;margin-bottom:14px;line-height:1">'+dots5+'</div>';
-  html+='<button onclick="vbAbrirPaso6FromPaso5()" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(90,122,83,0.3);text-align:center;line-height:1.3">→ IR AL PASO 6 DE 9<div style="font-size:12px;font-weight:600;color:#D1FAE5;margin-top:4px">Tu diagnóstico</div></button>';
+  
+  html+='<div style="background:linear-gradient(135deg,#FAF7F0,#F5EFE0);border:2px solid #C49E72;border-radius:14px;padding:18px 16px;margin-bottom:14px;text-align:center">';
+  html+='<p style="font-size:10px;letter-spacing:2px;color:#C49E72;text-transform:uppercase;font-weight:700;margin:0 0 8px">✨ Continuá tu camino</p>';
+  html+='<h4 style="font-family:Georgia,serif;font-size:18px;color:#3D5A36;font-weight:600;margin:0 0 6px;line-height:1.3">Recuperá tus hábitos naturales</h4>';
+  html+='<p style="font-size:13px;color:#5A4A2A;line-height:1.5;margin:0 0 14px">Práctica Diaria · 10 días gratis · sin tarjeta</p>';
+  html+='<button onclick="if(typeof _vbMostrarSuscripcion===\'function\')_vbMostrarSuscripcion();try{if(typeof gtag===\'function\')gtag(\'event\',\'cta_pago_paso5_click\');if(window.clarity)window.clarity(\'event\',\'cta_pago_paso5_click\');}catch(e){}" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(224,122,31,0.3);text-align:center;line-height:1.3">🔥 Activar Práctica · 10 días gratis<div style="font-size:11px;font-weight:600;color:#FED7AA;margin-top:4px">Acceso completo · cancelás cuando quieras</div></button>';
+  html+='<p style="font-size:10px;color:#8B7355;margin:10px 0 0;font-style:italic">Vos sos el amor de tu vida</p>';
+  html+='</div>';
+  try{if(typeof gtag==="function")gtag("event","cta_pago_paso5_visto");if(window.clarity)window.clarity("event","cta_pago_paso5_visto");}catch(e){}
+  
+  html+='<button onclick="vbAbrirPaso6FromPaso5()" style="display:block;width:100%;padding:14px 14px;background:transparent;color:#5A7A53;border:2px solid #5A7A53;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;line-height:1.3">→ Seguir gratis al paso 6<div style="font-size:11px;font-weight:500;color:#8B7355;margin-top:4px">Tu diagnóstico ayurvédico</div></button>';
   html+='</div>';
   
   html+='</div>'; // cierre vbPantallaPaso5
@@ -7391,6 +7401,94 @@ window._vbActualizarContadorFotos=function(){
 <!-- BOTÓN WHATSAPP FLOTANTE — solo si pagó -->
 <a id="vbWhatsAppBtn" href="https://wa.me/5491153149117?text=Hola%2C%20quiero%20saber%20m%C3%A1s%20sobre%20Vedabite" target="_blank" style="display:none;position:fixed;bottom:20px;right:20px;width:56px;height:56px;background:#25D366;border-radius:50%;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.25);z-index:9999;text-decoration:none;transition:transform .15s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"><svg width="28" height="28" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
 <script>(function(){try{if(localStorage.getItem('vb_paid')==='true'){var w=document.getElementById('vbWhatsAppBtn');if(w)w.style.display='flex';}}catch(e){}})();</script>
+
+<div id="vbStickyCTA" style="display:none;position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,#E07A1F,#C45F0F);padding:12px 16px;box-shadow:0 -4px 16px rgba(0,0,0,0.18);z-index:9998;animation:vbSlideUp .35s cubic-bezier(0.4,0,0.2,1)">
+<div style="max-width:520px;margin:0 auto;display:flex;align-items:center;gap:12px">
+<div style="flex:1;min-width:0">
+<div style="font-size:11px;color:#FED7AA;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">10 días gratis</div>
+<div style="font-size:14px;color:#fff;font-weight:700;line-height:1.2">Activá Práctica completa</div>
+</div>
+<button id="vbStickyCTABtn" style="background:#fff;color:#C45F0F;border:none;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.15)">Activar →</button>
+<button id="vbStickyCTAClose" style="background:rgba(255,255,255,0.15);color:#fff;border:none;width:32px;height:32px;border-radius:50%;font-size:16px;font-weight:700;cursor:pointer;flex-shrink:0;line-height:1" aria-label="Cerrar">×</button>
+</div>
+</div>
+
+<style>
+@keyframes vbSlideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes vbSlideDown{from{transform:translateY(0);opacity:1}to{transform:translateY(100%);opacity:0}}
+#vbStickyCTABtn:hover{transform:scale(1.04)}
+#vbStickyCTABtn{transition:transform .15s}
+</style>
+
+<script>
+(function(){
+  var sticky = document.getElementById('vbStickyCTA');
+  if(!sticky) return;
+  
+  var btnActivar = document.getElementById('vbStickyCTABtn');
+  var btnCerrar = document.getElementById('vbStickyCTAClose');
+  var cerradoSesion = false;
+  var ultimoVisto = false;
+  
+  function debeMostrarCTA(){
+    if(cerradoSesion) return false;
+    try{
+      if(localStorage.getItem('vb_pago_activo')==='si') return false;
+      if(localStorage.getItem('vb_paid')==='true') return false;
+      if(localStorage.getItem('vb_admin')==='si') return false;
+    }catch(e){}
+    var pasos = ['vbPantallaPaso6','vbPantallaPaso7','vbPantallaPaso8','vbPantallaPaso9'];
+    for(var i=0;i<pasos.length;i++){
+      var el = document.getElementById(pasos[i]);
+      if(el && el.offsetParent !== null && el.style.display !== 'none'){
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  function actualizarCTA(){
+    var debe = debeMostrarCTA();
+    if(debe && !ultimoVisto){
+      sticky.style.display = 'block';
+      sticky.style.animation = 'vbSlideUp .35s cubic-bezier(0.4,0,0.2,1)';
+      ultimoVisto = true;
+      try{
+        if(typeof gtag === 'function') gtag('event','sticky_cta_visto');
+        if(window.clarity) window.clarity('event','sticky_cta_visto');
+      }catch(e){}
+    }else if(!debe && ultimoVisto){
+      sticky.style.display = 'none';
+      ultimoVisto = false;
+    }
+  }
+  
+  btnActivar.addEventListener('click', function(){
+    try{
+      if(typeof gtag === 'function') gtag('event','sticky_cta_click');
+      if(window.clarity) window.clarity('event','sticky_cta_click');
+    }catch(e){}
+    if(typeof window._vbMostrarSuscripcion === 'function'){
+      window._vbMostrarSuscripcion();
+    }else if(window._vbPaymentConfig && window._vbPaymentConfig.mpAR){
+      window.open(window._vbPaymentConfig.mpAR, '_blank');
+    }
+  });
+  
+  btnCerrar.addEventListener('click', function(){
+    cerradoSesion = true;
+    sticky.style.animation = 'vbSlideDown .25s ease-out';
+    setTimeout(function(){ sticky.style.display = 'none'; ultimoVisto = false; }, 240);
+    try{
+      if(typeof gtag === 'function') gtag('event','sticky_cta_cerrado');
+      if(window.clarity) window.clarity('event','sticky_cta_cerrado');
+    }catch(e){}
+  });
+  
+  setInterval(actualizarCTA, 800);
+  setTimeout(actualizarCTA, 500);
+})();
+</script>
 
 <!-- CONTADOR DINÁMICO DESDE FIREBASE — v4 simple y directo -->
 <script>
