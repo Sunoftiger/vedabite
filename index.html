@@ -2029,7 +2029,7 @@ function vbContinuarTest(){
 </div>
 <div class="tabs-grid" id="tabsGrid"></div>
 <div id="tabContents"></div>
-<div style="padding:20px"><div class="card" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);text-align:center"><h4 style="margin-bottom:12px">📥 Descargá tu informe</h4><p style="font-size:13px;color:#666;margin-bottom:14px">Elegí en qué voz querés leerlo:</p><div style="display:grid;gap:10px"><button class="btn btn-sage" onclick="downloadPDF('medico')">🩺 Médico Occidental</button><button class="btn btn-primary" onclick="downloadPDF('ayurveda')">🌿 Terapeuta Ayurvédico</button><button class="btn btn-gold" onclick="downloadPDF('amiga')">💚 Como una Amiga</button></div></div>
+<div style="padding:20px"><div class="card" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);text-align:center"><h4 style="margin-bottom:6px">📥 Descargá tu informe</h4><p style="font-size:12px;color:#7C2D12;font-weight:600;margin-bottom:10px;letter-spacing:0.5px;text-transform:uppercase">3 voces · 1 gratis · 2 desbloqueables</p><p style="font-size:13px;color:#666;margin-bottom:14px">Cada voz lee el mismo análisis con un lente distinto:</p><div style="display:grid;gap:10px"><button class="btn btn-gold" onclick="downloadPDF('amiga')" style="position:relative">💚 Como una Amiga<span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:10px;background:#10B981;color:#fff;padding:2px 8px;border-radius:10px;font-weight:700">GRATIS</span></button><button class="btn btn-sage" onclick="downloadPDF('medico')" style="position:relative;opacity:0.85">🩺 Médico Occidental<span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px">🔒</span></button><button class="btn btn-primary" onclick="downloadPDF('ayurveda')" style="position:relative;opacity:0.85">🌿 Terapeuta Ayurvédico<span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px">🔒</span></button></div><p style="font-size:11px;color:#78350F;margin-top:12px;line-height:1.5;font-style:italic">Las voces médica y ayurvédica se desbloquean con Práctica · 10 días gratis sin tarjeta</p></div></div>
 
 <div id="vbBloquePostInforme" style="margin-top:24px;font-family:inherit;display:none">
 <!-- Bloque post-informe Vedabite v1 ELIMINADO — reemplazado por el roadmap navegable + paso 7 prescriptivo -->
@@ -2178,6 +2178,47 @@ function confirmClearSession(){if(confirm("¿Seguro que querés empezar de nuevo
 function vbHacerPDF(htmlContent,nombre){var doc='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+nombre+'</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Helvetica,Arial,sans-serif;color:#1a1a1a;background:#fff;padding:20px;max-width:600px;margin:0 auto;line-height:1.5}h1{font-size:22px;margin:8px 0}h3{font-size:16px;margin:0 0 8px}h4{font-size:14px;margin:8px 0 4px}p{margin:4px 0;font-size:13px}@media print{body{padding:10px}}</style></head><body>'+htmlContent+'</body></html>';try{var blob=new Blob([doc],{type:'text/html;charset=utf-8'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=nombre.replace('.pdf','.html');a.style.display='none';document.body.appendChild(a);a.click();setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);}catch(e){var w=window.open('','_blank');if(w){w.document.open();w.document.write(doc);w.document.close();w.focus();setTimeout(function(){try{w.print()}catch(e2){}},500);}else{alert('No se pudo descargar el informe. Intentá desde otro navegador.');}}}
 function downloadPDF(voz){
 voz=voz||'ayurveda';
+
+// === PAYWALL · 3 voces ===
+// Voz amiga: SIEMPRE gratis
+// Voz medico + ayurveda: requieren trial activo o pago
+if(voz==='medico'||voz==='ayurveda'){
+  var tieneAcceso=false;
+  try{
+    if(localStorage.getItem('vb_pago_activo')==='si')tieneAcceso=true;
+    if(localStorage.getItem('vb_paid')==='true')tieneAcceso=true;
+    if(localStorage.getItem('vb_admin')==='si')tieneAcceso=true;
+    if(typeof vbTrialActivo==='function'&&vbTrialActivo())tieneAcceso=true;
+  }catch(e){}
+  if(!tieneAcceso){
+    try{
+      if(typeof gtag==='function')gtag('event','paywall_voz_'+voz+'_visto',{voz:voz,dosha:res.p});
+      if(window.clarity)window.clarity('event','paywall_voz_visto');
+    }catch(e){}
+    var nombreVoz=voz==='medico'?'🩺 Médico Occidental':'🌿 Terapeuta Ayurvédico';
+    var modalHTML='<div id="vbPaywallVoz" style="position:fixed;inset:0;background:rgba(45,30,20,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .25s">';
+    modalHTML+='<div style="background:linear-gradient(180deg,#FFFAF0,#F5EFE0);max-width:440px;width:100%;border-radius:18px;padding:28px 24px;box-shadow:0 20px 60px rgba(0,0,0,0.4);border:2px solid #C49E72;position:relative">';
+    modalHTML+='<button onclick="document.getElementById(\'vbPaywallVoz\').remove()" style="position:absolute;top:12px;right:12px;background:transparent;border:none;font-size:22px;cursor:pointer;color:#8B7355;line-height:1">×</button>';
+    modalHTML+='<div style="text-align:center;font-size:38px;margin-bottom:8px">🔒</div>';
+    modalHTML+='<h3 style="font-family:Georgia,serif;font-size:21px;color:#3D5A36;text-align:center;margin:0 0 6px;font-weight:600">'+nombreVoz+'</h3>';
+    modalHTML+='<p style="font-size:13px;color:#5A4A2A;text-align:center;margin:0 0 18px;line-height:1.5">Esta voz se desbloquea con <strong>Vedabite Práctica</strong></p>';
+    modalHTML+='<div style="background:#fff;border-radius:12px;padding:16px;margin-bottom:18px;border:1px solid #E8DFC8">';
+    modalHTML+='<p style="font-size:12px;letter-spacing:1.5px;color:#C49E72;text-transform:uppercase;font-weight:700;margin:0 0 10px;text-align:center">Lo que desbloqueás</p>';
+    modalHTML+='<ul style="list-style:none;padding:0;margin:0;font-size:13px;color:#3D5A36;line-height:1.9">';
+    modalHTML+='<li>✓ Voz Médico Occidental + PDF</li>';
+    modalHTML+='<li>✓ Voz Terapeuta Ayurvédico + PDF</li>';
+    modalHTML+='<li>✓ Plan personalizado completo (paso 7)</li>';
+    modalHTML+='<li>✓ Escáner IA · Jihva + Netra Pariksha</li>';
+    modalHTML+='<li>✓ Carta natal védica detallada</li>';
+    modalHTML+='</ul></div>';
+    modalHTML+='<button onclick="try{if(typeof gtag===\'function\')gtag(\'event\',\'paywall_voz_'+voz+'_click\');if(window.clarity)window.clarity(\'event\',\'paywall_voz_click\');}catch(e){}document.getElementById(\'vbPaywallVoz\').remove();if(typeof window._vbMostrarSuscripcion===\'function\')window._vbMostrarSuscripcion();" style="display:block;width:100%;padding:15px;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(224,122,31,0.35);text-align:center;line-height:1.3">🔓 Activar Práctica · 10 días gratis<div style="font-size:11px;font-weight:600;color:#FED7AA;margin-top:4px">Sin tarjeta · cancelás cuando quieras</div></button>';
+    modalHTML+='<p style="text-align:center;margin:14px 0 0;font-size:11px;color:#8B7355;font-style:italic">Vos sos el amor de tu vida</p>';
+    modalHTML+='</div></div>';
+    var div=document.createElement('div');div.innerHTML=modalHTML;document.body.appendChild(div.firstChild);
+    return;
+  }
+}
+
 try{if(typeof gtag==='function'){gtag('event','download_informe',{event_category:'descarga_pdf',event_label:voz,voz_elegida:voz,dosha:res.p,value:1});gtag('event','download_'+voz,{event_category:'descarga_pdf',dosha:res.p,value:1});gtag('event','conversion',{send_to:'AW-632212911/download_informe'});}if(typeof window.clarity==='function'){window.clarity('set','descarga_voz',voz);window.clarity('set','descarga_dosha',res.p);window.clarity('event','descarga_informe_'+voz);}window.dataLayer=window.dataLayer||[];window.dataLayer.push({event:'descarga_informe',voz_elegida:voz,dosha:res.p,timestamp:new Date().toISOString()});window.dataLayer.push({event:'download_'+voz,dosha:res.p});if(window._vbDB){window._vbDB.collection('descargas').add({email:userEmail||'sin_email',voz:voz,dosha:res.p,timestamp:firebase.firestore.FieldValue.serverTimestamp(),createdAt:new Date().toISOString()}).catch(function(){});}}catch(e){}
 var V=VOCES[voz],a=D[res.p];
 var doshaNombre=V.dosha[res.p].nombre,doshaDesc=V.dosha[res.p].desc;
