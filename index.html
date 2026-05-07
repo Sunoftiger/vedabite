@@ -79,7 +79,7 @@ h1,h2,h3,h4{font-family:'Lora',serif}.container{max-width:480px;margin:0 auto;pa
 .tab-card.premium{background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:2px solid var(--gold)}
 .tab-card span{font-size:2rem;display:block;margin-bottom:8px}
 .tab-content{display:none;padding:20px}.tab-content.active{display:block}
-.progress{height:8px;background:#fff;border-radius:8px;overflow:hidden;margin-bottom:8px}.progress-bar{height:100%;background:linear-gradient(90deg,var(--sage),var(--terracotta));transition:width .3s}
+.progress{height:14px;background:#F5EFE0;border-radius:10px;overflow:hidden;margin-bottom:10px;box-shadow:inset 0 1px 3px rgba(90,122,83,0.15);border:1px solid #E5DDC8}.progress-bar{height:100%;background:linear-gradient(90deg,#5A7A53,#C49E72);transition:width .5s cubic-bezier(0.4,0,0.2,1);box-shadow:0 0 8px rgba(196,158,114,0.4)}
 .test-opt{background:#fff;border:2px solid #e5e5e5;border-radius:12px;padding:16px;margin-bottom:12px;cursor:pointer;transition:all .15s}
 .test-opt:hover{border-color:var(--terracotta);background:#fff9f5}
 .email-screen{background:linear-gradient(180deg,#D1FAE5,#A7F3D0);min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px}
@@ -1987,7 +1987,10 @@ function vbContinuarTest(){
 </div>
 <div style="text-align:center;margin-bottom:24px">
 <div class="progress"><div class="progress-bar" id="pbar"></div></div>
-<span style="font-size:14px;color:#7a7a7a"><span id="qnum">1</span>/<span id="qtotal">50</span></span>
+<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-top:6px">
+<span style="color:#5A7A53;font-weight:700"><span id="qnum">1</span> de <span id="qtotal">50</span></span>
+<span id="qmotiva" style="color:#C49E72;font-style:italic;font-weight:600">empezamos</span>
+</div>
 </div>
 <div class="card" style="text-align:center">
 <p style="font-size:12px;color:var(--sage);text-transform:uppercase;margin-bottom:12px;cursor:default;user-select:none;pointer-events:none" id="qcat">Constitución</p>
@@ -2235,10 +2238,37 @@ function renderQ(){
   }
   document.getElementById("qnum").textContent=qi+1;
   var qt=document.getElementById("qtotal");if(qt)qt.textContent=Q.length;
-  document.getElementById("pbar").style.width=(qi+1)/Q.length*100+"%";
+  var pct=(qi+1)/Q.length*100;
+  document.getElementById("pbar").style.width=pct+"%";
+  // Mensaje motivacional dinámico según progreso
+  var motiva=document.getElementById("qmotiva");
+  if(motiva){
+    var msg='empezamos';
+    if(qi>=5&&qi<10)msg='vamos bien';
+    else if(qi>=10&&qi<20)msg='ya vas 1/5';
+    else if(qi>=20&&qi<25)msg='casi mitad';
+    else if(qi>=25&&qi<30)msg='mitad ✓';
+    else if(qi>=30&&qi<40)msg='3/5 hechas';
+    else if(qi>=40&&qi<45)msg='últimas 10';
+    else if(qi>=45&&qi<48)msg='últimas 5 🌿';
+    else if(qi>=48)msg='falta poquito';
+    motiva.textContent=msg;
+  }
   document.getElementById("qcat").textContent=e.c;
   document.getElementById("qtxt").textContent=e.q;
   document.getElementById("qopts").innerHTML=[{v:0,l:"No me identifica"},{v:1,l:"A veces"},{v:2,l:"Frecuentemente"},{v:3,l:"Totalmente"}].map(function(a){return'<div class="test-opt" onclick="answer(\''+e.d+"',"+a.v+')"><span>'+a.l+"</span></div>"}).join("");
+  // Tracking GA4 de hitos clave para medir si reduce la fuga
+  if(typeof gtag==='function'){
+    if(qi===0)gtag('event','test_p1_iniciado');
+    else if(qi===10)gtag('event','test_p10_alcanzado');
+    else if(qi===25)gtag('event','test_p25_mitad');
+    else if(qi===40)gtag('event','test_p40_avanzado');
+  }
+  if(window.clarity){
+    if(qi===10)window.clarity('event','test_p10_alcanzado');
+    else if(qi===25)window.clarity('event','test_p25_mitad');
+    else if(qi===40)window.clarity('event','test_p40_avanzado');
+  }
 }
 function answer(a,e){ans[a]+=e,(Q.length<=++qi?showEmail:renderQ)()}
 function prevQ(){0<qi?(qi--,renderQ()):show("s1")}
@@ -3834,7 +3864,7 @@ function vbRenderEscaner(e,dosha,relevancia){
   // Si fue escaneado y tiene foto → no muestro nada acá porque el resultado real va a aparecer en el preview tras la API
   
   if(e.foto){
-    html+='<button type="button" data-vbfoto-paso4="'+e.id+'" data-dosha-paso4="'+dosha+'" onclick="event.preventDefault();event.stopPropagation();return false;" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:12px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px">📷 Sacar foto + análisis con IA</button>';
+    html+='<button type="button" data-vbfoto-paso4="'+e.id+'" data-dosha-paso4="'+dosha+'" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:12px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px">📷 Sacar foto + análisis con IA</button>';
     html+='<div class="vb-foto-preview-paso4" data-sec-id="'+e.id+'" style="display:none;margin-top:10px"></div>';
   }
   html+='<p style="font-size:10px;color:#8B7355;font-style:italic;margin:10px 0 0;text-align:right">📜 '+e.fuente+'</p>';
@@ -6812,6 +6842,30 @@ window._vbActualizarContadorFotos=function(){
     var seccion = SECCION_MAP[seccionId] || seccionId;
     var dosha = btn.getAttribute('data-dosha-paso4') || (window.res && window.res.p) || '';
     var email = window.userEmail || (typeof userEmail !== 'undefined' ? userEmail : '') || localStorage.getItem('vb_email') || '';
+    
+    // DIAGNOSTICO: log del email para detectar fallas de registro
+    console.log('[escaner_paso4] email detectado:', email || '(VACIO)');
+    console.log('[escaner_paso4] window.userEmail:', window.userEmail);
+    console.log('[escaner_paso4] localStorage vb_email:', localStorage.getItem('vb_email'));
+    
+    // GUARDIA: si no hay email, no llames a la API · mostrá mensaje claro
+    if(!email || !email.includes('@')){
+      var preview2 = document.querySelector('.vb-foto-preview-paso4[data-sec-id="'+seccionId+'"]');
+      if(preview2){
+        preview2.style.display = 'block';
+        preview2.innerHTML = 
+          '<div style="background:#FEF3C7;border:2px solid #D97706;border-radius:10px;padding:14px;text-align:center">' +
+          '<div style="font-size:32px;margin-bottom:6px">📧</div>' +
+          '<h4 style="margin:4px 0;color:#92400E;font-size:14px">Necesitamos tu email primero</h4>' +
+          '<p style="font-size:11px;color:#78350F;margin:6px 0">Completá el test y dejá tu email para activar el escáner con IA.</p>' +
+          '</div>';
+      }
+      try{
+        if(typeof gtag === 'function') gtag('event','escaner_paso4_sin_email',{seccion:seccion});
+        if(window.clarity) window.clarity('event','escaner_paso4_sin_email');
+      }catch(e){}
+      return;
+    }
     
     // Recopilar contexto: Prakriti + porcentajes
     var prakriti = window._vbPrakriti || {};
