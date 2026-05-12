@@ -452,7 +452,7 @@ function _vbMostrarSuscripcion(){
   var urlPago=(cfg.country==='AR')?cfg.mpAR:cfg.lsIntl;
   var metodo=(cfg.country==='AR')?'Mercado Pago':'Lemon Squeezy';
   var banderita=(cfg.country==='AR')?'🇦🇷':'🌎';
-  var html='<div onclick="this.remove()" style="position:fixed;inset:0;background:rgba(45,66,38,0.85);z-index:4000;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto"><div onclick="event.stopPropagation()" style="background:#FAF7F0;padding:32px 24px;border-radius:22px;max-width:420px;width:100%;text-align:center;margin:20px 0;border:1px solid #E8DFC8">'+'<div style="background:linear-gradient(135deg,#3D5A36,#2D4226);color:#F5F1E8;padding:24px 20px;border-radius:18px;margin-bottom:24px;text-align:center">'+'<div style="font-size:20px;letter-spacing:5px;opacity:0.6;margin-bottom:10px">॥ ॐ ॥</div>'+'<p style="font-size:10px;letter-spacing:2.5px;margin:0 0 12px;opacity:0.85;text-transform:uppercase">Manifiesto Vedabite</p>'+'<p style="font-size:18px;line-height:1.4;margin:0 0 12px;font-weight:400;color:#F5F1E8">Invertí en longevidad.<br><em style="color:#D4B896">Recuperá hábitos naturales.</em></p>'+'<div style="width:30px;height:1px;background:#D4B896;margin:14px auto"></div>'+'<p style="font-size:12px;line-height:1.6;margin:0;opacity:0.9;font-style:italic;color:#E8DFC8">No gastes en remedios.<br>Gastá en la calidad de vida<br>que te rejuvenece.</p>'+'</div>'+'<div style="margin-bottom:6px">'+'<span style="display:inline-block;padding:5px 14px;background:#fff;border:1px solid #D4B896;border-radius:50px;font-size:10px;font-weight:600;color:#8B7355;letter-spacing:2px">SEGUNDO PASO</span>'+'</div>'+'<h2 style="margin:18px 0 6px;font-size:26px;color:#3D5A36;font-weight:500;letter-spacing:1px">Práctica</h2>'+'<p style="font-size:13px;color:#8B7355;font-style:italic;margin:0 0 22px">El qué · El cómo · Los porqués</p>'+'<div style="background:#fff;padding:18px 16px;border-radius:14px;margin-bottom:22px;font-size:14px;line-height:1.7;color:#3D5A36;font-style:italic;border:1px solid #E8DFC8">'+'"No solo te decimos qué hacer.<br>Te enseñamos cómo."'+'</div>'+'<div style="text-align:left;margin-bottom:22px">'+'<p style="font-size:11px;color:#8B7355;text-transform:uppercase;letter-spacing:1.5px;margin:0 0 14px;text-align:center">Tu práctica completa</p>'+'<div style="font-size:13px;line-height:2;color:#4A4A4A">'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🪷 <strong>Mudras</strong> con instrucciones detalladas</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🧘 <strong>Meditaciones</strong> guiadas paso a paso</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🌬️ <strong>Pranayamas</strong> técnica completa</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🍃 <strong>Recetas</strong> con preparación detallada</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">⏳ <strong>Dinacharya</strong> tu rutina con porqués</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🌿 <strong>Yoga</strong> personalizado por dosha</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">💆 <strong>Terapias</strong> ayurvédicas aplicadas</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🕉️ <strong>Chakras</strong> activación según tu energía</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🔮 <strong>Tu proyección</strong> a 5, 10 y 20 años</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🌾 <strong>Salud preventiva</strong> con plan semanal</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">📷 <strong>Escáner</strong> de menús sin límites</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">📍 <strong>Lugares cerca tuyo</strong> para tu dosha</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🪐 <strong>Carta astral</strong> védica completa</div>'+'<div style="padding:6px 0">💌 <strong>Acompañamiento</strong> directo por mail</div>'+'</div>'+'</div>'+'<div style="background:#fff;padding:18px;border-radius:14px;margin-bottom:22px;border:1px solid #E8DFC8;text-align:left">'+'<p style="font-size:11px;color:#8B7355;text-transform:uppercase;letter-spacing:1.5px;margin:0 0 8px">Lo que te llevás</p>'+'<p style="font-size:14px;line-height:1.6;color:#3D5A36;margin:0;font-style:italic">Una guía completa para revertir el tránsito hacia el equilibrio que muestra tu informe.<br>Pasos claros para vivir más años. Mejor.</p>'+'</div>'+'<div style="margin-bottom:22px">'+'<div style="font-size:11px;color:#8B7355;letter-spacing:2px;margin-bottom:6px">TU INVERSIÓN '+banderita+'</div>'+'<div style="font-size:36px;font-weight:300;color:#3D5A36;line-height:1;letter-spacing:0.5px">'+precio+'<span style="font-size:16px;color:#7C9A73">'+sufijo+'</span></div>'+'<div style="font-size:11px;color:#8B7355;margin-top:6px">Pagás con '+metodo+'</div>'+'</div>'+'<div style="background:#fff;border:1px solid #E8DFC8;padding:14px;border-radius:12px;margin-bottom:18px;font-size:12px;color:#8B7355;line-height:1.6;font-style:italic">🌱 <a href="'+urlPago+'" onclick="try{window._vbIrCheckout(\'modal_suscripcion\',\'boton_principal\')}catch(e){}return false;" style="display:inline-block;width:100%;padding:16px;background:#5A7A53;color:#fff;border-radius:14px;font-size:15px;font-weight:500;text-align:center;text-decoration:none">Comenzar mi camino</a></div>'+'<button onclick="window._vbSelectorPais()" style="width:100%;padding:10px;background:none;border:1px dashed #B8B09C;border-radius:10px;color:#8B7355;font-size:11px;cursor:pointer;margin-bottom:12px">¿No sos de '+((cfg.country==='AR')?'Argentina':'tu país')+'? Cambiar moneda</button>'+'<button class="btn btn-outline" style="width:100%;color:#3D5A36;border-color:#7C9A73" onclick="this.parentElement.parentElement.remove()">Tal vez después</button>'+'<p style="margin:16px 0 0;font-size:11px;color:#8B7355;letter-spacing:0.5px;line-height:1.6">🌱 7 días gratis para probarlo<br>Cancelás cuando quieras</p>'+'</div></div>';
+  var html='<div onclick="this.remove()" style="position:fixed;inset:0;background:rgba(45,66,38,0.85);z-index:4000;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto"><div onclick="event.stopPropagation()" style="background:#FAF7F0;padding:32px 24px;border-radius:22px;max-width:420px;width:100%;text-align:center;margin:20px 0;border:1px solid #E8DFC8">'+'<div style="background:linear-gradient(135deg,#3D5A36,#2D4226);color:#F5F1E8;padding:24px 20px;border-radius:18px;margin-bottom:24px;text-align:center">'+'<div style="font-size:20px;letter-spacing:5px;opacity:0.6;margin-bottom:10px">॥ ॐ ॥</div>'+'<p style="font-size:10px;letter-spacing:2.5px;margin:0 0 12px;opacity:0.85;text-transform:uppercase">Manifiesto Vedabite</p>'+'<p style="font-size:18px;line-height:1.4;margin:0 0 12px;font-weight:400;color:#F5F1E8">Invertí en longevidad.<br><em style="color:#D4B896">Recuperá hábitos naturales.</em></p>'+'<div style="width:30px;height:1px;background:#D4B896;margin:14px auto"></div>'+'<p style="font-size:12px;line-height:1.6;margin:0;opacity:0.9;font-style:italic;color:#E8DFC8">No gastes en remedios.<br>Gastá en la calidad de vida<br>que te rejuvenece.</p>'+'</div>'+'<div style="margin-bottom:6px">'+'<span style="display:inline-block;padding:5px 14px;background:#fff;border:1px solid #D4B896;border-radius:50px;font-size:10px;font-weight:600;color:#8B7355;letter-spacing:2px">SEGUNDO PASO</span>'+'</div>'+'<h2 style="margin:18px 0 6px;font-size:26px;color:#3D5A36;font-weight:500;letter-spacing:1px">Práctica</h2>'+'<p style="font-size:13px;color:#8B7355;font-style:italic;margin:0 0 22px">El qué · El cómo · Los porqués</p>'+'<div style="background:#fff;padding:18px 16px;border-radius:14px;margin-bottom:22px;font-size:14px;line-height:1.7;color:#3D5A36;font-style:italic;border:1px solid #E8DFC8">'+'"No solo te decimos qué hacer.<br>Te enseñamos cómo."'+'</div>'+'<div style="text-align:left;margin-bottom:22px">'+'<p style="font-size:11px;color:#8B7355;text-transform:uppercase;letter-spacing:1.5px;margin:0 0 14px;text-align:center">Tu práctica completa</p>'+'<div style="font-size:13px;line-height:2;color:#4A4A4A">'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🪷 <strong>Mudras</strong> con instrucciones detalladas</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🧘 <strong>Meditaciones</strong> guiadas paso a paso</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🌬️ <strong>Pranayamas</strong> técnica completa</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🍃 <strong>Recetas</strong> con preparación detallada</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">⏳ <strong>Dinacharya</strong> tu rutina con porqués</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🌿 <strong>Yoga</strong> personalizado por dosha</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">💆 <strong>Terapias</strong> ayurvédicas aplicadas</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🕉️ <strong>Chakras</strong> activación según tu energía</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🔮 <strong>Tu proyección</strong> a 5, 10 y 20 años</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🌾 <strong>Salud preventiva</strong> con plan semanal</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">📷 <strong>Escáner</strong> de menús sin límites</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">📍 <strong>Lugares cerca tuyo</strong> para tu dosha</div>'+'<div style="padding:6px 0;border-bottom:1px solid #E8DFC8">🪐 <strong>Carta astral</strong> védica completa</div>'+'<div style="padding:6px 0">💌 <strong>Acompañamiento</strong> directo por mail</div>'+'</div>'+'</div>'+'<div style="background:#fff;padding:18px;border-radius:14px;margin-bottom:22px;border:1px solid #E8DFC8;text-align:left">'+'<p style="font-size:11px;color:#8B7355;text-transform:uppercase;letter-spacing:1.5px;margin:0 0 8px">Lo que te llevás</p>'+'<p style="font-size:14px;line-height:1.6;color:#3D5A36;margin:0;font-style:italic">Una guía completa para revertir el tránsito hacia el equilibrio que muestra tu informe.<br>Pasos claros para vivir más años. Mejor.</p>'+'</div>'+'<div style="margin-bottom:22px">'+'<div style="font-size:11px;color:#8B7355;letter-spacing:2px;margin-bottom:6px">TU INVERSIÓN '+banderita+'</div>'+'<div style="font-size:36px;font-weight:300;color:#3D5A36;line-height:1;letter-spacing:0.5px">'+precio+'<span style="font-size:16px;color:#7C9A73">'+sufijo+'</span></div>'+'<div style="font-size:11px;color:#8B7355;margin-top:6px">Pagás con '+metodo+'</div>'+'</div>'+'<div style="background:#fff;border:1px solid #E8DFC8;padding:14px;border-radius:12px;margin-bottom:18px;font-size:12px;color:#8B7355;line-height:1.6;font-style:italic">🌱 <a href="'+urlPago+'" onclick="try{window._vbIrCheckout(\'modal_suscripcion\',\'boton_principal\')}catch(e){}return false;" style="display:inline-block;width:100%;padding:16px;background:#5A7A53;color:#fff;border-radius:14px;font-size:15px;font-weight:500;text-align:center;text-decoration:none">Comenzar mi camino</a></div>'+'<button onclick="window._vbSelectorPais()" style="width:100%;padding:10px;background:none;border:1px dashed #B8B09C;border-radius:10px;color:#8B7355;font-size:11px;cursor:pointer;margin-bottom:12px">¿No sos de '+((cfg.country==='AR')?'Argentina':'tu país')+'? Cambiar moneda</button>'+'<button class="btn btn-outline" style="width:100%;color:#3D5A36;border-color:#7C9A73" onclick="this.parentElement.parentElement.remove()">Tal vez después</button>'+'<p style="margin:16px 0 0;font-size:11px;color:#8B7355;letter-spacing:0.5px;line-height:1.6">🌱 10 días de prueba<br>Cancelás cuando quieras</p>'+'</div></div>';
   document.body.insertAdjacentHTML('beforeend',html);
 }
 function _vbAccionPracticaPostInforme(variant){
@@ -1817,7 +1817,7 @@ function vbMostrarPrakriti(p){
     html+='<div style="font-size:48px;margin-bottom:8px">🔒</div>';
     html+='<h4 style="margin:6px 0 8px;color:#92400E;font-size:15px">Tu carta natal completa está en Práctica</h4>';
     html+='<p style="font-size:12px;color:#78350F;margin:0 0 14px;line-height:1.6">Acá ves los 4 pilares. En Práctica accedés a:<br>• Los 9 grahas con sus casas y grados exactos<br>• Las 12 bhavas con sus regentes<br>• Conclusión ayurvédica por cada item<br>• El cruce con tu test del estado actual</p>';
-    html+='<button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="if(window._vbMostrarSuscripcion)window._vbMostrarSuscripcion()">🔥 Probar Práctica 10 días gratis</button>';
+    html+='<button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="if(window._vbMostrarSuscripcion)window._vbMostrarSuscripcion()">🔥 Probar Práctica · 10 días</button>';
     html+='<p style="font-size:11px;color:#92400E;margin:6px 0 0">Sin tarjeta · Cancelás cuando quieras</p>';
     html+='</div>';
   } else {
@@ -2240,7 +2240,7 @@ if(voz==='medico'||voz==='ayurveda'){
     modalHTML+='<li>✓ Escáner IA · Jihva + Netra Pariksha</li>';
     modalHTML+='<li>✓ Carta natal védica detallada</li>';
     modalHTML+='</ul></div>';
-    modalHTML+='<button onclick="try{if(typeof gtag===\'function\')gtag(\'event\',\'paywall_voz_'+voz+'_click\');if(window.clarity)window.clarity(\'event\',\'paywall_voz_click\');}catch(e){}document.getElementById(\'vbPaywallVoz\').remove();if(typeof window._vbMostrarSuscripcion===\'function\')window._vbMostrarSuscripcion();" style="display:block;width:100%;padding:15px;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(224,122,31,0.35);text-align:center;line-height:1.3">🔓 Activar Práctica · 10 días gratis<div style="font-size:11px;font-weight:600;color:#FED7AA;margin-top:4px">Sin tarjeta · cancelás cuando quieras</div></button>';
+    modalHTML+='<button onclick="try{if(typeof gtag===\'function\')gtag(\'event\',\'paywall_voz_'+voz+'_click\');if(window.clarity)window.clarity(\'event\',\'paywall_voz_click\');}catch(e){}document.getElementById(\'vbPaywallVoz\').remove();if(typeof window._vbMostrarSuscripcion===\'function\')window._vbMostrarSuscripcion();" style="display:block;width:100%;padding:15px;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(224,122,31,0.35);text-align:center;line-height:1.3">🔓 Activar Práctica · 10 días<div style="font-size:11px;font-weight:600;color:#FED7AA;margin-top:4px">Sin tarjeta · cancelás cuando quieras</div></button>';
     modalHTML+='<p style="text-align:center;margin:14px 0 0;font-size:11px;color:#8B7355;font-style:italic">Vos sos el amor de tu vida</p>';
     modalHTML+='</div></div>';
     var div=document.createElement('div');div.innerHTML=modalHTML;document.body.appendChild(div.firstChild);
@@ -2546,7 +2546,7 @@ function vbRenderDevolucionIntegral(){
     {n:1,t:'Datos básicos',sk:'Vyaktigata Vivara · व्यक्तिगत विवरा',d:'Sexo, edad, fecha y hora de nacimiento, ciudad, condiciones de salud',obj:'Conocer tu situación actual',precio:'gratis'},
     {n:2,t:'Carta natal védica',sk:'Janma Kundali Jyotish · जन्म कुण्डली ज्योतिष',d:'Lagna, Surya Rashi, Chandra Rashi, Nakshatra · Tu Prakriti calculada por API real',obj:'Conocer tu naturaleza desde el nacimiento',precio:'gratis'},
     {n:3,t:'Test del estado actual',sk:'Vikriti Pariksha · विकृति परीक्षा',d:'50 preguntas que cubren las 14 zonas que mide el Ayurveda · Tu estado actual en porcentajes Vata/Pitta/Kapha',obj:'Saber cómo estás vos hoy',precio:'gratis'},
-    {n:4,t:'Tu escáner físico',sk:'Asta Sthana Pariksha · अष्ट स्थान परीक्षा',d:'18 chequeos en tu cuerpo · Lengua, ojos y uñas con foto + IA · Pulso, sudor, voz, postura',obj:'Confirmar tu diagnóstico mirando tu cuerpo',precio:'7 días gratis'},
+    {n:4,t:'Tu escáner físico',sk:'Asta Sthana Pariksha · अष्ट स्थान परीक्षा',d:'18 chequeos en tu cuerpo · Lengua, ojos y uñas con foto + IA · Pulso, sudor, voz, postura',obj:'Confirmar tu diagnóstico mirando tu cuerpo',precio:'10 días de prueba'},
     {n:5,t:'Tu lectura',sk:'Vaidya Nirnaya · वैद्य निर्णय',d:'Cómo naciste vs cómo estás hoy · Las 5 cualidades · La dirección y el movimiento de tu desorden',obj:'Entender qué se te desordenó',precio:'incluido'},
     {n:6,t:'Diagnóstico hiper personalizado',sk:'Samprapti · सम्प्राप्ति',d:'Línea de tiempo 6m/2a/5a/10a · 13 canales (Srotas) · Tus toxinas (Ama) · Las 6 etapas Kriyakala',obj:'Ver hacia dónde vas si no actuás hoy',precio:'incluido'},
     {n:7,t:'Cómo transitar hacia tu equilibrio',sk:'Chikitsa · चिकित्सा',d:'7 módulos prescriptos · 12 hierbas Rasayana · 4 recetas para hacer en casa · Mujer/hombre · Mapa profesionales',obj:'Transitar hacia tu equilibrio',precio:'USD 20/mes'},
@@ -2656,7 +2656,7 @@ function vbRenderDevolucionIntegral(){
   
   html+='<div style="background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border-radius:12px;padding:14px;margin-top:14px;text-align:center"><p style="font-size:12px;color:#FDE68A;letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-bottom:6px">¿Por qué USD 20/mes?</p><p style="font-size:13px;color:#fff;line-height:1.6;margin-bottom:4px">Tu terapeuta ayurvédico digital activo 24/7 · Re-test cada 30 días · Plan que se ajusta a tu evolución · Acceso a profesionales verificados · Sin contrato, cancelás cuando quieras</p><p style="font-size:10px;color:#A7F3D0;opacity:0.7;font-style:italic;letter-spacing:0.3px;margin-bottom:8px">Vaidya · वैद्य</p><p style="font-size:11px;color:#A7F3D0;font-style:italic;line-height:1.5">Calm cuesta USD 14.99 y solo te da meditaciones genéricas · Vedabite te da el terapeuta ayurvédico completo</p></div>';
   
-  html+='<p style="font-size:11px;color:#8B7355;text-align:center;margin-top:14px;font-style:italic;line-height:1.5">Ya completaste el diagnóstico inicial. Ahora vas a recorrer los pasos 4 al 8 a tu ritmo · 7 días gratis para probar todo</p>';
+  html+='<p style="font-size:11px;color:#8B7355;text-align:center;margin-top:14px;font-style:italic;line-height:1.5">Ya completaste el diagnóstico inicial. Ahora vas a recorrer los pasos 4 al 8 a tu ritmo · 10 días de prueba para acceder a todo</p>';
   html+='</div>';
   
   // === Paso 4 ya está dentro del roadmap como botón clickeable ===
@@ -2786,8 +2786,8 @@ function vbRenderDevolucionIntegral(){
   html+='<div style="background:linear-gradient(135deg,#FAF7F0,#F5EFE0);border:2px solid #C49E72;border-radius:14px;padding:18px 16px;margin-bottom:14px;text-align:center">';
   html+='<p style="font-size:10px;letter-spacing:2px;color:#C49E72;text-transform:uppercase;font-weight:700;margin:0 0 8px">✨ Continuá tu camino</p>';
   html+='<h4 style="font-family:Georgia,serif;font-size:18px;color:#3D5A36;font-weight:600;margin:0 0 6px;line-height:1.3">Recuperá tus hábitos naturales</h4>';
-  html+='<p style="font-size:13px;color:#5A4A2A;line-height:1.5;margin:0 0 14px">Práctica Diaria · 10 días gratis · sin tarjeta</p>';
-  html+='<button onclick="if(typeof _vbMostrarSuscripcion===\'function\')_vbMostrarSuscripcion();try{if(typeof gtag===\'function\')gtag(\'event\',\'cta_pago_paso5_click\');if(window.clarity)window.clarity(\'event\',\'cta_pago_paso5_click\');}catch(e){}" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(224,122,31,0.3);text-align:center;line-height:1.3">🔥 Activar Práctica · 10 días gratis<div style="font-size:11px;font-weight:600;color:#FED7AA;margin-top:4px">Acceso completo · cancelás cuando quieras</div></button>';
+  html+='<p style="font-size:13px;color:#5A4A2A;line-height:1.5;margin:0 0 14px">Práctica Diaria · 10 días de prueba · sin tarjeta</p>';
+  html+='<button onclick="if(typeof _vbMostrarSuscripcion===\'function\')_vbMostrarSuscripcion();try{if(typeof gtag===\'function\')gtag(\'event\',\'cta_pago_paso5_click\');if(window.clarity)window.clarity(\'event\',\'cta_pago_paso5_click\');}catch(e){}" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(224,122,31,0.3);text-align:center;line-height:1.3">🔥 Activar Práctica · 10 días<div style="font-size:11px;font-weight:600;color:#FED7AA;margin-top:4px">Acceso completo · cancelás cuando quieras</div></button>';
   html+='<p style="font-size:10px;color:#8B7355;margin:10px 0 0;font-style:italic">Vos sos el amor de tu vida</p>';
   html+='</div>';
   try{if(typeof gtag==="function")gtag("event","cta_pago_paso5_visto");if(window.clarity)window.clarity("event","cta_pago_paso5_visto");}catch(e){}
@@ -3180,7 +3180,7 @@ function vbAbrirPaso6(){
   html+='<div style="text-align:center;margin-bottom:14px;line-height:1">'+dots6+'</div>';
   if(ctaTrialOk){
     html+='<button onclick="vbAbrirPaso7()" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(90,122,83,0.3);text-align:center;line-height:1.3">→ IR AL PASO 7 DE 9<div style="font-size:12px;font-weight:600;color:#D1FAE5;margin-top:4px">Cómo transitar hacia tu equilibrio</div></button>';
-    html+='<p style="font-size:11px;color:#8B7355;text-align:center;margin:8px 0 0;font-style:italic">'+ctaDiasRest+' día'+(ctaDiasRest!==1?'s':'')+' gratis · Después USD 20/mes</p>';
+    html+='<p style="font-size:11px;color:#8B7355;text-align:center;margin:8px 0 0;font-style:italic">'+ctaDiasRest+' día'+(ctaDiasRest!==1?'s':'')+' de prueba · Después USD 20/mes</p>';
   }else{
     html+='<button onclick="vbCheckoutPaso7()" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(224,122,31,0.4);text-align:center;line-height:1.3">→ IR AL PASO 7 DE 9 · USD 20/mes<div style="font-size:12px;font-weight:600;color:#FDE68A;margin-top:4px">Tu prueba terminó · Cancelás cuando quieras</div></button>';
   }
@@ -3222,7 +3222,7 @@ function vbCheckoutPaso7(){
 }
 
 // ============================================================
-// HELPERS TRIAL — 7 días gratis con todo desbloqueado
+// HELPERS TRIAL — 10 días de prueba con todo desbloqueado
 // ============================================================
 // AUTO-INICIO DE TRIAL: cualquier visitante nuevo desde hoy (26/4/2026)
 // arranca su contador de 7 días al primer load de la página.
@@ -4190,7 +4190,7 @@ function vbMostrarModalBloqueado(numPasoQueQuiereAbrir,numPasoFaltante,detalleFa
     emoji='🔒';
     titulo='Esto es para quien camina todo el sendero';
     cuerpo='<p style="font-size:14px;color:#5A4A2A;line-height:1.6;margin:0 0 8px">El <strong>Paso '+pasoIntenta+': '+vbNombrePaso(pasoIntenta)+'</strong> está dentro de Vedabite Práctica.</p>'
-      +'<p style="font-size:13px;color:#5A7A53;line-height:1.5;margin:0 0 16px;font-weight:600">USD 20/mes · 7 días gratis · Sin tarjeta</p>';
+      +'<p style="font-size:13px;color:#5A7A53;line-height:1.5;margin:0 0 16px;font-weight:600">USD 20/mes · 10 días de prueba · Sin tarjeta</p>';
     if(pasosFaltan.length>0){
       cuerpo+='<p style="font-size:13px;color:#8B7355;line-height:1.5;margin:0 0 8px">Pero antes te falta:</p><ul style="font-size:13px;color:#5A4A2A;line-height:1.7;margin:0 0 16px;padding-left:22px">';
       pasosFaltan.forEach(function(pf){
@@ -4198,7 +4198,7 @@ function vbMostrarModalBloqueado(numPasoQueQuiereAbrir,numPasoFaltante,detalleFa
       });
       cuerpo+='</ul>';
     }
-    btnPrincipal='Empezar mi prueba gratis →';
+    btnPrincipal='Empezar mi prueba de 10 días →';
     btnPrincipalAccion='if(typeof _vbMostrarSuscripcion===\'function\')_vbMostrarSuscripcion();else window.location.href=\'https://vedabite.lemonsqueezy.com/checkout/buy/ec74072d-7b30-4273-b369-1950cc7820d0\'';
     btnSecundario=pasosFaltan.length>0?('Volver al Paso '+pasosFaltan[0].n):'Cancelar';
     btnSecundarioAccion=pasosFaltan.length>0?('vbIrAPaso('+pasosFaltan[0].n+')'):'';
@@ -4376,7 +4376,7 @@ function vbAbrirPaso7(){
   
   // Banner trial
   if(trialOk){
-    html+='<div style="background:#D1FAE5;border:2px solid #059669;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#065F46;font-weight:700">🎁 Acceso gratis · Te quedan '+diasRest+' día'+(diasRest!==1?'s':'')+' de prueba</p><p style="font-size:11px;color:#047857;margin-top:4px">Después USD 20/mes · Cancelás cuando quieras</p></div>';
+    html+='<div style="background:#D1FAE5;border:2px solid #059669;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#065F46;font-weight:700">🎁 Acceso completo · Te quedan '+diasRest+' día'+(diasRest!==1?'s':'')+' de prueba</p><p style="font-size:11px;color:#047857;margin-top:4px">Después USD 20/mes · Cancelás cuando quieras</p></div>';
   }else{
     html+='<div style="background:#FEF3C7;border:2px solid #F59E0B;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#92400E;font-weight:700">🔒 Tu prueba terminó (día '+diaActual+')</p><p style="font-size:11px;color:#78350F;margin-top:4px">Suscribite por USD 20/mes para desbloquear tu plan completo</p></div>';
   }
@@ -5500,7 +5500,7 @@ function vbAbrirPaso8(){
   
   if(trialOk){
     // Banner trial
-    html+='<div style="background:#D1FAE5;border:2px solid #059669;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#065F46;font-weight:700">🎁 Acceso gratis · Te quedan '+diasRest+' día'+(diasRest!==1?'s':'')+' de prueba</p></div>';
+    html+='<div style="background:#D1FAE5;border:2px solid #059669;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#065F46;font-weight:700">🎁 Acceso completo · Te quedan '+diasRest+' día'+(diasRest!==1?'s':'')+' de prueba</p></div>';
     
     // Contenido completo
     html+='<div style="background:#fff;border:1px solid #C49E72;border-radius:14px;padding:20px;margin-bottom:14px">';
@@ -6433,7 +6433,7 @@ window.renderTabs=function(a){
     // Para usuarias Esencia: dejar solo la primera card (la intro "por qué te equilibra") y agregar lock visual
     var matches=htmlOriginal.match(/<div class="card"[^>]*>[\s\S]*?<\/div>/);
     var intro=matches?matches[0]:'';
-    var lockHTML='<div class="card" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);text-align:center;padding:24px;border:2px dashed #D97706"><div style="font-size:50px;margin-bottom:8px">🔒</div><h4 style="margin:8px 0 4px;color:#92400E">El CÓMO se hace está en Práctica</h4><p style="font-size:13px;color:#78350F;margin:0 0 16px;line-height:1.6">Acá te decimos QUÉ hacer. Los pasos exactos, los tiempos, los porqués detallados y los 7 tips para esta tab están en Vedabite Práctica.</p><button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="_vbMostrarSuscripcion()">🔥 Probar Práctica 10 días gratis</button><p style="font-size:11px;color:#92400E;margin:8px 0 0">Sin tarjeta · Cancelás cuando quieras</p></div>';
+    var lockHTML='<div class="card" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);text-align:center;padding:24px;border:2px dashed #D97706"><div style="font-size:50px;margin-bottom:8px">🔒</div><h4 style="margin:8px 0 4px;color:#92400E">El CÓMO se hace está en Práctica</h4><p style="font-size:13px;color:#78350F;margin:0 0 16px;line-height:1.6">Acá te decimos QUÉ hacer. Los pasos exactos, los tiempos, los porqués detallados y los 7 tips para esta tab están en Vedabite Práctica.</p><button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="_vbMostrarSuscripcion()">🔥 Probar Práctica · 10 días</button><p style="font-size:11px;color:#92400E;margin:8px 0 0">Sin tarjeta · Cancelás cuando quieras</p></div>';
     return intro+lockHTML;
   }
   var html='';
@@ -6708,7 +6708,7 @@ window._vbMostrarPaywallFoto=function(preview, urlCheckout, seccion, fotosUsadas
     '<h4 style="margin:4px 0 8px;color:#92400E;font-size:17px">Usaste tus '+total+' análisis gratis</h4>'+
     '<p style="font-size:13px;color:#78350F;margin:0 0 16px;line-height:1.6">Ya conoces la magia. Para seguir analizando tu cuerpo con IA ayurvédica personalizada, pasá a Vedabite Práctica.</p>'+
     '<div style="background:rgba(255,255,255,0.6);padding:12px;border-radius:10px;margin-bottom:16px;text-align:left"><strong style="color:#92400E;font-size:13px">Con Práctica tenés:</strong><ul style="margin:8px 0 0;padding-left:20px;font-size:12px;color:#78350F;line-height:1.7"><li>Análisis IA ilimitado de lengua, ojos, líquidos y digestión</li><li>Histórico completo para ver tu evolución</li><li>Los 12 módulos del cómo hacer (no solo qué hacer)</li><li>PDF descargable de cada análisis</li></ul></div>'+
-    '<a href="'+url+'" target="_blank" style="display:inline-block;background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;padding:14px 24px;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px">🔥 Probar Práctica 7 días gratis</a>'+
+    '<a href="'+url+'" target="_blank" style="display:inline-block;background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;padding:14px 24px;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px">🔥 Probar Práctica · 10 días</a>'+
     '<p style="font-size:11px;color:#92400E;margin:12px 0 0">Sin tarjeta · Cancelás cuando quieras · USD 20/mes después del trial de 7 días</p>'+
     '</div>';
   var existing=preview.querySelector('img');
@@ -6809,8 +6809,8 @@ window._vbActualizarContadorFotos=function(){
       '<div style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:2px dashed #D97706;border-radius:10px;padding:18px;text-align:center">' +
       '<div style="font-size:42px;margin-bottom:6px">🔒</div>' +
       '<h4 style="margin:6px 0 4px;color:#92400E;font-size:14px">El análisis con IA está en Práctica</h4>' +
-      '<p style="font-size:12px;color:#78350F;margin:0 0 14px;line-height:1.5">Subí tu foto y la IA cruza tu Prakriti, Vikriti y carta natal. 10 días gratis.</p>' +
-      '<button class="btn btn-gold" style="width:100%;margin-bottom:6px" onclick="if(window._vbMostrarSuscripcion)window._vbMostrarSuscripcion()">🔥 Probar Práctica 10 días gratis</button>' +
+      '<p style="font-size:12px;color:#78350F;margin:0 0 14px;line-height:1.5">Subí tu foto y la IA cruza tu Prakriti, Vikriti y carta natal. 10 días de prueba.</p>' +
+      '<button class="btn btn-gold" style="width:100%;margin-bottom:6px" onclick="if(window._vbMostrarSuscripcion)window._vbMostrarSuscripcion()">🔥 Probar Práctica · 10 días</button>' +
       '<p style="font-size:10px;color:#92400E;margin:6px 0 0">Sin tarjeta · Cancelás cuando quieras</p>' +
       '</div>';
   }
@@ -6837,8 +6837,8 @@ window._vbActualizarContadorFotos=function(){
           '<div style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:2px dashed #D97706;border-radius:10px;padding:18px;text-align:center">' +
           '<div style="font-size:42px;margin-bottom:6px">🔒</div>' +
           '<h4 style="margin:6px 0 4px;color:#92400E;font-size:14px">El escáner de menú con IA está en Práctica</h4>' +
-          '<p style="font-size:12px;color:#78350F;margin:0 0 14px;line-height:1.5">Sacá foto del menú del restaurante y la IA cruza con tu Prakriti + Vikriti para recomendarte qué pedir. 10 días gratis.</p>' +
-          '<button class="btn btn-gold" style="width:100%;margin-bottom:6px" onclick="if(window._vbMostrarSuscripcion)window._vbMostrarSuscripcion()">🔥 Probar Práctica 10 días gratis</button>' +
+          '<p style="font-size:12px;color:#78350F;margin:0 0 14px;line-height:1.5">Sacá foto del menú del restaurante y la IA cruza con tu Prakriti + Vikriti para recomendarte qué pedir. 10 días de prueba.</p>' +
+          '<button class="btn btn-gold" style="width:100%;margin-bottom:6px" onclick="if(window._vbMostrarSuscripcion)window._vbMostrarSuscripcion()">🔥 Probar Práctica · 10 días</button>' +
           '<p style="font-size:10px;color:#92400E;margin:6px 0 0">Sin tarjeta · Cancelás cuando quieras</p>' +
           '</div>';
       }
@@ -6865,7 +6865,7 @@ window._vbActualizarContadorFotos=function(){
           '<div style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:2px dashed #D97706;border-radius:10px;padding:14px;text-align:center">' +
           '<div style="font-size:36px;margin-bottom:4px">🔒</div>' +
           '<h4 style="margin:4px 0;color:#92400E;font-size:13px">Análisis con IA · solo Práctica</h4>' +
-          '<p style="font-size:11px;color:#78350F;margin:0 0 10px">10 días gratis. Sin tarjeta.</p>' +
+          '<p style="font-size:11px;color:#78350F;margin:0 0 10px">10 días de prueba. Sin tarjeta.</p>' +
           '<button class="btn btn-gold" style="width:100%;margin-bottom:4px;font-size:13px" onclick="if(window._vbMostrarSuscripcion)window._vbMostrarSuscripcion()">🔥 Probar Práctica</button>' +
           '</div>';
       }
@@ -7475,7 +7475,7 @@ window._vbActualizarContadorFotos=function(){
 <div id="vbStickyCTA" style="display:none;position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,#E07A1F,#C45F0F);padding:12px 16px;box-shadow:0 -4px 16px rgba(0,0,0,0.18);z-index:9998;animation:vbSlideUp .35s cubic-bezier(0.4,0,0.2,1)">
 <div style="max-width:520px;margin:0 auto;display:flex;align-items:center;gap:12px">
 <div style="flex:1;min-width:0">
-<div style="font-size:11px;color:#FED7AA;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">10 días gratis</div>
+<div style="font-size:11px;color:#FED7AA;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">10 días de prueba</div>
 <div style="font-size:14px;color:#fff;font-weight:700;line-height:1.2">Activá Práctica completa</div>
 </div>
 <button id="vbStickyCTABtn" style="background:#fff;color:#C45F0F;border:none;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.15)">Activar →</button>
@@ -8171,7 +8171,7 @@ function generarCupon_LEGACY(){
   // Invitación
   ctx.fillStyle='#E8D5F5';
   ctx.font='700 52px sans-serif';
-  ctx.fillText('7 días gratis',540,810);
+  ctx.fillText('10 días de prueba',540,810);
   ctx.font='300 36px sans-serif';
   ctx.fillText('de Vedabite',540,870);
   
@@ -8341,7 +8341,7 @@ function enviarRegalo(){
     return '<div class="vb-cta-practica" style="margin:20px 0;padding:20px;background:linear-gradient(135deg,#FAF7F0,#F5EFE0);border-radius:16px;border:1px solid #E8DFC8;text-align:center'+(estilo||'')+'">'
       +'<p style="font-size:13px;color:#5A7A53;margin:0 0 12px;font-style:italic">'+subtexto+'</p>'
       +'<a href="'+lsURL+'" target="_blank" onclick="try{gtag(\'event\',\'click_compra_inline\',{event_category:\'conversion\',event_label:\''+texto.substring(0,30)+'\'})}catch(e){}" style="display:block;padding:14px 20px;background:linear-gradient(135deg,#E67E22,#D35400);color:#fff;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:0.3px">'+texto+'</a>'
-      +'<p style="font-size:11px;color:#8B7355;margin:10px 0 0">🌱 7 días gratis · Cancelás cuando quieras</p>'
+      +'<p style="font-size:11px;color:#8B7355;margin:10px 0 0">🌱 10 días de prueba · Cancelás cuando quieras</p>'
       +'</div>';
   }
 
