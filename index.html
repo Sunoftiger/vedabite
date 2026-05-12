@@ -844,7 +844,7 @@ window.clarity('event',eventName+(label?'_'+label:''));
 <div class="screen active" id="s1">
 <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 20px;text-align:center">
 <div class="container" style="width:100%">
-<p style="color:#5A7A53;font-size:13px;font-weight:500;margin-bottom:24px;cursor:default;user-select:none;display:inline-flex;align-items:center;gap:8px"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#5A7A53;animation:vbPulse 2s ease-in-out infinite"></span>Ya se realizaron <span id="vbContador">470</span> test</p>
+
 <style>
 @keyframes vbPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.8)}}
 /* Emojis decorativos grandes no clickeables - evita dead clicks */
@@ -858,9 +858,7 @@ Vos sos<br>el amor de tu vida.
 <p style="font-size:14px;color:#5A7A53;line-height:1.6;margin-bottom:6px;margin-top:18px;font-weight:500">
 Recuperá tus hábitos naturales.
 </p>
-<p style="font-size:12px;color:#8B7355;font-style:italic;margin-top:10px;margin-bottom:22px">
-Pequeños ajustes que cambian todo.
-</p>
+
 <div style="position:relative;display:inline-block;width:100%">
 <button class="btn btn-cta-hero" onclick="startTest()">Veamos tu equilibrio →<div style="font-size:11px;font-weight:500;color:#FFF;opacity:0.9;margin-top:4px;letter-spacing:0.5px">50 preguntas · 4 minutos</div></button>
 </div>
@@ -869,11 +867,42 @@ Pequeños ajustes que cambian todo.
 .btn-cta-hero:hover{transform:scale(1.02);box-shadow:0 6px 20px rgba(224,122,31,.45)}
 .btn-cta-hero:active{transform:scale(0.97)}
 </style>
-<div style="margin-top:24px;padding:18px 16px;background:rgba(255,255,255,0.5);border-radius:12px;border-left:3px solid #C49E72;text-align:left">
-<p style="font-size:14px;color:#3D5A36;line-height:1.7;margin:0 0 10px;font-style:italic">🌊 Tu cuerpo es como un río: nunca es el mismo.<br>Como el agua, todo lo que metés adentro fluye y causa un efecto.</p>
-<p style="font-size:14px;color:#3D5A36;line-height:1.7;margin:0;font-weight:600">Estás a tiempo. Siempre estás a tiempo de revertir.</p>
+
+<!-- REDES SOCIALES · prueba social -->
+<div style="margin-top:22px;padding:16px 14px;background:rgba(255,255,255,0.4);border-radius:12px;border:1px solid #E5DDC8">
+<p style="font-size:10px;letter-spacing:1.5px;color:#C49E72;text-transform:uppercase;font-weight:700;margin:0 0 4px;text-align:center">comunidad</p>
+<p style="font-size:13px;color:#3D5A36;font-weight:600;margin:0 0 12px;text-align:center">720+ personas ya están en la tribu Vedabite</p>
+<div style="display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap">
+
+<a href="https://instagram.com/vedabite" target="_blank" rel="noopener" onclick="try{if(typeof gtag==='function')gtag('event','social_click',{red:'instagram'});if(window.clarity)window.clarity('event','social_instagram_click');}catch(e){}" style="display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#5A4A2A;font-size:11px;font-weight:600;padding:6px 8px;border-radius:8px;transition:transform .15s">
+<div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#F09433,#E6683C,#DC2743,#CC2366,#BC1888);display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;box-shadow:0 2px 8px rgba(0,0,0,0.15)">📷</div>
+<span style="margin-top:5px">Instagram</span>
+</a>
+
+<a href="https://tiktok.com/@vedabite" target="_blank" rel="noopener" onclick="try{if(typeof gtag==='function')gtag('event','social_click',{red:'tiktok'});if(window.clarity)window.clarity('event','social_tiktok_click');}catch(e){}" style="display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#5A4A2A;font-size:11px;font-weight:600;padding:6px 8px;border-radius:8px;transition:transform .15s">
+<div style="width:42px;height:42px;border-radius:12px;background:#000;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;box-shadow:0 2px 8px rgba(0,0,0,0.15)">🎵</div>
+<span style="margin-top:5px">TikTok</span>
+</a>
+
+<a href="https://facebook.com/clasebrillante" target="_blank" rel="noopener" onclick="try{if(typeof gtag==='function')gtag('event','social_click',{red:'facebook'});if(window.clarity)window.clarity('event','social_facebook_click');}catch(e){}" style="display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#5A4A2A;font-size:11px;font-weight:600;padding:6px 8px;border-radius:8px;transition:transform .15s">
+<div style="width:42px;height:42px;border-radius:12px;background:#1877F2;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;box-shadow:0 2px 8px rgba(0,0,0,0.15)">f</div>
+<span style="margin-top:5px">Facebook</span>
+</a>
+
+<a href="https://threads.net/@vedabite" target="_blank" rel="noopener" onclick="try{if(typeof gtag==='function')gtag('event','social_click',{red:'threads'});if(window.clarity)window.clarity('event','social_threads_click');}catch(e){}" style="display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#5A4A2A;font-size:11px;font-weight:600;padding:6px 8px;border-radius:8px;transition:transform .15s">
+<div style="width:42px;height:42px;border-radius:12px;background:#000;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;box-shadow:0 2px 8px rgba(0,0,0,0.15)">@</div>
+<span style="margin-top:5px">Threads</span>
+</a>
+
 </div>
-<p style="font-size:12px;color:#8B7355;margin-top:14px;letter-spacing:0.3px;text-align:center">✓ Sin tarjeta · ✓ 100% gratis · ✓ Resultado al instante</p>
+<p style="font-size:11px;color:#8B7355;margin:12px 0 0;text-align:center;font-style:italic">@vedabite · 197 publicaciones · Ayurveda y Yoga</p>
+</div>
+
+<style>
+#vbHeroSocial a:hover{transform:scale(1.05)}
+</style>
+
+
 <div id="savedSession" style="display:none;margin-top:24px"><div class="card" style="background:#F0FDF4;border:2px solid #5A7A53;padding:18px"><p style="margin-bottom:14px;font-size:15px;color:#3D5A36;font-weight:600">🎉 ¡Tenés una sesión guardada!</p><p style="margin-bottom:16px;font-size:13px;color:#5A7A53">Podés continuar donde la dejaste o empezar de cero.</p><button type="button" class="btn btn-sage" style="padding:18px;font-size:15px;touch-action:manipulation;min-height:54px" onclick="loadSession()">CONTINUAR MI PERFIL →</button><button type="button" style="margin-top:14px;padding:8px;background:none;border:none;color:#8B7355;font-size:12px;text-decoration:underline;cursor:pointer;display:block;margin-left:auto;margin-right:auto" onclick="confirmClearSession()">empezar de nuevo</button></div></div>
 </div>
 </div>
