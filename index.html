@@ -9090,6 +9090,110 @@ function _vbCerrarDisclaimer(){
   if(m)m.remove();
   document.body.style.overflow='';
 }
+
+// ============================================================================
+// MODAL PREMIUM - Conversión de dead clicks en tabs bloqueadas
+// ============================================================================
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+    // Detectar clicks en tabs premium bloqueadas
+    document.querySelectorAll('.tab-card.premium').forEach(function(tab) {
+      tab.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Track evento en Google Analytics
+        try {
+          gtag('event', 'premium_tab_attempt', {
+            event_category: 'engagement',
+            tab_name: this.querySelector('strong') ? this.querySelector('strong').textContent : 'unknown',
+            event_label: 'dead_click_conversion'
+          });
+        } catch(err) {
+          console.log('[Premium Modal] Analytics error:', err);
+        }
+        
+        // Mostrar modal de conversión
+        var tabName = this.querySelector('strong') ? this.querySelector('strong').textContent : 'Esta herramienta';
+        showPremiumModal(tabName);
+      });
+    });
+  }, 1500); // Esperar 1.5seg para que carguen las tabs
+});
+
+function showPremiumModal(tabName) {
+  // Remover modal anterior si existe
+  var oldModal = document.getElementById('premiumModal');
+  if(oldModal) oldModal.remove();
+  
+  var modal = '<div id="premiumModal" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn 0.2s ease-out" onclick="if(event.target.id===\'premiumModal\')closePremiumModal()">' +
+    '<div style="background:#fff;border-radius:20px;padding:28px 24px;max-width:380px;width:100%;text-align:center;position:relative;animation:slideUp 0.3s ease-out">' +
+      '<button onclick="closePremiumModal()" style="position:absolute;top:12px;right:12px;background:none;border:none;font-size:28px;color:#999;cursor:pointer;padding:0;width:36px;height:36px;line-height:28px">×</button>' +
+      '<div style="font-size:48px;margin-bottom:16px">🔒</div>' +
+      '<h2 style="margin-bottom:12px;font-size:22px;font-weight:700;color:#1a1a1a">' + tabName + ' es Premium</h2>' +
+      '<p style="margin-bottom:24px;color:#666;font-size:15px;line-height:1.5">Desbloqueá esta y 11 herramientas más con el Plan Práctica</p>' +
+      '<div style="background:linear-gradient(135deg,#F0FDF4,#DCFCE7);padding:18px;border-radius:12px;margin-bottom:24px;text-align:left;border-left:4px solid #22C55E">' +
+        '<div style="margin:10px 0;font-size:15px;display:flex;align-items:center"><span style="margin-right:8px">✅</span><span>252 tips personalizados para tu dosha</span></div>' +
+        '<div style="margin:10px 0;font-size:15px;display:flex;align-items:center"><span style="margin-right:8px">✅</span><span>Carta natal védica completa</span></div>' +
+        '<div style="margin:10px 0;font-size:15px;display:flex;align-items:center"><span style="margin-right:8px">✅</span><span>12 herramientas de bienestar</span></div>' +
+      '</div>' +
+      '<div style="background:#FEF3C7;padding:12px;border-radius:8px;margin-bottom:20px">' +
+        '<div style="font-size:13px;color:#92400E;margin-bottom:6px">Plan Práctica</div>' +
+        '<div style="font-size:26px;font-weight:700;color:#1a1a1a;margin-bottom:4px">ARS 28,300<span style="font-size:16px;font-weight:400">/mes</span></div>' +
+        '<div style="color:#22C55E;font-weight:700;font-size:17px">🎁 Primeros 10 días GRATIS</div>' +
+      '</div>' +
+      '<button onclick="goToPremiumCheckout()" style="width:100%;padding:17px;background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;border:none;border-radius:12px;font-size:18px;font-weight:700;margin-bottom:10px;cursor:pointer;box-shadow:0 4px 12px rgba(245,158,11,0.3)">PROBAR 10 DÍAS GRATIS</button>' +
+      '<div style="font-size:13px;color:#999;margin-bottom:10px">Sin tarjeta requerida • Cancelá cuando quieras</div>' +
+      '<button onclick="closePremiumModal()" style="background:none;border:none;color:#999;font-size:14px;cursor:pointer;padding:8px;text-decoration:underline">Ahora no</button>' +
+    '</div>' +
+  '</div>';
+  
+  // Agregar CSS para animaciones
+  var style = document.createElement('style');
+  style.textContent = '@keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}';
+  document.head.appendChild(style);
+  
+  document.body.insertAdjacentHTML('beforeend', modal);
+  document.body.style.overflow = 'hidden'; // Prevenir scroll
+}
+
+function closePremiumModal() {
+  var modal = document.getElementById('premiumModal');
+  if(modal) {
+    modal.style.animation = 'fadeOut 0.2s ease-out';
+    setTimeout(function() {
+      modal.remove();
+      document.body.style.overflow = '';
+    }, 200);
+  }
+  
+  // Track cierre
+  try {
+    gtag('event', 'premium_modal_closed', {
+      event_category: 'engagement',
+      event_label: 'user_dismissed'
+    });
+  } catch(err) {}
+}
+
+function goToPremiumCheckout() {
+  // Track conversión desde modal
+  try {
+    gtag('event', 'premium_modal_conversion', {
+      event_category: 'conversion',
+      event_label: 'modal_to_checkout',
+      value: 28300
+    });
+  } catch(err) {}
+  
+  // Cerrar modal
+  closePremiumModal();
+  
+  // Redirigir a checkout Mercado Pago
+  setTimeout(function() {
+    window.location.href = 'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c9380849305cfb30193101dfc5f0405';
+  }, 200);
+}
 </script>
 
 </body>
