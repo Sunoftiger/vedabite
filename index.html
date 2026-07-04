@@ -2997,219 +2997,6 @@ function vbDesbloquearDiagnostico(){
   vbAbrirPaso6();
 }
 
-// ============================================================
-// PASO 6 — DIAGNÓSTICO INTEGRAL HIPER PERSONALIZADO (paso de venta)
-// Matriz fija basada en Charaka Samhita + Madhava Nidana + Ashtanga Hridayam
-// ============================================================
-var VB_CONSECUENCIAS={
-  vata:{
-    '25-34':{m:'Insomnio crónico, ansiedad, sequedad de piel y mucosas',a2:'Trastornos digestivos funcionales, gastritis nerviosa, dolor lumbar recurrente',a5:'Fibromialgia, fatiga crónica, ciclos hormonales irregulares, posible osteopenia temprana',a10:'Osteoporosis, hipertensión refractaria, deterioro cognitivo Vata, vulnerabilidad ósea'},
-    '35-49':{m:'Tensión muscular constante, ciclos del sueño rotos, irritabilidad subclínica',a2:'Lumbalgias crónicas, gastritis, ansiedad generalizada, caída de cabello',a5:'Osteopenia, problemas tiroideos, ciclos hormonales caóticos (peri-menopausia/andropausia)',a10:'Osteoporosis instalada, hipertensión Vata, deterioro cognitivo, fragilidad vertebral'},
-    '50-64':{m:'Sequedad articular, insomnio profundo, sensibilidad al frío',a2:'Artrosis Vata, hipertensión por rigidez vascular, pérdida ósea acelerada',a5:'Osteoporosis, problemas neurológicos sutiles, deterioro de memoria reciente',a10:'Demencia Vata, fracturas espontáneas, dependencia funcional progresiva'},
-    '65+':{m:'Sequedad sistémica, sueño fragmentado, frialdad de extremidades',a2:'Pérdida de masa ósea acelerada, deterioro cognitivo Vata',a5:'Fragilidad ósea grave, demencia, dependencia',a10:'Cuidados intensivos, pérdida de autonomía'}
-  },
-  pitta:{
-    '25-34':{m:'Acidez, brotes en piel, irritabilidad, perfeccionismo agotador',a2:'Gastritis crónica, dermatitis Pitta, hipertensión por estrés, infertilidad por inflamación',a5:'Úlcera, problemas hepáticos, hipertiroidismo, infertilidad inflamatoria',a10:'Cirrosis incipiente, cáncer hormono-dependiente Pitta, infarto temprano por estrés'},
-    '35-49':{m:'Acidez nocturna, dermatitis, migrañas Pitta, calor interno persistente',a2:'Esofagitis, dermatosis crónicas, hipertensión instalada, problemas hepáticos sutiles',a5:'Úlcera, hígado graso, hipertensión refractaria, cáncer hormono-dependiente potencial',a10:'Cirrosis, infarto, accidente cerebrovascular hemorrágico, cáncer instalado'},
-    '50-64':{m:'Acidez crónica, calor sofocante, brotes inflamatorios, ojos rojos',a2:'Hígado graso, hipertensión instalada, dermatitis crónica, problemas oculares',a5:'Cirrosis, infarto, cáncer Pitta, glaucoma',a10:'Insuficiencia hepática, eventos cardiovasculares mayores'},
-    '65+':{m:'Inflamación crónica subclínica, presión variable, sensibilidad al calor',a2:'Eventos cardiovasculares, deterioro hepático',a5:'Cardiopatía instalada, cáncer Pitta, deterioro orgánico múltiple',a10:'Insuficiencia multi-orgánica'}
-  },
-  kapha:{
-    '25-34':{m:'Pesadez matinal, sueño excesivo, antojo de dulces, congestión',a2:'Sobrepeso, prediabetes, sinusitis crónica, depresión Kapha sutil',a5:'Diabetes tipo 2, obesidad instalada, apnea del sueño, hipotiroidismo',a10:'Diabetes complicada, enfermedad cardiovascular Kapha, deterioro metabólico'},
-    '35-49':{m:'Aumento de peso, lentitud digestiva, mucosa abundante, melancolía',a2:'Síndrome metabólico, hígado graso, diabetes en horizonte, depresión instalada',a5:'Diabetes 2, hipertensión Kapha, apnea, problemas cardíacos por sedentarismo',a10:'Cardiopatía isquémica, ACV, complicaciones diabéticas, demencia vascular'},
-    '50-64':{m:'Sobrepeso instalado, retención, lentitud cognitiva, sueño pesado',a2:'Diabetes, hipertensión, hígado graso avanzado, apnea',a5:'Cardiopatía, ACV potencial, demencia vascular incipiente, complicaciones renales',a10:'Eventos cardiovasculares mayores, diálisis potencial, demencia instalada'},
-    '65+':{m:'Edemas, lentitud generalizada, congestión bronquial',a2:'Insuficiencia cardíaca Kapha, ACV, deterioro renal',a5:'Complicaciones múltiples, dependencia funcional',a10:'Cuidados paliativos, pérdida de autonomía total'}
-  }
-};
-
-var VB_CONDICIONES_IMPACTO={
-  hipertension:{vata:'agrava la rigidez vascular Vata, riesgo accidente cerebrovascular',pitta:'agrava el daño endotelial Pitta, riesgo infarto',kapha:'agrava el sedentarismo Kapha, riesgo cardiovascular global'},
-  diabetes:{vata:'descompensa el sistema nervioso autónomo, neuropatía Vata',pitta:'agrava daño hepático y renal, retinopatía Pitta',kapha:'es la diana de Kapha — empeora todo el cuadro metabólico'},
-  colesterol:{vata:'rigidez arterial acelerada',pitta:'hígado graso y daño hepático',kapha:'placa aterosclerótica clásica Kapha'},
-  sobrepeso:{vata:'rara combinación, suele indicar Vata-Kapha mixto',pitta:'inflamación visceral, hígado graso Pitta',kapha:'cuadro Kapha clásico — alta urgencia metabólica'},
-  tiroides:{vata:'amplifica la inestabilidad Vata',pitta:'amplifica la inflamación autoinmune',kapha:'amplifica la lentitud metabólica'},
-  embarazo:{vata:'requiere grasas calientes, descanso, contención',pitta:'requiere refrescar, evitar picantes y calor',kapha:'requiere movimiento moderado, alimentos ligeros'},
-  alergia_gluten:{vata:'inflamación intestinal Vata',pitta:'inflamación inmune Pitta',kapha:'mucosa intestinal cargada Kapha'},
-  alergia_lactosa:{vata:'mala absorción de calcio, riesgo óseo',pitta:'fermentación ácida intestinal',kapha:'mucosa abundante, congestión bronquial'}
-};
-
-function vbAbrirPaso6(){
-  var datos=window._vbDatos||{};
-  var prakriti=window._vbPrakriti||(datos.prakriti||null);
-  var vikriti=window.res||null;
-  if(!datos.sexo||!datos.edad||!vikriti||!vikriti.p){
-    alert('Faltan datos para generar tu diagnóstico integral. Completá primero los pasos anteriores.');
-    return;
-  }
-  var sexo=datos.sexo;
-  var edad=datos.edad;
-  var condiciones=Array.isArray(datos.condiciones)?datos.condiciones.filter(function(c){return c!=='ninguna';}):[];
-  var doshaVikriti=vikriti.p;
-  var doshaPrakriti=prakriti?prakriti.dosha_predominante:doshaVikriti;
-  var pctVikriti=vikriti.pct||{};
-  var pctActual=pctVikriti[doshaVikriti]||0;
-  
-  function nombreDosha(d){return ({vata:'Vata (aire+éter)',pitta:'Pitta (fuego+agua)',kapha:'Kapha (tierra+agua)'})[d]||d;}
-  function colorDosha(d){return ({vata:'#7B68EE',pitta:'#E67E22',kapha:'#5A7A53'})[d]||'#5A7A53';}
-  function rangoEdad(e){if(e<35)return '25-34';if(e<50)return '35-49';if(e<65)return '50-64';return '65+';}
-  function tituloSexo(s){return ({mujer:'Mujer',hombre:'Hombre',otro:'Persona'})[s]||'Persona';}
-  
-  var rango=rangoEdad(edad);
-  var conse=(VB_CONSECUENCIAS[doshaVikriti]&&VB_CONSECUENCIAS[doshaVikriti][rango])||VB_CONSECUENCIAS.vata['35-49'];
-  var fraseCondiciones=condiciones.length?condiciones.map(function(c){return ({hipertension:'hipertensión',diabetes:'diabetes',colesterol:'colesterol alto',sobrepeso:'sobrepeso',tiroides:'tiroides',embarazo:'embarazo',alergia_gluten:'intolerancia al gluten',alergia_lactosa:'intolerancia a la lactosa'})[c]||c;}).join(' + '):'sin condiciones declaradas';
-  
-  var html='<div style="background:linear-gradient(180deg,#FAF7F0,#FEF3C7);min-height:100vh;padding:20px 16px"><div style="max-width:600px;margin:0 auto">';
-  html+='<button onclick="vbCerrarPaso6()" style="background:#fff;border:2px solid #5A7A53;color:#3D5A36;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:14px;padding:10px 18px;border-radius:10px;box-shadow:0 2px 6px rgba(90,122,83,0.12);display:inline-flex;align-items:center;gap:6px">← Volver al diagnóstico</button>';
-  
-  html+='<div style="text-align:center;margin-bottom:20px">';
-  html+='<div style="background:#1a1a1a;color:#D4AF37;padding:6px 14px;border-radius:20px;display:inline-block;margin-bottom:8px;letter-spacing:2px;font-size:10px;font-weight:800;text-transform:uppercase;border:1px solid #D4AF37">⭐ PRÁCTICA ⭐</div><p style="font-size:11px;letter-spacing:3px;color:#D4AF37;text-transform:uppercase;font-weight:700">📋 Diagnóstico integral · Paso 6 de 9</p>';
-  html+='<h2 style="font-family:Georgia,serif;font-size:24px;color:#3D5A36;font-weight:400;margin-top:8px;line-height:1.3">Lo que un Vaidya (terapeuta ayurvédico) con 80 años de experiencia vería en vos</h2>';
-  html+='</div>';
-  
-  // CAPA 1
-  html+='<div style="background:#fff;border:2px solid '+colorDosha(doshaVikriti)+';border-radius:14px;padding:20px;margin-bottom:14px">';
-  html+='<p style="font-size:11px;letter-spacing:2px;color:'+colorDosha(doshaVikriti)+';text-transform:uppercase;font-weight:700;margin-bottom:10px">Capa 1 · Tu cuerpo en 3 frases</p>';
-  html+='<p style="font-size:16px;color:#3D5A36;line-height:1.7;margin-bottom:10px"><strong>'+tituloSexo(sexo)+' · '+edad+' años · '+fraseCondiciones+'</strong></p>';
-  html+='<p style="font-size:14px;color:#5A7A53;line-height:1.7;margin-bottom:8px">Naciste <strong>'+nombreDosha(doshaPrakriti)+'</strong> y hoy estás siendo <strong>'+nombreDosha(doshaVikriti)+' al '+pctActual+'%</strong>.</p>';
-  if(doshaPrakriti!==doshaVikriti){
-    html+='<p style="font-size:14px;color:#5A7A53;line-height:1.7">Tu naturaleza '+doshaPrakriti+' (heredada según tu carta natal védica) está siendo empujada hacia '+doshaVikriti+' por tu rutina, alimentación, emociones o estación actual.</p>';
-  }else{
-    html+='<p style="font-size:14px;color:#5A7A53;line-height:1.7">Tu naturaleza '+doshaPrakriti+' está expresándose con intensidad. La clave es no exagerar lo que ya sos.</p>';
-  }
-  if(condiciones.length){
-    html+='<div style="margin-top:14px;padding-top:14px;border-top:1px solid #E8DFC8"><p style="font-size:13px;color:#3D5A36;font-weight:700;margin-bottom:6px">Cómo se cruza tu cuadro con tus condiciones:</p>';
-    condiciones.forEach(function(c){
-      var impacto=VB_CONDICIONES_IMPACTO[c];
-      if(impacto&&impacto[doshaVikriti]){
-        html+='<p style="font-size:13px;color:#5A7A53;line-height:1.6;margin-bottom:6px">• <strong>'+(({hipertension:'Hipertensión',diabetes:'Diabetes',colesterol:'Colesterol alto',sobrepeso:'Sobrepeso',tiroides:'Tiroides',embarazo:'Embarazo',alergia_gluten:'Intolerancia gluten',alergia_lactosa:'Intolerancia lactosa'})[c]||c)+':</strong> '+impacto[doshaVikriti]+'</p>';
-      }
-    });
-    html+='</div>';
-  }
-  html+='</div>';
-  
-  // CAPA 2
-  html+='<div style="background:#fff;border:1px solid #C44E4E;border-radius:14px;padding:20px;margin-bottom:14px">';
-  html+='<p style="font-size:11px;letter-spacing:2px;color:#C44E4E;text-transform:uppercase;font-weight:700;margin-bottom:10px">Capa 2 · Tu línea de tiempo (si seguís así)</p>';
-  html+='<div style="display:flex;flex-direction:column;gap:10px">';
-  html+='<div style="background:#FEF3C7;border-left:4px solid #F59E0B;padding:12px 14px;border-radius:8px"><p style="font-size:12px;color:#92400E;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">En 6 meses</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">'+conse.m+'</p></div>';
-  html+='<div style="background:#FED7AA;border-left:4px solid #EA580C;padding:12px 14px;border-radius:8px"><p style="font-size:12px;color:#7C2D12;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">En 2 años</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">'+conse.a2+'</p></div>';
-  html+='<div style="background:#FECACA;border-left:4px solid #DC2626;padding:12px 14px;border-radius:8px"><p style="font-size:12px;color:#7F1D1D;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">En 5 años</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">'+conse.a5+'</p></div>';
-  html+='<div style="background:#FCA5A5;border-left:4px solid #991B1B;padding:12px 14px;border-radius:8px"><p style="font-size:12px;color:#7F1D1D;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">En 10 años</p><p style="font-size:13px;color:#5A7A53;line-height:1.6">'+conse.a10+'</p></div>';
-  html+='</div>';
-  html+='<div style="margin-top:14px;padding:12px 14px;background:#D1FAE5;border-left:4px solid #059669;border-radius:8px"><p style="font-size:13px;color:#065F46;line-height:1.6"><strong>Pero todavía estás en etapa Prakopa (agravamiento). Todavía es reversible.</strong></p></div>';
-  html+='</div>';
-  
-  // CAPA 3
-  if(prakriti&&prakriti.lagna){
-    html+='<div style="background:linear-gradient(180deg,#F5F3FF,#EDE9FE);border:1px solid #7B68EE;border-radius:14px;padding:20px;margin-bottom:14px">';
-    html+='<p style="font-size:11px;letter-spacing:2px;color:#5B21B6;text-transform:uppercase;font-weight:700;margin-bottom:10px">Capa 3 · Tu cruce único (lo que nadie te dijo antes)</p>';
-    html+='<p style="font-size:14px;color:#3D5A36;line-height:1.7;margin-bottom:10px">Según tu carta natal védica (Janma Kundali), tu cuerpo no es una constitución simple. Tiene 3 voces:</p>';
-    html+='<div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:10px">';
-    html+='<p style="font-size:13px;color:#5A7A53;margin-bottom:8px;line-height:1.6"><strong>Lagna (ascendente, marca tu cuerpo físico):</strong> '+prakriti.lagna.sign+' → '+nombreDosha(prakriti.lagna.dosha)+'</p>';
-    if(prakriti.surya)html+='<p style="font-size:13px;color:#5A7A53;margin-bottom:8px;line-height:1.6"><strong>Surya Rashi (sol, marca tu energía vital):</strong> '+prakriti.surya.sign+' → '+nombreDosha(prakriti.surya.dosha)+'</p>';
-    if(prakriti.chandra)html+='<p style="font-size:13px;color:#5A7A53;margin-bottom:8px;line-height:1.6"><strong>Chandra Rashi (luna, marca tus emociones):</strong> '+prakriti.chandra.sign+' → '+nombreDosha(prakriti.chandra.dosha)+'</p>';
-    if(prakriti.nakshatra)html+='<p style="font-size:13px;color:#5A7A53;line-height:1.6"><strong>Nakshatra (mansión lunar, marca tu mente profunda):</strong> '+prakriti.nakshatra.nombre+' → '+nombreDosha(prakriti.nakshatra.dosha)+'</p>';
-    html+='</div>';
-    html+='<p style="font-size:13px;color:#5A7A53;line-height:1.7"><strong>Esto significa:</strong> tu '+(condiciones.length?'cuadro de '+fraseCondiciones:'tránsito hacia el equilibrio actual')+' NO es genérico. Es la combinación de estos elementos cruzándose contigo a los '+edad+' años. Por eso el plan común no te funciona — y por eso necesitás uno propio.</p>';
-    html+='</div>';
-  }
-  
-  // CAPA 4
-  var topByDosha={
-    vata:[
-      {n:'Manas (mente) · pensamientos rápidos, dificultad para concentrarse',d:'Tu mente está acelerada. Saltás de un tema a otro. La calma se siente como esfuerzo.'},
-      {n:'Nidra (sueño) · sueño liviano, despertares',d:'Tu cuerpo no está pudiendo entrar al descanso profundo. La reparación nocturna no está sucediendo.'},
-      {n:'Bala (energía vital) · agotamiento variable',d:'Tu energía sube y baja sin lógica. Lo que ayer pudiste, hoy te agota.'}
-    ],
-    pitta:[
-      {n:'Agni (fuego digestivo) · acidez, hambre voraz',d:'Tu digestión está en alarma. El cuerpo quema lo que no debe.'},
-      {n:'Sveda (sudor) · sudoración con olor fuerte',d:'Tu cuerpo está liberando calor sin filtro. La temperatura interna está alta.'},
-      {n:'Manas (mente) · irritabilidad, perfeccionismo',d:'Tu mente quema. Cosas mínimas te incendian.'}
-    ],
-    kapha:[
-      {n:'Agni (fuego digestivo) · digestión lenta, pesadez',d:'Tu fuego digestivo está apagado. Lo que comés se acumula.'},
-      {n:'Nidra (sueño) · sueño excesivo, despertar pesado',d:'Dormís pero no descansás. El cuerpo no termina de procesar la noche.'},
-      {n:'Bala (energía vital) · falta de impulso',d:'Tu energía está baja desde la mañana. Arrancar es el desafío.'}
-    ]
-  };
-  var areasTop=topByDosha[doshaVikriti]||topByDosha.vata;
-  html+='<div style="background:#fff;border:1px solid #5A7A53;border-radius:14px;padding:20px;margin-bottom:14px">';
-  html+='<p style="font-size:11px;letter-spacing:2px;color:#5A7A53;text-transform:uppercase;font-weight:700;margin-bottom:10px">Capa 4 · Lo que tu cuerpo te dice hoy</p>';
-  html+='<p style="font-size:14px;color:#5A7A53;line-height:1.7;margin-bottom:14px">De las 14 áreas que mide el Ayurveda en tu cuerpo, las que están más cargadas en tu '+doshaVikriti+' son:</p>';
-  html+='<div style="display:flex;flex-direction:column;gap:8px">';
-  areasTop.forEach(function(a,idx){
-    html+='<div style="background:#FAF7F0;border-radius:10px;padding:12px 14px"><p style="font-size:13px;color:#3D5A36;font-weight:700;margin-bottom:4px">'+(idx+1)+'. '+a.n+'</p><p style="font-size:12px;color:#5A7A53;line-height:1.5">'+a.d+'</p></div>';
-  });
-  html+='</div>';
-  html+='<p style="font-size:13px;color:#5A7A53;line-height:1.7;margin-top:14px;font-style:italic">Tu cuerpo lleva meses avisando. Hoy, recién hoy, lo viste claro.</p>';
-  html+='</div>';
-  
-  // CAPA 5 + CTA
-  // === PASO 4 INTERMEDIO — Escáner del Vaidya (después del diagnóstico, antes del plan) ===
-  html+='<div style="background:#fff;border:2px solid #5A7A53;border-radius:18px;padding:22px;margin-bottom:18px">';
-  html+='<div style="text-align:center;margin-bottom:14px"><p style="font-size:11px;letter-spacing:3px;color:#5A7A53;text-transform:uppercase;font-weight:700">📋 Paso 4 de 9</p><h3 style="font-family:Georgia,serif;font-size:20px;color:#3D5A36;font-weight:400;margin-top:8px;line-height:1.3">Tu escáner físico</h3><p style="font-size:13px;color:#7a7a7a;margin-top:8px;line-height:1.5">Antes de tu plan, mirá tu lengua y tus ojos. <strong>Tu cuerpo te cuenta lo que pasa adentro.</strong> Sacá las 2 fotos y la IA te lo lee.</p></div>';
-  html+='<button onclick="vbCerrarPaso6();setTimeout(function(){if(typeof vbAbrirPaso4===\'function\')vbAbrirPaso4();},80)" style="width:100%;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;padding:16px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;box-shadow:0 4px 14px rgba(90,122,83,0.25)">📷 Sacar mis 2 fotos →</button>';
-  html+='</div>';
-  
-  html+='<div style="background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border-radius:18px;padding:28px 22px;text-align:center;margin-bottom:14px">';
-  html+='<p style="font-size:11px;letter-spacing:3px;color:#FDE68A;text-transform:uppercase;font-weight:700;margin-bottom:10px">Capa 5 · La esperanza concreta</p>';
-  html+='<h3 style="font-family:Georgia,serif;font-size:26px;color:#fff;font-weight:400;margin-bottom:14px;line-height:1.3">Tu equilibrio es alcanzable en 90 días</h3>';
-  html+='<p style="font-size:15px;color:#E8DFC8;line-height:1.7;margin-bottom:8px">Por la naturaleza de tu Prakriti (constitución natural) cruzada con tus '+(condiciones.length?'condiciones declaradas':'síntomas actuales')+', ese plan es <strong style="color:#FDE68A">único</strong>.</p>';
-  html+='<p style="font-size:15px;color:#E8DFC8;line-height:1.7;margin-bottom:22px">No es el mismo plan que para cualquier otra '+tituloSexo(sexo).toLowerCase()+' de '+edad+' años. Es el <strong style="color:#FDE68A">tuyo</strong>.</p>';
-  var ctaTrialOk=vbTrialActivo();
-  var ctaDiasRest=vbDiasRestantes();
-  if(ctaTrialOk){
-    html+='<button onclick="vbAbrirPaso7()" style="width:100%;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;padding:18px;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:0.3px;box-shadow:0 4px 14px rgba(224,122,31,0.4);margin-bottom:10px">Ver mi plan de equilibrio personalizado →</button>';
-    html+='<p style="font-size:12px;color:#FDE68A;opacity:0.9">'+ctaDiasRest+' día'+(ctaDiasRest!==1?'s':'')+' de prueba · Después USD 20/mes</p>';
-  }else{
-    html+='<button onclick="vbCheckoutPaso7()" style="width:100%;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;padding:18px;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:0.3px;box-shadow:0 4px 14px rgba(224,122,31,0.4);margin-bottom:10px">Suscribirme · USD 20/mes →</button>';
-    html+='<p style="font-size:12px;color:#FDE68A;opacity:0.9">Tu prueba de 7 días terminó · Cancelás cuando quieras</p>';
-  }
-  html+='</div>';
-  
-  // === BOTÓN GIGANTE: IR AL PASO 7 ===
-  html+='<div style="margin:24px 0;padding:18px 14px;background:#FAFAF7;border-radius:12px;border:2px solid #5A7A53">';
-  html+='<p style="font-size:11px;color:#8B7355;text-align:center;margin:0 0 10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700">Ya hiciste el paso 6 de 9</p>';
-  var dots6='';
-  for(var k=1;k<=9;k++){
-    var iC=(k<=6),iA=(k===6);
-    var bgD=iC?'#059669':'#E5E5E4',colD=iC?'#fff':'#A8A29E',sz=iA?32:26,fs=iA?14:12;
-    dots6+='<div style="display:inline-flex;align-items:center;justify-content:center;width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:'+bgD+';color:'+colD+';font-size:'+fs+'px;font-weight:800;margin:0 3px;vertical-align:middle">'+(k<6?'✓':k)+'</div>';
-  }
-  html+='<div style="text-align:center;margin-bottom:14px;line-height:1">'+dots6+'</div>';
-  if(ctaTrialOk){
-    html+='<button onclick="vbAbrirPaso7()" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(90,122,83,0.3);text-align:center;line-height:1.3">→ IR AL PASO 7 DE 9<div style="font-size:12px;font-weight:600;color:#D1FAE5;margin-top:4px">Cómo transitar hacia tu equilibrio</div></button>';
-    html+='<p style="font-size:11px;color:#8B7355;text-align:center;margin:8px 0 0;font-style:italic">'+ctaDiasRest+' día'+(ctaDiasRest!==1?'s':'')+' de prueba · Después USD 20/mes</p>';
-  }else{
-    html+='<button onclick="vbCheckoutPaso7()" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(224,122,31,0.4);text-align:center;line-height:1.3">→ IR AL PASO 7 DE 9 · USD 20/mes<div style="font-size:12px;font-weight:600;color:#FDE68A;margin-top:4px">Tu prueba terminó · Cancelás cuando quieras</div></button>';
-  }
-  html+='</div>';
-  
-  html+='<p style="font-size:11px;color:#8B7355;text-align:center;font-style:italic;line-height:1.6;margin-bottom:30px">Vedabite acompaña, no diagnostica enfermedad ni reemplaza atención médica. Si algo te preocupa, consultá con tu médico de confianza. Las consecuencias mostradas son orientativas según la tradición ayurvédica clásica (Charaka Samhita, Madhava Nidana, Ashtanga Hridayam).</p>';
-  html+='</div></div>';
-  
-  var s6=document.getElementById('s6');
-  if(!s6){
-    s6=document.createElement('div');
-    s6.className='screen';
-    s6.id='s6';
-    document.body.appendChild(s6);
-  }
-  s6.innerHTML=html;
-  show('s6');
-  
-  try{
-    if(typeof gtag==='function')gtag('event','paso6_visto',{sexo:sexo,edad:edad,rango_edad:rango,condiciones_count:condiciones.length,condiciones:condiciones.join(',')||'ninguna',prakriti:doshaPrakriti,vikriti:doshaVikriti,pct_vikriti:pctActual});
-    if(window.clarity){window.clarity('set','paso6_visto','si');window.clarity('event','paso6_diagnostico_integral_visto');}
-  }catch(e){}
-}
-
-function vbCerrarPaso6(){
-  show('s4');
-  try{if(typeof gtag==='function')gtag('event','paso6_cerrado_sin_pagar');}catch(e){}
-}
-
 function vbCheckoutPaso7(){
   try{
     if(typeof gtag==='function'){
@@ -3956,54 +3743,24 @@ function vbRenderEscaner(e,dosha,relevancia){
 // PASO 5 — abre/cierra la pantalla embebida
 // ============================================================
 function vbAbrirPaso5(){
-  // Ocultar el roadmap y otros bloques de la pantalla resultados
-  var roadmap=document.querySelector('#vbDevolucionIntegral > div:first-child');
-  if(roadmap)roadmap.style.display='none';
-  // Mostrar la pantalla del paso 5
   var p5=document.getElementById('vbPantallaPaso5');
   if(p5){
-    p5.style.display='block';
-    p5.scrollIntoView({behavior:'smooth',block:'start'});
-  }
-  // Ocultar paso 6 si está visible
-  var devo=document.getElementById('vbDevolucionIntegral');
-  if(devo){
-    var hijos=devo.children;
-    for(var i=0;i<hijos.length;i++){
-      var h=hijos[i];
-      if(h.id!=='vbPantallaPaso5')h.style.display='none';
+    if(!p5.classList.contains('screen')){
+      p5.classList.add('screen');   // promover a screen top-level una sola vez
+      p5.style.display='';          // quitar el display:none inline; lo gobierna .screen/.active
+      document.body.appendChild(p5);
     }
+    show('vbPantallaPaso5');         // show() ya hace scrollTo(0,0) y maneja el navBar
   }
   try{if(typeof gtag==='function')gtag('event','paso5_visto');}catch(e){}
   if(typeof vbMarcarPasoCompleto==='function')vbMarcarPasoCompleto(5);
 }
 
 function vbCerrarPaso5(){
-  // Ocultar la pantalla del paso 5
-  var p5=document.getElementById('vbPantallaPaso5');
-  if(p5)p5.style.display='none';
-  // Restaurar todos los hijos del contenedor
+  show('s4');
   var devo=document.getElementById('vbDevolucionIntegral');
-  if(devo){
-    var hijos=devo.children;
-    for(var i=0;i<hijos.length;i++){
-      var h=hijos[i];
-      if(h.id!=='vbPantallaPaso5')h.style.display='';
-    }
-  }
-  // Volver al inicio del índice (roadmap)
-  var roadmap=document.querySelector('#vbDevolucionIntegral > div:first-child');
-  if(roadmap){
-    roadmap.style.display='';
-    roadmap.scrollIntoView({behavior:'smooth',block:'start'});
-  }
+  if(devo)devo.scrollIntoView({behavior:'smooth',block:'start'});
   try{if(typeof gtag==='function')gtag('event','paso5_cerrado');}catch(e){}
-}
-
-// Atajo desde paso 5 al paso 6
-function vbAbrirPaso6FromPaso5(){
-  vbCerrarPaso5();
-  setTimeout(function(){vbAbrirPaso6();},200);
 }
 
 // ============================================================
@@ -4282,41 +4039,23 @@ function vbValidarYAbrir(n){
 // PASO 6 — abre/cierra la pantalla embebida
 // ============================================================
 function vbAbrirPaso6(){
-  // Ocultar todo lo del contenedor menos la pantalla del paso 6
-  var devo=document.getElementById('vbDevolucionIntegral');
-  if(devo){
-    var hijos=devo.children;
-    for(var i=0;i<hijos.length;i++){
-      var h=hijos[i];
-      if(h.id!=='vbPantallaPaso6')h.style.display='none';
-    }
-  }
-  // Mostrar la pantalla del paso 6
   var p6=document.getElementById('vbPantallaPaso6');
   if(p6){
-    p6.style.display='block';
-    p6.scrollIntoView({behavior:'smooth',block:'start'});
+    if(!p6.classList.contains('screen')){
+      p6.classList.add('screen');
+      p6.style.display='';
+      document.body.appendChild(p6);
+    }
+    show('vbPantallaPaso6');
   }
   try{if(typeof gtag==='function')gtag('event','paso6_visto');}catch(e){}
   if(typeof vbMarcarPasoCompleto==='function')vbMarcarPasoCompleto(6);
 }
 
 function vbCerrarPaso6(){
-  var p6=document.getElementById('vbPantallaPaso6');
-  if(p6)p6.style.display='none';
+  show('s4');
   var devo=document.getElementById('vbDevolucionIntegral');
-  if(devo){
-    var hijos=devo.children;
-    for(var i=0;i<hijos.length;i++){
-      var h=hijos[i];
-      if(h.id!=='vbPantallaPaso6')h.style.display='';
-    }
-  }
-  var roadmap=document.querySelector('#vbDevolucionIntegral > div:first-child');
-  if(roadmap){
-    roadmap.style.display='';
-    roadmap.scrollIntoView({behavior:'smooth',block:'start'});
-  }
+  if(devo)devo.scrollIntoView({behavior:'smooth',block:'start'});
   try{if(typeof gtag==='function')gtag('event','paso6_cerrado');}catch(e){}
 }
 
@@ -5217,8 +4956,7 @@ function vbBuscarMapa(categoria){
 }
 
 function vbCerrarPaso7(){
-  if(document.getElementById('s6')&&document.getElementById('s6').classList.contains('active')){show('s6');}
-  else show('s4');
+  show('s4');
   try{if(typeof gtag==='function')gtag('event','paso7_cerrado');}catch(e){}
 }
 
@@ -7507,12 +7245,11 @@ window._vbActualizarContadorFotos=function(){
       if(localStorage.getItem('vb_paid')==='true') return false;
       if(localStorage.getItem('vb_admin')==='si') return false;
     }catch(e){}
-    var pasos = ['vbPantallaPaso6','vbPantallaPaso7','vbPantallaPaso8','vbPantallaPaso9'];
-    for(var i=0;i<pasos.length;i++){
-      var el = document.getElementById(pasos[i]);
-      if(el && el.offsetParent !== null && el.style.display !== 'none'){
-        return true;
-      }
+    // Pasos 6–9 ahora son screens: 6→#vbPantallaPaso6, 7→s7, 8→s8, 9→s11
+    var pasoScreens = ['vbPantallaPaso6','s7','s8','s11'];
+    var activa = document.querySelector('.screen.active');
+    if(activa && pasoScreens.indexOf(activa.id) > -1){
+      return true;
     }
     return false;
   }
