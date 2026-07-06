@@ -5,10 +5,10 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="vb-version" content="B1-admin-auto-email-20260706">
+<meta name="vb-version" content="B1-admin-roadmap-visual-20260706">
 <script>
 (function(){
-  var VERSION='B1-admin-auto-email-20260706';
+  var VERSION='B1-admin-roadmap-visual-20260706';
   try{
     var stored=localStorage.getItem('vb_version');
     if(stored && stored!==VERSION){
@@ -2560,8 +2560,13 @@ function vbRenderDevolucionIntegral(){
   // Estado dinámico según validaciones encadenadas
   var pasos=pasosBase.map(function(p){
     var cumplido=(typeof vbPasoEstaCompleto==='function')?vbPasoEstaCompleto(p.n):false;
+    // Admin (owner): todos los pasos 1-9 desbloqueados en el roadmap (completado si ya lo hizo, si no próximo)
+    if(window._vbEsAdmin&&window._vbEsAdmin()){
+      p.estado=cumplido?'completado':'proximo';
+      return p;
+    }
     var anteriorOk=(p.n===1)?true:((typeof vbPasoEstaCompleto==='function')?vbPasoEstaCompleto(p.n-1):false);
-    
+
     // CASO ESPECIAL paso 9 (Rasayana): desbloqueado durante trial o pago, requiere solo paso 3 (test) hecho
     if(p.n===9){
       var test3OK=(typeof vbPasoEstaCompleto==='function')?vbPasoEstaCompleto(3):false;
@@ -3125,8 +3130,9 @@ window._vbActivarAdminSiCorresponde=function(email){
       try{ localStorage.setItem('vb_admin','si'); }catch(_){}
       try{ if(!window.userEmail)window.userEmail=e; }catch(_){}
       try{ localStorage.setItem('vb_email',e); }catch(_){}
-      // Refrescar al instante la UI gateada (tabs bloqueados → abiertos)
+      // Refrescar al instante la UI gateada (tabs bloqueados → abiertos + roadmap)
       try{ if(window._vbRefrescarTabs)window._vbRefrescarTabs(); }catch(_){}
+      try{ if(typeof vbRenderDevolucionIntegral==='function')vbRenderDevolucionIntegral(); }catch(_){}
       try{ if(typeof gtag==='function')gtag('event','admin_auto_activado'); }catch(_){}
     }
     return true;
