@@ -5,10 +5,10 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="vb-version" content="B1-nav-pasos-7-8-9-20260706">
+<meta name="vb-version" content="B1-admin-auto-email-20260706">
 <script>
 (function(){
-  var VERSION='B1-nav-pasos-7-8-9-20260706';
+  var VERSION='B1-admin-auto-email-20260706';
   try{
     var stored=localStorage.getItem('vb_version');
     if(stored && stored!==VERSION){
@@ -3108,6 +3108,46 @@ window._vbTieneAccesoPractica=function(){
 };
 
 // ============================================================
+// ADMIN AUTOMÁTICO POR EMAIL — bypass total del gating (solo owner)
+// Si en CUALQUIER form del sitio se ingresa el email del owner, se marca
+// vb_admin='si' y se desbloquea todo: trial, suscripción y pasos 1-9.
+// No afecta el gating del resto de usuarios (solo actúa ante ese email).
+// ============================================================
+window._VB_ADMIN_EMAILS=['juanseelunico@gmail.com'];
+window._vbEsAdmin=function(){
+  try{ return localStorage.getItem('vb_admin')==='si'; }catch(e){ return false; }
+};
+window._vbActivarAdminSiCorresponde=function(email){
+  try{
+    var e=(email||'').toString().toLowerCase().trim();
+    if(window._VB_ADMIN_EMAILS.indexOf(e)<0)return false;
+    if(localStorage.getItem('vb_admin')!=='si'){
+      try{ localStorage.setItem('vb_admin','si'); }catch(_){}
+      try{ if(!window.userEmail)window.userEmail=e; }catch(_){}
+      try{ localStorage.setItem('vb_email',e); }catch(_){}
+      // Refrescar al instante la UI gateada (tabs bloqueados → abiertos)
+      try{ if(window._vbRefrescarTabs)window._vbRefrescarTabs(); }catch(_){}
+      try{ if(typeof gtag==='function')gtag('event','admin_auto_activado'); }catch(_){}
+    }
+    return true;
+  }catch(_){ return false; }
+};
+// Escucha global: detecta el email owner tipeado/pegado en cualquier input/textarea
+(function(){
+  function _vbAdminHandler(ev){
+    var t=ev.target;
+    if(!t||typeof t.value!=='string'||!t.value)return;
+    var tag=(t.tagName||'').toLowerCase();
+    if(tag!=='input'&&tag!=='textarea')return;
+    window._vbActivarAdminSiCorresponde(t.value);
+  }
+  document.addEventListener('input',_vbAdminHandler,true);
+  document.addEventListener('change',_vbAdminHandler,true);
+  // Al cargar: si ya había un email owner guardado de una sesión previa
+  try{ window._vbActivarAdminSiCorresponde(window.userEmail||localStorage.getItem('vb_email')); }catch(_){}
+})();
+
+// ============================================================
 // PASO 7 — TRATAMIENTO PERSONALIZADO
 // Visible siempre, contenido bloqueado al día 8
 // ============================================================
@@ -3899,6 +3939,8 @@ function vbValidacionDetallada(n){
 }
 
 function vbValidarPaso(n){
+  // Admin (owner): todos los pasos 1-9 abiertos, sin gating
+  if(window._vbEsAdmin&&window._vbEsAdmin())return {ok:true};
   // Pasos del PLAN premium (7, 8, 9): se gatean por TEST hecho (paso 3) + trial/pago,
   // NO por la carta natal ni el lugar de nacimiento (son dosha-based). Antes 7 y 8
   // encadenaban hasta el paso 1 y se bloqueaban por falta de país/ciudad, mientras el 9
