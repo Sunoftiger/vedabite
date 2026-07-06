@@ -5,10 +5,10 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="vb-version" content="B1-informe1-pago-unico-20260705">
+<meta name="vb-version" content="B1-nav-pasos-7-8-9-20260706">
 <script>
 (function(){
-  var VERSION='B1-informe1-pago-unico-20260705';
+  var VERSION='B1-nav-pasos-7-8-9-20260706';
   try{
     var stored=localStorage.getItem('vb_version');
     if(stored && stored!==VERSION){
@@ -3899,17 +3899,27 @@ function vbValidacionDetallada(n){
 }
 
 function vbValidarPaso(n){
-  // CASO ESPECIAL: paso 9 (Rasayana) — desbloqueado durante los 7 días de trial
-  // Solo requiere haber hecho el test (paso 3) para tener un dosha sobre el cual armar Rasayana
-  if(n===9){
+  // Pasos del PLAN premium (7, 8, 9): se gatean por TEST hecho (paso 3) + trial/pago,
+  // NO por la carta natal ni el lugar de nacimiento (son dosha-based). Antes 7 y 8
+  // encadenaban hasta el paso 1 y se bloqueaban por falta de país/ciudad, mientras el 9
+  // salteaba esa cadena → producía el salto 6→9. Ahora los tres son consistentes.
+  if(n===7||n===8||n===9){
     // Verificar que al menos hizo el test (paso 3) para tener dosha
     var v3=vbValidacionDetallada(3);
     if(!v3.ok)return {ok:false,faltante:3,detalleFaltante:v3};
+    // 7 y 8 requieren además haber recorrido escáner/lectura/diagnóstico (y 8, el plan 7)
+    if(n===7||n===8){
+      var previos=(n===7)?[4,5,6]:[4,5,6,7];
+      for(var j=0;j<previos.length;j++){
+        if(!vbPasoEstaCompleto(previos[j]))
+          return {ok:false,faltante:previos[j],detalleFaltante:vbValidacionDetallada(previos[j])};
+      }
+    }
     // Si tiene trial activo o ya pagó, desbloqueado
     if(typeof vbTrialActivo==='function'&&vbTrialActivo())return {ok:true};
     if(typeof vbEsUsuarioPago==='function'&&vbEsUsuarioPago())return {ok:true};
     // Sin trial y sin pago → bloqueado pero el motivo es PAGO, no falta de pasos
-    return {ok:false,faltante:9,detalleFaltante:{ok:false,problema:'Tu prueba terminó',detalle:'Suscribite a Vedabite Práctica para acceder a Rasayana',accion:'Empezar suscripción'}};
+    return {ok:false,faltante:n,detalleFaltante:{ok:false,problema:'Tu prueba terminó',detalle:'Suscribite a Vedabite Práctica para acceder a este paso',accion:'Empezar suscripción'}};
   }
   
   // Resto de pasos: verificación encadenada normal
@@ -5327,7 +5337,8 @@ function vbAbrirPaso8(){
   if(!s8){s8=document.createElement('div');s8.className='screen';s8.id='s8';document.body.appendChild(s8);}
   s8.innerHTML=html;
   show('s8');
-  
+  if(typeof vbMarcarPasoCompleto==='function')vbMarcarPasoCompleto(8);
+
   try{
     if(typeof gtag==='function')gtag('event','paso8_visto',{trial_activo:trialOk,dia_trial:diaActual});
     if(window.clarity){window.clarity('set','paso8_visto','si');window.clarity('event','paso8_'+(trialOk?'trial':'bloqueado'));}
