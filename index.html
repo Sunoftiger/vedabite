@@ -5,10 +5,10 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="vb-version" content="B1-rasayana-programa-20260707">
+<meta name="vb-version" content="B1-mail-link-paso4-20260708">
 <script>
 (function(){
-  var VERSION='B1-rasayana-programa-20260707';
+  var VERSION='B1-mail-link-paso4-20260708';
   try{
     var stored=localStorage.getItem('vb_version');
     if(stored && stored!==VERSION){
@@ -2417,7 +2417,7 @@ function getRes(){
   };
 }
 function showEmail(){res=getRes();var a=D[res.p];document.getElementById("eDosha").textContent=a.e,document.getElementById("eName").textContent=a.n,show("s3")}
-function submitEmail(){var a=document.getElementById("emailIn").value;if(!a||!a.includes("@"))return alert("Email inválido");(async function(){try{var emailClean=a.trim().toLowerCase();var msgBuffer=new TextEncoder().encode(emailClean);var hashBuffer=await crypto.subtle.digest('SHA-256',msgBuffer);var hashed=Array.from(new Uint8Array(hashBuffer)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');if(typeof gtag==='function'){gtag('set','user_data',{'sha256_email_address':hashed});}}catch(e){}})();userEmail=a;window.userEmail=a;window.res=res;try{localStorage.setItem("vb_email",a);}catch(e){}try{if(window.clarity){window.clarity('identify',a);window.clarity('set','userEmail',a);window.clarity('set','dosha',res.p);}}catch(e){}var e=D[res.p];emailjs.send("service_xf7v0x7","template_cwvkmyu",{to_email:a,dosha_name:e.n,dosha_emoji:e.e,dosha_desc:e.desc,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha}).then(function(r){console.log('[email] enviado OK',r);}).catch(function(err){console.error('[email] FALLÓ:',err);try{if(typeof gtag==='function')gtag('event','email_envio_fallo',{error:String(err).substring(0,100)});}catch(e2){}});try{if(window._vbSaveLead)window._vbSaveLead({email:a,dosha:res.p,dosha_name:e.n,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha,source:document.referrer||"direct",utm:location.search||""}).catch(function(){});}catch(e){}try{localStorage.setItem("vb_trialStart",new Date().toISOString());gtag("event","generate_lead");if(window._vbTrack)window._vbTrack()}catch(a){}saveSession(),showResults()}
+function submitEmail(){var a=document.getElementById("emailIn").value;if(!a||!a.includes("@"))return alert("Email inválido");(async function(){try{var emailClean=a.trim().toLowerCase();var msgBuffer=new TextEncoder().encode(emailClean);var hashBuffer=await crypto.subtle.digest('SHA-256',msgBuffer);var hashed=Array.from(new Uint8Array(hashBuffer)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');if(typeof gtag==='function'){gtag('set','user_data',{'sha256_email_address':hashed});}}catch(e){}})();userEmail=a;window.userEmail=a;window.res=res;try{localStorage.setItem("vb_email",a);}catch(e){}try{if(window.clarity){window.clarity('identify',a);window.clarity('set','userEmail',a);window.clarity('set','dosha',res.p);}}catch(e){}var e=D[res.p];emailjs.send("service_xf7v0x7","template_cwvkmyu",{to_email:a,dosha_name:e.n,dosha_emoji:e.e,dosha_desc:e.desc,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha,link:'https://vedabite.com/?ir=paso4'}).then(function(r){console.log('[email] enviado OK',r);}).catch(function(err){console.error('[email] FALLÓ:',err);try{if(typeof gtag==='function')gtag('event','email_envio_fallo',{error:String(err).substring(0,100)});}catch(e2){}});try{if(window._vbSaveLead)window._vbSaveLead({email:a,dosha:res.p,dosha_name:e.n,vata_pct:res.pct.vata,pitta_pct:res.pct.pitta,kapha_pct:res.pct.kapha,source:document.referrer||"direct",utm:location.search||""}).catch(function(){});}catch(e){}try{localStorage.setItem("vb_trialStart",new Date().toISOString());gtag("event","generate_lead");if(window._vbTrack)window._vbTrack()}catch(a){}saveSession(),showResults()}
 function showResults(){
   var a=D[res.p];
   document.getElementById("resHeader").style.background=a.bg;
@@ -5621,6 +5621,24 @@ html+='<div style="background:#FEF2F2;border:1px solid #FECACA;padding:12px;bord
 html+='<div style="text-align:center;color:#999;font-size:11px;margin-top:20px;padding:16px"><strong>VedaBite</strong> — Tu guía de bienestar ayurvédico</div>';
 vbHacerPDF(html,'VedaBite-CartaNatal-'+voz+'.pdf')}
 checkSaved();
+// Deep-link desde el mail "Tu resultado está listo": ?ir=paso4 → retoma sesión y abre el Paso 4
+(function(){
+  try{
+    if(!/[?&]ir=paso4\b/.test(location.search))return;
+    var arrancar=function(){
+      try{
+        if(!localStorage.getItem('vb_res'))return; // sin sesión local (otro dispositivo) → queda en el inicio
+        var ok=(typeof loadSession==='function')?loadSession():false; // restaura res/email + resultados
+        if(ok){
+          try{if(typeof gtag==='function')gtag('event','email_link_paso4',{event_category:'retencion'});}catch(e){}
+          setTimeout(function(){ if(typeof vbAbrirPaso4==='function')vbAbrirPaso4(); },400);
+        }
+      }catch(e){}
+    };
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(arrancar,300);});
+    else setTimeout(arrancar,300);
+  }catch(e){}
+})();
 </script>
 <script>
 (function(){'use strict';function t(c,a,l){try{if(typeof window.clarity==='function')window.clarity('set',c,a+(l?' | '+l:''));window.dataLayer=window.dataLayer||[];window.dataLayer.push({event:'vedabite_event',event_category:c,event_action:a,event_label:l||''});}catch(e){}}t('sesion','pagina_cargada');var w=window.innerWidth;t('dispositivo',w<768?'mobile':w<1024?'tablet':'desktop',w+'x'+window.innerHeight);var r=document.referrer.toLowerCase();t('fuente',r.includes('google')?'google':r.includes('instagram')?'instagram':r.includes('facebook')?'facebook':r?'otro':'directo');if(location.search.includes('gclid'))t('ads','google_ads_click');var sf={};window.addEventListener('scroll',function(){var p=Math.round((window.scrollY/(document.body.scrollHeight-window.innerHeight))*100);[25,50,75,100].forEach(function(m){if(p>=m&&!sf[m]){sf[m]=1;t('scroll',m+'%');}});});var ts={started:0,highest:0,start:null,done:0},ms={};var mo=new MutationObserver(function(){var bt=document.body.innerText,m=bt.match(/(\d+)\/50/);if(m){var q=parseInt(m[1]);if(!ts.started&&q>=1){ts.started=1;ts.start=Date.now();t('test','inicio');}if(q>ts.highest){ts.highest=q;t('test','pregunta','pregunta_'+q);[10,20,30,40,50].forEach(function(x){if(q>=x&&!ms[x]){ms[x]=1;t('test_milestone',x===50?'completo':'llego_a_'+x);}});}}if(!ts.done&&bt.includes('Test completado')){ts.done=1;t('test','completado',Math.round((Date.now()-ts.start)/1000)+'s');}});mo.observe(document.body,{childList:1,subtree:1,characterData:1});window.addEventListener('beforeunload',function(){if(ts.started&&!ts.done)t('test','abandono','ultima_'+ts.highest);});})();
