@@ -5,10 +5,10 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="vb-version" content="B1-confirmar-pago-manual-20260707">
+<meta name="vb-version" content="B1-rasayana-programa-20260707">
 <script>
 (function(){
-  var VERSION='B1-confirmar-pago-manual-20260707';
+  var VERSION='B1-rasayana-programa-20260707';
   try{
     var stored=localStorage.getItem('vb_version');
     if(stored && stored!==VERSION){
@@ -3233,6 +3233,37 @@ var VB_PLAN_HIERBAS={
   kapha:'Trikatu (jengibre+pimienta larga+pimienta negra, activa Agni) · Triphala (limpia toxinas) · Punarnava (drena líquidos) · Guggul (metabolismo) · Tulsi (mucosa respiratoria)'
 };
 
+// Programa Rasayana de activación (Paso 9) — 6 pilares + hitos 30/60/90 por dosha
+var VB_RASAYANA_PROGRAMA={
+  vata:{
+    ahara:'Ghee tibio en ayunas',
+    vihara:'Abhyanga (auto-masaje con aceite de sésamo) antes de dormir',
+    aushadhi:'Ashwagandha · 1 cápsula a la noche',
+    nidra:'Rutina fija de sueño, sin pantallas 1h antes, acostarse antes de las 22hs, infusión de manzanilla o nuez moscada',
+    vyayama:'Yoga suave, caminata, Tai Chi — nunca alto impacto ni hasta el agotamiento',
+    manas:'Respiración nasal alternada (Nadi Shodhana), rutina predecible, evitar multitarea',
+    hitos:{ d30:'Sueño más estable', d60:'Menos ansiedad diurna', d90:'Digestión regular' }
+  },
+  pitta:{
+    ahara:'Agua de coco en ayunas + evitar picante',
+    vihara:'Caminata al atardecer, evitar sol del mediodía',
+    aushadhi:'Shatavari · 1 cápsula a la mañana',
+    nidra:'Acostarse antes de las 23hs, evitar trabajar hasta tarde, ambiente fresco al dormir',
+    vyayama:'Ejercicio moderado en horas frescas (mañana temprano o atardecer), natación, evitar competir o sobre-exigirse',
+    manas:'Práctica de no-juicio, humor, dejar de necesitar tener razón, respiración refrescante (Sheetali)',
+    hitos:{ d30:'Menos reflujo/acidez', d60:'Menos irritabilidad', d90:'Piel más calma' }
+  },
+  kapha:{
+    ahara:'Agua tibia con jengibre y limón en ayunas',
+    vihara:'Ejercicio activo antes de las 10am, evitar siesta',
+    aushadhi:'Trikatu · antes del almuerzo',
+    nidra:'Evitar siestas, no más de 6-7hs de sueño, despertar activo',
+    vyayama:'Ejercicio vigoroso diario antes de las 10am, cardio + fuerza',
+    manas:'Romper rutina, buscar novedad, meditación dinámica (caminando, con movimiento)',
+    hitos:{ d30:'Más energía matutina', d60:'Menos pesadez post-comida', d90:'Cambios de peso/composición corporal' }
+  }
+};
+
 // ============================================================
 // RASAYANA COMPLETO — Charaka Chikitsa Sthana cap. 1 + Sushruta + Bhava Prakasha + Vagbhata
 // ============================================================
@@ -5108,6 +5139,50 @@ function vbVeloLock(){
   return '<div style="position:relative;background:#FAF7F0;border-radius:8px;padding:18px;text-align:center"><div style="filter:blur(4px);user-select:none;color:#5A7A53;font-size:13px;line-height:1.6">Contenido completo disponible solo con suscripción activa. Cereales calientes, legumbres bien cocidas con especias, vegetales con ghee, frutas dulces. Horarios específicos. Detalles personalizados según tu cuadro.</div><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;padding:10px 16px;border-radius:50px;border:2px solid #C49E72;font-size:13px;color:#3D5A36;font-weight:700;white-space:nowrap">🔒 Suscribite para ver</div></div>';
 }
 
+// Activación del programa Rasayana (Paso 9) — 6 pilares + hitos, gateado por acceso Práctica
+window.vbActivarRasayana=function(){
+  if(!(window._vbTieneAccesoPractica&&window._vbTieneAccesoPractica())){
+    try{if(typeof gtag==='function')gtag('event','rasayana_activar_bloqueado');}catch(e){}
+    if(typeof window._vbMostrarSuscripcion==='function')window._vbMostrarSuscripcion();
+    return;
+  }
+  var d=(window.res&&window.res.p)||(window._vbPrakriti&&window._vbPrakriti.dosha_predominante)||'vata';
+  var p=VB_RASAYANA_PROGRAMA[d]||VB_RASAYANA_PROGRAMA.vata;
+  var nombreDosha=({vata:'Vata',pitta:'Pitta',kapha:'Kapha'})[d]||d;
+  var pilares=[
+    {ic:'🍽️',t:'Ahara · Dieta',v:p.ahara},
+    {ic:'🧘',t:'Vihara · Rutina diaria',v:p.vihara},
+    {ic:'🌿',t:'Aushadhi · Hierbas',v:p.aushadhi},
+    {ic:'😴',t:'Nidra · Sueño',v:p.nidra},
+    {ic:'🏃',t:'Vyayama · Movimiento',v:p.vyayama},
+    {ic:'🧠',t:'Manas · Mente',v:p.manas}
+  ];
+  var hitos=[
+    {t:'Día 30',v:p.hitos.d30},{t:'Día 60',v:p.hitos.d60},{t:'Día 90',v:p.hitos.d90}
+  ];
+  var html='<div id="vbModalRasayana" onclick="if(event.target===this)this.remove()" style="position:fixed;inset:0;background:rgba(45,66,38,0.85);z-index:6000;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto">'+
+    '<div onclick="event.stopPropagation()" style="background:#FAF7F0;max-width:440px;width:100%;border-radius:20px;padding:26px 22px;border:1px solid #C49E72;margin:20px 0">'+
+    '<div style="text-align:center;font-size:40px;margin-bottom:6px">🌱</div>'+
+    '<h3 style="font-family:Georgia,serif;font-size:21px;color:#3D5A36;text-align:center;margin:0 0 4px;font-weight:600">Tu programa Rasayana</h3>'+
+    '<p style="text-align:center;font-size:12px;color:#8B7355;margin:0 0 18px;letter-spacing:0.5px">6 pilares personalizados · '+nombreDosha+'</p>';
+  pilares.forEach(function(x){
+    html+='<div style="background:#fff;border:1px solid #E8DFC8;border-radius:12px;padding:14px;margin-bottom:10px">'+
+      '<div style="font-size:11px;letter-spacing:1px;color:#C49E72;text-transform:uppercase;font-weight:700;margin-bottom:4px">'+x.ic+' '+x.t+'</div>'+
+      '<div style="font-size:14px;color:#3D5A36;line-height:1.5">'+x.v+'</div></div>';
+  });
+  html+='<p style="font-size:11px;letter-spacing:2px;color:#C49E72;text-transform:uppercase;font-weight:700;text-align:center;margin:18px 0 10px">Seguimiento</p>';
+  hitos.forEach(function(h){
+    html+='<div style="display:flex;gap:10px;align-items:flex-start;background:#F0FDF4;border-left:3px solid #5A7A53;border-radius:8px;padding:10px 12px;margin-bottom:8px">'+
+      '<div style="font-size:11px;font-weight:800;color:#065F46;white-space:nowrap;padding-top:1px">'+h.t+'</div>'+
+      '<div style="font-size:13px;color:#3D2914;line-height:1.5">'+h.v+'</div></div>';
+  });
+  html+='<p style="font-size:11px;color:#8B7355;font-style:italic;text-align:center;line-height:1.5;margin:14px 0 16px">Elegí 1 cosa de cada pilar y sostenela 90 días. Las hierbas, bajo guía de un Vaidya.</p>'+
+    '<button onclick="document.getElementById(\'vbModalRasayana\').remove()" style="display:block;width:100%;padding:13px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer">Empezar</button>'+
+    '</div></div>';
+  document.body.insertAdjacentHTML('beforeend',html);
+  try{if(typeof gtag==='function')gtag('event','rasayana_activado',{dosha:d});if(window.clarity)window.clarity('event','rasayana_activado');}catch(e){}
+};
+
 // ============================================================
 // PASO 9 — RASAYANA (Tu nuevo estilo de vida)
 // ============================================================
@@ -5310,7 +5385,7 @@ function vbAbrirPaso9Rasayana(){
   html+='<div style="background:#fff;border:2px dashed #C49E72;border-radius:14px;padding:22px;text-align:center;margin-bottom:20px">';
   html+='<h3 style="font-family:Georgia,serif;font-size:18px;color:#3D5A36;margin-bottom:10px;font-weight:600">🌱 Empezá tu Rasayana hoy</h3>';
   html+='<p style="font-size:13px;color:#5A4A2A;line-height:1.6;margin-bottom:14px">El primer paso es elegir 1 sola cosa de cada pilar y sostenerla 90 días. No quieras todo a la vez. Rasayana es paciencia.</p>';
-  html+='<button onclick="alert(\'Próximamente: programa Rasayana de 90 días con seguimiento\')" style="display:inline-block;width:100%;padding:14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">Activar mi programa Rasayana →</button>';
+  html+='<button onclick="if(window.vbActivarRasayana)window.vbActivarRasayana()" style="display:inline-block;width:100%;padding:14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">Activar mi programa Rasayana →</button>';
   html+='</div>';
   
   html+='<p style="font-size:11px;color:#8B7355;font-style:italic;text-align:center;line-height:1.5;padding:14px 20px">Vedabite acompaña, no diagnostica enfermedad ni reemplaza atención médica. Las hierbas Rasayana se toman bajo guía de un Vaidya certificado, especialmente con medicación crónica, embarazo o lactancia.</p>';
