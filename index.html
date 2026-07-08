@@ -5,10 +5,10 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="vb-version" content="B1-contador-real-20260708">
+<meta name="vb-version" content="B1-informe-en-leads-20260708">
 <script>
 (function(){
-  var VERSION='B1-contador-real-20260708';
+  var VERSION='B1-informe-en-leads-20260708';
   try{
     var stored=localStorage.getItem('vb_version');
     if(stored && stored!==VERSION){
@@ -487,19 +487,22 @@ window._vbConfirmarPagoManual=function(){
     if(msg){msg.style.color='#C0392B';msg.textContent='Poné un email válido.';}return;
   }
   try{ if(!window.userEmail)window.userEmail=email; localStorage.setItem('vb_email',email); }catch(e){}
-  var doc={ email:email, fuente:'manual',
-    timestamp:(window.firebase&&firebase.firestore)?firebase.firestore.FieldValue.serverTimestamp():new Date().toISOString(),
-    createdAt:new Date().toISOString() };
-  if(op4)doc.op4=op4;
-  function guardarLocal(){try{var b=JSON.parse(localStorage.getItem('vb_informes_pendientes')||'[]');b.push({email:email,op4:op4,createdAt:doc.createdAt,fuente:'manual'});localStorage.setItem('vb_informes_pendientes',JSON.stringify(b));}catch(e){}}
+  var createdAt=new Date().toISOString();
+  function guardarLocal(){try{var b=JSON.parse(localStorage.getItem('vb_informes_pendientes')||'[]');b.push({email:email,op4:op4,createdAt:createdAt,fuente:'manual'});localStorage.setItem('vb_informes_pendientes',JSON.stringify(b));}catch(e){}}
   function done(ok){
     if(msg){msg.style.color=ok?'#2E7D32':'#B45309';msg.textContent=ok?'¡Listo! Registramos tu compra. Gracias 🙏':'Lo guardamos, lo sincronizamos en breve.';}
     try{if(typeof gtag==='function')gtag('event','confirmar_pago_enviado',{event_category:'informe1'});if(window.clarity)window.clarity('event','confirmar_pago_manual');}catch(e){}
     setTimeout(function(){var m=document.getElementById('vbModalConfirmarPago');if(m)m.remove();},1600);
   }
+  // PLAN B: registrar la compra como campos en el doc de leads/{email} (las reglas ya permiten
+  // update; evita la colección informes_comprados que quedó bloqueada por reglas no publicadas).
+  var lead={ informe_comprado:true, informe_fecha:createdAt };
+  if(op4)lead.informe_op4=op4;
+  var dosha=(window.res&&window.res.p)||'';
+  if(dosha){ lead.email=email; lead.dosha=dosha; } // habilita el CREATE si el lead no existía (la regla lo exige)
   try{
     if(window._vbDB){
-      window._vbDB.collection('informes_comprados').add(doc).then(function(){done(true);}).catch(function(){guardarLocal();done(false);});
+      window._vbDB.collection('leads').doc(email).set(lead,{merge:true}).then(function(){done(true);}).catch(function(){guardarLocal();done(false);});
     }else{ guardarLocal(); done(false); }
   }catch(e){ guardarLocal(); done(false); }
 };
