@@ -5,10 +5,10 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="vb-version" content="B1-diag-dead-clicks-20260708">
+<meta name="vb-version" content="B1-contador-real-20260708">
 <script>
 (function(){
-  var VERSION='B1-diag-dead-clicks-20260708';
+  var VERSION='B1-contador-real-20260708';
   try{
     var stored=localStorage.getItem('vb_version');
     if(stored && stored!==VERSION){
@@ -919,7 +919,7 @@ Recuperá tus hábitos naturales.
 <!-- REDES SOCIALES · prueba social -->
 <div style="margin-top:22px;padding:16px 14px;background:rgba(255,255,255,0.4);border-radius:12px;border:1px solid #E5DDC8">
 <p style="font-size:10px;letter-spacing:1.5px;color:#C49E72;text-transform:uppercase;font-weight:700;margin:0 0 4px;text-align:center">comunidad</p>
-<p style="font-size:13px;color:#3D5A36;font-weight:600;margin:0 0 12px;text-align:center">720+ personas ya están en la tribu Vedabite</p>
+<p style="font-size:13px;color:#3D5A36;font-weight:600;margin:0 0 12px;text-align:center"><span id="vbContador">720</span>+ personas ya están en la tribu Vedabite</p>
 <div style="display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap">
 
 <a href="https://instagram.com/vedabite" target="_blank" rel="noopener" onclick="try{if(typeof gtag==='function')gtag('event','social_click',{red:'instagram'});if(window.clarity)window.clarity('event','social_instagram_click');}catch(e){}" style="display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#5A4A2A;font-size:11px;font-weight:600;padding:6px 8px;border-radius:8px;transition:transform .15s">
@@ -7587,69 +7587,43 @@ window._vbActualizarContadorFotos=function(){
 })();
 </script>
 
-<!-- CONTADOR DINÁMICO DESDE FIREBASE — v4 simple y directo -->
+<!-- CONTADOR DINÁMICO — lee config/contador (incrementado client-side por lead nuevo) -->
 <script>
 (function(){
-  function actualizar(){
-    var el=document.getElementById('vbContador');
-    if(!el){console.log('[Contador] elemento no encontrado, reintentando...');setTimeout(actualizar,500);return;}
-    if(!window._vbDB||!firebase||!firebase.firestore){console.log('[Contador] Firebase no listo, reintentando...');setTimeout(actualizar,500);return;}
-    
-    console.log('[Contador] Consultando Firestore...');
-    
-    // Método principal: get() server-only (siempre funciona en SDK v8 compat)
-    window._vbDB.collection('leads').get({source:'server'}).then(function(snap){
-      var c=snap.size;
-      console.log('[Contador] Resultado Firestore:',c);
-      if(c>0){
-        el.textContent=c;
-        try{localStorage.setItem('vb_contador_real',c);}catch(e){}
-        // Guardar en config doc para fallback futuro
-        try{window._vbDB.collection('config').doc('contador').set({total:c,updated:new Date().toISOString()},{merge:true});}catch(e){}
-      }else{
-        console.warn('[Contador] Firestore devolvió 0 leads — chequear permisos');
-      }
-    }).catch(function(err){
-      console.error('[Contador] ERROR Firestore:',err.code,err.message);
-      // Fallback al doc config
+  var BASE=720; // fallback si el doc todavía no está sembrado
+  function pintar(v){ var el=document.getElementById('vbContador'); if(el&&v>0)el.textContent=v; }
+  function leer(){
+    if(!window._vbDB)return;
+    try{
       window._vbDB.collection('config').doc('contador').get().then(function(doc){
-        if(doc.exists&&doc.data().total){
-          console.log('[Contador] Usando valor del doc config:',doc.data().total);
-          el.textContent=doc.data().total;
-        }
+        var t=(doc&&doc.exists&&doc.data()&&doc.data().total)?doc.data().total:BASE;
+        pintar(t);
+        try{localStorage.setItem('vb_contador_real',t);}catch(e){}
       }).catch(function(){});
-    });
+    }catch(e){}
   }
-  
-  // Cargar valor de localStorage primero (UX rápida)
-  setTimeout(function(){
-    var el=document.getElementById('vbContador');
-    if(el){
-      try{
-        var v=localStorage.getItem('vb_contador_real');
-        if(v&&parseInt(v)>0)el.textContent=v;
-      }catch(e){}
-    }
-  },100);
-  
-  // Primer fetch al cargar
-  setTimeout(actualizar,800);
-  
-  // Re-fetch cada 30 segundos
-  setInterval(actualizar,30000);
-  
-  // Re-fetch cuando se guarda un lead nuevo
-  var checkSaveLead=setInterval(function(){
-    if(window._vbSaveLead&&!window._vbSaveLead._wrapped){
+  function incrementarSiNuevo(){
+    try{
+      if(localStorage.getItem('vb_conto_lead')==='si')return;      // una vez por navegador
+      if(!window._vbDB||!firebase||!firebase.firestore)return;
+      window._vbDB.collection('config').doc('contador').set(
+        {total:firebase.firestore.FieldValue.increment(1),updated:new Date().toISOString()},{merge:true}
+      ).then(function(){ try{localStorage.setItem('vb_conto_lead','si');}catch(e){} setTimeout(leer,1500); })
+       .catch(function(){});
+    }catch(e){}
+  }
+  // UX rápida: valor cacheado
+  setTimeout(function(){ try{var v=parseInt(localStorage.getItem('vb_contador_real')||'0');if(v>0)pintar(v);}catch(e){} },100);
+  // Primer fetch + refresco periódico
+  setTimeout(leer,800);
+  setInterval(leer,60000);
+  // Hook al guardado de lead (submitEmail → _vbSaveLead) → incrementa 1 vez por navegador
+  var iv=setInterval(function(){
+    if(window._vbSaveLead && !window._vbSaveLead._contoWrap){
       var orig=window._vbSaveLead;
-      window._vbSaveLead=function(d){
-        var r=orig(d);
-        setTimeout(actualizar,2500);
-        return r;
-      };
-      window._vbSaveLead._wrapped=true;
-      clearInterval(checkSaveLead);
-      console.log('[Contador] Hook a _vbSaveLead instalado');
+      window._vbSaveLead=function(d){ var r=orig(d); incrementarSiNuevo(); return r; };
+      window._vbSaveLead._contoWrap=true;
+      clearInterval(iv);
     }
   },500);
 })();
