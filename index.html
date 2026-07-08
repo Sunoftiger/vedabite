@@ -5,10 +5,10 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="vb-version" content="B1-mail-link-paso4-20260708">
+<meta name="vb-version" content="B1-diag-dead-clicks-20260708">
 <script>
 (function(){
-  var VERSION='B1-mail-link-paso4-20260708';
+  var VERSION='B1-diag-dead-clicks-20260708';
   try{
     var stored=localStorage.getItem('vb_version');
     if(stored && stored!==VERSION){
@@ -5638,6 +5638,59 @@ checkSaved();
     if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(arrancar,300);});
     else setTimeout(arrancar,300);
   }catch(e){}
+})();
+// ============================================================
+// DIAGNÓSTICO DE DEAD CLICKS — reporta clicks en elementos que
+// parecen clickeables pero no producen ningún cambio visible.
+// Efímero: sacar cuando tengamos los culpables identificados.
+// ============================================================
+(function(){
+  var reportados=0, MAX=25;
+  function snap(){
+    return [location.href,(document.querySelector('.screen.active')||{}).id||'',
+            document.body.childElementCount,Math.round(window.scrollY/40)].join('~');
+  }
+  function lucheClickeable(el){
+    var n=el,hops=0;
+    while(n&&n.nodeType===1&&hops<3){
+      try{
+        var s=getComputedStyle(n);
+        var looks = s.cursor==='pointer' ||
+          (parseInt(s.borderTopLeftRadius)>=6 &&
+           (/gradient/.test(s.backgroundImage)||parseInt(s.fontWeight)>=600) &&
+           n.tagName!=='P'&&n.tagName!=='LI'&&n.tagName!=='UL');
+        if(looks)return n;
+      }catch(e){}
+      n=n.parentElement;hops++;
+    }
+    return null;
+  }
+  function desc(el){
+    var p=[el.tagName.toLowerCase()];
+    if(el.id)p.push('#'+el.id);
+    if(el.className&&typeof el.className==='string'){var c=el.className.trim().split(/\s+/).slice(0,2);if(c[0])p.push('.'+c.join('.'));}
+    var txt=(el.textContent||'').trim().replace(/\s+/g,' ').slice(0,40);
+    if(txt)p.push('"'+txt+'"');
+    return p.join(' ').slice(0,100);
+  }
+  document.addEventListener('click',function(ev){
+    try{
+      if(reportados>=MAX)return;
+      var t=ev.target; if(!t||t.nodeType!==1)return;
+      if(t.closest('a[href],button,input,select,textarea,label,summary,[onclick],[role="button"],[contenteditable]'))return;
+      var cand=lucheClickeable(t); if(!cand)return;
+      var s0=snap();
+      setTimeout(function(){
+        try{
+          if(snap()!==s0)return; // algo visible cambió → NO es dead click
+          reportados++;
+          var label=desc(cand);
+          try{if(typeof gtag==='function')gtag('event','dead_click',{event_category:'ux_dead_click',event_label:label});}catch(_){}
+          try{if(window.clarity){window.clarity('event','dead_click');window.clarity('set','dead_click_el',label);}}catch(_){}
+        }catch(_){}
+      },700);
+    }catch(_){}
+  },true);
 })();
 </script>
 <script>
