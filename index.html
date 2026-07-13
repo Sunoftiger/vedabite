@@ -5,10 +5,10 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="vb-version" content="B1-informe-en-leads-20260708">
+<meta name="vb-version" content="B1-gate-informe1-o-practica-20260713">
 <script>
 (function(){
-  var VERSION='B1-informe-en-leads-20260708';
+  var VERSION='B1-gate-informe1-o-practica-20260713';
   try{
     var stored=localStorage.getItem('vb_version');
     if(stored && stored!==VERSION){
@@ -487,6 +487,8 @@ window._vbConfirmarPagoManual=function(){
     if(msg){msg.style.color='#C0392B';msg.textContent='Poné un email válido.';}return;
   }
   try{ if(!window.userEmail)window.userEmail=email; localStorage.setItem('vb_email',email); }catch(e){}
+  // Honor-system (Plan B, sin webhook): al confirmar, desbloqueamos las descargas del informe localmente.
+  try{ localStorage.setItem('vb_informe_comprado','si'); }catch(e){}
   var createdAt=new Date().toISOString();
   function guardarLocal(){try{var b=JSON.parse(localStorage.getItem('vb_informes_pendientes')||'[]');b.push({email:email,op4:op4,createdAt:createdAt,fuente:'manual'});localStorage.setItem('vb_informes_pendientes',JSON.stringify(b));}catch(e){}}
   function done(ok){
@@ -505,6 +507,41 @@ window._vbConfirmarPagoManual=function(){
       window._vbDB.collection('leads').doc(email).set(lead,{merge:true}).then(function(){done(true);}).catch(function(){guardarLocal();done(false);});
     }else{ guardarLocal(); done(false); }
   }catch(e){ guardarLocal(); done(false); }
+};
+// ============================================================
+// GATE DEL INFORME PAGO ÚNICO · $4.500 ARS (mpAR_informe1)
+// TODAS las descargas de informe/carta natal pasan por acá.
+// Se desbloquea solo con la compra del informe (o admin).
+// ============================================================
+window.vbCompraInforme1Activa=function(){
+  // Desbloquea con: admin · compra del informe ($4.500) · o acceso Práctica (trial/suscripción).
+  try{ if(localStorage.getItem('vb_admin')==='si')return true; }catch(e){}
+  try{ if(localStorage.getItem('vb_informe_comprado')==='si')return true; }catch(e){}
+  // Acceso Práctica (mismos signals que el gate histórico de downloadPDF)
+  try{ if(localStorage.getItem('vb_pago_activo')==='si')return true; }catch(e){}
+  try{ if(localStorage.getItem('vb_paid')==='true')return true; }catch(e){}
+  try{ if(typeof vbTrialActivo==='function'&&vbTrialActivo())return true; }catch(e){}
+  try{ if(typeof vbEsUsuarioPago==='function'&&vbEsUsuarioPago())return true; }catch(e){}
+  return false;
+};
+window.vbGateInforme1=function(contexto){
+  try{
+    if(typeof gtag==='function')gtag('event','gate_informe1_visto',{event_category:'informe1',contexto:contexto||''});
+    if(window.clarity)window.clarity('event','gate_informe1_visto');
+  }catch(e){}
+  if(document.getElementById('vbGateInforme1'))return;
+  var m='<div id="vbGateInforme1" onclick="if(event.target===this)this.remove()" style="position:fixed;inset:0;background:rgba(45,30,20,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .25s">';
+  m+='<div style="background:linear-gradient(180deg,#FFFAF0,#F5EFE0);max-width:440px;width:100%;border-radius:18px;padding:28px 24px;box-shadow:0 20px 60px rgba(0,0,0,0.4);border:2px solid #C49E72;position:relative">';
+  m+='<button onclick="document.getElementById(\'vbGateInforme1\').remove()" style="position:absolute;top:12px;right:12px;background:transparent;border:none;font-size:22px;cursor:pointer;color:#8B7355;line-height:1">×</button>';
+  m+='<div style="text-align:center;font-size:38px;margin-bottom:8px">🔒</div>';
+  m+='<h3 style="font-family:Georgia,serif;font-size:21px;color:#3D5A36;text-align:center;margin:0 0 6px;font-weight:600">Descargá tu informe</h3>';
+  m+='<p style="font-size:13px;color:#5A4A2A;text-align:center;margin:0 0 4px;line-height:1.5">Informe + Carta Natal Védica Nivel 1</p>';
+  m+='<p style="font-size:13px;color:#5A4A2A;text-align:center;margin:0 0 18px;line-height:1.5">Sin suscripción · lo tenés para siempre · <strong>$4.500</strong></p>';
+  m+='<button onclick="var u=(window._vbPaymentConfig&&window._vbPaymentConfig.mpAR_informe1)||\'\';if(!u||u===\'REEMPLAZAR_CON_LINK_DE_PAGO_MP\'){alert(\'Link de pago todavía no configurado\');return;}try{if(typeof gtag===\'function\'){gtag(\'event\',\'gate_informe1_click\',{event_category:\'conversion\',value:4500,currency:\'ARS\'});gtag(\'event\',\'begin_checkout\',{value:4500,currency:\'ARS\',items:[{item_name:\'Informe + Carta Natal Vedica Nivel 1\',price:4500}]});}if(window.clarity)window.clarity(\'event\',\'gate_informe1_click\');}catch(e){}window.location.href=u;" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#D97706,#B45309);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(217,119,6,0.3);text-align:center;line-height:1.3">🪔 Comprar informe · $4.500<div style="font-size:11px;font-weight:600;color:#FDE68A;margin-top:4px">Pago único con Mercado Pago</div></button>';
+  m+='<button onclick="document.getElementById(\'vbGateInforme1\').remove();if(window._vbAbrirConfirmarPago)window._vbAbrirConfirmarPago();try{if(typeof gtag===\'function\')gtag(\'event\',\'gate_informe1_ya_pague\');}catch(e){}" style="display:block;width:100%;padding:11px;margin-top:10px;background:none;border:1px solid #C49E72;border-radius:12px;font-size:13px;font-weight:700;color:#B45309;cursor:pointer">Ya pagué, confirmar →</button>';
+  m+='<p style="text-align:center;margin:14px 0 0;font-size:11px;color:#8B7355;font-style:italic">Vos sos el amor de tu vida</p>';
+  m+='</div></div>';
+  var d=document.createElement('div');d.innerHTML=m;document.body.appendChild(d.firstChild);
 };
 function _vbAccionPracticaPostInforme(variant){
   try{
@@ -2109,7 +2146,7 @@ function vbContinuarTest(){
 </div>
 <div class="tabs-grid" id="tabsGrid"></div>
 <div id="tabContents"></div>
-<div style="padding:20px"><div class="card" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);text-align:center"><h4 style="margin-bottom:6px">📥 Descargá tu informe</h4><p style="font-size:12px;color:#7C2D12;font-weight:600;margin-bottom:10px;letter-spacing:0.5px;text-transform:uppercase">3 voces · 1 gratis · 2 desbloqueables</p><p style="font-size:13px;color:#666;margin-bottom:14px">Cada voz lee el mismo análisis con un lente distinto:</p><div style="display:grid;gap:10px"><button class="btn btn-gold" onclick="downloadPDF('amiga')" style="position:relative">💚 Como una Amiga<span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:10px;background:#10B981;color:#fff;padding:2px 8px;border-radius:10px;font-weight:700">GRATIS</span></button><button class="btn btn-sage" onclick="downloadPDF('medico')" style="position:relative;opacity:0.85">🩺 Médico Occidental<span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px">🔒</span></button><button class="btn btn-primary" onclick="downloadPDF('ayurveda')" style="position:relative;opacity:0.85">🌿 Terapeuta Ayurvédico<span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px">🔒</span></button></div><p style="font-size:11px;color:#78350F;margin-top:12px;line-height:1.5;font-style:italic">Las voces médica y ayurvédica se desbloquean con Práctica · 10 días gratis sin tarjeta</p></div></div>
+<div style="padding:20px"><div class="card" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);text-align:center"><h4 style="margin-bottom:6px">📥 Descargá tu informe</h4><p style="font-size:12px;color:#7C2D12;font-weight:600;margin-bottom:10px;letter-spacing:0.5px;text-transform:uppercase">3 voces · informe pago único</p><p style="font-size:13px;color:#666;margin-bottom:14px">Cada voz lee el mismo análisis con un lente distinto:</p><div style="display:grid;gap:10px"><button class="btn btn-gold" onclick="downloadPDF('amiga')" style="position:relative;opacity:0.85">💚 Como una Amiga<span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px">🔒</span></button><button class="btn btn-sage" onclick="downloadPDF('medico')" style="position:relative;opacity:0.85">🩺 Médico Occidental<span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px">🔒</span></button><button class="btn btn-primary" onclick="downloadPDF('ayurveda')" style="position:relative;opacity:0.85">🌿 Terapeuta Ayurvédico<span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px">🔒</span></button></div><p style="font-size:11px;color:#78350F;margin-top:12px;line-height:1.5;font-style:italic">El informe en PDF (cualquier voz) es un pago único de $4.500 · lo tenés para siempre · incluido en Práctica</p></div></div>
 
 <div id="vbBloquePostInforme" style="margin-top:24px;font-family:inherit;display:none">
 <!-- Bloque post-informe Vedabite v1 ELIMINADO — reemplazado por el roadmap navegable + paso 7 prescriptivo -->
@@ -2259,10 +2296,11 @@ function vbHacerPDF(htmlContent,nombre){var doc='<!DOCTYPE html><html><head><met
 function downloadPDF(voz){
 voz=voz||'ayurveda';
 
-// === PAYWALL · 3 voces ===
-// Voz amiga: SIEMPRE gratis
-// Voz medico + ayurveda: requieren trial activo o pago
-if(voz==='medico'||voz==='ayurveda'){
+// === PAYWALL · informe pago único $4.500 (mpAR_informe1) ===
+// TODAS las voces del informe (incluida "amiga") requieren la compra del informe.
+if(!vbCompraInforme1Activa()){ vbGateInforme1('pdf_'+voz); return; }
+// (Bloque histórico del gate "Práctica" desactivado — reemplazado por el gate informe1 de arriba)
+if(false){
   var tieneAcceso=false;
   try{
     if(localStorage.getItem('vb_pago_activo')==='si')tieneAcceso=true;
@@ -5605,7 +5643,7 @@ z+="<li><strong>Sol en "+N+":</strong> Tu esencia y propósito vital</li>";
 z+="<li><strong>Luna en "+H+":</strong> Tu mente emocional y mundo interior</li>";
 z+="<li><strong>Ascendente "+T+":</strong> Tu personalidad y cómo te perciben</li>";
 z+="<li><strong>Júpiter en "+U+":</strong> Tu crecimiento y expansión espiritual</li></ul></div>";
-z+='<div class="card" style="margin-top:16px;background:linear-gradient(135deg,#FEF3C7,#FDE68A);text-align:center"><h4 style="margin-bottom:12px">📥 Descargá tu carta astral védica</h4><p style="font-size:13px;color:#666;margin-bottom:14px">Elegí la voz del informe:</p><div style="display:grid;gap:10px"><button class="btn btn-sage" onclick="downloadAstro(&#39;medico&#39;)">🩺 Médico Occidental</button><button class="btn btn-primary" onclick="downloadAstro(&#39;ayurveda&#39;)">🌿 Terapeuta Ayurvédico</button><button class="btn btn-gold" onclick="downloadAstro(&#39;amiga&#39;)">💚 Como una Amiga</button></div></div>';
+z+='<div class="card" style="margin-top:16px;background:linear-gradient(135deg,#FEF3C7,#FDE68A);text-align:center"><h4 style="margin-bottom:12px">📥 Descargá tu carta astral védica</h4><p style="font-size:13px;color:#666;margin-bottom:14px">Elegí la voz del informe:</p><div style="display:grid;gap:10px"><button class="btn btn-sage" onclick="downloadAstro(&#39;medico&#39;)" style="position:relative;opacity:0.85">🩺 Médico Occidental<span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px">🔒</span></button><button class="btn btn-primary" onclick="downloadAstro(&#39;ayurveda&#39;)" style="position:relative;opacity:0.85">🌿 Terapeuta Ayurvédico<span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px">🔒</span></button><button class="btn btn-gold" onclick="downloadAstro(&#39;amiga&#39;)" style="position:relative;opacity:0.85">💚 Como una Amiga<span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px">🔒</span></button></div><p style="font-size:11px;color:#78350F;margin-top:12px;line-height:1.5;font-style:italic">La descarga de la carta natal es parte del informe · pago único de $4.500 · incluido en Práctica</p></div>';
 document.getElementById("astroResult").innerHTML=z}else alert("Completá todos los campos");
 function B(a){return Math.floor((a%360+360)%360/30)}function L(a){return Math.floor((a%360+360)%360%30)}function ea(a){return Math.floor((a-Y+360)%360/30)+1}}
 
@@ -5614,6 +5652,8 @@ voz=voz||'ayurveda';
 var V=VOCES[voz];
 var astroEl=document.getElementById('astroResult');
 if(!astroEl||!astroEl.innerHTML.trim()){alert('Primero generá tu carta natal');return}
+// === PAYWALL · informe pago único $4.500 (mpAR_informe1) — carta natal ===
+if(!vbCompraInforme1Activa()){ vbGateInforme1('astro_'+voz); return; }
 var astroIntros={medico:'El siguiente documento presenta un análisis astronómico-simbólico basado en las posiciones planetarias al momento del nacimiento.',ayurveda:'Jyotish, la ciencia de la luz, es la rama del Vedanga dedicada a leer los movimientos de los astros.',amiga:'¡Ay, qué emoción! 🌙✨ Acá tenés tu carta natal, la foto del cielo en el momento en que naciste.'};
 var astroDisc={medico:'⚠️ Este informe se entrega con fines culturales y de autoexploración.',ayurveda:'🕉️ El Jyotish es una herramienta sagrada.',amiga:'💛 Recordá: esto es para que te diviertas conociéndote. ✨'};
 var astroTit={medico:'🔭 Análisis Astronómico-Simbólico',ayurveda:'⭐ Janma Kundali — Tu Carta Astral Védica',amiga:'🌙 Tu Mapa de las Estrellas ✨'};
