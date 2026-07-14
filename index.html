@@ -196,43 +196,7 @@ window._vbMetodoPago=function(){
   return 'Lemon Squeezy';
 };
 
-// Ir a checkout (con tracking)
-window._vbIrCheckout=function(origen,variant){
-  try{
-    var country=window._vbPaymentConfig.country||'XX';
-    var v=variant||'default';
-    if(typeof gtag==='function')gtag('event','checkout_iniciado',{event_category:'conversion',event_label:origen,pais:country,metodo:window._vbMetodoPago(),variant:v});
-    if(typeof window.clarity==='function')window.clarity('event','checkout_'+country+'_'+origen);
-  }catch(e){}
-  var url=window._vbURLCheckout();
-  window.location.href=url;
-};
-
-// Selector manual de país (si el usuario quiere cambiar)
-window._vbSelectorPais=function(){
-  var actual=window._vbPaymentConfig.country||'AR';
-  var html='<div onclick="this.remove()" style="position:fixed;inset:0;background:rgba(45,66,38,0.85);z-index:5000;display:flex;align-items:center;justify-content:center;padding:20px">'+
-    '<div onclick="event.stopPropagation()" style="background:#FAF7F0;padding:28px 24px;border-radius:22px;max-width:380px;width:100%;text-align:center;border:1px solid #E8DFC8">'+
-    '<h3 style="margin:0 0 8px;color:#3D5A36;font-size:20px">¿De dónde estás?</h3>'+
-    '<p style="color:#8B7355;font-size:13px;margin:0 0 20px">Elegí tu moneda de pago</p>'+
-    '<button onclick="window._vbCambiarPais(\'AR\');this.parentElement.parentElement.remove();" style="display:block;width:100%;padding:14px;margin-bottom:10px;background:'+(actual==='AR'?'#5A7A53':'#fff')+';color:'+(actual==='AR'?'#fff':'#3D5A36')+';border:2px solid #5A7A53;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer">🇦🇷 Argentina · $28.300/mes</button>'+
-    '<button onclick="window._vbCambiarPais(\'XX\');this.parentElement.parentElement.remove();" style="display:block;width:100%;padding:14px;background:'+(actual!=='AR'?'#5A7A53':'#fff')+';color:'+(actual!=='AR'?'#fff':'#3D5A36')+';border:2px solid #5A7A53;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer">🌎 Otro país · USD 20/mes</button>'+
-    '<button onclick="this.parentElement.parentElement.remove()" style="margin-top:16px;color:#8B7355;background:none;border:none;font-size:12px;cursor:pointer">Cerrar</button>'+
-    '</div></div>';
-  document.body.insertAdjacentHTML('beforeend',html);
-};
-
-// Cambiar país manualmente
-window._vbCambiarPais=function(nuevo){
-  window._vbPaymentConfig.country=nuevo;
-  window._vbPaymentConfig.currency=(nuevo==='AR')?'ARS':'USD';
-  window._vbPaymentConfig.price=(nuevo==='AR')?'$28.300':'USD 20';
-  try{localStorage.setItem('vb_pais',nuevo);}catch(e){}
-  try{if(typeof gtag==='function')gtag('event','pais_manual',{event_category:'ubicacion',event_label:nuevo});}catch(e){}
-  // Refrescar botones visibles
-  var precios=document.querySelectorAll('.vb-precio-dinamico');
-  for(var i=0;i<precios.length;i++)precios[i].textContent=window._vbPrecio();
-};
+// (Helpers de checkout/selector de suscripción eliminados — no hay suscripción)
 
 // Detectar al cargar
 window._vbDetectarPais();
@@ -1887,19 +1851,8 @@ function vbMostrarPrakriti(p){
   html+='<div style="display:flex;justify-content:space-between;padding:6px 0"><span style="font-size:12px;color:#8B7355">Nakshatra</span><strong style="font-size:12px;color:#3D5A36">'+p.nakshatra.nombre+'</strong></div>';
   html+='</div>';
   
-  // === GATING: la expansión completa de la carta natal solo para Práctica ===
-  var tieneAcceso = window._vbTieneAccesoPractica ? window._vbTieneAccesoPractica() : false;
-  
-  if(!tieneAcceso){
-    // Esencia: mostrar lock con CTA
-    html+='<div style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:2px dashed #D97706;border-radius:12px;padding:20px;margin-bottom:18px;text-align:center">';
-    html+='<div style="font-size:48px;margin-bottom:8px">🔒</div>';
-    html+='<h4 style="margin:6px 0 8px;color:#92400E;font-size:15px">Tu carta natal completa está en Práctica</h4>';
-    html+='<p style="font-size:12px;color:#78350F;margin:0 0 14px;line-height:1.6">Acá ves los 4 pilares. En Práctica accedés a:<br>• Los 9 grahas con sus casas y grados exactos<br>• Las 12 bhavas con sus regentes<br>• Conclusión ayurvédica por cada item<br>• El cruce con tu test del estado actual</p>';
-    html+='<button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="if(window._vbMostrarSuscripcion)window._vbMostrarSuscripcion()">🔥 Probar Práctica · 10 días</button>';
-    html+='<p style="font-size:11px;color:#92400E;margin:6px 0 0">Sin tarjeta · Cancelás cuando quieras</p>';
-    html+='</div>';
-  } else {
+  // Carta natal completa — visible para todos (ver es 100% gratis)
+  if(true){
     // Práctica: mostrar acordeones completos
   
   // ===== ACORDEÓN 1: LAGNA EXPANDIDO =====
@@ -3075,16 +3028,6 @@ function vbDesbloquearDiagnostico(){
   vbAbrirPaso6();
 }
 
-function vbCheckoutPaso7(){
-  try{
-    if(typeof gtag==='function'){
-      gtag('event','cta_checkout_paso6',{event_category:'paso6',value:20,currency:'USD'});
-      gtag('event','begin_checkout',{value:20,currency:'USD',items:[{item_name:'Vedabite Práctica',price:20}]});
-    }
-    if(window.clarity){window.clarity('event','cta_checkout_paso6');window.clarity('set','intencion_compra','si');}
-  }catch(e){}
-  window.location.href=(window._vbURLCheckout&&window._vbURLCheckout())||'https://vedabite.lemonsqueezy.com/checkout/buy/ec74072d-7b30-4273-b369-1950cc7820d0';
-}
 
 // ============================================================
 // HELPERS TRIAL — 10 días de prueba con todo desbloqueado
@@ -4034,8 +3977,6 @@ function vbValidarPaso(n){
     // Si tiene trial activo o ya pagó, desbloqueado
     if(typeof vbTrialActivo==='function'&&vbTrialActivo())return {ok:true};
     if(typeof vbEsUsuarioPago==='function'&&vbEsUsuarioPago())return {ok:true};
-    // Sin trial y sin pago → bloqueado pero el motivo es PAGO, no falta de pasos
-    return {ok:false,faltante:n,detalleFaltante:{ok:false,problema:'Tu prueba terminó',detalle:'Suscribite a Vedabite Práctica para acceder a este paso',accion:'Empezar suscripción'}};
   }
   
   // Resto de pasos: verificación encadenada normal
@@ -4962,15 +4903,6 @@ function vbAbrirPaso7(){
   
   html+='</div></div>';
   
-  // CTA si trial vencido
-  if(!trialOk){
-    html+='<div style="background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border-radius:18px;padding:28px 22px;text-align:center;margin-bottom:14px">';
-    html+='<h3 style="font-family:Georgia,serif;font-size:22px;color:#fff;font-weight:400;margin-bottom:14px;line-height:1.3">Desbloqueá tu plan completo + seguimiento mensual</h3>';
-    html+='<p style="font-size:15px;color:#E8DFC8;line-height:1.6;margin-bottom:22px">USD 20/mes · Plan personalizado + re-test cada 30 días + ajustes automáticos según tu progreso.</p>';
-    html+='<button onclick="vbCheckoutPaso7()" style="width:100%;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;padding:18px;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:0.3px;box-shadow:0 4px 14px rgba(224,122,31,0.4);margin-bottom:10px">Suscribirme · USD 20/mes →</button>';
-    html+='<p style="font-size:12px;color:#FDE68A;opacity:0.9">Cancelás cuando quieras</p>';
-    html+='</div>';
-  }
   // === BOTÓN GIGANTE: IR AL PASO SIGUIENTE (SIEMPRE VISIBLE) ===
   html+='<div style="margin:24px 0;padding:18px 14px;background:#FAFAF7;border-radius:12px;border:2px solid #5A7A53">';
   html+='<p style="font-size:11px;color:#8B7355;text-align:center;margin:0 0 10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700">Ya hiciste el paso 7 de 9</p>';
@@ -5164,39 +5096,6 @@ function vbAbrirPaso9Rasayana(){
   var pctVikriti=(vikriti&&vikriti.pct)||{vata:33,pitta:33,kapha:33};
   var edad=datos.edad||60;
   
-  // === BLOQUEO TOTAL si trial vencido y no pagó ===
-  var trialOK=(typeof vbTrialActivo==='function')?vbTrialActivo():true;
-  var pagoOK=(typeof vbEsUsuarioPago==='function')?vbEsUsuarioPago():false;
-  
-  if(!trialOK&&!pagoOK){
-    // PANTALLA BLOQUEADA — trial vencido sin pago
-    var blockHtml='<div style="background:linear-gradient(180deg,#FAF7F0,#F0FDF4);min-height:100vh;padding:0 0 40px 0">';
-    blockHtml+='<div style="position:sticky;top:0;left:0;right:0;background:#fff;border-bottom:1px solid #D4AF37;padding:10px 16px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:space-between"><button onclick="vbCerrarPaso9()" style="background:#5A7A53;color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">📖 Volver al índice</button><span style="font-size:11px;color:#1a1a1a;background:#D4AF37;padding:3px 10px;border-radius:10px;font-weight:800;letter-spacing:1px">⭐ PRÁCTICA · 🌱 Paso 9 de 9</span></div>';
-    blockHtml+='<div style="padding:32px 20px;max-width:520px;margin:0 auto;text-align:center">';
-    blockHtml+='<div style="font-size:64px;margin-bottom:14px">🔒</div>';
-    blockHtml+='<h2 style="font-family:Georgia,serif;font-size:24px;color:#3D5A36;font-weight:600;margin-bottom:14px;line-height:1.3">Tu prueba de 7 días terminó</h2>';
-    blockHtml+='<p style="font-size:15px;color:#5A4A2A;line-height:1.7;margin-bottom:18px"><strong>Rasayana es el corazón de Vedabite Práctica.</strong></p>';
-    blockHtml+='<p style="font-size:14px;color:#5A4A2A;line-height:1.7;margin-bottom:22px">Acá está donde tu cuerpo se vuelve eterno: las 10 conductas que rejuvenecen, los 7 alimentos clave, las 12 hierbas Rasayana, anti-edad, vitalidad sexual, mente clara, estilo de vida que sostiene.</p>';
-    blockHtml+='<div style="background:#fff;border:2px solid #5A7A53;border-radius:14px;padding:20px;margin-bottom:18px;text-align:left">';
-    blockHtml+='<p style="font-size:13px;color:#3D5A36;font-weight:700;margin-bottom:10px">Tu suscripción Práctica te da:</p>';
-    blockHtml+='<ul style="font-size:13px;color:#3D2914;line-height:1.7;padding-left:22px;margin:0">';
-    blockHtml+='<li>Acceso completo a Rasayana para tu '+({vata:'Vata',pitta:'Pitta',kapha:'Kapha'}[doshaVikriti]||'dosha')+'</li>';
-    blockHtml+='<li>Pasos 4 al 9 con todo el detalle</li>';
-    blockHtml+='<li>Re-test cada 30 días</li>';
-    blockHtml+='<li>Plan que se ajusta a tu evolución</li>';
-    blockHtml+='<li>Mapa de profesionales certificados</li>';
-    blockHtml+='</ul></div>';
-    blockHtml+='<button onclick="if(typeof _vbMostrarSuscripcion===\'function\')_vbMostrarSuscripcion();else window.location.href=\'https://vedabite.lemonsqueezy.com/checkout/buy/ec74072d-7b30-4273-b369-1950cc7820d0\'" style="display:block;width:100%;padding:16px;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(224,122,31,0.3);margin-bottom:10px">Suscribirme · USD 20/mes →</button>';
-    blockHtml+='<p style="font-size:11px;color:#8B7355;font-style:italic">Cancelás cuando quieras · Sin contrato</p>';
-    blockHtml+='</div></div>';
-    
-    var s11b=document.getElementById('s11');
-    if(!s11b){s11b=document.createElement('div');s11b.className='screen';s11b.id='s11';document.body.appendChild(s11b);}
-    s11b.innerHTML=blockHtml;
-    show('s11');
-    try{if(typeof gtag==='function')gtag('event','paso9_bloqueado_trial_vencido');}catch(e){}
-    return;
-  }
   
   // Estimación días en equilibrio (desde inicio del trial)
   var diasEquilibrio=0;
@@ -5425,7 +5324,7 @@ function vbAbrirPaso8(){
   
   if(trialOk){
     // Banner trial
-    html+='<div style="background:#D1FAE5;border:2px solid #059669;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#065F46;font-weight:700">🎁 Acceso completo · Te quedan '+diasRest+' día'+(diasRest!==1?'s':'')+' de prueba</p></div>';
+    html+='<div style="background:#D1FAE5;border:2px solid #059669;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#065F46;font-weight:700">🎁 Acceso completo y gratuito</p></div>';
     
     // Contenido completo
     html+='<div style="background:#fff;border:1px solid #C49E72;border-radius:14px;padding:20px;margin-bottom:14px">';
@@ -5443,15 +5342,6 @@ function vbAbrirPaso8(){
     html+='<button onclick="alert(\'El re-test se habilita automáticamente a los 30 días. Te avisamos por email cuando esté listo.\')" style="background:#5A7A53;color:#fff;border:none;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">Saber más</button>';
     html+='</div>';
     
-  }else{
-    // BLOQUEADO COMPLETO
-    html+='<div style="background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border-radius:18px;padding:32px 22px;text-align:center;margin-bottom:14px">';
-    html+='<div style="font-size:48px;margin-bottom:14px">🔒</div>';
-    html+='<h3 style="font-family:Georgia,serif;font-size:24px;color:#fff;font-weight:400;margin-bottom:14px;line-height:1.3">Seguimiento mensual</h3>';
-    html+='<p style="font-size:15px;color:#E8DFC8;line-height:1.7;margin-bottom:22px">El seguimiento mensual con re-test automático, ajuste del plan y gráfico de evolución es exclusivo de la suscripción Vedabite Práctica.</p>';
-    html+='<button onclick="vbCheckoutPaso7()" style="width:100%;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;padding:18px;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:0.3px;box-shadow:0 4px 14px rgba(224,122,31,0.4);margin-bottom:10px">Suscribirme · USD 20/mes →</button>';
-    html+='<p style="font-size:12px;color:#FDE68A;opacity:0.9">Cancelás cuando quieras</p>';
-    html+='</div>';
   }
   
   // === BLOQUE FINAL: ÍNDICE COMPLETO ===
@@ -6427,13 +6317,7 @@ window.renderTabs=function(a){
   // GATING REAL: lee el estado del usuario (Esencia bloquea, Práctica/trial activo abre)
   var tieneAccesoCompleto = window._vbTieneAccesoPractica ? window._vbTieneAccesoPractica() : !estado.bloqueado;
   function aplicarGating(htmlOriginal,tabId){
-    if(tieneAccesoCompleto)return htmlOriginal;
-    if(tabsConGating.indexOf(tabId)===-1)return htmlOriginal;
-    // Para usuarias Esencia: dejar solo la primera card (la intro "por qué te equilibra") y agregar lock visual
-    var matches=htmlOriginal.match(/<div class="card"[^>]*>[\s\S]*?<\/div>/);
-    var intro=matches?matches[0]:'';
-    var lockHTML='<div class="card" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);text-align:center;padding:24px;border:2px dashed #D97706"><div style="font-size:50px;margin-bottom:8px">🔒</div><h4 style="margin:8px 0 4px;color:#92400E">El CÓMO se hace está en Práctica</h4><p style="font-size:13px;color:#78350F;margin:0 0 16px;line-height:1.6">Acá te decimos QUÉ hacer. Los pasos exactos, los tiempos, los porqués detallados y los 7 tips para esta tab están en Vedabite Práctica.</p><button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="_vbMostrarSuscripcion()">🔥 Probar Práctica · 10 días</button><p style="font-size:11px;color:#92400E;margin:8px 0 0">Sin tarjeta · Cancelás cuando quieras</p></div>';
-    return intro+lockHTML;
+    return htmlOriginal; // ver es 100% gratis: sin gating de tabs
   }
   var html='';
   Object.keys(tabIcons).forEach(function(tabId){
@@ -6782,35 +6666,10 @@ window._vbActualizarContadorFotos=function(){
     ev.preventDefault();
     ev.stopPropagation();
     
-    // GATING: solo Práctica (trial activo o pago)
-    if(window._vbTieneAccesoPractica && !window._vbTieneAccesoPractica()){
-      vbMostrarBloqueoEscaner(btn);
-      return;
-    }
     
     abrirCamaraOArchivo(btn);
   }, true);
   
-  // Bloqueo visual cuando Esencia intenta usar escáner
-  function vbMostrarBloqueoEscaner(btn){
-    var card = btn.closest('[data-sec]');
-    var preview = card ? card.querySelector('.vb-foto-preview') : null;
-    if(!preview){
-      preview = document.createElement('div');
-      preview.className = 'vb-foto-preview';
-      preview.style.marginTop = '10px';
-      btn.parentNode.appendChild(preview);
-    }
-    preview.style.display = 'block';
-    preview.innerHTML = 
-      '<div style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:2px dashed #D97706;border-radius:10px;padding:18px;text-align:center">' +
-      '<div style="font-size:42px;margin-bottom:6px">🔒</div>' +
-      '<h4 style="margin:6px 0 4px;color:#92400E;font-size:14px">El análisis con IA está en Práctica</h4>' +
-      '<p style="font-size:12px;color:#78350F;margin:0 0 14px;line-height:1.5">Subí tu foto y la IA cruza tu Prakriti, Vikriti y carta natal. 10 días de prueba.</p>' +
-      '<button class="btn btn-gold" style="width:100%;margin-bottom:6px" onclick="if(window._vbMostrarSuscripcion)window._vbMostrarSuscripcion()">🔥 Probar Práctica · 10 días</button>' +
-      '<p style="font-size:10px;color:#92400E;margin:6px 0 0">Sin tarjeta · Cancelás cuando quieras</p>' +
-      '</div>';
-  }
   
   // Exponer función globalmente como respaldo
   window._vbAbrirEscanerFoto = function(btn){
@@ -6825,22 +6684,6 @@ window._vbActualizarContadorFotos=function(){
     ev.preventDefault();
     ev.stopPropagation();
     
-    // GATING: solo Práctica
-    if(window._vbTieneAccesoPractica && !window._vbTieneAccesoPractica()){
-      var preview = document.getElementById('vbMenuFotoPreview');
-      if(preview){
-        preview.style.display = 'block';
-        preview.innerHTML = 
-          '<div style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:2px dashed #D97706;border-radius:10px;padding:18px;text-align:center">' +
-          '<div style="font-size:42px;margin-bottom:6px">🔒</div>' +
-          '<h4 style="margin:6px 0 4px;color:#92400E;font-size:14px">El escáner de menú con IA está en Práctica</h4>' +
-          '<p style="font-size:12px;color:#78350F;margin:0 0 14px;line-height:1.5">Sacá foto del menú del restaurante y la IA cruza con tu Prakriti + Vikriti para recomendarte qué pedir. 10 días de prueba.</p>' +
-          '<button class="btn btn-gold" style="width:100%;margin-bottom:6px" onclick="if(window._vbMostrarSuscripcion)window._vbMostrarSuscripcion()">🔥 Probar Práctica · 10 días</button>' +
-          '<p style="font-size:10px;color:#92400E;margin:6px 0 0">Sin tarjeta · Cancelás cuando quieras</p>' +
-          '</div>';
-      }
-      return;
-    }
     
     abrirCamaraMenu(btn);
   }, true);
@@ -6852,22 +6695,6 @@ window._vbActualizarContadorFotos=function(){
     ev.preventDefault();
     ev.stopPropagation();
     
-    // GATING: solo Práctica
-    if(window._vbTieneAccesoPractica && !window._vbTieneAccesoPractica()){
-      var secId = btn.getAttribute('data-vbfoto-paso4');
-      var prev = document.querySelector('.vb-foto-preview-paso4[data-sec-id="'+secId+'"]');
-      if(prev){
-        prev.style.display = 'block';
-        prev.innerHTML = 
-          '<div style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:2px dashed #D97706;border-radius:10px;padding:14px;text-align:center">' +
-          '<div style="font-size:36px;margin-bottom:4px">🔒</div>' +
-          '<h4 style="margin:4px 0;color:#92400E;font-size:13px">Análisis con IA · solo Práctica</h4>' +
-          '<p style="font-size:11px;color:#78350F;margin:0 0 10px">10 días de prueba. Sin tarjeta.</p>' +
-          '<button class="btn btn-gold" style="width:100%;margin-bottom:4px;font-size:13px" onclick="if(window._vbMostrarSuscripcion)window._vbMostrarSuscripcion()">🔥 Probar Práctica</button>' +
-          '</div>';
-      }
-      return;
-    }
     
     abrirCamaraPaso4(btn);
   }, true);
@@ -8296,96 +8123,6 @@ function enviarRegalo(){
 }
 </script>
 
-<script>
-/* ============================================
-   VEDABITE — BOTONES DE COMPRA MÚLTIPLES
-   4 touchpoints según los maestros
-   ============================================ */
-(function(){
-  function getURL(){
-    return (window._vbURLCheckout&&window._vbURLCheckout())||'https://vedabite.lemonsqueezy.com/checkout/buy/ec74072d-7b30-4273-b369-1950cc7820d0';
-  }
-  
-  function ctaHTML(texto,subtexto,estilo){
-    var lsURL=getURL();
-    return '<div class="vb-cta-practica" style="margin:20px 0;padding:20px;background:linear-gradient(135deg,#FAF7F0,#F5EFE0);border-radius:16px;border:1px solid #E8DFC8;text-align:center'+(estilo||'')+'">'
-      +'<p style="font-size:13px;color:#5A7A53;margin:0 0 12px;font-style:italic">'+subtexto+'</p>'
-      +'<a href="'+lsURL+'" target="_blank" onclick="try{gtag(\'event\',\'click_compra_inline\',{event_category:\'conversion\',event_label:\''+texto.substring(0,30)+'\'})}catch(e){}" style="display:block;padding:14px 20px;background:linear-gradient(135deg,#E67E22,#D35400);color:#fff;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:0.3px">'+texto+'</a>'
-      +'<p style="font-size:11px;color:#8B7355;margin:10px 0 0">🌱 Ver todo es gratis · solo pagás la descarga del informe</p>'
-      +'</div>';
-  }
-
-  // PUNTO 1: Después de descargar el PDF
-  var origDownload=window.downloadPDF;
-  if(origDownload){
-    window.downloadPDF=function(voz){
-      origDownload(voz);
-      // Después de la descarga, insertar CTA si no existe
-      setTimeout(function(){
-        var pdfSection=document.querySelector('#vbBloquePostInforme');
-        if(pdfSection && !pdfSection.querySelector('.vb-cta-post-pdf')){
-          var div=document.createElement('div');
-          div.className='vb-cta-post-pdf';
-          div.innerHTML=ctaHTML(
-            '🌿 QUIERO SABER CÓMO EQUILIBRARME',
-            'Tu informe te dice QUÉ pasa. Práctica te enseña CÓMO resolverlo.'
-          );
-          pdfSection.insertBefore(div,pdfSection.firstChild);
-          try{gtag('event','cta_post_pdf_mostrado',{event_category:'conversion'})}catch(e){}
-        }
-      },1500);
-    };
-  }
-
-  // PUNTO 2: Después de explorar 3 tabs
-  var tabCount=0;
-  var origShowTab=window.showTab;
-  if(origShowTab){
-    window.showTab=function(id){
-      origShowTab(id);
-      tabCount++;
-      if(tabCount===3){
-        setTimeout(function(){
-          var tabContents=document.getElementById('tabContents');
-          if(tabContents && !document.querySelector('.vb-cta-3tabs')){
-            var div=document.createElement('div');
-            div.className='vb-cta-3tabs';
-            div.innerHTML=ctaHTML(
-              '🧘 ACCEDÉ A TU PRÁCTICA COMPLETA',
-              'Ya exploraste 3 áreas. Imaginate tener las 17 con instrucciones paso a paso.'
-            );
-            // Insertar como banner flotante temporal
-            div.style.cssText='position:fixed;bottom:0;left:0;right:0;z-index:3000;padding:0 12px 12px;animation:slideUp .4s ease';
-            document.body.appendChild(div);
-            try{gtag('event','cta_3tabs_mostrado',{event_category:'conversion'})}catch(e){}
-            // Cerrar después de 15 segundos si no toca
-            setTimeout(function(){if(div.parentNode)div.style.opacity='0';setTimeout(function(){if(div.parentNode)div.remove()},500)},15000);
-          }
-        },2000);
-      }
-    };
-  }
-
-  // PUNTO 3: Botón en la navbar inferior
-  var navbar=document.querySelector('.bottom-nav');
-  if(navbar){
-    var pracBtn=document.createElement('button');
-    pracBtn.className='nb4';
-    pracBtn.onclick=function(){
-      window._vbMostrarSuscripcion();
-      try{gtag('event','cta_navbar_practica',{event_category:'conversion'})}catch(e){}
-    };
-    pracBtn.textContent='🌿 Práctica';
-    pracBtn.style.cssText='background:linear-gradient(135deg,#E67E22,#D35400);color:#fff;border:none;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer';
-    navbar.appendChild(pracBtn);
-  }
-
-  // Animación slideUp para el banner
-  var style=document.createElement('style');
-  style.textContent='@keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}.vb-cta-practica a:active{transform:scale(0.97)}';
-  document.head.appendChild(style);
-})();
-</script>
 
 <script>
 /* ============================================
