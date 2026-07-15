@@ -5,10 +5,10 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="vb-version" content="B1-copy-descarga-valor-20260714">
+<meta name="vb-version" content="B1-informes-per-paso-20260715">
 <script>
 (function(){
-  var VERSION='B1-copy-descarga-valor-20260714';
+  var VERSION='B1-informes-per-paso-20260715';
   try{
     var stored=localStorage.getItem('vb_version');
     if(stored && stored!==VERSION){
@@ -139,7 +139,6 @@ y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
 window._vbPaymentConfig={
   mpAR:'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=920ac9e7536e4490b5e8b936a1d6e1bf',
   // Pago ÚNICO (no suscripción): "Informe + Carta Natal Védica Nivel 1" · $4.500 ARS
-  // TODO: reemplazar por el Link de Pago real generado en el panel de Mercado Pago (tipo https://mpago.la/xxxxx)
   mpAR_informe1:'https://mpago.la/17RVMd9',
   lsIntl:'https://vedabite.lemonsqueezy.com/checkout/buy/ec74072d-7b30-4273-b369-1950cc7820d0',
   country:null,
@@ -1956,7 +1955,10 @@ function vbMostrarPrakriti(p){
   html+=ac('score','📊 Cómo se calculó tu Prakriti','Sistema clásico Jyotish con peso por pilares',contScore);
   
   } // fin del else (tieneAcceso)
-  
+
+  // === INFORME DESCARGABLE DEL PASO 2 (carta natal) ===
+  html+=window.vbBloqueDescargaPaso(2,'Tu carta natal · Janma Kundali','vbInformePaso2');
+
   // ===== TRANSICIÓN AL TEST =====
   html+='<div style="margin-top:20px">';
   html+='<p style="font-size:13px;color:#5A7A53;line-height:1.6;font-style:italic;margin-bottom:18px;text-align:center">Esta es tu constitución desde el nacimiento.<br>Veamos cómo estás <em style="color:#C49E72;font-style:normal;font-weight:600">hoy</em>.</p>';
@@ -2271,6 +2273,294 @@ if(astroEl&&astroEl.innerHTML.trim()){html+=sec('⭐','Carta Astral Védica',ast
 html+='<div style="background:#FEF2F2;border:1px solid #FECACA;padding:12px;border-radius:8px;margin-top:16px;font-size:11px;color:#7F1D1D;line-height:1.5">'+V.disclaimer+'</div>';
 html+='<div style="text-align:center;color:#999;font-size:11px;margin-top:20px;padding:16px"><strong>VedaBite</strong> — Tu guía de bienestar ayurvédico</div>';
 vbHacerPDF(html,'VedaBite-Informe-'+voz+'.pdf')}
+
+// ============================================================================
+// === INFORMES DESCARGABLES PER-PASO ==========================================
+// Cada paso con resultado (2,3,4,5,6,7,9) puede bajarse como documento propio.
+// El contenido NO es nuevo: se toma el que ya existe dentro de cada paso.
+// Mismo gate $4.500 (vbCompraInforme1Activa/vbGateInforme1), mismas 3 voces,
+// disclaimer médico y sánscrito con traducción al lado.
+// ============================================================================
+
+// Helpers compartidos por todos los informes per-paso
+window._vbNombreDosha=function(d){return ({vata:'Vata (aire+éter)',pitta:'Pitta (fuego+agua)',kapha:'Kapha (tierra+agua)'})[d]||d;};
+window._vbSec=function(emoji,titulo,contenido){return'<div style="background:#f9f9f9;border-radius:10px;padding:14px;margin-bottom:12px;page-break-inside:avoid"><h3 style="font-size:16px;margin:0 0 8px;color:#1a1a1a">'+emoji+' '+titulo+'</h3>'+contenido+'</div>';};
+window._vbCabeceraInforme=function(V,pasoLabel,titulo,sanscrito,dosha){
+  return'<div style="text-align:center;padding:20px;background:'+V.color+';border-radius:12px;margin-bottom:16px"><div style="display:inline-block;background:rgba(0,0,0,0.5);color:#fff;padding:4px 12px;border-radius:50px;font-size:11px;font-weight:700;margin-bottom:10px">'+V.tag+'</div><p style="font-size:11px;letter-spacing:2px;color:#3D5A36;text-transform:uppercase;font-weight:700;margin:0 0 6px">'+pasoLabel+'</p><h1 style="font-size:21px;margin:6px 0;color:#1a1a1a">'+titulo+'</h1><p style="font-size:12px;color:#5A4A2A;margin:4px 0"><strong>Sánscrito (español):</strong> '+sanscrito+'</p>'+(dosha?'<p style="font-size:12px;color:#1a1a1a;margin:6px 0">Tu constitución hoy: <strong>'+window._vbNombreDosha(dosha)+'</strong></p>':'')+'</div>';
+};
+window._vbDisclaimerInforme=function(V){
+  return'<div style="background:#FEF2F2;border:1px solid #FECACA;padding:12px;border-radius:8px;margin-top:16px;font-size:11px;color:#7F1D1D;line-height:1.5">'+V.disclaimer+'<br><br><strong>El Ayurveda previene, nunca cura ni diagnostica una enfermedad.</strong> Este informe es una guía educativa de autoconocimiento; no reemplaza el diagnóstico ni el tratamiento de un profesional de la salud matriculado.</div><div style="text-align:center;color:#999;font-size:11px;margin-top:20px;padding:16px"><strong>VedaBite</strong> — Tu guía de bienestar ayurvédico</div>';
+};
+// Tracking común de descarga de informe per-paso (misma familia de eventos que downloadPDF)
+window._vbTrackDescargaPaso=function(n,voz,dosha,tipo){
+  try{if(typeof gtag==='function'){gtag('event','download_informe_paso',{event_category:'descarga_pdf',event_label:tipo+'_'+voz,paso:n,voz_elegida:voz,dosha:dosha,value:1});gtag('event','conversion',{send_to:'AW-632212911/download_informe'});}if(typeof window.clarity==='function')window.clarity('event','descarga_informe_paso'+n+'_'+voz);if(window._vbDB)window._vbDB.collection('descargas').add({email:userEmail||'sin_email',tipo:tipo,paso:n,voz:voz,dosha:dosha,timestamp:firebase.firestore.FieldValue.serverTimestamp(),createdAt:new Date().toISOString()}).catch(function(){});}catch(e){}
+};
+// Bloque UI reutilizable: 3 voces + CTA compra $4.500 (con evento GA4). Se inserta en cada pantalla de paso.
+window.vbBloqueDescargaPaso=function(n,subtitulo,fnBase){
+  var pago=(typeof vbCompraInforme1Activa==='function')&&vbCompraInforme1Activa();
+  var lock=pago?'':'<span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px">🔒</span>';
+  var h='<div style="background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border:2px solid #C49E72;border-radius:14px;padding:18px 16px;margin:22px 0 14px;text-align:center">';
+  h+='<p style="font-size:10px;letter-spacing:2px;color:#B45309;text-transform:uppercase;font-weight:700;margin:0 0 8px">📥 Informe del Paso '+n+(pago?' · desbloqueado':' · pago único')+'</p>';
+  h+='<h4 style="font-family:Georgia,serif;font-size:18px;color:#3D5A36;font-weight:600;margin:0 0 6px;line-height:1.3">'+subtitulo+'</h4>';
+  h+='<p style="font-size:13px;color:#5A4A2A;line-height:1.5;margin:0 0 12px">Lo que ves en pantalla se pierde al cerrar la página. En PDF es tuyo para siempre — para leerlo, guardarlo, imprimirlo o compartirlo. 3 voces leen el mismo análisis con un lente distinto'+(pago?'':' · pago único, sin suscripción · <strong>$4.500</strong>')+'.</p>';
+  h+='<div style="display:grid;gap:10px;margin-bottom:'+(pago?'0':'12px')+'">';
+  h+='<button onclick="'+fnBase+'(\'amiga\')" class="btn btn-gold" style="position:relative;opacity:0.9">💚 Como una Amiga'+lock+'</button>';
+  h+='<button onclick="'+fnBase+'(\'medico\')" class="btn btn-sage" style="position:relative;opacity:0.9">🩺 Médico Occidental'+lock+'</button>';
+  h+='<button onclick="'+fnBase+'(\'ayurveda\')" class="btn btn-primary" style="position:relative;opacity:0.9">🌿 Terapeuta Ayurvédico'+lock+'</button>';
+  h+='</div>';
+  if(!pago){
+    h+='<button onclick="var u=(window._vbPaymentConfig&&window._vbPaymentConfig.mpAR_informe1)||\'\';if(!u||u===\'REEMPLAZAR_CON_LINK_DE_PAGO_MP\'){alert(\'Link de pago todavía no configurado\');return;}try{if(typeof gtag===\'function\'){gtag(\'event\',\'cta_informe1_click\',{event_category:\'conversion\',value:4500,currency:\'ARS\',paso:'+n+'});gtag(\'event\',\'begin_checkout\',{value:4500,currency:\'ARS\',items:[{item_name:\'Informe Paso '+n+'\',price:4500}]});}if(window.clarity)window.clarity(\'event\',\'cta_informe1_click_paso'+n+'\');}catch(e){}window.location.href=u;" style="display:block;width:100%;padding:15px 14px;background:linear-gradient(135deg,#D97706,#B45309);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(217,119,6,0.3);text-align:center;line-height:1.3">🪔 Comprar informe · $4.500<div style="font-size:11px;font-weight:600;color:#FDE68A;margin-top:4px">Pago único con Mercado Pago · desbloquea todos los informes</div></button>';
+    h+='<button onclick="if(window._vbAbrirConfirmarPago)window._vbAbrirConfirmarPago();try{if(typeof gtag===\'function\')gtag(\'event\',\'cta_ya_pague_click\');}catch(e){}" style="display:block;width:100%;padding:11px;margin-top:10px;background:none;border:1px solid #C49E72;border-radius:12px;font-size:13px;font-weight:700;color:#B45309;cursor:pointer">Ya pagué, confirmar →</button>';
+    h+='<p style="font-size:11px;color:#8B7355;line-height:1.5;margin:12px 0 0;font-style:italic">¿Lo hiciste por otra persona —tu hijo, tu paciente, tu alumno—? Cada informe es de ella; comprá uno por cada una.</p>';
+    try{if(typeof gtag==="function")gtag("event","cta_informe1_visto",{paso:n});if(window.clarity)window.clarity("event","cta_informe1_visto_paso"+n);}catch(e){}
+  }
+  h+='</div>';
+  return h;
+};
+
+// === PASO 4 · Tu escáner físico (Asta Sthana Pariksha) ======================
+function vbInformePaso4(voz){
+  voz=voz||'ayurveda';
+  var vikriti=window.res||null;var dosha=(vikriti&&vikriti.p)?vikriti.p:'vata';
+  if(!vbCompraInforme1Activa()){ vbGateInforme1('paso4_'+voz); return; }
+  window._vbTrackDescargaPaso(4,voz,dosha,'paso4');
+  var V=VOCES[voz],ESC=window.VB_ESCANERES||[],nd=window._vbNombreDosha(dosha);
+  var html=window._vbCabeceraInforme(V,'Paso 4 de 9 · Tu escáner físico','Tu escáner físico ayurvédico','Asta Sthana Pariksha · अष्ट स्थान परीक्षा — examen de los ocho asientos del diagnóstico',dosha);
+  html+='<div style="background:#FFFBEB;border-left:4px solid #F59E0B;padding:14px;border-radius:8px;margin-bottom:14px;font-size:13px;line-height:1.6;font-style:italic;color:#1a1a1a">Este informe reúne las '+ESC.length+' observaciones de tu escáner físico. Cada una lee tu cuerpo como lo haría un Vaidya: qué se observa, cómo se ve en equilibrio, cómo se expresa hoy en tu constitución '+nd+', y qué hacer al respecto.</div>';
+  ESC.forEach(function(s){
+    var db=(s.desbalance&&s.desbalance[dosha])||'',hc=(s.hacer&&s.hacer[dosha])||'';
+    var cont='<p style="font-size:12px;color:#5A7A53;margin:0 0 8px"><strong>Sánscrito (español):</strong> '+s.sk+' · '+s.dev+' — '+s.nombre+'</p>';
+    cont+='<p style="font-size:13px;margin:6px 0"><strong>👁 Qué se observa:</strong> '+s.observa+'</p>';
+    cont+='<p style="font-size:13px;margin:6px 0"><strong>✓ En equilibrio:</strong> '+s.equilibrio+'</p>';
+    if(db)cont+='<div style="background:#FEF3C7;padding:8px 12px;border-radius:8px;margin:6px 0;font-size:13px"><strong>En tu caso ('+nd+'):</strong> '+db+'</div>';
+    if(hc)cont+='<div style="background:#D1FAE5;padding:8px 12px;border-radius:8px;margin:6px 0;font-size:13px"><strong>Qué hacer:</strong> '+hc+'</div>';
+    cont+='<p style="font-size:11px;color:#999;margin:6px 0 0;font-style:italic">Fuente clásica: '+s.fuente+'</p>';
+    html+=window._vbSec(s.emoji,s.nombre+' — '+s.sk,cont);
+  });
+  html+=window._vbDisclaimerInforme(V);
+  vbHacerPDF(html,'VedaBite-Paso4-Escaner-'+voz+'.pdf');
+}
+window.vbInformePaso4=vbInformePaso4;
+
+// === PASO 5 · Tu lectura (Vaidya Nirnaya) ===================================
+function vbInformePaso5(voz){
+  voz=voz||'ayurveda';
+  var prakriti=window._vbPrakriti||(window._vbDatos&&window._vbDatos.prakriti)||null;
+  var vikriti=window.res||null;
+  if(!vikriti||!vikriti.p){alert('Primero completá el test (Paso 3).');return;}
+  var doshaVikriti=vikriti.p,pctVikriti=vikriti.pct||{};
+  var doshaPrakriti=prakriti?prakriti.dosha_predominante:null;
+  if(!vbCompraInforme1Activa()){ vbGateInforme1('paso5_'+voz); return; }
+  window._vbTrackDescargaPaso(5,voz,doshaVikriti,'paso5');
+  var V=VOCES[voz],CUAL=window.VB_CUALIDADES_DOSHA||{};
+  function pickDosha(d){return ({vata:'Vata · Aire+Éter',pitta:'Pitta · Fuego+Agua',kapha:'Kapha · Tierra+Agua'})[d]||d;}
+  function nombreDosha(d){return ({vata:'Vata (aire+éter)',pitta:'Pitta (fuego+agua)',kapha:'Kapha (tierra+agua)'})[d]||d;}
+  function emojiDosha(d){return ({vata:'🌬️',pitta:'🔥',kapha:'🌍'})[d]||'';}
+  var html=window._vbCabeceraInforme(V,'Paso 5 de 9 · Tu lectura','Cómo naciste vs cómo estás hoy','Vaidya Nirnaya · वैद्य निर्णय — el juicio del médico ayurvédico',doshaVikriti);
+  html+='<div style="background:#FFFBEB;border-left:4px solid #F59E0B;padding:14px;border-radius:8px;margin-bottom:14px;font-size:13px;line-height:1.6;font-style:italic;color:#1a1a1a">Esta es tu lectura: qué se te desordenó. Comparamos tu Prakriti (cómo naciste) con tu Vikriti (cómo estás hoy) y leemos la dirección y el movimiento de ese desorden.</div>';
+  // Sección 1: Prakriti
+  if(prakriti&&doshaPrakriti){
+    var cualPra=CUAL[doshaPrakriti]||[];
+    var c1='<p style="font-size:13px;margin:4px 0"><strong>Sánscrito (español):</strong> '+pickDosha(doshaPrakriti)+'</p><p style="font-size:13px;margin:6px 0">Naciste <strong>'+emojiDosha(doshaPrakriti)+' '+(prakriti.prakriti_nombre||nombreDosha(doshaPrakriti))+'</strong>. Tus 5 cualidades naturales (los 5 Gunas):</p>';
+    cualPra.forEach(function(c){c1+='<p style="font-size:13px;margin:4px 0"><strong>'+c.s+'</strong> ('+c.e+'): '+c.d+'</p>';});
+    html+=window._vbSec('⊙','Cómo naciste · Tu Prakriti',c1);
+  }
+  // Sección 2: Vikriti
+  var cualVik=CUAL[doshaVikriti]||[],pctActual=pctVikriti[doshaVikriti]||0;
+  var c2='<p style="font-size:13px;margin:4px 0"><strong>Sánscrito (español):</strong> '+pickDosha(doshaVikriti)+'</p><p style="font-size:13px;margin:6px 0">Hoy estás siendo <strong>'+emojiDosha(doshaVikriti)+' '+nombreDosha(doshaVikriti)+' al '+pctActual+'%</strong>. Las 5 cualidades que están subiendo en vos hoy:</p>';
+  cualVik.forEach(function(c){c2+='<p style="font-size:13px;margin:4px 0"><strong>↑ '+c.s+'</strong> ('+c.e+'): '+c.d+'</p>';});
+  html+=window._vbSec('⊙','Cómo estás hoy · Tu Vikriti',c2);
+  // Sección 3: El gap
+  if(doshaPrakriti){
+    var gapMismo=(doshaPrakriti===doshaVikriti),c3;
+    if(gapMismo){c3='<p style="font-size:13px;margin:6px 0">Naciste <strong>'+nombreDosha(doshaPrakriti)+'</strong> y hoy estás siendo <strong>'+nombreDosha(doshaVikriti)+'</strong>. Tu naturaleza se está expresando.</p><p style="font-size:12px;color:#8B7355;margin:6px 0">Esto es bueno: tu cuerpo está alineado con su programación original. El trabajo es mantener esa coherencia y evitar que se exagere.</p>';}
+    else{c3='<p style="font-size:13px;margin:6px 0">Naciste <strong>'+nombreDosha(doshaPrakriti)+'</strong> pero hoy estás siendo <strong>'+nombreDosha(doshaVikriti)+'</strong>. Tu cuerpo se está apartando de su naturaleza; no estás siendo lo que naciste para ser.</p><p style="font-size:12px;color:#8B7355;margin:6px 0">Es una señal: hay algo en tu rutina, alimentación, emociones o la estación del año que está empujando a tu cuerpo en la dirección opuesta a tu naturaleza.</p>';}
+    html+=window._vbSec(gapMismo?'✓':'⚠️','Qué se te desordenó',c3);
+  }
+  // Sección 4: Vikara
+  var pctV=pctVikriti[doshaVikriti]||0,vikaraS,vikaraDesc;
+  if(pctV>=50){vikaraS='Vriddhi (aumento)';vikaraDesc='Tu '+nombreDosha(doshaVikriti)+' está más alto de lo que debería. El cuerpo está produciendo o acumulando más de esta energía de la que necesita.';}
+  else if(pctV>=35){vikaraS='Sama Vriddhi (aumento moderado)';vikaraDesc='Tu '+nombreDosha(doshaVikriti)+' está empezando a subir, todavía sin desbordarse. Es el mejor momento para corregir.';}
+  else{vikaraS='Sama (equilibrio)';vikaraDesc='No hay un dosha claramente fuera de su lugar. Estás cerca de tu equilibrio natural.';}
+  html+=window._vbSec('⊙','En qué dirección va tu cuerpo · '+vikaraS,'<p style="font-size:13px;margin:6px 0">'+vikaraDesc+'</p>');
+  // Sección 5: Gati
+  var gatiS,gatiDesc,gatiEmoji;
+  if(doshaVikriti==='vata'){gatiS='Urdhva Gati (asciende)';gatiEmoji='⬆️';gatiDesc='Tu tránsito se está moviendo hacia arriba: cabeza, mente, sistema nervioso, pulmones. Sentís ansiedad, pensamientos rápidos, insomnio, sequedad en garganta o respiración corta.';}
+  else if(doshaVikriti==='pitta'){gatiS='Tiryak Gati (se extiende lateralmente)';gatiEmoji='↔️';gatiDesc='Tu tránsito se está extendiendo lateralmente: piel, sangre, articulaciones, músculos. Aparecen rojeces, inflamación, irritabilidad, calor superficial.';}
+  else{gatiS='Adho Gati (desciende)';gatiEmoji='⬇️';gatiDesc='Tu tránsito se está moviendo hacia abajo: estómago, intestino, piernas, sistema linfático. Sentís pesadez, lentitud digestiva, retención, congestión, cansancio matinal.';}
+  html+=window._vbSec(gatiEmoji,'Por dónde se está moviendo · '+gatiS,'<p style="font-size:13px;margin:6px 0">'+gatiDesc+'</p>');
+  html+=window._vbDisclaimerInforme(V);
+  vbHacerPDF(html,'VedaBite-Paso5-Lectura-'+voz+'.pdf');
+}
+window.vbInformePaso5=vbInformePaso5;
+
+// === PASO 6 · Diagnóstico hiper personalizado (Samprapti) ===================
+function vbInformePaso6(voz){
+  voz=voz||'ayurveda';
+  var vikriti=window.res||null;var dosha=(vikriti&&vikriti.p)?vikriti.p:'vata';
+  if(!vbCompraInforme1Activa()){ vbGateInforme1('paso6_'+voz); return; }
+  window._vbTrackDescargaPaso(6,voz,dosha,'paso6');
+  var V=VOCES[voz],CAPAS=window.VB_CAPAS5||[];
+  var html=window._vbCabeceraInforme(V,'Paso 6 de 9 · Tu diagnóstico','Diagnóstico hiper personalizado','Samprapti · सम्प्राप्ति — la patogénesis: cómo se forma un desequilibrio',dosha);
+  html+='<div style="background:#FFFBEB;border-left:4px solid #F59E0B;padding:14px;border-radius:8px;margin-bottom:14px;font-size:13px;line-height:1.6;font-style:italic;color:#1a1a1a">Este informe reúne las 5 lecturas profundas de tu diagnóstico: las 14 áreas, los 13 canales (Srotas), tus toxinas (Ama), tu fuerza vital (Bala) y la etapa exacta del ciclo (Kriyakala). Cada una te dice qué pasa, cómo verificarlo vos y qué hacer hoy.</div>';
+  if(!CAPAS.length){html+='<p style="font-size:13px;color:#7F1D1D">No se pudo cargar el detalle del diagnóstico. Abrí primero el Paso 6 en la app y volvé a intentar.</p>';}
+  CAPAS.forEach(function(c){
+    var cont='<p style="font-size:12px;color:#8B7355;margin:0 0 8px;font-style:italic"><strong>Sánscrito (español):</strong> '+c.s+'</p>';
+    cont+='<p style="font-size:13px;margin:6px 0"><strong>Qué es:</strong> '+c.que+'</p>';
+    if(c.areas){
+      cont+='<p style="font-size:13px;margin:6px 0"><strong>'+((c.n.indexOf('ciclo')>-1||c.n.indexOf('etapa')>-1)?'Las 6 etapas:':'Las áreas:')+'</strong></p><ul style="margin:0;padding-left:18px;font-size:12px;line-height:1.7;color:#1a1a1a">';
+      c.areas.forEach(function(a){cont+='<li>'+a+'</li>';});cont+='</ul>';
+    }
+    if(c.test){
+      cont+='<p style="font-size:13px;margin:8px 0 6px"><strong>Cómo lo verificás vos:</strong></p><ul style="margin:0;padding-left:18px;font-size:12px;line-height:1.7;color:#1a1a1a">';
+      c.test.forEach(function(a){cont+='<li>'+a+'</li>';});cont+='</ul>';
+    }
+    cont+='<div style="background:#D1FAE5;padding:8px 12px;border-radius:8px;margin:8px 0 0;font-size:13px"><strong>Qué hacer hoy:</strong> '+c.hacer+'</div>';
+    html+=window._vbSec('🔎',c.n,cont);
+  });
+  html+=window._vbDisclaimerInforme(V);
+  vbHacerPDF(html,'VedaBite-Paso6-Diagnostico-'+voz+'.pdf');
+}
+window.vbInformePaso6=vbInformePaso6;
+
+// === PASO 7 · Tu plan personalizado (Chikitsa) ==============================
+function vbInformePaso7(voz){
+  voz=voz||'ayurveda';
+  var datos=window._vbDatos||{},vikriti=window.res||null;
+  var dosha=(vikriti&&vikriti.p)?vikriti.p:'vata';
+  if(!vbCompraInforme1Activa()){ vbGateInforme1('paso7_'+voz); return; }
+  window._vbTrackDescargaPaso(7,voz,dosha,'paso7');
+  var V=VOCES[voz],nd=window._vbNombreDosha(dosha),TIPS=window.VB_TIPS_PASO7||{};
+  var PA=((typeof VB_PLAN_ALIMENTACION!=='undefined'?VB_PLAN_ALIMENTACION:{})[dosha])||{};
+  var PR=((typeof VB_PLAN_RUTINA!=='undefined'?VB_PLAN_RUTINA:{})[dosha])||{};
+  var PH=((typeof VB_PLAN_HIERBAS!=='undefined'?VB_PLAN_HIERBAS:{})[dosha])||'';
+  var VY=(window.VB_VYAYAMA||{})[dosha]||'',SA=(window.VB_SADHANA||{})[dosha]||'',SN=(window.VB_SNEHANA||{})[dosha]||'';
+  var sexoTxt=({mujer:'Mujer',hombre:'Hombre',otro:'Persona',F:'Mujer',M:'Hombre'})[datos.sexo]||'';
+  var html=window._vbCabeceraInforme(V,'Paso 7 de 9 · Tu plan','Chikitsa para equilibrar tu '+nd,'Chikitsa · चिकित्सा — el tratamiento: cómo transitar hacia tu equilibrio',dosha);
+  html+='<div style="background:#FFFBEB;border-left:4px solid #F59E0B;padding:14px;border-radius:8px;margin-bottom:14px;font-size:13px;line-height:1.6;font-style:italic;color:#1a1a1a">'+(sexoTxt?sexoTxt+(datos.edad?' · '+datos.edad+' años':'')+' · ':'')+'Tu plan prescriptivo para equilibrar tu '+nd+', basado en Charaka Samhita. Cada sección trae la prescripción base y 10 acciones concretas para tu constitución.</div>';
+  var CATS=[
+    {k:'ahara',emoji:'🍽️',t:'Ahara — alimentación',sk:'आहार',extra:(PA.si?'<div style="background:#D1FAE5;padding:8px 12px;border-radius:8px;margin:6px 0;font-size:13px"><strong>Sí:</strong> '+PA.si+'</div><div style="background:#FEE2E2;padding:8px 12px;border-radius:8px;margin:6px 0;font-size:13px"><strong>Evitar:</strong> '+PA.no+'</div><p style="font-size:13px;margin:6px 0"><strong>Cuándo:</strong> '+PA.cuando+'</p>':'')},
+    {k:'dinacharya',emoji:'⏰',t:'Dinacharya — rutina diaria',sk:'दिनचर्या',extra:(PR.m?'<p style="font-size:13px;margin:4px 0"><strong>Mañana:</strong> '+PR.m+'</p><p style="font-size:13px;margin:4px 0"><strong>Tarde:</strong> '+PR.t+'</p><p style="font-size:13px;margin:4px 0"><strong>Noche:</strong> '+PR.n+'</p>':'')},
+    {k:'yoga',emoji:'🧘‍♀️',t:'Vyayama / Yoga — ejercicio',sk:'व्यायाम',extra:(VY?'<p style="font-size:13px;margin:6px 0">'+VY+'</p>':'')},
+    {k:'pranayama',emoji:'🌬️',t:'Pranayama — respiración',sk:'प्राणायाम',extra:''},
+    {k:'meditacion',emoji:'🧘',t:'Dhyana — meditación',sk:'ध्यान',extra:(SA?'<p style="font-size:13px;margin:6px 0">'+SA+'</p>':'')},
+    {k:'abhyanga',emoji:'💆',t:'Snehana / Abhyanga — automasaje con aceite',sk:'अभ्यंग',extra:(SN?'<p style="font-size:13px;margin:6px 0">'+SN+'</p>':'')},
+    {k:'mudras',emoji:'🙏',t:'Hasta Mudra — sellos de las manos',sk:'मुद्रा',extra:''},
+    {k:'chakras',emoji:'🔴',t:'Chakra — centros de energía',sk:'चक्र',extra:''},
+    {k:'hierbas',emoji:'🌿',t:'Aushadhi — hierbas',sk:'औषधि',extra:(PH?'<p style="font-size:13px;margin:6px 0">'+PH+'</p>':'')},
+    {k:'rasayana',emoji:'✨',t:'Rasayana — rejuvenecimiento',sk:'रसायन',extra:''}
+  ];
+  CATS.forEach(function(cat){
+    var tips=(TIPS[cat.k]&&TIPS[cat.k][dosha])||[];
+    if(!cat.extra&&!tips.length)return;
+    var trad=cat.t.split('— ')[1]||'';
+    var cont='<p style="font-size:12px;color:#8B7355;margin:0 0 8px;font-style:italic"><strong>Sánscrito (español):</strong> '+cat.sk+' — '+trad+'</p>';
+    if(cat.extra)cont+=cat.extra;
+    if(tips.length){cont+='<p style="font-size:13px;margin:8px 0 4px;font-weight:600">10 acciones para tu '+nd+':</p>';tips.forEach(function(tp,i){cont+='<div style="background:#F0FDF4;border-left:3px solid #7C9A73;padding:6px 10px;margin:4px 0;font-size:12px"><strong>'+(i+1)+'.</strong> '+tp+'</div>';});}
+    html+=window._vbSec(cat.emoji,cat.t,cont);
+  });
+  html+=window._vbDisclaimerInforme(V);
+  vbHacerPDF(html,'VedaBite-Paso7-Plan-'+voz+'.pdf');
+}
+window.vbInformePaso7=vbInformePaso7;
+
+// === PASO 9 · Síntesis previa a Rasayana ====================================
+// Cierra el recorrido 1-8 y prepara la decisión. NO reproduce el contenido de
+// los 7 pilares (eso vive dentro del programa Rasayana): solo los nombra.
+function vbInformePaso9(voz){
+  voz=voz||'ayurveda';
+  var datos=window._vbDatos||{},vikriti=window.res||null;
+  var dosha=(vikriti&&vikriti.p)||'vata';
+  var pct=(vikriti&&vikriti.pct)||{vata:33,pitta:33,kapha:33};
+  var edad=datos.edad||null;
+  if(!vbCompraInforme1Activa()){ vbGateInforme1('paso9_'+voz); return; }
+  window._vbTrackDescargaPaso(9,voz,dosha,'paso9');
+  var V=VOCES[voz],nd=window._vbNombreDosha(dosha);
+  var dias=1;try{var t=localStorage.getItem('vb_trialStart');if(t){dias=Math.floor((new Date()-new Date(t))/864e5);if(dias<1)dias=1;}}catch(e){}
+  function emo(d){return ({vata:'🌬️',pitta:'🔥',kapha:'💧'})[d]||'';}
+  var html=window._vbCabeceraInforme(V,'Paso 9 de 9 · Síntesis','Rasayana — tu nuevo estilo de vida','Rasayana · रसायन — el camino del Rasa (el plasma vital)',dosha);
+  html+='<div style="background:#FFFBEB;border-left:4px solid #F59E0B;padding:14px;border-radius:8px;margin-bottom:14px;font-size:13px;line-height:1.6;font-style:italic;color:#1a1a1a">Llegaste hasta acá: hiciste el camino completo (pasos 1 a 8) — limpiaste lo que sobraba, equilibraste lo que faltaba, sostuviste tu plan. Este informe cierra tu recorrido y te prepara para el último capítulo: rejuvenecer. «Rasayana es una disciplina de vida que detiene el envejecimiento celular.» — Charaka Samhita · चरक संहिता.</div>';
+  // Sección 1 · Espejo
+  var e1='<p style="font-size:13px;margin:4px 0"><strong>📊 Tu Vikriti hoy:</strong> '+emo('vata')+' Vata '+pct.vata+'% · '+emo('pitta')+' Pitta '+pct.pitta+'% · '+emo('kapha')+' Kapha '+pct.kapha+'%</p>';
+  e1+='<p style="font-size:13px;margin:4px 0"><strong>🔥 Días en tu camino:</strong> '+dias+' día'+(dias!==1?'s':'')+' instalando el cambio</p>';
+  e1+='<p style="font-size:13px;margin:4px 0"><strong>💪 Hábitos que instalaste:</strong> comida que te conviene · tu rutina diaria · pranayama · yoga para tu '+nd+' · automasaje</p>';
+  if(edad)e1+='<p style="font-size:13px;margin:4px 0"><strong>⏳ Tu edad biológica:</strong> cronológica '+edad+' años · si seguís: -3 a -5 años en 12 meses</p>';
+  html+=window._vbSec('🪞','Sección 1 · Espejo — ¿Qué cambió en vos?',e1);
+  // Sección 2 · Riesgo de regresión
+  var riesgo=[
+    {t:'En 30 días',d:'Vuelven los primeros síntomas: pérdida de calidad de sueño, ansiedad sostenida 2-3 días/semana, sequedad de piel.'},
+    {t:'En 90 días',d:'Tu Vikriti se desbalancea otra vez al nivel original. Volvés al punto de partida, pero con tejido más cansado.'},
+    {t:'En 1 año',d:'Estás peor que antes de empezar: tu cuerpo «registró» el desorden como nuevo normal. Recuperar cuesta el doble.'},
+    {t:'En 5 años',d:'Tu vitalidad profunda (Ojas · ओजस्) se disipó. Aparece envejecimiento acelerado: piel, articulaciones, mente.'}
+  ];
+  var r='';riesgo.forEach(function(x){r+='<div style="background:#FEE2E2;border-left:3px solid #DC2626;padding:6px 10px;margin:4px 0;font-size:12px"><strong>⏱️ '+x.t+':</strong> '+x.d+'</div>';});
+  html+=window._vbSec('⚠️','Sección 2 · Riesgo de regresión — ¿Qué pasa si dejás?',r);
+  // Sección 3 · Beneficios por año
+  var ben=[
+    {t:'Mes 3',d:'Piel más firme, menos arrugas finas. Despertar con energía propia (sin café). Digestión silenciosa.'},
+    {t:'Mes 6',d:'Más energía sostenida durante el día. Menos fatiga al atardecer. Sueño profundo de 7-8 hs sin interrupciones.'},
+    {t:'Año 1',d:'Edad biológica medible -3 a -5 años. Pelo más fuerte, uñas firmes, ojos más claros.'},
+    {t:'Año 3',d:'Longevidad celular optimizada. Marcadores cardiovasculares en rangos de persona 10 años más joven.'},
+    {t:'Año 5+',d:'Tu vitalidad profunda (Ojas) se reconstruyó. Vitalidad estable, mente clara, cuerpo que no envejece como el de tus pares.'}
+  ];
+  var b='';ben.forEach(function(x){b+='<div style="background:#F0FDF4;border-left:3px solid #059669;padding:6px 10px;margin:4px 0;font-size:12px"><strong>📍 '+x.t+':</strong> '+x.d+'</div>';});
+  html+=window._vbSec('📊','Sección 3 · Beneficios concretos que vas a notar',b);
+  // Cierre · decisión (solo NOMBRA los pilares; su contenido vive dentro de Rasayana)
+  var pil='<p style="font-size:13px;margin:4px 0">Si activás tu programa Rasayana, adentro te esperan los 7 pilares que sostienen el rejuvenecimiento — cada uno desarrollado en detalle dentro del programa:</p><ul style="margin:6px 0;padding-left:18px;font-size:12px;line-height:1.7;color:#1a1a1a"><li>Achara Rasayana (आचार) — las conductas que rejuvenecen</li><li>Ahara Rasayana (आहार) — los alimentos que rejuvenecen</li><li>Aushadhi Rasayana (औषधि) — las hierbas Rasayana</li><li>Vihara Rasayana (विहार) — el estilo de vida que sostiene</li><li>Medhya Rasayana (मेध्य) — rejuvenecedores mentales</li><li>Vajikarana (वाजीकरण) — vitalidad sexual y reproductiva</li><li>Vaya Sthapana (वय स्थापन) — estabilizadores anti-edad</li></ul><p style="font-size:13px;margin:8px 0"><strong>El primer paso:</strong> elegí una sola cosa de cada pilar y sostenela 90 días. No quieras todo a la vez — Rasayana es paciencia.</p>';
+  html+=window._vbSec('🌱','Tu decisión — Activar tu programa Rasayana',pil);
+  html+=window._vbDisclaimerInforme(V);
+  vbHacerPDF(html,'VedaBite-Paso9-Rasayana-'+voz+'.pdf');
+}
+window.vbInformePaso9=vbInformePaso9;
+
+// === PASO 2 · Carta natal védica (Janma Kundali) ============================
+function vbInformePaso2(voz){
+  voz=voz||'ayurveda';
+  var p=window._vbPrakriti||(window._vbDatos&&window._vbDatos.prakriti)||null;
+  if(!p||!p.lagna){alert('Primero calculá tu carta natal (Paso 2).');return;}
+  var dosha=p.dosha_predominante||'vata';
+  if(!vbCompraInforme1Activa()){ vbGateInforme1('paso2_'+voz); return; }
+  window._vbTrackDescargaPaso(2,voz,dosha,'paso2');
+  var V=VOCES[voz];
+  var RI=(typeof VB_RASHI_INFO!=='undefined')?VB_RASHI_INFO:{};
+  var GI=(typeof VB_GRAHAS_INFO!=='undefined')?VB_GRAHAS_INFO:{};
+  var BH=(typeof VB_BHAVAS!=='undefined')?VB_BHAVAS:{};
+  var du=p.datos_usuario||{};
+  var html=window._vbCabeceraInforme(V,'Paso 2 de 9 · Tu carta natal védica','Janma Kundali — tu carta natal védica','Janma Kundali Jyotish · जन्म कुण्डली ज्योतिष — la carta del nacimiento',dosha);
+  var dn='';
+  if(du.fecha)dn+='<p style="font-size:13px;margin:4px 0"><strong>Fecha:</strong> '+du.fecha+'</p>';
+  if(du.hora)dn+='<p style="font-size:13px;margin:4px 0"><strong>Hora:</strong> '+du.hora+'</p>';
+  if(du.lugar)dn+='<p style="font-size:13px;margin:4px 0"><strong>Lugar:</strong> '+du.lugar+'</p>';
+  dn+='<p style="font-size:13px;margin:8px 0 0"><strong>Tu Prakriti (constitución de nacimiento):</strong> '+p.prakriti_nombre+' — dosha predominante '+window._vbNombreDosha(dosha)+'.</p>';
+  html+=window._vbSec('🪔','Datos de tu nacimiento',dn);
+  function pilar(emoji,titulo,sanscrito,obj,glosa,peso){
+    var info=RI[obj.signIdx]||{};
+    var c='<p style="font-size:12px;color:#8B7355;margin:0 0 8px;font-style:italic"><strong>Sánscrito (español):</strong> '+sanscrito+'</p>';
+    c+='<p style="font-size:13px;margin:4px 0">'+glosa+'</p>';
+    c+='<p style="font-size:13px;margin:4px 0"><strong>Signo:</strong> '+obj.sign+(info.elem?' · <strong>Elemento:</strong> '+info.elem:'')+(info.regente?' · <strong>Regente:</strong> '+info.regente:'')+'</p>';
+    if(info.cualidad||info.caracter)c+='<p style="font-size:13px;margin:4px 0">'+(info.cualidad?'<strong>Cualidad:</strong> '+info.cualidad+' · ':'')+(info.caracter?'<strong>Carácter:</strong> '+info.caracter:'')+'</p>';
+    c+='<div style="background:#D1FAE5;padding:6px 10px;border-radius:8px;margin:6px 0 0;font-size:13px"><strong>Dosha que aporta:</strong> '+obj.dosha.toUpperCase()+' (peso +'+peso+')</div>';
+    return window._vbSec(emoji,titulo,c);
+  }
+  html+=pilar('⬆️','Lagna — Ascendente · cuerpo físico','Lagna · लग्न — ascendente',p.lagna,'El Lagna es tu cuerpo físico y pesa más que cualquier otro punto para definir tu Prakriti.',3);
+  html+=pilar('🌙','Chandra — Luna · mente y emociones','Chandra · चन्द्र — la Luna',p.chandra,'La Luna representa tu mente, emociones e intuición. En Jyotish pesa casi tanto como el Lagna.',2);
+  html+=window._vbSec('✨','Nakshatra — asterismo lunar','<p style="font-size:12px;color:#8B7355;margin:0 0 8px;font-style:italic"><strong>Sánscrito (español):</strong> Nakshatra · नक्षत्र — asterismo lunar</p><p style="font-size:13px;margin:4px 0">Uno de los 27 asterismos lunares: define tu firma kármica más fina, tus instintos y patrones inconscientes.</p><p style="font-size:13px;margin:4px 0"><strong>Tu Nakshatra:</strong> '+p.nakshatra.nombre+'</p><div style="background:#D1FAE5;padding:6px 10px;border-radius:8px;margin:6px 0 0;font-size:13px"><strong>Dosha que aporta:</strong> '+p.nakshatra.dosha.toUpperCase()+' (peso +2)</div>');
+  html+=pilar('☀️','Surya — Sol · alma y vitalidad','Surya · सूर्य — el Sol',p.surya,'El Sol gobierna tu Agni (fuego digestivo), tu vitalidad y tu autoridad interna.',1);
+  var sc='<table style="width:100%;font-size:13px;border-collapse:collapse"><tr><td style="padding:4px 0">Lagna ('+p.lagna.sign+')</td><td style="text-align:right"><strong>'+p.lagna.dosha.toUpperCase()+' +3</strong></td></tr><tr><td style="padding:4px 0">Chandra ('+p.chandra.sign+')</td><td style="text-align:right"><strong>'+p.chandra.dosha.toUpperCase()+' +2</strong></td></tr><tr><td style="padding:4px 0">Nakshatra ('+p.nakshatra.nombre+')</td><td style="text-align:right"><strong>'+p.nakshatra.dosha.toUpperCase()+' +2</strong></td></tr><tr><td style="padding:4px 0">Surya ('+p.surya.sign+')</td><td style="text-align:right"><strong>'+p.surya.dosha.toUpperCase()+' +1</strong></td></tr></table><hr style="border:none;border-top:1px solid #E8DFC8;margin:8px 0"><table style="width:100%;font-size:13px;font-weight:700"><tr><td>Vata</td><td style="text-align:right">'+(p.score.vata||0)+' pts</td></tr><tr><td>Pitta</td><td style="text-align:right">'+(p.score.pitta||0)+' pts</td></tr><tr><td>Kapha</td><td style="text-align:right">'+(p.score.kapha||0)+' pts</td></tr></table><p style="font-size:13px;margin:8px 0 0"><strong>Tu Prakriti:</strong> '+p.prakriti_nombre+'. Tu equilibrio natural desde el nacimiento.</p>';
+  html+=window._vbSec('📊','Cómo se calculó tu Prakriti (sistema Jyotish por pilares)',sc);
+  if(p.grahas&&Object.keys(p.grahas).length){
+    var gc='<p style="font-size:13px;margin:0 0 8px">Los 9 Grahas (planetas védicos) en tu carta:</p>';
+    ['Sun','Moon','Mercury','Venus','Mars','Jupiter','Saturn','Rahu','Ketu'].forEach(function(n){
+      var g=p.grahas[n];if(!g)return;var info=GI[n]||{},bh=BH[g.casa]||{};
+      gc+='<p style="font-size:12px;margin:4px 0">'+(info.emoji||'')+' <strong>'+(info.nombre||n)+':</strong> en '+g.signo+' · Casa '+g.casa+(bh.nombre?' ('+bh.nombre+')':'')+'</p>';
+    });
+    html+=window._vbSec('🪐','Los 9 Grahas — posiciones planetarias',gc);
+  }
+  html+=window._vbDisclaimerInforme(V);
+  vbHacerPDF(html,'VedaBite-Paso2-CartaNatal-'+voz+'.pdf');
+}
+window.vbInformePaso2=vbInformePaso2;
+
 function confirmRestart(){confirm("¿Querés rehacer el test? Tus resultados actuales se perderán.")&&(clearSession(),startTest())}
 function show(a){document.querySelectorAll(".screen").forEach(function(a){a.classList.remove("active")}),document.getElementById(a).classList.add("active"),window.scrollTo(0,0);var navBar=document.getElementById("navBar");if(navBar){if(a==="s1"){navBar.classList.remove("active");navBar.style.display="none"}else{navBar.classList.add("active");navBar.style.display="flex"}}}
 
@@ -2498,7 +2788,7 @@ function vbRenderDevolucionIntegral(){
   if(!completitud.suficiente)return;
   
   // === DATA TABLES (las 5 cualidades de cada dosha) ===
-  var CUALIDADES_DOSHA={
+  window.VB_CUALIDADES_DOSHA=window.VB_CUALIDADES_DOSHA||{
     vata:[
       {s:'Laghu',e:'Liviano',d:'sentís el cuerpo y la mente livianos, casi sin peso'},
       {s:'Ruksha',e:'Seco',d:'piel, pelo, mucosas e intestino tienden a la sequedad'},
@@ -2521,7 +2811,8 @@ function vbRenderDevolucionIntegral(){
       {s:'Madhura',e:'Dulce',d:'tendencia a antojo de dulces, naturaleza tierna y maternal'}
     ]
   };
-  
+  var CUALIDADES_DOSHA=window.VB_CUALIDADES_DOSHA;
+
   // === HELPERS ===
   function pickDosha(d){return ({vata:'Vata · Aire+Éter',pitta:'Pitta · Fuego+Agua',kapha:'Kapha · Tierra+Agua'})[d]||d;}
   function nombreDosha(d){return ({vata:'Vata (aire+éter)',pitta:'Pitta (fuego+agua)',kapha:'Kapha (tierra+agua)'})[d]||d;}
@@ -2793,16 +3084,8 @@ function vbRenderDevolucionIntegral(){
   
   // (Bloque "Activar Práctica · 10 días" eliminado — no hay suscripción; el único CTA de compra es el del informe $4.500 de abajo)
 
-  // ===== PAGO ÚNICO: Informe + Carta Natal Védica Nivel 1 · $4.500 ARS (separado de la suscripción) =====
-  html+='<div style="background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border:2px solid #C49E72;border-radius:14px;padding:18px 16px;margin-bottom:14px;text-align:center">';
-  html+='<p style="font-size:10px;letter-spacing:2px;color:#B45309;text-transform:uppercase;font-weight:700;margin:0 0 8px">🪔 Comprá tu informe · pago único</p>';
-  html+='<h4 style="font-family:Georgia,serif;font-size:18px;color:#3D5A36;font-weight:600;margin:0 0 6px;line-height:1.3">Informe + Carta Natal Védica Nivel 1</h4>';
-  html+='<p style="font-size:13px;color:#5A4A2A;line-height:1.5;margin:0 0 8px">Lo que ves ahora se pierde al cerrar la pestaña. En PDF lo tenés para siempre — para leerlo, guardarlo, imprimirlo o compartirlo. Pago único, sin suscripción · <strong>$4.500</strong></p>';
-  html+='<p style="font-size:11px;color:#8B7355;line-height:1.5;margin:0 0 14px;font-style:italic">¿Lo hiciste por otra persona —tu hijo, tu paciente, tu alumno—? Cada informe es de ella; comprá uno por cada una.</p>';
-  html+='<button onclick="var u=(window._vbPaymentConfig&&window._vbPaymentConfig.mpAR_informe1)||\'\';if(!u||u===\'REEMPLAZAR_CON_LINK_DE_PAGO_MP\'){alert(\'Link de pago todavía no configurado\');return;}try{if(typeof gtag===\'function\')gtag(\'event\',\'cta_informe1_click\',{event_category:\'conversion\',value:4500,currency:\'ARS\'});gtag(\'event\',\'begin_checkout\',{value:4500,currency:\'ARS\',items:[{item_name:\'Informe + Carta Natal Vedica Nivel 1\',price:4500}]});if(window.clarity)window.clarity(\'event\',\'cta_informe1_click\');}catch(e){}window.location.href=u;" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#D97706,#B45309);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(217,119,6,0.3);text-align:center;line-height:1.3">🪔 Comprar informe · $4.500<div style="font-size:11px;font-weight:600;color:#FDE68A;margin-top:4px">Pago único con Mercado Pago</div></button>';
-  html+='<button onclick="if(window._vbAbrirConfirmarPago)window._vbAbrirConfirmarPago();try{if(typeof gtag===\'function\')gtag(\'event\',\'cta_ya_pague_click\');}catch(e){}" style="display:block;width:100%;padding:11px;margin-top:10px;background:none;border:1px solid #C49E72;border-radius:12px;font-size:13px;font-weight:700;color:#B45309;cursor:pointer">Ya pagué, confirmar →</button>';
-  html+='</div>';
-  try{if(typeof gtag==="function")gtag("event","cta_informe1_visto");if(window.clarity)window.clarity("event","cta_informe1_visto");}catch(e){}
+  // ===== INFORME DESCARGABLE DEL PASO 5 (3 voces + CTA compra $4.500) =====
+  html+=window.vbBloqueDescargaPaso(5,'Tu lectura · Vaidya Nirnaya','vbInformePaso5');
   
   html+='<button onclick="if(window._vbTieneAccesoPractica&&window._vbTieneAccesoPractica()){if(typeof vbAbrirPaso6===\'function\')vbAbrirPaso6();}else if(typeof _vbMostrarSuscripcion===\'function\'){_vbMostrarSuscripcion();}try{if(typeof gtag===\'function\')gtag(\'event\',\'cta_paso5_a_paso6_click\');if(window.clarity)window.clarity(\'event\',\'cta_paso5_a_paso6_click\');}catch(e){}" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#5A7A53,#3D5A36);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(90,122,83,0.3);text-align:center;line-height:1.3">→ IR AL PASO 6 DE 9<div style="font-size:12px;font-weight:600;color:#D1FAE5;margin-top:4px">Diagnóstico hiper personalizado</div></button>';
   html+='</div>';
@@ -2819,13 +3102,12 @@ function vbRenderDevolucionIntegral(){
   if(trialOk5){
     // TRIAL ACTIVO → 5 capas DETALLADAS Y EJECUTABLES
     html+='<div style="background:linear-gradient(180deg,#FAF7F0,#F5EFE0);color:#3D5A36;border:2px solid #C49E72;border-radius:14px;padding:22px;margin-bottom:14px;position:relative;overflow:hidden">';
-    html+='<div style="position:absolute;top:14px;right:14px;background:#059669;color:#fff;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px">🎁 GRATIS</div>';
     html+='<div style="background:#1a1a1a;color:#D4AF37;padding:6px 14px;border-radius:20px;display:inline-block;margin-bottom:8px;letter-spacing:2px;font-size:10px;font-weight:800;text-transform:uppercase;border:1px solid #D4AF37">⭐ PRÁCTICA ⭐</div><p style="font-size:11px;letter-spacing:3px;color:#D4AF37;text-transform:uppercase;font-weight:700;margin-bottom:8px;text-align:center">✨ Paso 6 de 9 · Tu diagnóstico</p>';
     html+='<h3 style="font-family:Georgia,serif;font-size:22px;color:#3D5A36;font-weight:600;margin-bottom:8px;line-height:1.4;text-align:center">Esto es lo que pasa en tu cuerpo hoy</h3>';
     html+='<p style="font-size:13px;color:#5A4A2A;line-height:1.6;margin-bottom:8px;text-align:center">5 lecturas profundas. Cada una te dice <strong>qué pasa, cómo lo ves vos y qué hacer hoy.</strong></p>';
     html+='<p style="font-size:10px;color:#8B7355;font-style:italic;text-align:center;margin-bottom:14px;letter-spacing:0.3px">Samprapti · सम्प्राप्ति</p>';
     
-    var capas5=[
+    window.VB_CAPAS5=window.VB_CAPAS5||[
       {
         n:'1 · Las 14 áreas detalladas',
         s:'Las 8 zonas clásicas del Ayurveda',
@@ -2909,7 +3191,8 @@ function vbRenderDevolucionIntegral(){
         hacer:'Según los puntos de tu test Vikriti, hoy estás en una etapa específica. El paso 6 te lo indica con tu nombre y tu cuadro. Si estás en etapa 1, 2 o 3 → todavía es tu decisión, hoy podés revertirlo. Si estás en 4 o más → consultá con un médico Y empezá Ayurveda complementario en paralelo.'
       }
     ];
-    
+    var capas5=window.VB_CAPAS5;
+
     capas5.forEach(function(c,idx){
       html+='<div style="background:#FFF7ED;border:1px solid #C49E72;border-radius:12px;padding:16px;margin-bottom:14px">';
       html+='<div style="font-size:15px;color:#3D5A36;font-weight:700;margin-bottom:4px">'+c.n+'</div>';
@@ -2934,8 +3217,6 @@ function vbRenderDevolucionIntegral(){
       html+='</div>';
     });
     
-    html+='<button onclick="vbDesbloquearDiagnostico()" style="width:100%;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;padding:16px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:0.5px;box-shadow:0 4px 14px rgba(224,122,31,0.3);margin-top:6px">Ver mi diagnóstico personalizado completo →</button>';
-    html+='<p style="font-size:11px;color:#FDE68A;margin-top:10px;opacity:0.85;text-align:center">Acceso completo · Sin tarjeta de crédito</p>';
     html+='</div>';
   }else{
     // TRIAL VENCIDO → mantener velo + candado
@@ -2968,6 +3249,9 @@ function vbRenderDevolucionIntegral(){
     html+='</div>';
   }
   
+  // === INFORME DESCARGABLE DEL PASO 6 ===
+  html+=window.vbBloqueDescargaPaso(6,'Tu diagnóstico · Samprapti','vbInformePaso6');
+
   // === Botón ir al paso 7 al final del paso 6 ===
   html+='<div style="margin:24px 0 0 0;padding:18px 14px;background:#FAFAF7;border-radius:12px;border:2px solid #5A7A53">';
   html+='<p style="font-size:11px;color:#8B7355;text-align:center;margin:0 0 10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700">Ya hiciste el paso 6 de 9</p>';
@@ -3405,7 +3689,7 @@ function vbAbrirPaso4(){
   
   // Cada escáner tiene: emoji, nombre español, sánscrito, devanagari, qué se observa, en equilibrio, 
   // qué hacer, foto disponible, y un map de "relevancia por dosha" para el sistema verde/gris
-  var ESCANERES=[
+  window.VB_ESCANERES=window.VB_ESCANERES||[
     // === LAS 3 PRINCIPALES (Jihva, Netra, Nakha) — siempre verdes para todos ===
     {id:'jihva',cat:'principal',emoji:'👅',nombre:'Lengua',sk:'Jihva Pariksha',dev:'जिह्वा परीक्षा',
      observa:'Color (pálida, roja, violácea), capa que la cubre (blanca, amarilla, gris, marrón), grietas o fisuras, marcas de dientes en los bordes, forma y tamaño.',
@@ -3652,7 +3936,8 @@ function vbAbrirPaso4(){
      fuente:'Charaka Sutra cap. 30 (Ojas)'
     }
   ];
-  
+  var ESCANERES=window.VB_ESCANERES;
+
   // === Construir HTML ===
   var html='<div style="background:linear-gradient(180deg,#FAF7F0,#F5EFE0);min-height:100vh;padding:0 0 20px 0">';
   // === NAVBAR FIJO ARRIBA ===
@@ -3689,6 +3974,9 @@ function vbAbrirPaso4(){
   });
   html+='</div>';
   
+  // === INFORME DESCARGABLE DEL PASO 4 ===
+  html+=window.vbBloqueDescargaPaso(4,'Tu escáner físico · Asta Sthana Pariksha','vbInformePaso4');
+
   // === BOTÓN GIGANTE: IR AL PASO SIGUIENTE ===
   html+='<div style="margin:24px 0;padding:18px 14px;background:#FAFAF7;border-radius:12px;border:2px solid #5A7A53">';
   html+='<p style="font-size:11px;color:#8B7355;text-align:center;margin:0 0 10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700">Ya hiciste el paso 4 de 9</p>';
@@ -4594,7 +4882,9 @@ function vbAbrirPaso7(){
       ]
     }
   };
-  
+  // Exponer tablas del paso 7 a global para el informe descargable (vbInformePaso7)
+  window.VB_VYAYAMA=VB_VYAYAMA;window.VB_SADHANA=VB_SADHANA;window.VB_SNEHANA=VB_SNEHANA;window.VB_TIPS_PASO7=VB_TIPS_PASO7;
+
   // === 3 SERIES COMPLETAS POR DISCIPLINA Y DOSHA ===
   var VB_SERIES_PASO7={
     yoga:{
@@ -4905,6 +5195,9 @@ function vbAbrirPaso7(){
   
   html+='</div></div>';
   
+  // === INFORME DESCARGABLE DEL PASO 7 ===
+  html+=window.vbBloqueDescargaPaso(7,'Tu plan · Chikitsa','vbInformePaso7');
+
   // === BOTÓN GIGANTE: IR AL PASO SIGUIENTE (SIEMPRE VISIBLE) ===
   html+='<div style="margin:24px 0;padding:18px 14px;background:#FAFAF7;border-radius:12px;border:2px solid #5A7A53">';
   html+='<p style="font-size:11px;color:#8B7355;text-align:center;margin:0 0 10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700">Ya hiciste el paso 7 de 9</p>';
@@ -5251,6 +5544,9 @@ function vbAbrirPaso9Rasayana(){
   });
   html+='</div>';
   
+  // === INFORME DESCARGABLE DEL PASO 9 (síntesis) ===
+  html+=window.vbBloqueDescargaPaso(9,'Tu síntesis · Rasayana','vbInformePaso9');
+
   // === CTA FINAL ===
   html+='<div style="background:#fff;border:2px dashed #C49E72;border-radius:14px;padding:22px;text-align:center;margin-bottom:20px">';
   html+='<h3 style="font-family:Georgia,serif;font-size:18px;color:#3D5A36;margin-bottom:10px;font-weight:600">🌱 Empezá tu Rasayana hoy</h3>';
@@ -5502,6 +5798,57 @@ checkSaved();
     else setTimeout(arrancar,300);
   }catch(e){}
 })();
+
+// ============================================================
+// BYPASS DE TESTING · ?testscan=1 — SOLO localhost, JAMÁS producción
+// La Cloud Function del escáner no responde desde localhost. Este flag
+// simula un resultado completo del escáner (lengua + ojos + los 13
+// chequeos complementarios = 15 evaluaciones) para poder avanzar al Paso 5.
+// Doble guard de host: nunca corre en vedabite.com.
+// ============================================================
+window._vbEsLocalhost=function(){var h=location.hostname;return h==='localhost'||h==='127.0.0.1';};
+window.vbTestScanBypass=function(){
+  if(!window._vbEsLocalhost()){console.warn('[testscan] bypass IGNORADO: solo disponible en localhost, nunca en producción');return false;}
+  var dosha=(window.res&&window.res.p)||'vata';
+  var ahora=new Date().toISOString();
+  // Los 15 ids reales del array ESCANERES (jihva=lengua, netra=ojos + complementarias)
+  var ids=['jihva','netra','nadi','mutra','mala','shabda','sparsha','drik','akriti','oshtha','danta','sveda','kesha','asana','chaya'];
+  // 1) vb_fotos_paso4: marca cada chequeo como "sacado" + alias lengua/ojos que valida el avance al Paso 5
+  var fotos={};
+  ids.forEach(function(id){fotos[id]=ahora;});
+  fotos.lengua=ahora; fotos.ojos=ahora;
+  try{localStorage.setItem('vb_fotos_paso4',JSON.stringify(fotos));}catch(e){}
+  // 2) Resultado simulado por sección (misma forma que un escaneo real: vb_escaner_<seccion>)
+  ['lengua','ojos','piel'].concat(ids).forEach(function(sec){
+    try{localStorage.setItem('vb_escaner_'+sec,JSON.stringify({seccion:sec,dosha:dosha,fecha:ahora,resumen:'[TEST] Resultado simulado de '+sec+' · dosha '+dosha+' (bypass ?testscan=1, solo localhost).',test:true}));}catch(e){}
+  });
+  console.warn('[testscan] Escáner simulado: '+ids.length+' evaluaciones (lengua, ojos y complementarias) · dosha '+dosha+'. Ya podés avanzar al Paso 5.');
+  return true;
+};
+// Auto-activar si ?testscan=1 en localhost
+(function(){
+  try{
+    if(!/[?&]testscan=1\b/.test(location.search))return;
+    if(!window._vbEsLocalhost())return; // jamás en producción
+    var run=function(){
+      window.vbTestScanBypass();
+      // Si el Paso 4 ya está abierto, refrescarlo para que muestre todo escaneado
+      try{if((document.querySelector('.screen.active')||{}).id==='s10'&&typeof vbAbrirPaso4==='function')vbAbrirPaso4();}catch(e){}
+      // Banner visible: deja claro que es modo test y que no existe en producción
+      try{
+        if(!document.getElementById('vbTestScanBanner')){
+          var b=document.createElement('div');b.id='vbTestScanBanner';
+          b.style.cssText='position:fixed;bottom:0;left:0;right:0;z-index:99998;background:#7C2D12;color:#FDE68A;font-size:12px;font-weight:700;text-align:center;padding:6px 10px;letter-spacing:0.3px';
+          b.textContent='🧪 TEST MODE · escáner simulado (?testscan=1) · solo localhost — no existe en producción';
+          document.body.appendChild(b);
+        }
+      }catch(e){}
+    };
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(run,350);});
+    else setTimeout(run,350);
+  }catch(e){}
+})();
+
 // ============================================================
 // DIAGNÓSTICO DE DEAD CLICKS — reporta clicks en elementos que
 // parecen clickeables pero no producen ningún cambio visible.
