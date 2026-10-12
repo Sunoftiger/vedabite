@@ -5,10 +5,10 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="vb-version" content="B1-informes-per-paso-20260715">
+<meta name="vb-version" content="B1-gratis-churnas-20261002">
 <script>
 (function(){
-  var VERSION='B1-informes-per-paso-20260715';
+  var VERSION='B1-gratis-churnas-20261002';
   try{
     var stored=localStorage.getItem('vb_version');
     if(stored && stored!==VERSION){
@@ -137,10 +137,10 @@ y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
    VEDABITE — SISTEMA DUAL DE PAGOS (MP Argentina + LS Internacional)
    ========================================================= */
 window._vbPaymentConfig={
-  mpAR:'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=920ac9e7536e4490b5e8b936a1d6e1bf',
-  // Pago ÚNICO (no suscripción): "Informe + Carta Natal Védica Nivel 1" · $4.500 ARS
-  mpAR_informe1:'https://mpago.la/17RVMd9',
-  lsIntl:'https://vedabite.lemonsqueezy.com/checkout/buy/ec74072d-7b30-4273-b369-1950cc7820d0',
+  // Vedabite es 100% gratis: sin links de pago
+  mpAR:'',
+  mpAR_informe1:'',
+  lsIntl:'',
   country:null,
   currency:null,
   price:null,
@@ -156,10 +156,10 @@ window._vbDetectarPais=function(){
     window._vbPaymentConfig.detected=true;
     if(country==='AR'){
       window._vbPaymentConfig.currency='ARS';
-      window._vbPaymentConfig.price='$28.300';
+      window._vbPaymentConfig.price='Gratis';
     }else{
       window._vbPaymentConfig.currency='USD';
-      window._vbPaymentConfig.price='USD 20';
+      window._vbPaymentConfig.price='Gratis';
     }
     try{if(typeof gtag==='function')gtag('event','pais_detectado',{event_category:'ubicacion',event_label:country});}catch(e){}
     try{localStorage.setItem('vb_pais',country);}catch(e){}
@@ -170,7 +170,7 @@ window._vbDetectarPais=function(){
     try{saved=localStorage.getItem('vb_pais')||'AR';}catch(e){}
     window._vbPaymentConfig.country=saved;
     window._vbPaymentConfig.currency=(saved==='AR')?'ARS':'USD';
-    window._vbPaymentConfig.price=(saved==='AR')?'$28.300':'USD 20';
+    window._vbPaymentConfig.price='Gratis';
     window._vbPaymentConfig.detected=true;
     return window._vbPaymentConfig;
   });
@@ -178,14 +178,12 @@ window._vbDetectarPais=function(){
 
 // Obtener URL de checkout según país
 window._vbURLCheckout=function(){
-  var cfg=window._vbPaymentConfig;
-  if(cfg.country==='AR')return cfg.mpAR;
-  return cfg.lsIntl;
+  return ''; // 100% gratis: no hay checkout
 };
 
 // Obtener precio formateado según país
 window._vbPrecio=function(){
-  return window._vbPaymentConfig.price||'USD 20';
+  return 'Gratis';
 };
 
 // Obtener método de pago
@@ -412,9 +410,7 @@ window._vbSaveLead=function(d){
   }
 };
 function _vbMostrarSuscripcion(){
-  // Modelo nuevo: no hay suscripción. Lo único pago es DESCARGAR el informe ($4.500).
-  // Todo CTA que antes abría la suscripción Práctica ahora ofrece el informe.
-  if(typeof window.vbGateInforme1==='function'){ window.vbGateInforme1('ex_suscripcion'); return; }
+  // Vedabite es 100% gratis: no hay suscripción ni compra.
 }
 // ============================================================
 // CONFIRMACIÓN MANUAL DE PAGO — parche mientras no hay webhook de MP.
@@ -467,46 +463,16 @@ window._vbConfirmarPagoManual=function(){
   }catch(e){ guardarLocal(); done(false); }
 };
 // ============================================================
-// GATE DEL INFORME PAGO ÚNICO · $4.500 ARS (mpAR_informe1)
-// TODAS las descargas de informe/carta natal pasan por acá.
-// Se desbloquea solo con la compra del informe (o admin).
+// VEDABITE 100% GRATIS (oct 2026): todas las descargas de informe y
+// carta natal están abiertas. No hay gate ni checkout.
 // ============================================================
-window.vbCompraInforme1Activa=function(){
-  // Modelo nuevo: el ÚNICO desbloqueo de descargas es la compra del informe
-  // ($4.500, mpAR_informe1) o admin. El trial/Práctica NO desbloquea descargas.
-  try{ if(localStorage.getItem('vb_admin')==='si')return true; }catch(e){}
-  try{ if(localStorage.getItem('vb_informe_comprado')==='si')return true; }catch(e){}
-  return false;
-};
-window.vbGateInforme1=function(contexto){
-  try{
-    if(typeof gtag==='function')gtag('event','gate_informe1_visto',{event_category:'informe1',contexto:contexto||''});
-    if(window.clarity)window.clarity('event','gate_informe1_visto');
-  }catch(e){}
-  if(document.getElementById('vbGateInforme1'))return;
-  var m='<div id="vbGateInforme1" onclick="if(event.target===this)this.remove()" style="position:fixed;inset:0;background:rgba(45,30,20,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .25s">';
-  m+='<div style="background:linear-gradient(180deg,#FFFAF0,#F5EFE0);max-width:440px;width:100%;border-radius:18px;padding:28px 24px;box-shadow:0 20px 60px rgba(0,0,0,0.4);border:2px solid #C49E72;position:relative">';
-  m+='<button onclick="document.getElementById(\'vbGateInforme1\').remove()" style="position:absolute;top:12px;right:12px;background:transparent;border:none;font-size:22px;cursor:pointer;color:#8B7355;line-height:1">×</button>';
-  m+='<div style="text-align:center;font-size:38px;margin-bottom:8px">🔒</div>';
-  m+='<h3 style="font-family:Georgia,serif;font-size:21px;color:#3D5A36;text-align:center;margin:0 0 8px;font-weight:600">Lleváte tu informe en PDF</h3>';
-  m+='<p style="font-size:13px;color:#5A4A2A;text-align:center;margin:0 0 8px;line-height:1.5">Lo que estás viendo se pierde cuando cerrás la pestaña. El PDF es tuyo para siempre: para leerlo con calma, guardarlo, imprimirlo o compartirlo.</p>';
-  m+='<p style="font-size:13px;color:#5A4A2A;text-align:center;margin:0 0 4px;line-height:1.5">Sin suscripción · pago único · <strong>$4.500</strong></p>';
-  m+='<p style="font-size:12px;color:#8B7355;text-align:center;margin:0 0 18px;line-height:1.5;font-style:italic">¿Hiciste el test por otra persona? Cada informe es de ella — comprá uno por cada una.</p>';
-  m+='<button onclick="var u=(window._vbPaymentConfig&&window._vbPaymentConfig.mpAR_informe1)||\'\';if(!u||u===\'REEMPLAZAR_CON_LINK_DE_PAGO_MP\'){alert(\'Link de pago todavía no configurado\');return;}try{if(typeof gtag===\'function\'){gtag(\'event\',\'gate_informe1_click\',{event_category:\'conversion\',value:4500,currency:\'ARS\'});gtag(\'event\',\'begin_checkout\',{value:4500,currency:\'ARS\',items:[{item_name:\'Informe + Carta Natal Vedica Nivel 1\',price:4500}]});}if(window.clarity)window.clarity(\'event\',\'gate_informe1_click\');}catch(e){}window.location.href=u;" style="display:block;width:100%;padding:16px 14px;background:linear-gradient(135deg,#D97706,#B45309);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(217,119,6,0.3);text-align:center;line-height:1.3">🪔 Comprar informe · $4.500<div style="font-size:11px;font-weight:600;color:#FDE68A;margin-top:4px">Pago único con Mercado Pago</div></button>';
-  m+='<button onclick="document.getElementById(\'vbGateInforme1\').remove();if(window._vbAbrirConfirmarPago)window._vbAbrirConfirmarPago();try{if(typeof gtag===\'function\')gtag(\'event\',\'gate_informe1_ya_pague\');}catch(e){}" style="display:block;width:100%;padding:11px;margin-top:10px;background:none;border:1px solid #C49E72;border-radius:12px;font-size:13px;font-weight:700;color:#B45309;cursor:pointer">Ya pagué, confirmar →</button>';
-  m+='<p style="text-align:center;margin:14px 0 0;font-size:11px;color:#8B7355;font-style:italic">Vos sos el amor de tu vida</p>';
-  m+='</div></div>';
-  var d=document.createElement('div');d.innerHTML=m;document.body.appendChild(d.firstChild);
-};
+window.vbCompraInforme1Activa=function(){ return true; };
+window.vbGateInforme1=function(contexto){ /* sin gate: todo gratis */ };
 function _vbAccionPracticaPostInforme(variant){
   try{
-    var v=variant||'boton_sage_original';
-    var country=(window._vbPaymentConfig&&window._vbPaymentConfig.country)||'XX';
-    if(typeof gtag==='function')gtag('event','cta_post_informe',{event_category:'conversion',event_label:'click_empezar_ahora',variant:v,pais:country});
-    if(typeof window.clarity==='function'){window.clarity('set','cta_variant',v);window.clarity('event','cta_post_informe_click_'+v);}
+    if(typeof gtag==='function')gtag('event','cta_post_informe',{event_category:'engagement',event_label:'tu_camino',variant:variant||''});
   }catch(e){}
-  var url=(window._vbURLCheckout&&window._vbURLCheckout())||'https://vedabite.lemonsqueezy.com/checkout/buy/ec74072d-7b30-4273-b369-1950cc7820d0';
-  window.location.href=url;
+  if(typeof _vbAbrirPantallaGPS==='function')_vbAbrirPantallaGPS();
 }
 </script>
 
@@ -2093,7 +2059,7 @@ function vbContinuarTest(){
 </div>
 <div class="tabs-grid" id="tabsGrid"></div>
 <div id="tabContents"></div>
-<div style="padding:20px"><div class="card" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);text-align:center"><h4 style="margin-bottom:6px">📥 Lleváte tu informe en PDF</h4><p style="font-size:12px;color:#7C2D12;font-weight:600;margin-bottom:10px;letter-spacing:0.5px;text-transform:uppercase">3 voces · pago único, sin suscripción</p><p style="font-size:13px;color:#666;margin-bottom:14px">Lo que ves en pantalla se pierde al cerrar la página. El PDF es tuyo para siempre: leélo en detalle, guardalo, imprimilo o compartilo. Cada voz lee el mismo análisis con un lente distinto:</p><div style="display:grid;gap:10px"><button class="btn btn-gold" onclick="downloadPDF('amiga')" style="position:relative;opacity:0.85">💚 Como una Amiga<span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px">🔒</span></button><button class="btn btn-sage" onclick="downloadPDF('medico')" style="position:relative;opacity:0.85">🩺 Médico Occidental<span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px">🔒</span></button><button class="btn btn-primary" onclick="downloadPDF('ayurveda')" style="position:relative;opacity:0.85">🌿 Terapeuta Ayurvédico<span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px">🔒</span></button></div><p style="font-size:11px;color:#78350F;margin-top:12px;line-height:1.5;font-style:italic">Pago único de $4.500 (cualquier voz), lo tenés para siempre. ¿Lo hiciste por otra persona —tu hijo, tu paciente, tu alumno—? Comprá un informe por cada una.</p></div></div>
+<div style="padding:20px"><div class="card" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);text-align:center"><h4 style="margin-bottom:6px">📥 Lleváte tu informe en PDF</h4><p style="font-size:12px;color:#7C2D12;font-weight:600;margin-bottom:10px;letter-spacing:0.5px;text-transform:uppercase">3 voces · descarga gratis</p><p style="font-size:13px;color:#666;margin-bottom:14px">Lo que ves en pantalla se pierde al cerrar la página. El PDF es tuyo para siempre: leélo en detalle, guardalo, imprimilo o compartilo. Cada voz lee el mismo análisis con un lente distinto:</p><div style="display:grid;gap:10px"><button class="btn btn-gold" onclick="downloadPDF('amiga')" style="position:relative;opacity:0.85">💚 Como una Amiga</button><button class="btn btn-sage" onclick="downloadPDF('medico')" style="position:relative;opacity:0.85">🩺 Médico Occidental</button><button class="btn btn-primary" onclick="downloadPDF('ayurveda')" style="position:relative;opacity:0.85">🌿 Terapeuta Ayurvédico</button></div><p style="font-size:11px;color:#78350F;margin-top:12px;line-height:1.5;font-style:italic">Descargá las voces que quieras. Es gratis.</p></div></div>
 
 <div id="vbBloquePostInforme" style="margin-top:24px;font-family:inherit;display:none">
 <!-- Bloque post-informe Vedabite v1 ELIMINADO — reemplazado por el roadmap navegable + paso 7 prescriptivo -->
@@ -2295,25 +2261,19 @@ window._vbDisclaimerInforme=function(V){
 window._vbTrackDescargaPaso=function(n,voz,dosha,tipo){
   try{if(typeof gtag==='function'){gtag('event','download_informe_paso',{event_category:'descarga_pdf',event_label:tipo+'_'+voz,paso:n,voz_elegida:voz,dosha:dosha,value:1});gtag('event','conversion',{send_to:'AW-632212911/download_informe'});}if(typeof window.clarity==='function')window.clarity('event','descarga_informe_paso'+n+'_'+voz);if(window._vbDB)window._vbDB.collection('descargas').add({email:userEmail||'sin_email',tipo:tipo,paso:n,voz:voz,dosha:dosha,timestamp:firebase.firestore.FieldValue.serverTimestamp(),createdAt:new Date().toISOString()}).catch(function(){});}catch(e){}
 };
-// Bloque UI reutilizable: 3 voces + CTA compra $4.500 (con evento GA4). Se inserta en cada pantalla de paso.
+// Bloque UI reutilizable: 3 voces de descarga gratuita. Se inserta en cada pantalla de paso.
 window.vbBloqueDescargaPaso=function(n,subtitulo,fnBase){
   var pago=(typeof vbCompraInforme1Activa==='function')&&vbCompraInforme1Activa();
-  var lock=pago?'':'<span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px">🔒</span>';
+  var lock=pago?'':'';
   var h='<div style="background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border:2px solid #C49E72;border-radius:14px;padding:18px 16px;margin:22px 0 14px;text-align:center">';
-  h+='<p style="font-size:10px;letter-spacing:2px;color:#B45309;text-transform:uppercase;font-weight:700;margin:0 0 8px">📥 Informe del Paso '+n+(pago?' · desbloqueado':' · pago único')+'</p>';
+  h+='<p style="font-size:10px;letter-spacing:2px;color:#B45309;text-transform:uppercase;font-weight:700;margin:0 0 8px">📥 Informe del Paso '+n+' · gratis'+'</p>';
   h+='<h4 style="font-family:Georgia,serif;font-size:18px;color:#3D5A36;font-weight:600;margin:0 0 6px;line-height:1.3">'+subtitulo+'</h4>';
-  h+='<p style="font-size:13px;color:#5A4A2A;line-height:1.5;margin:0 0 12px">Lo que ves en pantalla se pierde al cerrar la página. En PDF es tuyo para siempre — para leerlo, guardarlo, imprimirlo o compartirlo. 3 voces leen el mismo análisis con un lente distinto'+(pago?'':' · pago único, sin suscripción · <strong>$4.500</strong>')+'.</p>';
+  h+='<p style="font-size:13px;color:#5A4A2A;line-height:1.5;margin:0 0 12px">Lo que ves en pantalla se pierde al cerrar la página. En PDF es tuyo para siempre — para leerlo, guardarlo, imprimirlo o compartirlo. 3 voces leen el mismo análisis con un lente distinto.</p>';
   h+='<div style="display:grid;gap:10px;margin-bottom:'+(pago?'0':'12px')+'">';
   h+='<button onclick="'+fnBase+'(\'amiga\')" class="btn btn-gold" style="position:relative;opacity:0.9">💚 Como una Amiga'+lock+'</button>';
   h+='<button onclick="'+fnBase+'(\'medico\')" class="btn btn-sage" style="position:relative;opacity:0.9">🩺 Médico Occidental'+lock+'</button>';
   h+='<button onclick="'+fnBase+'(\'ayurveda\')" class="btn btn-primary" style="position:relative;opacity:0.9">🌿 Terapeuta Ayurvédico'+lock+'</button>';
   h+='</div>';
-  if(!pago){
-    h+='<button onclick="var u=(window._vbPaymentConfig&&window._vbPaymentConfig.mpAR_informe1)||\'\';if(!u||u===\'REEMPLAZAR_CON_LINK_DE_PAGO_MP\'){alert(\'Link de pago todavía no configurado\');return;}try{if(typeof gtag===\'function\'){gtag(\'event\',\'cta_informe1_click\',{event_category:\'conversion\',value:4500,currency:\'ARS\',paso:'+n+'});gtag(\'event\',\'begin_checkout\',{value:4500,currency:\'ARS\',items:[{item_name:\'Informe Paso '+n+'\',price:4500}]});}if(window.clarity)window.clarity(\'event\',\'cta_informe1_click_paso'+n+'\');}catch(e){}window.location.href=u;" style="display:block;width:100%;padding:15px 14px;background:linear-gradient(135deg,#D97706,#B45309);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(217,119,6,0.3);text-align:center;line-height:1.3">🪔 Comprar informe · $4.500<div style="font-size:11px;font-weight:600;color:#FDE68A;margin-top:4px">Pago único con Mercado Pago · desbloquea todos los informes</div></button>';
-    h+='<button onclick="if(window._vbAbrirConfirmarPago)window._vbAbrirConfirmarPago();try{if(typeof gtag===\'function\')gtag(\'event\',\'cta_ya_pague_click\');}catch(e){}" style="display:block;width:100%;padding:11px;margin-top:10px;background:none;border:1px solid #C49E72;border-radius:12px;font-size:13px;font-weight:700;color:#B45309;cursor:pointer">Ya pagué, confirmar →</button>';
-    h+='<p style="font-size:11px;color:#8B7355;line-height:1.5;margin:12px 0 0;font-style:italic">¿Lo hiciste por otra persona —tu hijo, tu paciente, tu alumno—? Cada informe es de ella; comprá uno por cada una.</p>';
-    try{if(typeof gtag==="function")gtag("event","cta_informe1_visto",{paso:n});if(window.clarity)window.clarity("event","cta_informe1_visto_paso"+n);}catch(e){}
-  }
   h+='</div>';
   return h;
 };
@@ -2835,10 +2795,10 @@ function vbRenderDevolucionIntegral(){
     {n:2,t:'Carta natal védica',sk:'Janma Kundali Jyotish · जन्म कुण्डली ज्योतिष',d:'Lagna, Surya Rashi, Chandra Rashi, Nakshatra · Tu Prakriti calculada por API real',obj:'Conocer tu naturaleza desde el nacimiento',precio:'gratis'},
     {n:3,t:'Test del estado actual',sk:'Vikriti Pariksha · विकृति परीक्षा',d:'50 preguntas que cubren las 14 zonas que mide el Ayurveda · Tu estado actual en porcentajes Vata/Pitta/Kapha',obj:'Saber cómo estás vos hoy',precio:'gratis'},
     {n:4,t:'Tu escáner físico',sk:'Asta Sthana Pariksha · अष्ट स्थान परीक्षा',d:'18 chequeos en tu cuerpo · Lengua, ojos y uñas con foto + IA · Pulso, sudor, voz, postura',obj:'Confirmar tu diagnóstico mirando tu cuerpo',precio:'gratis'},
-    {n:5,t:'Tu lectura',sk:'Vaidya Nirnaya · वैद्य निर्णय',d:'Cómo naciste vs cómo estás hoy · Las 5 cualidades · La dirección y el movimiento de tu desorden',obj:'Entender qué se te desordenó',precio:'incluido'},
-    {n:6,t:'Diagnóstico hiper personalizado',sk:'Samprapti · सम्प्राप्ति',d:'Línea de tiempo 6m/2a/5a/10a · 13 canales (Srotas) · Tus toxinas (Ama) · Las 6 etapas Kriyakala',obj:'Ver hacia dónde vas si no actuás hoy',precio:'incluido'},
+    {n:5,t:'Tu lectura',sk:'Vaidya Nirnaya · वैद्य निर्णय',d:'Cómo naciste vs cómo estás hoy · Las 5 cualidades · La dirección y el movimiento de tu desorden',obj:'Entender qué se te desordenó',precio:'gratis'},
+    {n:6,t:'Diagnóstico hiper personalizado',sk:'Samprapti · सम्प्राप्ति',d:'Línea de tiempo 6m/2a/5a/10a · 13 canales (Srotas) · Tus toxinas (Ama) · Las 6 etapas Kriyakala',obj:'Ver hacia dónde vas si no actuás hoy',precio:'gratis'},
     {n:7,t:'Cómo transitar hacia tu equilibrio',sk:'Chikitsa · चिकित्सा',d:'7 módulos prescriptos · 12 hierbas Rasayana · 4 recetas para hacer en casa · Mujer/hombre · Mapa profesionales',obj:'Transitar hacia tu equilibrio',precio:'gratis'},
-    {n:8,t:'Seguimiento mensual',sk:'Anubandha · अनुबन्ध',d:'Re-test cada 30 días · Ajuste automático del plan · Comparativa día 60/90 · Acceso premium a Vaidyas verificados',obj:'Mantener tu equilibrio en el tiempo',precio:'gratis'},
+    {n:8,t:'Seguimiento mensual',sk:'Anubandha · अनुबन्ध',d:'Re-test cada 30 días · Ajuste automático del plan · Comparativa día 60/90 · Acceso a Vaidyas verificados',obj:'Mantener tu equilibrio en el tiempo',precio:'gratis'},
     {n:9,t:'🌱 Rasayana · Tu nuevo estilo de vida',sk:'Rasayana · रसायन',d:'Las 10 conductas · 7 alimentos · 12 hierbas · Anti-edad · Vitalidad sexual · Estilo de vida que sostiene el equilibrio',obj:'Donde tu cuerpo se vuelve eterno',precio:'gratis'}
   ];
   
@@ -3221,7 +3181,7 @@ function vbRenderDevolucionIntegral(){
   }else{
     // TRIAL VENCIDO → mantener velo + candado
     html+='<div style="background:linear-gradient(180deg,#3D5A36,#2D3A26);color:#fff;border-radius:14px;padding:22px;margin-bottom:14px;text-align:center;position:relative;overflow:hidden">';
-    html+='<div style="position:absolute;top:14px;right:14px;background:#C49E72;color:#fff;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px">PAGO · USD 20</div>';
+    html+='<div style="position:absolute;top:14px;right:14px;background:#C49E72;color:#fff;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px">GRATIS</div>';
     html+='<p style="font-size:11px;letter-spacing:3px;color:#FDE68A;text-transform:uppercase;font-weight:700;margin-bottom:8px">🔒 Diagnóstico integral</p>';
     html+='<h3 style="font-family:Georgia,serif;font-size:22px;color:#FFF;font-weight:400;margin-bottom:14px;line-height:1.4">Faltan 5 lecturas más para que tengas tu diagnóstico completo</h3>';
     
@@ -3244,7 +3204,7 @@ function vbRenderDevolucionIntegral(){
     });
     html+='</div>';
     
-    html+='<button onclick="vbDesbloquearDiagnostico()" style="width:100%;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;padding:16px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:0.5px;box-shadow:0 4px 14px rgba(224,122,31,0.3)">Desbloquear mi diagnóstico integral · USD 20 →</button>';
+    html+='<button onclick="vbDesbloquearDiagnostico()" style="width:100%;background:linear-gradient(135deg,#E07A1F,#C45F0F);color:#fff;border:none;padding:16px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:0.5px;box-shadow:0 4px 14px rgba(224,122,31,0.3)">Ver mi diagnóstico integral →</button>';
     html+='<p style="font-size:11px;color:#FDE68A;margin-top:10px;opacity:0.8">Cancelás cuando quieras</p>';
     html+='</div>';
   }
@@ -4492,7 +4452,7 @@ function vbAbrirPaso7(){
   html+='</div>';
   
   // Banner acceso libre (modelo nuevo: ver es 100% gratis)
-  html+='<div style="background:#D1FAE5;border:2px solid #059669;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#065F46;font-weight:700">🎁 Ver todo es gratis</p><p style="font-size:11px;color:#047857;margin-top:4px">Explorá el informe entero sin pagar nada. Lo único pago es descargarlo en PDF ($4.500): así no se pierde al cerrar la página y lo tenés para siempre.</p></div>';
+  html+='<div style="background:#D1FAE5;border:2px solid #059669;border-radius:12px;padding:14px;margin-bottom:18px;text-align:center"><p style="font-size:13px;color:#065F46;font-weight:700">🎁 Todo es gratis</p><p style="font-size:11px;color:#047857;margin-top:4px">Explorá el informe entero y descargalo en PDF sin pagar nada: así no se pierde al cerrar la página y lo tenés para siempre.</p></div>';
   
   // ============================================================
   // PASO 7 — REORGANIZADO POR PRIORIDAD CON CARDS EXPANDIBLES
@@ -5332,7 +5292,7 @@ function vbCerrarPaso7(){
 
 // Velo y candado para secciones bloqueadas
 function vbVeloLock(){
-  return '<div style="position:relative;background:#FAF7F0;border-radius:8px;padding:18px;text-align:center"><div style="filter:blur(4px);user-select:none;color:#5A7A53;font-size:13px;line-height:1.6">Contenido completo disponible solo con suscripción activa. Cereales calientes, legumbres bien cocidas con especias, vegetales con ghee, frutas dulces. Horarios específicos. Detalles personalizados según tu cuadro.</div><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;padding:10px 16px;border-radius:50px;border:2px solid #C49E72;font-size:13px;color:#3D5A36;font-weight:700;white-space:nowrap">🔒 Suscribite para ver</div></div>';
+  return '<div style="position:relative;background:#FAF7F0;border-radius:8px;padding:18px;text-align:center"><div style="filter:blur(4px);user-select:none;color:#5A7A53;font-size:13px;line-height:1.6">Contenido completo disponible gratis. Cereales calientes, legumbres bien cocidas con especias, vegetales con ghee, frutas dulces. Horarios específicos. Detalles personalizados según tu cuadro.</div><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;padding:10px 16px;border-radius:50px;border:2px solid #C49E72;font-size:13px;color:#3D5A36;font-weight:700;white-space:nowrap">Disponible gratis</div></div>';
 }
 
 // Activación del programa Rasayana (Paso 9) — 6 pilares + hitos, gateado por acceso Práctica
@@ -5679,6 +5639,52 @@ function vbCerrarPaso8(){
 // Conectar paso 6 → paso 7 directo (en lugar de checkout) cuando trial activo
 window.vbAbrirPaso7=vbAbrirPaso7;
 window.vbAbrirPaso8=vbAbrirPaso8;
+// ============================================================
+// CHURNAS (चूर्ण · "polvo": mezcla de especias molidas) POR BIOTIPO
+// Se muestran en el tab Recetas según el dosha dominante (res.p).
+// ============================================================
+window.VB_CHURNAS={
+  vata:{n:'Churna Vata',lema:'Calienta, asienta y ayuda a digerir sin gases',color:'#8B5CF6',bg:'#F5F3FF',
+    ing:['2 cdas de semillas de hinojo','1 cda de semillas de comino','1 cda de semillas de cilantro','1 cdita de jengibre seco en polvo','1 cdita de cúrcuma en polvo','1 cdita de sal de roca o sal marina','media cdita de canela en polvo','un cuarto de cdita de asafétida (hing), opcional'],
+    uso:'Media a 1 cdita por plato. Mejor salteada 30 segundos en ghee o aceite de sésamo al empezar a cocinar: sopas, guisos, arroz, zapallo, lentejas.',
+    tip:'Vata necesita calor, untuosidad y sal. Usala siempre con algo de grasa, nunca sobre comida fría o seca.'},
+  pitta:{n:'Churna Pitta',lema:'Refresca, da sabor y no enciende más fuego',color:'#DC2626',bg:'#FEF2F2',
+    ing:['2 cdas de semillas de cilantro','2 cdas de semillas de hinojo','1 cda de semillas de comino','1 cdita de cardamomo molido','1 cdita de cúrcuma en polvo','1 cdita de menta seca','1 cdita de azúcar mascabo','1 pizca de canela, opcional'],
+    uso:'Media a 1 cdita por plato. Salteada suave en ghee o aceite de coco, o espolvoreada al final sobre arroz basmati, verduras al vapor, ensaladas y yogur natural.',
+    tip:'Sin picante, sin ajo y casi sin sal: lo que te refresca es el cilantro, el hinojo y la menta.'},
+  kapha:{n:'Churna Kapha',lema:'Picante y seca: despierta la digestión lenta',color:'#059669',bg:'#ECFDF5',
+    ing:['2 cdas de jengibre seco en polvo','1 cda de pimienta negra en grano','1 cda de semillas de cilantro','1 cda de cúrcuma en polvo','1 cdita de semillas de comino','1 cdita de canela en polvo','media cdita de clavo de olor molido','1 pizca de pimienta de cayena, opcional'],
+    uso:'Media a 1 cdita por plato. Tostada en sartén casi sin aceite antes de sumar verduras, legumbres o quinoa. También sobre sopas livianas.',
+    tip:'Sin sal y sin azúcar. Cuanto más liviano y seco el plato, mejor te funciona.'},
+  tri:{n:'Churna tridóshica',lema:'Para cuando cocinás para toda la familia',color:'#B45309',bg:'#FFFBEB',
+    ing:['1 cda de semillas de comino','1 cda de semillas de cilantro','1 cda de semillas de hinojo','1 cda de cúrcuma en polvo','1 cdita de jengibre seco en polvo','media cdita de cardamomo molido'],
+    uso:'Media a 1 cdita por plato, en cualquier comida salada.',
+    tip:'Es la base CCF (comino, cilantro, hinojo) más cúrcuma: equilibra a los tres biotipos.'}
+};
+window.vbChurnaCard=function(c,destacada){
+  var h='<div class="card" style="background:'+c.bg+';border-left:4px solid '+c.color+'">';
+  h+='<h4 style="color:'+c.color+';margin-bottom:4px">🌶️ '+c.n+(destacada?' · la tuya':'')+'</h4>';
+  h+='<p style="font-size:13px;font-style:italic;color:#666;margin-bottom:10px">'+c.lema+'</p>';
+  h+='<p style="font-size:13px;font-weight:700;margin-bottom:4px">Ingredientes</p><ul style="margin:0 0 10px">'+c.ing.map(function(i){return '<li>'+i+'</li>';}).join('')+'</ul>';
+  h+='<p style="font-size:13px;line-height:1.6;margin-bottom:6px"><strong>Cómo usarla:</strong> '+c.uso+'</p>';
+  h+='<p style="font-size:13px;line-height:1.6"><strong>Clave:</strong> '+c.tip+'</p>';
+  h+='</div>';
+  return h;
+};
+window.vbChurnasHTML=function(dosha){
+  var C=window.VB_CHURNAS,d=(C[dosha]&&dosha!=='tri')?dosha:'vata';
+  var h='<div style="margin-top:20px"><h4 style="margin-bottom:6px">🌶️ Tu churna</h4>';
+  h+='<p style="font-size:13px;color:#666;line-height:1.6;margin-bottom:12px">Churna (चूर्ण) significa "polvo": una mezcla de especias molidas que se usa para condimentar la comida según tu biotipo. La hacés una vez y te dura semanas.</p>';
+  h+=window.vbChurnaCard(C[d],true);
+  h+='<div class="card"><h4>🥣 Preparación (igual para todas)</h4><ol style="padding-left:18px;font-size:13px;line-height:1.7"><li>Tostá las semillas enteras en sartén seca, a fuego bajo, 1 a 2 minutos, hasta que larguen aroma. Que no se quemen.</li><li>Dejalas enfriar y molelas en molinillo de café o mortero.</li><li>Mezclá con las especias que ya vienen en polvo.</li><li>Guardá en frasco de vidrio hermético, lejos de la luz y del calor. Dura 2 a 3 meses.</li></ol></div>';
+  h+=window.vbChurnaCard(C.tri,false);
+  h+='<details style="margin-top:10px"><summary style="cursor:pointer;font-size:13px;font-weight:700;color:#5A7A53;padding:8px 0">Ver las churnas de los otros biotipos</summary>';
+  ['vata','pitta','kapha'].forEach(function(k){ if(k!==d)h+=window.vbChurnaCard(C[k],false); });
+  h+='</details>';
+  h+='<p style="font-size:11px;color:#8B7355;font-style:italic;line-height:1.5;margin-top:10px">Son condimentos de cocina, no medicación. Si estás embarazada, tomás anticoagulantes o tenés gastritis o reflujo, consultá antes de usar mucho jengibre, pimienta, cúrcuma o asafétida.</p>';
+  h+='</div>';
+  return h;
+};
 function tips(a){return a&&a.length?'<div style="margin-top:20px"><h4 style="margin-bottom:12px">💡 7 Tips Personalizados</h4>'+a.map(function(a,e){return'<div class="tip-card"><span class="tip-num">'+(e+1)+"</span>"+a+"</div>"}).join("")+"</div>":""}
 function showTab(a){document.querySelectorAll(".tab-content").forEach(function(a){a.classList.remove("active")});var el=document.getElementById("t-"+a);if(el){el.classList.add("active");document.getElementById("tabsGrid").style.display="none";window.scrollTo(0,0);if(a==="escanerEquilibrio"){try{var dd=res&&res.p?res.p:"desconocido";if(window._vbTrack)window._vbTrack("tab_abierto",{tab:"escaner_equilibrio",dosha:dd});if(typeof window._vbFetchEstadoEscaner==='function')window._vbFetchEstadoEscaner();// IDs para anchor-scroll a las 3 evaluaciones principales
 try{var lengua=el.querySelector('[data-sec="lengua"]');if(lengua)lengua.id='evaluacion-lengua';var ojos=el.querySelector('[data-sec="ojos"]');if(ojos)ojos.id='evaluacion-ojos';var unas=el.querySelector('[data-sec="unas"]');if(unas)unas.id='evaluacion-unas';}catch(e){}if(!el._vbBound){el._vbBound=true;el.addEventListener("click",function(ev){var card=ev.target.closest("[data-sec]");if(card){try{if(window._vbTrack)window._vbTrack("escaner_seccion",{seccion:card.getAttribute("data-sec"),dosha:card.getAttribute("data-dosha")});}catch(e){}}});}}catch(e){}}}}
@@ -5688,7 +5694,7 @@ function qScan(a){document.getElementById("prodIn").value=a,scan()}
 function renderTabs(a){var e="";
 e+='<div class="tab-content" id="t-resumen"><button class="back-btn" onclick="backIdx()">← Volver</button><h3>📊 Tu Resumen</h3><div class="card"><h4>Así sos vos</h4><ul>'+a.traits.map(function(a){return"<li>✓ "+a+"</li>"}).join("")+"</ul></div>"+tips(a.saludTips)+"</div>";
 e+='<div class="tab-content" id="t-alimentos"><button class="back-btn" onclick="backIdx()">← Volver</button><h3>🍽️ Alimentos</h3><div class="card" style="background:#D1FAE5"><h4>✅ Te hacen bien</h4><ul>'+a.good.map(function(a){return"<li>✓ "+a+"</li>"}).join("")+'</ul></div><div class="card" style="background:#FEE2E2"><h4>⚠️ Evitá estos</h4><ul>'+a.bad.map(function(a){return"<li>✗ "+a+"</li>"}).join("")+"</ul></div></div>";
-e+='<div class="tab-content" id="t-recetas"><button class="back-btn" onclick="backIdx()">← Volver</button><h3>🍲 Recetas</h3><div class="card"><h4>🍳 Desayuno</h4><p>'+a.recetas.d+'</p></div><div class="card"><h4>🥗 Almuerzo</h4><p>'+a.recetas.a+'</p></div><div class="card"><h4>🍵 Cena</h4><p>'+a.recetas.c+"</p></div>"+tips(a.recetasTips)+"</div>";
+e+='<div class="tab-content" id="t-recetas"><button class="back-btn" onclick="backIdx()">← Volver</button><h3>🍲 Recetas</h3><div class="card"><h4>🍳 Desayuno</h4><p>'+a.recetas.d+'</p></div><div class="card"><h4>🥗 Almuerzo</h4><p>'+a.recetas.a+'</p></div><div class="card"><h4>🍵 Cena</h4><p>'+a.recetas.c+"</p></div>"+window.vbChurnasHTML(res&&res.p)+tips(a.recetasTips)+"</div>";
 e+='<div class="tab-content" id="t-horarios"><button class="back-btn" onclick="backIdx()">← Volver</button><h3>⏰ Tu Rutina</h3><div class="card">'+a.horarios.map(function(a){return'<p style="padding:8px 0;border-bottom:1px solid #eee">🕐 '+a+"</p>"}).join("")+"</div></div>";
 e+='<div class="tab-content" id="t-proyeccion"><button class="back-btn" onclick="backIdx()">← Volver</button><h3>🔮 Proyección</h3><div class="card"><p style="padding:12px 0;border-bottom:1px solid #eee"><strong>📅 1 mes:</strong> '+a.proy.m1+'</p><p style="padding:12px 0;border-bottom:1px solid #eee"><strong>📅 3 meses:</strong> '+a.proy.m3+'</p><p style="padding:12px 0;border-bottom:1px solid #eee"><strong>📅 6 meses:</strong> '+a.proy.m6+'</p><p style="padding:12px 0"><strong>🎯 1 año:</strong> '+a.proy.a+"</p></div></div>";
 e+='<div class="tab-content" id="t-ejercicio"><button class="back-btn" onclick="backIdx()">← Volver</button><h3>🏃 Ejercicio</h3><div class="card"><ul>'+a.ejercicios.map(function(a){return"<li>🏃 "+a+"</li>"}).join("")+"</ul></div>"+tips(a.ejerciciosTips)+"</div>";
@@ -5759,7 +5765,7 @@ z+="<li><strong>Sol en "+N+":</strong> Tu esencia y propósito vital</li>";
 z+="<li><strong>Luna en "+H+":</strong> Tu mente emocional y mundo interior</li>";
 z+="<li><strong>Ascendente "+T+":</strong> Tu personalidad y cómo te perciben</li>";
 z+="<li><strong>Júpiter en "+U+":</strong> Tu crecimiento y expansión espiritual</li></ul></div>";
-z+='<div class="card" style="margin-top:16px;background:linear-gradient(135deg,#FEF3C7,#FDE68A);text-align:center"><h4 style="margin-bottom:12px">📥 Descargá tu carta astral védica</h4><p style="font-size:13px;color:#666;margin-bottom:14px">Lo que estás viendo se pierde al cerrar la página. En PDF es tuya para siempre. Elegí la voz del informe:</p><div style="display:grid;gap:10px"><button class="btn btn-sage" onclick="downloadAstro(&#39;medico&#39;)" style="position:relative;opacity:0.85">🩺 Médico Occidental<span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px">🔒</span></button><button class="btn btn-primary" onclick="downloadAstro(&#39;ayurveda&#39;)" style="position:relative;opacity:0.85">🌿 Terapeuta Ayurvédico<span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px">🔒</span></button><button class="btn btn-gold" onclick="downloadAstro(&#39;amiga&#39;)" style="position:relative;opacity:0.85">💚 Como una Amiga<span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px">🔒</span></button></div><p style="font-size:11px;color:#78350F;margin-top:12px;line-height:1.5;font-style:italic">La descarga es parte del informe · pago único de $4.500, sin suscripción</p></div>';
+z+='<div class="card" style="margin-top:16px;background:linear-gradient(135deg,#FEF3C7,#FDE68A);text-align:center"><h4 style="margin-bottom:12px">📥 Descargá tu carta astral védica</h4><p style="font-size:13px;color:#666;margin-bottom:14px">Lo que estás viendo se pierde al cerrar la página. En PDF es tuya para siempre. Elegí la voz del informe:</p><div style="display:grid;gap:10px"><button class="btn btn-sage" onclick="downloadAstro(&#39;medico&#39;)" style="position:relative;opacity:0.85">🩺 Médico Occidental</button><button class="btn btn-primary" onclick="downloadAstro(&#39;ayurveda&#39;)" style="position:relative;opacity:0.85">🌿 Terapeuta Ayurvédico</button><button class="btn btn-gold" onclick="downloadAstro(&#39;amiga&#39;)" style="position:relative;opacity:0.85">💚 Como una Amiga</button></div><p style="font-size:11px;color:#78350F;margin-top:12px;line-height:1.5;font-style:italic">La descarga es gratis</p></div>';
 document.getElementById("astroResult").innerHTML=z}else alert("Completá todos los campos");
 function B(a){return Math.floor((a%360+360)%360/30)}function L(a){return Math.floor((a%360+360)%360%30)}function ea(a){return Math.floor((a-Y+360)%360/30)+1}}
 
@@ -6672,6 +6678,7 @@ window.renderTabs=function(a){
   Object.keys(tabIcons).forEach(function(tabId){
     if(info[tabId]){
       var contenido=aplicarGating(info[tabId],tabId);
+      if(tabId==='recetas'&&typeof window.vbChurnasHTML==='function')contenido+=window.vbChurnasHTML(doshaKey);
       html+='<div class="tab-content" id="t-'+tabId+'"><button class="back-btn" onclick="backIdx()">← Volver</button><h3>'+tabIcons[tabId]+' '+tabTitles[tabId]+'</h3>'+contenido+'</div>';
     }
   });
@@ -6932,14 +6939,14 @@ window._vbRenderAnalisis=function(preview, a, seccion, dosha){
 
 // Mostrar paywall cuando se agotaron las fotos gratis
 window._vbMostrarPaywallFoto=function(preview, urlCheckout, seccion, fotosUsadas, fotosGratisTotal){
-  var url=urlCheckout||(window._vbURLCheckout&&window._vbURLCheckout())||'https://vedabite.lemonsqueezy.com/checkout/buy/ec74072d-7b30-4273-b369-1950cc7820d0';
+  var url=urlCheckout||(window._vbURLCheckout&&window._vbURLCheckout())||'';
   var usadas=fotosUsadas||3;
   var total=fotosGratisTotal||3;
   var html='<div style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);padding:24px;border-radius:14px;margin-top:10px;text-align:center;border:2px solid #D97706">'+
     '<div style="font-size:42px;margin-bottom:8px">🎁</div>'+
     '<h4 style="margin:4px 0 8px;color:#92400E;font-size:17px">Usaste tus '+total+' análisis gratis con IA</h4>'+
     '<p style="font-size:13px;color:#78350F;margin:0 0 8px;line-height:1.6">¡Gracias por probar el escáner! Los '+total+' análisis con IA son gratis. Todo el resto del contenido de Vedabite lo podés ver sin límite y sin costo.</p>'+
-    '<p style="font-size:12px;color:#92400E;margin:12px 0 0;font-style:italic">Lo único pago es descargar tu informe en PDF ($4.500): lo que ves en pantalla se pierde al cerrar la página, el PDF es tuyo para siempre.</p>'+
+    '<p style="font-size:12px;color:#92400E;margin:12px 0 0;font-style:italic">Descargá tu informe en PDF, también gratis: lo que ves en pantalla se pierde al cerrar la página, el PDF es tuyo para siempre.</p>'+
     '</div>';
   var existing=preview.querySelector('img');
   preview.innerHTML=(existing?existing.outerHTML:'')+html;
@@ -6980,7 +6987,7 @@ window._vbActualizarContadorFotos=function(){
   
   if(restantes===0){
     badge.style.cssText='background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:2px solid #D97706;color:#92400E;padding:12px 16px;border-radius:10px;margin-bottom:12px;text-align:center;font-size:13px;font-weight:600';
-    var urlCTA=(window._vbURLCheckout&&window._vbURLCheckout())||'https://vedabite.lemonsqueezy.com/checkout/buy/ec74072d-7b30-4273-b369-1950cc7820d0';
+    var urlCTA=(window._vbURLCheckout&&window._vbURLCheckout())||'';
     badge.innerHTML='🔒 Usaste los 3 análisis gratis con IA';
   }else if(restantes===1){
     badge.style.cssText='background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:2px solid #F59E0B;color:#92400E;padding:12px 16px;border-radius:10px;margin-bottom:12px;text-align:center;font-size:13px;font-weight:600';
@@ -7649,9 +7656,9 @@ window._vbActualizarContadorFotos=function(){
 <div style="max-width:520px;margin:0 auto;display:flex;align-items:center;gap:12px">
 <div style="flex:1;min-width:0">
 <div style="font-size:11px;color:#FED7AA;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">Informe en PDF · tuyo para siempre</div>
-<div style="font-size:14px;color:#fff;font-weight:700;line-height:1.2">Descargalo antes de cerrar la página · $4.500</div>
+<div style="font-size:14px;color:#fff;font-weight:700;line-height:1.2">Descargalo antes de cerrar la página · gratis</div>
 </div>
-<button id="vbStickyCTABtn" style="background:#fff;color:#C45F0F;border:none;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.15)">Comprar →</button>
+<button id="vbStickyCTABtn" style="background:#fff;color:#C45F0F;border:none;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.15)">Descargar →</button>
 <button id="vbStickyCTAClose" style="background:rgba(255,255,255,0.15);color:#fff;border:none;width:32px;height:32px;border-radius:50%;font-size:16px;font-weight:700;cursor:pointer;flex-shrink:0;line-height:1" aria-label="Cerrar">×</button>
 </div>
 </div>
@@ -7674,6 +7681,7 @@ window._vbActualizarContadorFotos=function(){
   var ultimoVisto = false;
   
   function debeMostrarCTA(){
+    return false; // 100% gratis: sin CTA de compra
     if(cerradoSesion) return false;
     try{
       if(localStorage.getItem('vb_pago_activo')==='si') return false;
@@ -8562,7 +8570,6 @@ function enviarRegalo(){
       var yaVioTerapeuta=localStorage.getItem('vb_vio_terapeuta')==='true';
       var yaPago=localStorage.getItem('vb_paid')==='true';
       // Ocultar si pagó (ya tiene el GPS adentro del producto)
-      if(yaPago){btn.style.display='none';return;}
       // Mostrar solo en pantalla post-informe, con test hecho, y tras ver terapeuta
       if(activa && activa.id==='s4' && window.res && window.res.p && yaVioTerapeuta){
         btn.style.display='block';
@@ -8606,8 +8613,7 @@ function enviarRegalo(){
 // - Si NO pagó → checkout directo (gancho de conversión)
 // - Si YA pagó → abre la pantalla completa del GPS
 function _vbAbrirTuCamino(){
-  var yaPago=false;
-  try{yaPago=localStorage.getItem('vb_paid')==='true';}catch(e){}
+  var yaPago=true; // 100% gratis: el GPS está abierto para todos
   
   try{
     if(typeof gtag==='function'){
@@ -9195,7 +9201,7 @@ function showPremiumModal(tabName) {
       '</div>' +
       '<div style="background:#FEF3C7;padding:12px;border-radius:8px;margin-bottom:20px">' +
         '<div style="font-size:13px;color:#92400E;margin-bottom:6px">Plan Práctica</div>' +
-        '<div style="font-size:26px;font-weight:700;color:#1a1a1a;margin-bottom:4px">ARS 28,300<span style="font-size:16px;font-weight:400">/mes</span></div>' +
+        '<div style="font-size:26px;font-weight:700;color:#1a1a1a;margin-bottom:4px">Gratis</div>' +
         '<div style="color:#22C55E;font-weight:700;font-size:17px">🎁 Primeros 10 días GRATIS</div>' +
       '</div>' +
       '<button onclick="goToPremiumCheckout()" style="width:100%;padding:17px;background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;border:none;border-radius:12px;font-size:18px;font-weight:700;margin-bottom:10px;cursor:pointer;box-shadow:0 4px 12px rgba(245,158,11,0.3)">PROBAR 10 DÍAS GRATIS</button>' +
@@ -9233,22 +9239,8 @@ function closePremiumModal() {
 }
 
 function goToPremiumCheckout() {
-  // Track conversión desde modal
-  try {
-    gtag('event', 'premium_modal_conversion', {
-      event_category: 'conversion',
-      event_label: 'modal_to_checkout',
-      value: 28300
-    });
-  } catch(err) {}
-  
-  // Cerrar modal
+  // 100% gratis: no hay checkout
   closePremiumModal();
-  
-  // Redirigir a checkout Mercado Pago (plan unificado vía _vbPaymentConfig.mpAR)
-  setTimeout(function() {
-    window.location.href = (window._vbPaymentConfig && window._vbPaymentConfig.mpAR) || 'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=920ac9e7536e4490b5e8b936a1d6e1bf';
-  }, 200);
 }
 </script>
 
